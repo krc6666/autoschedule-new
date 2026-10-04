@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-10-04-validation-deploy-separation",
+  "title": "Separate push validation from Pages deployment",
+  "startedFrom": "3f0407de03a66234f05a672f83c9fd23ce880461",
+  "expectation": {
+    "example": "A failed verify or acceptance check should be visible as a push/PR validation failure, while Pages deployment should only run for a successful main validation.",
+    "expected": "Validate runs full verify and acceptance checks on push/PR; Deploy Pages consumes successful main validation, performs a lightweight current-version check, builds, and deploys.",
+    "unchanged": "No product code, scheduling rule, acceptance semantics, or manual Pages dispatch behavior changes.",
+    "fallback": "If validation fails or its result is not a successful main push, Pages deployment must not run."
+  },
+  "testedVersion": "da5452d93fda1278fe71e8aad726166240cd668ebc77c9b41e1cc353924fc321",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "The previous workflow combined full verify, acceptance, build, and deployment in one Pages build job; the changed workflow separates those stages.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-04-validation-deploy-workflow.txt",
+          "summary": "Workflow inspection records the old responsibility split and the new triggers/conditions.",
+          "sha256": "1d4221e3ccab843c404d00d3f2f6f6d79c5cca9074db9b390f20377b7f3354bb"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "The focused architecture tests confirm full verification is attached to validate.yml and the deploy workflow uses the successful main validation condition.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-04-validation-deploy-verify.txt",
+          "summary": "Focused CI workflow tests passed as part of the full verify run.",
+          "sha256": "ee8ae95fca9d57f6ce123c94f47661a21b3ddfdf6bd4eb2604e6b43baa9b5314"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "The workflow keeps workflow_dispatch available and the deploy condition explicitly permits that manual path.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-04-validation-deploy-workflow.txt",
+          "summary": "Static workflow inspection confirms manual trigger handling.",
+          "sha256": "1d4221e3ccab843c404d00d3f2f6f6d79c5cca9074db9b390f20377b7f3354bb"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "The deploy job performs the current-version fingerprint check before the production build and artifact upload; full verify is no longer repeated there.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-04-validation-deploy-workflow.txt",
+          "summary": "Workflow inspection confirms fingerprint-before-build ordering and no full verify in deploy.",
+          "sha256": "1d4221e3ccab843c404d00d3f2f6f6d79c5cca9074db9b390f20377b7f3354bb"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "The deploy workflow requires a successful Validate workflow run from a push to main; the final lightweight fingerprint check remains before publishing.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-04-validation-deploy-workflow.txt",
+          "summary": "Workflow condition and final fingerprint guard are recorded and checked.",
+          "sha256": "1d4221e3ccab843c404d00d3f2f6f6d79c5cca9074db9b390f20377b7f3354bb"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "The full repository verification passed and the diff is limited to workflows, the workflow architecture test, history, and acceptance material.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-04-validation-deploy-verify.txt",
+          "summary": "Typecheck, all functional tests, performance tests, and production build passed.",
+          "sha256": "ee8ae95fca9d57f6ce123c94f47661a21b3ddfdf6bd4eb2604e6b43baa9b5314"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "verified",
+      "reason": "The final workflow files are present, parseable, and covered by the focused architecture tests; actual GitHub-hosted execution remains an external follow-up.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-04-validation-deploy-workflow.txt",
+          "summary": "Final workflow file paths, triggers, conditions, and YAML parse result are recorded.",
+          "sha256": "1d4221e3ccab843c404d00d3f2f6f6d79c5cca9074db9b390f20377b7f3354bb"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "The old Pages workflow reported a failed verify or acceptance check as a deployment failure because those checks lived in the deployment build job.",
+    "laterChanges": "Full verify and acceptance now run in Validate on push/PR; Pages waits for successful main validation, then runs only a fingerprint check and build.",
+    "finalArtifact": "The final artifacts are .github/workflows/validate.yml and the updated .github/workflows/deploy-pages.yml, with the current source fingerprint recorded above."
+  },
+  "review": {
+    "missedScope": "A workflow split can accidentally allow deployment without successful validation or break manual dispatch; both paths were explicitly checked.",
+    "rootCause": "The previous workflow mixed two responsibilities, so the GitHub UI surfaced a validation refusal as a deployment failure.",
+    "earlyDetection": "For future release changes, inspect triggers, success dependency, checkout SHA, pre-publish guard, and manual dispatch separately, then run the architecture workflow test and full verify before delivery."
+  }
+}

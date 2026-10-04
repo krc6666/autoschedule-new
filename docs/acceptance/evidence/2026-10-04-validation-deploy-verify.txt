@@ -1,0 +1,10 @@
+Command: npm.cmd run verify
+Result: exit code 0.
+- Typecheck passed.
+- Functional tests: 121 files, 1114 tests passed.
+- Performance tests: 5 files, 16 tests passed.
+- Production Vite build passed.
+
+Focused architecture test:
+- tests/architecture/ci-workflow.test.ts: 2 tests passed.
+- It checks full verification is attached to validate.yml and Pages deployment requires successful main validation while omitting npm run verify.

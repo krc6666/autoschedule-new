@@ -1,0 +1,14 @@
+Files checked:
+- .github/workflows/validate.yml
+- .github/workflows/deploy-pages.yml
+
+Static YAML parse:
+- Python PyYAML parsed both workflow files successfully.
+- Validate triggers on push, pull_request, and workflow_dispatch.
+- Deploy Pages triggers on completed Validate workflow runs and workflow_dispatch.
+- Deploy condition requires a successful push validation whose branch is main.
+- Manual workflow_dispatch remains available.
+
+Repository checks:
+- git diff --check: exit code 0.
+- Current repository fingerprint: da5452d93fda1278fe71e8aad726166240cd668ebc77c9b41e1cc353924fc321.

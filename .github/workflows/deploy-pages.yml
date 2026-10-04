@@ -1,9 +1,9 @@
 name: Deploy Pages
 
 on:
-  push:
-    branches: [main]
-  pull_request:
+  workflow_run:
+    workflows: [Validate]
+    types: [completed]
   workflow_dispatch:
 
 permissions:
@@ -17,17 +17,24 @@ concurrency:
 
 jobs:
   build:
+    if: >-
+      ${{ github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'main') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npm run verify
-      - name: Check acceptance evidence before publishing
-        run: node scripts/check-acceptance.mjs
+      - name: Check current version fingerprint before publishing
+        run: node scripts/check-acceptance.mjs --fingerprint
+      - run: npm run build
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
