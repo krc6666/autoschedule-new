@@ -1,0 +1,9 @@
+Old owner-provided export was checked independently before using it as evidence.
+
+Input: D:\浏览器下载\保障明细_2026-10-05.xlsx
+SHA-256: 54C01EAB6D47B891030CDF44DD936FFD54AF6A73FA9EBB89EEB073807A487D50
+File timestamp: 2026-10-03 13:18:57
+
+Counting rule: group the 人员排班 sheet by person and normalized flight number; multiple positions for one person on one flight count once.
+Result: assigned personnel flight counts include 4 and 2; observed spread is 2.
+Conclusion: this is the pre-fix failure artifact, not evidence that the current version passes.

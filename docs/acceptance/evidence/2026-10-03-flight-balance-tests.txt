@@ -1,0 +1,3 @@
+Command: npm.cmd exec vitest -- run tests/domain/staff-flight-count.test.ts tests/domain/daily-schedule-optimizer.test.ts tests/domain/schedule-feedback.test.ts --reporter=dot
+Result: exit code 0; 3 test files passed; 82 tests passed.
+Coverage included: same-person same-flight multi-position deduplication, KE166 supervisor/guide/zero-hour reuse, post-processing 4-to-2 rebalance, large candidate sets, unavoidable balance vacancy, and final feedback spread.

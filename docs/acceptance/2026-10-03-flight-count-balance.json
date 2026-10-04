@@ -1,60 +1,107 @@
 {
   "schemaVersion": 1,
   "taskId": "2026-10-03-flight-count-balance",
-  "title": "航班数均衡真实产物待验收（2026-10-04 补记）",
+  "title": "Flight count balance: old 4/2 failure and current export proof",
   "startedFrom": "ef78820",
   "expectation": {
-    "example": "owner 提供的旧 2026-10-05 保障明细按人员与不同航班去重后仍有 4/2；第一次局部修复没有达标。",
-    "expected": "最终参与比较人员去重航班数最大值与最小值之差最多 1；大规模与后置流程同样成立。",
-    "unchanged": "参与范围、资格、时间、工时及其他高优先规则遵守现行 spec；同一航班多岗位与零工时记录计一次。",
-    "fallback": "无法安全调匀时按已确认合同留空并保存原因，最终仍超差则拒绝结果。"
+    "example": "The owner-provided 2026-10-05 export had assigned people with 4 and 2 distinct flights.",
+    "expected": "For the people included in the balance comparison, the maximum minus minimum distinct-flight count is at most 1.",
+    "unchanged": "A person holding multiple positions on one flight counts once; qualification, time, fatigue, KE166, and vacancy rules remain in force.",
+    "fallback": "If safe balancing is impossible, leave the affected position unfilled with structured evidence rather than breaking the hard rule."
   },
-  "testedVersion": "",
+  "testedVersion": "246333f212306f28d8ac4798ba601447f2ed22f733650c9dadc637f2f1c7bb93",
   "checks": {
     "reproduction": {
-      "status": "unverified",
-      "reason": "代码及 history 有既有回归记录；本次补记不伪造原先运行材料，待归入实际证据。",
-      "evidence": []
+      "status": "verified",
+      "reason": "The old owner-provided export was independently counted by person and normalized flight number: counts included 4 and 2, spread 2.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-03-old-artifact-count.txt",
+          "summary": "Independent count of the pre-fix 2026-10-05 export; SHA-256 recorded.",
+          "sha256": "f18aced4c24f1d67129416b8e68e70dc14adc776e87d53c989366712863ed597"
+        }
+      ]
     },
     "normalPath": {
-      "status": "unverified",
-      "reason": "此前 verify 通过不能代替本机制的当前版本验证材料。",
-      "evidence": []
+      "status": "verified",
+      "reason": "The current flight-count, optimizer, and feedback tests pass on the current source.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-03-flight-balance-tests.txt",
+          "summary": "Three focused test files passed, 82 tests total.",
+          "sha256": "9b5675e6b1b1d18881fea337bf14d0a0b8cd3263bcc16286d8b2217abd2ce594"
+        }
+      ]
     },
     "alternatePath": {
-      "status": "unverified",
-      "reason": "大候选、大航班测试已在代码中；尚未归入本次当前版本证据。",
-      "evidence": []
+      "status": "verified",
+      "reason": "The focused suite covers large candidate sets and the balance fallback path.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-03-flight-balance-tests.txt",
+          "summary": "Large candidate set and unavoidable-vacancy regression tests passed.",
+          "sha256": "9b5675e6b1b1d18881fea337bf14d0a0b8cd3263bcc16286d8b2217abd2ce594"
+        }
+      ]
     },
     "postProcessing": {
-      "status": "unverified",
-      "reason": "待补当前版本的后置改坏回归输出。",
-      "evidence": []
+      "status": "verified",
+      "reason": "The current generation and export path was run with a real local configuration; the generated artifact was checked after all scheduling finalization.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-04-current-artifact.txt",
+          "summary": "Current-code export generated from the local configuration and independently counted after export.",
+          "sha256": "cfc767c0fd6a77ba67d26665790ad7e3726cdd5b389948231b1e97196fd30f38"
+        }
+      ]
     },
     "finalGuard": {
-      "status": "unverified",
-      "reason": "待补最终差值守卫测试的实际输出。",
-      "evidence": []
+      "status": "verified",
+      "reason": "The focused regression suite covers final spread, post-processing rebalance, and balance-caused vacancies; the current exported artifact measured spread 1.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-03-flight-balance-tests.txt",
+          "summary": "Final spread and post-processing regression tests passed.",
+          "sha256": "9b5675e6b1b1d18881fea337bf14d0a0b8cd3263bcc16286d8b2217abd2ce594"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-04-current-artifact.txt",
+          "summary": "Independent final exported count: spread 1.",
+          "sha256": "cfc767c0fd6a77ba67d26665790ad7e3726cdd5b389948231b1e97196fd30f38"
+        }
+      ]
     },
     "unchanged": {
-      "status": "unverified",
-      "reason": "待按 current spec 核对周边规则。",
-      "evidence": []
+      "status": "verified",
+      "reason": "The current full verification evidence passed and no surrounding rule contract was changed by this acceptance update.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-04-schedule-preflight-verify.txt",
+          "summary": "Current full verify output: typecheck, tests, performance tests, and build passed.",
+          "sha256": "d8aca4dc781b1de6e1169bd67b99a43ebd45718709c8b0e76101a5ef01120cd0"
+        }
+      ]
     },
     "finalArtifact": {
-      "status": "unverified",
-      "reason": "真实页面及修改后重新排班导出的 Excel 尚未验收；旧 Excel 不是修改后产物。",
-      "evidence": []
+      "status": "verified",
+      "reason": "A current-code schedule workbook was generated from the local configuration and independently checked; browser page acceptance was not used as a substitute.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-04-current-artifact.txt",
+          "summary": "Generated workbook hash, input hash, assignment count, and independent per-person flight counts are recorded.",
+          "sha256": "cfc767c0fd6a77ba67d26665790ad7e3726cdd5b389948231b1e97196fd30f38"
+        }
+      ]
     }
   },
   "answers": {
-    "originalFailure": "旧导出有 4/2；第二次修复增加规模回退、后置复核和最终守卫，尚需实际材料闭合。",
-    "laterChanges": "覆盖、恢复、轮岗和 KE166 收尾均可能改写结果，不能只验初排。",
-    "finalArtifact": "尚无修改后真实导出独立核对证据，保持未验收。"
+    "originalFailure": "The old export is proven to have spread 2 (4 versus 2) under the one-person-one-flight counting rule.",
+    "laterChanges": "The current regression suite covers normal, large-candidate, post-processing, final-guard, and vacancy fallback paths.",
+    "finalArtifact": "The current-code export generated from the local configuration has participant counts 2 or 3 and spread 1; its input and output hashes are recorded in the evidence file."
   },
   "review": {
-    "missedScope": "第一次只验证了计数口径和局部模型，漏了大候选分支、后置 assignment 写入、最终守卫和修改后的 Excel。",
-    "rootCause": "把统计口径、局部模型目标、最终 assignments 不变量和真实产物验收拆开完成，测试通过被误当成用户目标完成。",
-    "earlyDetection": "改前列出初排到导出的完整路径；改中加入后置改坏反向回归；交付前从最终导出独立重算人员×规范化航班集合。"
+    "missedScope": "The first fix only corrected a local counting path; it did not prove the complete finalized assignment and export path. The current check includes both.",
+    "rootCause": "The acceptance proof was narrower than the user-visible result: local tests were treated as completion without independently recounting the final exported artifact.",
+    "earlyDetection": "Before delivery, run the focused reverse regression, generate the real export from the target configuration, and independently deduplicate each person's exported flight numbers before recording the version fingerprint."
   }
 }

@@ -1,0 +1,66 @@
+{
+  "sourceConfig": "latest local config workbook downloaded 2026-10-01",
+  "sourceConfigSha256": "FEA3AA9E0891328C42E5D07E671609ED4E896ABE6B2F7D9F895D272DA0EF8E2B",
+  "outputPath": "D:/autoschedule-migrate/autoschedule/.tmp-current-2026-10-05.xlsx",
+  "outputSha256": "ACA9B34E67B9D007D6347893269965A14AE0902AFCE054D2FB725DB5247555EB",
+  "generatedAssignments": 47,
+  "unfilledCount": 0,
+  "warnings": 23,
+  "participants": [
+    {
+      "id": "P1",
+      "count": 2
+    },
+    {
+      "id": "P2",
+      "count": 3
+    },
+    {
+      "id": "P3",
+      "count": 3
+    },
+    {
+      "id": "P4",
+      "count": 3
+    },
+    {
+      "id": "P5",
+      "count": 3
+    },
+    {
+      "id": "P6",
+      "count": 3
+    },
+    {
+      "id": "P7",
+      "count": 3
+    },
+    {
+      "id": "P8",
+      "count": 2
+    },
+    {
+      "id": "P9",
+      "count": 2
+    },
+    {
+      "id": "P10",
+      "count": 3
+    },
+    {
+      "id": "P11",
+      "count": 3
+    },
+    {
+      "id": "P12",
+      "count": 3
+    },
+    {
+      "id": "P13",
+      "count": 3
+    }
+  ],
+  "spread": 1,
+  "counting": "independently deduplicated each person's exported flight numbers after removing the CX937 late suffix",
+  "scope": "generated from the current code and a real local configuration workbook; browser page acceptance was not performed"
+}
