@@ -1,0 +1,127 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-10-04-acceptance-gate",
+  "title": "将任务验收记录接入新会话动作与发布检查",
+  "startedFrom": "a04da9362ef2c8a59d53db59607c08abf1ef2152",
+  "expectation": {
+    "example": "只有局部测试通过，没有最终产物证据时，任务不能被当作验收完成；缺材料的版本不能上传为 Pages 部署产物。",
+    "expected": "新会话先建记录；检查脚本拒绝缺记录、缺证据、证据被改和旧版本，完整材料通过；发布调用同一脚本。",
+    "unchanged": "不修改 src、public、应用数据、排班规则或页面；不清理 owner 的 .cursor；不自动 commit、push 或部署。",
+    "fallback": "材料不全时保留修改，退出 1 并指出缺项；原航班均衡真实产物未验收仍保持未验收。"
+  },
+  "testedVersion": "a9935134bf6f687ce766e933e864ec86296e6e166aaefade10c9bf10cf8c94df",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "保留实现前 15 项失败、首轮类型检查失败和随后完整 verify 通过的历史运行材料。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-04-gate-before.txt",
+          "sha256": "8f777fd84f2cee077418a3017cc23a57a6da7c0fc72be44a41ff47dbbb30c460",
+          "summary": "Before implementation, 15 gate regressions failed: the checker did not exist and the publishing workflow had no acceptance step. Exit code was 1. Trailing whitespace was removed for Git hygiene; command results are unchanged."
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-04-verify-first.txt",
+          "sha256": "0a6174942ebfa9b64b2d8e6df9c2297e95ca55cfee3fe03c318b50a86e7377bc",
+          "summary": "The first full verify failed at typecheck on the test fixture dictionary. The fixture was corrected; this failed attempt is preserved rather than called a successful verify."
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-04-verify.txt",
+          "sha256": "90f019bebea6df78cdd2305f179da52c35cac6a4776f6e4390239011ffa6bb6e",
+          "summary": "npm.cmd run verify exited 0: typecheck, 120 files / 1090 functional tests, 5 files / 16 performance tests, and production build passed. The functional suite includes 15 acceptance gate CLI regressions."
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "历史 CLI 测试覆盖完整材料通过；证据见当轮 verify 输出，所验版本保留原指纹。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-04-verify.txt",
+          "sha256": "90f019bebea6df78cdd2305f179da52c35cac6a4776f6e4390239011ffa6bb6e",
+          "summary": "npm.cmd run verify exited 0: typecheck, 120 files / 1090 functional tests, 5 files / 16 performance tests, and production build passed. The functional suite includes 15 acceptance gate CLI regressions."
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "历史 CLI 测试覆盖缺记录、非法 JSON、路径越界、缺材料及不适用项；证据见当轮 verify 输出。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-04-verify.txt",
+          "sha256": "90f019bebea6df78cdd2305f179da52c35cac6a4776f6e4390239011ffa6bb6e",
+          "summary": "npm.cmd run verify exited 0: typecheck, 120 files / 1090 functional tests, 5 files / 16 performance tests, and production build passed. The functional suite includes 15 acceptance gate CLI regressions."
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "历史 CLI 测试覆盖证据修改、删除及后续源文件改写后拒绝旧结论。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-04-verify.txt",
+          "sha256": "90f019bebea6df78cdd2305f179da52c35cac6a4776f6e4390239011ffa6bb6e",
+          "summary": "npm.cmd run verify exited 0: typecheck, 120 files / 1090 functional tests, 5 files / 16 performance tests, and production build passed. The functional suite includes 15 acceptance gate CLI regressions."
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "历史本地整体检查按预期拒绝航班均衡未验收任务；远端 GitHub 工作流尚未运行。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-04-verify.txt",
+          "sha256": "90f019bebea6df78cdd2305f179da52c35cac6a4776f6e4390239011ffa6bb6e",
+          "summary": "npm.cmd run verify exited 0: typecheck, 120 files / 1090 functional tests, 5 files / 16 performance tests, and production build passed. The functional suite includes 15 acceptance gate CLI regressions."
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-04-cli-release.txt",
+          "summary": "The whole release set actually exited 1 because the historical flight balance task is still unverified; this is the expected refusal. Trailing whitespace was removed for Git hygiene; command results are unchanged.",
+          "sha256": "d4b7efb79b75f5e2ecee1c584ac504c8680687dd69938e3ef0c886b7ea088a29"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "历史范围检查确认 src/public 无改动；本地 .cursor 不进入任务变更范围。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-04-scope.txt",
+          "sha256": "b35a6030be5a48d8eb3fbe8367bc333d64524b8be945739092b821ddf67790c8",
+          "summary": "Actual git status for src and public was empty; git diff --check exited 0."
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-04-verify.txt",
+          "sha256": "90f019bebea6df78cdd2305f179da52c35cac6a4776f6e4390239011ffa6bb6e",
+          "summary": "npm.cmd run verify exited 0: typecheck, 120 files / 1090 functional tests, 5 files / 16 performance tests, and production build passed. The functional suite includes 15 acceptance gate CLI regressions."
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "verified",
+      "reason": "机制实际入口是 Node CLI；保留当轮单任务通过和整体发布拒绝的运行材料，不冒充当前版本验收。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-04-verify.txt",
+          "sha256": "90f019bebea6df78cdd2305f179da52c35cac6a4776f6e4390239011ffa6bb6e",
+          "summary": "npm.cmd run verify exited 0: typecheck, 120 files / 1090 functional tests, 5 files / 16 performance tests, and production build passed. The functional suite includes 15 acceptance gate CLI regressions."
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-04-cli-task.txt",
+          "summary": "The current repository task check actually exited 0 with the current file fingerprint.",
+          "sha256": "8439ae3be00b168a35d3e47f172ca28fca4f386c32ca9c7888cef5b24a4b5a2a"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "gate-before.txt 保存实现前 15 项失败；verify-first.txt 保存类型检查失败；verify.txt 保存当轮完整验证退出 0。",
+    "laterChanges": "源文件、构建配置或证据变更可能让旧结论失效；当轮 CLI 测试验证改写后拒绝，不能只更新版本指纹。",
+    "finalArtifact": "cli-task.txt 保存当轮单任务退出 0；cli-release.txt 保存整体检查因旧业务任务未验收退出 1；均绑定历史版本。"
+  },
+  "review": {
+    "missedScope": "初版只要求读历史和填写表格，漏了固定任务记录、版本绑定和发布前材料检查；本次用 gate-before 失败证据及最终 CLI 检查核对了这几个遗漏点。",
+    "rootCause": "完成条件只写在协作文字里，没有进入记录结构和会失败的检查程序，所以局部测试通过时仍能口头宣布完成。",
+    "earlyDetection": "以后用 --init 先生成含复盘字段的记录；交付前任一复盘字段或证据为空时，--record 和整体发布检查都必须退出 1。"
+  }
+}

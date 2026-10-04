@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-10-03-flight-count-balance",
+  "title": "航班数均衡真实产物待验收（2026-10-04 补记）",
+  "startedFrom": "ef78820",
+  "expectation": {
+    "example": "owner 提供的旧 2026-10-05 保障明细按人员与不同航班去重后仍有 4/2；第一次局部修复没有达标。",
+    "expected": "最终参与比较人员去重航班数最大值与最小值之差最多 1；大规模与后置流程同样成立。",
+    "unchanged": "参与范围、资格、时间、工时及其他高优先规则遵守现行 spec；同一航班多岗位与零工时记录计一次。",
+    "fallback": "无法安全调匀时按已确认合同留空并保存原因，最终仍超差则拒绝结果。"
+  },
+  "testedVersion": "",
+  "checks": {
+    "reproduction": {
+      "status": "unverified",
+      "reason": "代码及 history 有既有回归记录；本次补记不伪造原先运行材料，待归入实际证据。",
+      "evidence": []
+    },
+    "normalPath": {
+      "status": "unverified",
+      "reason": "此前 verify 通过不能代替本机制的当前版本验证材料。",
+      "evidence": []
+    },
+    "alternatePath": {
+      "status": "unverified",
+      "reason": "大候选、大航班测试已在代码中；尚未归入本次当前版本证据。",
+      "evidence": []
+    },
+    "postProcessing": {
+      "status": "unverified",
+      "reason": "待补当前版本的后置改坏回归输出。",
+      "evidence": []
+    },
+    "finalGuard": {
+      "status": "unverified",
+      "reason": "待补最终差值守卫测试的实际输出。",
+      "evidence": []
+    },
+    "unchanged": {
+      "status": "unverified",
+      "reason": "待按 current spec 核对周边规则。",
+      "evidence": []
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "真实页面及修改后重新排班导出的 Excel 尚未验收；旧 Excel 不是修改后产物。",
+      "evidence": []
+    }
+  },
+  "answers": {
+    "originalFailure": "旧导出有 4/2；第二次修复增加规模回退、后置复核和最终守卫，尚需实际材料闭合。",
+    "laterChanges": "覆盖、恢复、轮岗和 KE166 收尾均可能改写结果，不能只验初排。",
+    "finalArtifact": "尚无修改后真实导出独立核对证据，保持未验收。"
+  },
+  "review": {
+    "missedScope": "第一次只验证了计数口径和局部模型，漏了大候选分支、后置 assignment 写入、最终守卫和修改后的 Excel。",
+    "rootCause": "把统计口径、局部模型目标、最终 assignments 不变量和真实产物验收拆开完成，测试通过被误当成用户目标完成。",
+    "earlyDetection": "改前列出初排到导出的完整路径；改中加入后置改坏反向回归；交付前从最终导出独立重算人员×规范化航班集合。"
+  }
+}

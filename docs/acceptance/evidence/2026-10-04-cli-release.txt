@@ -1,0 +1,4 @@
+Command: node scripts/check-acceptance.mjs
+Exit code: 1
+验收材料检查失败：
+2026-10-03-flight-count-balance / reproduction：尚未验收通过（unverified）

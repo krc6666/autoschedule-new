@@ -1,0 +1,15 @@
+Command: npm.cmd run verify
+
+> autoschedule@1.0.0 verify
+> npm run typecheck && npm test && npm run test:performance && npm run build
+
+
+> autoschedule@1.0.0 typecheck
+> tsc -b --pretty false
+
+tests/architecture/acceptance-gate.test.ts(133,5): error TS18048: 'pending.checks.finalArtifact' is possibly 'undefined'.
+tests/architecture/acceptance-gate.test.ts(174,5): error TS18048: 'value.checks.finalArtifact' is possibly 'undefined'.
+tests/architecture/acceptance-gate.test.ts(177,5): error TS18048: 'value.checks.finalArtifact' is possibly 'undefined'.
+tests/architecture/acceptance-gate.test.ts(177,43): error TS18048: 'value.checks.normalPath' is possibly 'undefined'.
+tests/architecture/acceptance-gate.test.ts(228,5): error TS18048: 'value.checks.finalArtifact' is possibly 'undefined'.
+Exit code: 1

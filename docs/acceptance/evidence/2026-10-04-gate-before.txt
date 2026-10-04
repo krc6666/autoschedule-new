@@ -1,0 +1,551 @@
+Command: npm.cmd exec vitest -- run tests/architecture/acceptance-gate.test.ts
+Exit code: 1
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/architecture/acceptance-gate.test.ts (15 tests | 15 failed) 3882ms
+     × rejects a repository with no task records 262ms
+     × accepts complete evidence for the actual current files 250ms
+     × rejects unverified final output even when another current task passes 244ms
+     × rejects a formerly valid record after a later source rewrite 247ms
+     × also catches changed build settings and newly added source files 269ms
+     × rejects evidence altered after a successful check 249ms
+     × rejects missing evidence and verified checks without evidence 243ms
+     × rejects omitted required checks and empty delivery answers 237ms
+     × requires reasons for inapplicable paths and cannot exempt final output 243ms
+     × rejects malformed JSON and evidence outside the repository evidence folder 325ms
+     × keeps completed historical records while requiring current-version evidence 257ms
+     × normalizes Git line endings and separately hashes evidence consistently 479ms
+     × does not invalidate code evidence for record updates or local cursor files 321ms
+     × initializes an incomplete record without silently approving it or overwriting it 252ms
+     × runs the same release checker before Pages artifacts are uploaded 1ms
+System.Management.Automation.RemoteException
+⎯⎯⎯⎯⎯⎯ Failed Tests 15 ⎯⎯⎯⎯⎯⎯⎯
+System.Management.Automation.RemoteException
+ FAIL  tests/architecture/acceptance-gate.test.ts > acceptance release gate > rejects a repository with no task records
+AssertionError: expected 'node:internal/modules/cjs/loader:1568…' to contain '缺少验收记录'
+System.Management.Automation.RemoteException
+- Expected
++ Received
+System.Management.Automation.RemoteException
+- 缺少验收记录
++ node:internal/modules/cjs/loader:1568
++   throw err;
++   ^
++
++ Error: Cannot find module 'D:\autoschedule-migrate\autoschedule\scripts\check-acceptance.mjs'
++     at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
++     at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
++     at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
++     at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
++     at Module._load (node:internal/modules/cjs/loader:1341:5)
++     at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
++     at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
++     at node:internal/main/run_main_module:33:47 {
++   code: 'MODULE_NOT_FOUND',
++   requireStack: []
++ }
++
++ Node.js v24.21.0
++
+System.Management.Automation.RemoteException
+ ❯ tests/architecture/acceptance-gate.test.ts:70:27
+     68|     const result = run(fixture());
+     69|     expect(result.status).toBe(1);
+     70|     expect(result.output).toContain("缺少验收记录");
+       |                           ^
+     71|   });
+     72|
+System.Management.Automation.RemoteException
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/15]⎯
+System.Management.Automation.RemoteException
+ FAIL  tests/architecture/acceptance-gate.test.ts > acceptance release gate > accepts complete evidence for the actual current files
+AssertionError: node:internal/modules/cjs/loader:1568
+  throw err;
+  ^
+System.Management.Automation.RemoteException
+Error: Cannot find module 'D:\autoschedule-migrate\autoschedule\scripts\check-acceptance.mjs'
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+    at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+    at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+    at Module._load (node:internal/modules/cjs/loader:1341:5)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+    at node:internal/main/run_main_module:33:47 {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: []
+}
+System.Management.Automation.RemoteException
+Node.js v24.21.0
+: expected 1 to be +0 // Object.is equality
+System.Management.Automation.RemoteException
+- Expected
++ Received
+System.Management.Automation.RemoteException
+- 0
++ 1
+System.Management.Automation.RemoteException
+ ❯ record tests/architecture/acceptance-gate.test.ts:38:44
+     36| function record(root: string, taskId = "example") {
+     37|   const snapshot = run(root, "--fingerprint");
+     38|   expect(snapshot.status, snapshot.output).toBe(0);
+       |                                            ^
+     39|   const evidence = [{ path: proofPath, sha256: createHash("sha256").up…
+     40|   return {
+ ❯ tests/architecture/acceptance-gate.test.ts:75:16
+System.Management.Automation.RemoteException
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/15]⎯
+System.Management.Automation.RemoteException
+ FAIL  tests/architecture/acceptance-gate.test.ts > acceptance release gate > rejects unverified final output even when another current task passes
+AssertionError: node:internal/modules/cjs/loader:1568
+  throw err;
+  ^
+System.Management.Automation.RemoteException
+Error: Cannot find module 'D:\autoschedule-migrate\autoschedule\scripts\check-acceptance.mjs'
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+    at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+    at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+    at Module._load (node:internal/modules/cjs/loader:1341:5)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+    at node:internal/main/run_main_module:33:47 {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: []
+}
+System.Management.Automation.RemoteException
+Node.js v24.21.0
+: expected 1 to be +0 // Object.is equality
+System.Management.Automation.RemoteException
+- Expected
++ Received
+System.Management.Automation.RemoteException
+- 0
++ 1
+System.Management.Automation.RemoteException
+ ❯ record tests/architecture/acceptance-gate.test.ts:38:44
+     36| function record(root: string, taskId = "example") {
+     37|   const snapshot = run(root, "--fingerprint");
+     38|   expect(snapshot.status, snapshot.output).toBe(0);
+       |                                            ^
+     39|   const evidence = [{ path: proofPath, sha256: createHash("sha256").up…
+     40|   return {
+ ❯ tests/architecture/acceptance-gate.test.ts:81:21
+System.Management.Automation.RemoteException
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/15]⎯
+System.Management.Automation.RemoteException
+ FAIL  tests/architecture/acceptance-gate.test.ts > acceptance release gate > rejects a formerly valid record after a later source rewrite
+AssertionError: node:internal/modules/cjs/loader:1568
+  throw err;
+  ^
+System.Management.Automation.RemoteException
+Error: Cannot find module 'D:\autoschedule-migrate\autoschedule\scripts\check-acceptance.mjs'
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+    at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+    at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+    at Module._load (node:internal/modules/cjs/loader:1341:5)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+    at node:internal/main/run_main_module:33:47 {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: []
+}
+System.Management.Automation.RemoteException
+Node.js v24.21.0
+: expected 1 to be +0 // Object.is equality
+System.Management.Automation.RemoteException
+- Expected
++ Received
+System.Management.Automation.RemoteException
+- 0
++ 1
+System.Management.Automation.RemoteException
+ ❯ record tests/architecture/acceptance-gate.test.ts:38:44
+     36| function record(root: string, taskId = "example") {
+     37|   const snapshot = run(root, "--fingerprint");
+     38|   expect(snapshot.status, snapshot.output).toBe(0);
+       |                                            ^
+     39|   const evidence = [{ path: proofPath, sha256: createHash("sha256").up…
+     40|   return {
+ ❯ tests/architecture/acceptance-gate.test.ts:92:16
+System.Management.Automation.RemoteException
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/15]⎯
+System.Management.Automation.RemoteException
+ FAIL  tests/architecture/acceptance-gate.test.ts > acceptance release gate > also catches changed build settings and newly added source files
+AssertionError: node:internal/modules/cjs/loader:1568
+  throw err;
+  ^
+System.Management.Automation.RemoteException
+Error: Cannot find module 'D:\autoschedule-migrate\autoschedule\scripts\check-acceptance.mjs'
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+    at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+    at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+    at Module._load (node:internal/modules/cjs/loader:1341:5)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+    at node:internal/main/run_main_module:33:47 {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: []
+}
+System.Management.Automation.RemoteException
+Node.js v24.21.0
+: expected 1 to be +0 // Object.is equality
+System.Management.Automation.RemoteException
+- Expected
++ Received
+System.Management.Automation.RemoteException
+- 0
++ 1
+System.Management.Automation.RemoteException
+ ❯ record tests/architecture/acceptance-gate.test.ts:38:44
+     36| function record(root: string, taskId = "example") {
+     37|   const snapshot = run(root, "--fingerprint");
+     38|   expect(snapshot.status, snapshot.output).toBe(0);
+       |                                            ^
+     39|   const evidence = [{ path: proofPath, sha256: createHash("sha256").up…
+     40|   return {
+ ❯ tests/architecture/acceptance-gate.test.ts:102:16
+System.Management.Automation.RemoteException
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/15]⎯
+System.Management.Automation.RemoteException
+ FAIL  tests/architecture/acceptance-gate.test.ts > acceptance release gate > rejects evidence altered after a successful check
+AssertionError: node:internal/modules/cjs/loader:1568
+  throw err;
+  ^
+System.Management.Automation.RemoteException
+Error: Cannot find module 'D:\autoschedule-migrate\autoschedule\scripts\check-acceptance.mjs'
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+    at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+    at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+    at Module._load (node:internal/modules/cjs/loader:1341:5)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+    at node:internal/main/run_main_module:33:47 {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: []
+}
+System.Management.Automation.RemoteException
+Node.js v24.21.0
+: expected 1 to be +0 // Object.is equality
+System.Management.Automation.RemoteException
+- Expected
++ Received
+System.Management.Automation.RemoteException
+- 0
++ 1
+System.Management.Automation.RemoteException
+ ❯ record tests/architecture/acceptance-gate.test.ts:38:44
+     36| function record(root: string, taskId = "example") {
+     37|   const snapshot = run(root, "--fingerprint");
+     38|   expect(snapshot.status, snapshot.output).toBe(0);
+       |                                            ^
+     39|   const evidence = [{ path: proofPath, sha256: createHash("sha256").up…
+     40|   return {
+ ❯ tests/architecture/acceptance-gate.test.ts:112:16
+System.Management.Automation.RemoteException
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/15]⎯
+System.Management.Automation.RemoteException
+ FAIL  tests/architecture/acceptance-gate.test.ts > acceptance release gate > rejects missing evidence and verified checks without evidence
+AssertionError: node:internal/modules/cjs/loader:1568
+  throw err;
+  ^
+System.Management.Automation.RemoteException
+Error: Cannot find module 'D:\autoschedule-migrate\autoschedule\scripts\check-acceptance.mjs'
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+    at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+    at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+    at Module._load (node:internal/modules/cjs/loader:1341:5)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+    at node:internal/main/run_main_module:33:47 {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: []
+}
+System.Management.Automation.RemoteException
+Node.js v24.21.0
+: expected 1 to be +0 // Object.is equality
+System.Management.Automation.RemoteException
+- Expected
++ Received
+System.Management.Automation.RemoteException
+- 0
++ 1
+System.Management.Automation.RemoteException
+ ❯ record tests/architecture/acceptance-gate.test.ts:38:44
+     36| function record(root: string, taskId = "example") {
+     37|   const snapshot = run(root, "--fingerprint");
+     38|   expect(snapshot.status, snapshot.output).toBe(0);
+       |                                            ^
+     39|   const evidence = [{ path: proofPath, sha256: createHash("sha256").up…
+     40|   return {
+ ❯ tests/architecture/acceptance-gate.test.ts:122:19
+System.Management.Automation.RemoteException
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/15]⎯
+System.Management.Automation.RemoteException
+ FAIL  tests/architecture/acceptance-gate.test.ts > acceptance release gate > rejects omitted required checks and empty delivery answers
+AssertionError: node:internal/modules/cjs/loader:1568
+  throw err;
+  ^
+System.Management.Automation.RemoteException
+Error: Cannot find module 'D:\autoschedule-migrate\autoschedule\scripts\check-acceptance.mjs'
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+    at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+    at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+    at Module._load (node:internal/modules/cjs/loader:1341:5)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+    at node:internal/main/run_main_module:33:47 {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: []
+}
+System.Management.Automation.RemoteException
+Node.js v24.21.0
+: expected 1 to be +0 // Object.is equality
+System.Management.Automation.RemoteException
+- Expected
++ Received
+System.Management.Automation.RemoteException
+- 0
++ 1
+System.Management.Automation.RemoteException
+ ❯ record tests/architecture/acceptance-gate.test.ts:38:44
+     36| function record(root: string, taskId = "example") {
+     37|   const snapshot = run(root, "--fingerprint");
+     38|   expect(snapshot.status, snapshot.output).toBe(0);
+       |                                            ^
+     39|   const evidence = [{ path: proofPath, sha256: createHash("sha256").up…
+     40|   return {
+ ❯ tests/architecture/acceptance-gate.test.ts:135:19
+System.Management.Automation.RemoteException
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/15]⎯
+System.Management.Automation.RemoteException
+ FAIL  tests/architecture/acceptance-gate.test.ts > acceptance release gate > requires reasons for inapplicable paths and cannot exempt final output
+AssertionError: node:internal/modules/cjs/loader:1568
+  throw err;
+  ^
+System.Management.Automation.RemoteException
+Error: Cannot find module 'D:\autoschedule-migrate\autoschedule\scripts\check-acceptance.mjs'
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+    at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+    at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+    at Module._load (node:internal/modules/cjs/loader:1341:5)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+    at node:internal/main/run_main_module:33:47 {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: []
+}
+System.Management.Automation.RemoteException
+Node.js v24.21.0
+: expected 1 to be +0 // Object.is equality
+System.Management.Automation.RemoteException
+- Expected
++ Received
+System.Management.Automation.RemoteException
+- 0
++ 1
+System.Management.Automation.RemoteException
+ ❯ record tests/architecture/acceptance-gate.test.ts:38:44
+     36| function record(root: string, taskId = "example") {
+     37|   const snapshot = run(root, "--fingerprint");
+     38|   expect(snapshot.status, snapshot.output).toBe(0);
+       |                                            ^
+     39|   const evidence = [{ path: proofPath, sha256: createHash("sha256").up…
+     40|   return {
+ ❯ tests/architecture/acceptance-gate.test.ts:146:19
+System.Management.Automation.RemoteException
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/15]⎯
+System.Management.Automation.RemoteException
+ FAIL  tests/architecture/acceptance-gate.test.ts > acceptance release gate > rejects malformed JSON and evidence outside the repository evidence folder
+AssertionError: node:internal/modules/cjs/loader:1568
+  throw err;
+  ^
+System.Management.Automation.RemoteException
+Error: Cannot find module 'D:\autoschedule-migrate\autoschedule\scripts\check-acceptance.mjs'
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+    at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+    at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+    at Module._load (node:internal/modules/cjs/loader:1341:5)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+    at node:internal/main/run_main_module:33:47 {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: []
+}
+System.Management.Automation.RemoteException
+Node.js v24.21.0
+: expected 1 to be +0 // Object.is equality
+System.Management.Automation.RemoteException
+- Expected
++ Received
+System.Management.Automation.RemoteException
+- 0
++ 1
+System.Management.Automation.RemoteException
+ ❯ record tests/architecture/acceptance-gate.test.ts:38:44
+     36| function record(root: string, taskId = "example") {
+     37|   const snapshot = run(root, "--fingerprint");
+     38|   expect(snapshot.status, snapshot.output).toBe(0);
+       |                                            ^
+     39|   const evidence = [{ path: proofPath, sha256: createHash("sha256").up…
+     40|   return {
+ ❯ tests/architecture/acceptance-gate.test.ts:163:19
+System.Management.Automation.RemoteException
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/15]⎯
+System.Management.Automation.RemoteException
+ FAIL  tests/architecture/acceptance-gate.test.ts > acceptance release gate > keeps completed historical records while requiring current-version evidence
+AssertionError: node:internal/modules/cjs/loader:1568
+  throw err;
+  ^
+System.Management.Automation.RemoteException
+Error: Cannot find module 'D:\autoschedule-migrate\autoschedule\scripts\check-acceptance.mjs'
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+    at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+    at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+    at Module._load (node:internal/modules/cjs/loader:1341:5)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+    at node:internal/main/run_main_module:33:47 {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: []
+}
+System.Management.Automation.RemoteException
+Node.js v24.21.0
+: expected 1 to be +0 // Object.is equality
+System.Management.Automation.RemoteException
+- Expected
++ Received
+System.Management.Automation.RemoteException
+- 0
++ 1
+System.Management.Automation.RemoteException
+ ❯ record tests/architecture/acceptance-gate.test.ts:38:44
+     36| function record(root: string, taskId = "example") {
+     37|   const snapshot = run(root, "--fingerprint");
+     38|   expect(snapshot.status, snapshot.output).toBe(0);
+       |                                            ^
+     39|   const evidence = [{ path: proofPath, sha256: createHash("sha256").up…
+     40|   return {
+ ❯ tests/architecture/acceptance-gate.test.ts:171:16
+System.Management.Automation.RemoteException
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/15]⎯
+System.Management.Automation.RemoteException
+ FAIL  tests/architecture/acceptance-gate.test.ts > acceptance release gate > normalizes Git line endings and separately hashes evidence consistently
+AssertionError: expected 'node:internal/modules/cjs/loader:1568…' to be 'bb21ca76fe6d6955b2782c79a1961f8dd5d50…' // Object.is equality
+System.Management.Automation.RemoteException
+- Expected
++ Received
+System.Management.Automation.RemoteException
+- bb21ca76fe6d6955b2782c79a1961f8dd5d50f9813b4eef08ade2354fe65410e
++ node:internal/modules/cjs/loader:1568
++   throw err;
++   ^
++
++ Error: Cannot find module 'D:\autoschedule-migrate\autoschedule\scripts\check-acceptance.mjs'
++     at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
++     at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
++     at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
++     at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
++     at Module._load (node:internal/modules/cjs/loader:1341:5)
++     at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
++     at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
++     at node:internal/main/run_main_module:33:47 {
++   code: 'MODULE_NOT_FOUND',
++   requireStack: []
++ }
++
++ Node.js v24.21.0
+System.Management.Automation.RemoteException
+ ❯ tests/architecture/acceptance-gate.test.ts:186:67
+    184|     expect(run(root, "--fingerprint").output).toBe(before);
+    185|     write(root, proofPath, proof.replaceAll("\n", "\r\n"));
+    186|     expect(run(root, "--evidence-hash", proofPath).output.trim()).toBe…
+       |                                                                   ^
+    187|   });
+    188|
+System.Management.Automation.RemoteException
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/15]⎯
+System.Management.Automation.RemoteException
+ FAIL  tests/architecture/acceptance-gate.test.ts > acceptance release gate > does not invalidate code evidence for record updates or local cursor files
+AssertionError: node:internal/modules/cjs/loader:1568
+  throw err;
+  ^
+System.Management.Automation.RemoteException
+Error: Cannot find module 'D:\autoschedule-migrate\autoschedule\scripts\check-acceptance.mjs'
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+    at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+
+ Test Files  1 failed (1)
+      Tests  15 failed (15)
+   Start at  09:21:27
+   Duration  4.19s (transform 53ms, setup 0ms, import 71ms, tests 3.88s, environment 0ms)
+    at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+    at Module._load (node:internal/modules/cjs/loader:1341:5)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+    at node:internal/main/run_main_module:33:47 {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: []
+}
+System.Management.Automation.RemoteException
+Node.js v24.21.0
+: expected 1 to be +0 // Object.is equality
+System.Management.Automation.RemoteException
+- Expected
++ Received
+System.Management.Automation.RemoteException
+- 0
++ 1
+System.Management.Automation.RemoteException
+ ❯ record tests/architecture/acceptance-gate.test.ts:38:44
+     36| function record(root: string, taskId = "example") {
+     37|   const snapshot = run(root, "--fingerprint");
+     38|   expect(snapshot.status, snapshot.output).toBe(0);
+       |                                            ^
+     39|   const evidence = [{ path: proofPath, sha256: createHash("sha256").up…
+     40|   return {
+ ❯ tests/architecture/acceptance-gate.test.ts:192:16
+System.Management.Automation.RemoteException
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/15]⎯
+System.Management.Automation.RemoteException
+ FAIL  tests/architecture/acceptance-gate.test.ts > acceptance release gate > initializes an incomplete record without silently approving it or overwriting it
+AssertionError: expected 1 to be +0 // Object.is equality
+System.Management.Automation.RemoteException
+- Expected
++ Received
+System.Management.Automation.RemoteException
+- 0
++ 1
+System.Management.Automation.RemoteException
+ ❯ tests/architecture/acceptance-gate.test.ts:199:52
+    197|   it("initializes an incomplete record without silently approving it o…
+    198|     const root = fixture();
+    199|     expect(run(root, "--init", "new-task").status).toBe(0);
+       |                                                    ^
+    200|     const initial = JSON.parse(readFileSync(join(root, "docs/acceptanc…
+    201|     expect(initial.checks.finalArtifact.status).toBe("unverified");
+System.Management.Automation.RemoteException
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/15]⎯
+System.Management.Automation.RemoteException
+ FAIL  tests/architecture/acceptance-gate.test.ts > acceptance release gate > runs the same release checker before Pages artifacts are uploaded
+AssertionError: expected -1 to be greater than 429
+ ❯ tests/architecture/acceptance-gate.test.ts:210:18
+    208|     const workflow = readFileSync(fileURLToPath(new URL("../../.github…
+    209|     const gate = workflow.indexOf("node scripts/check-acceptance.mjs");
+    210|     expect(gate).toBeGreaterThan(workflow.indexOf("npm run verify"));
+       |                  ^
+    211|     expect(gate).toBeLessThan(workflow.indexOf("actions/upload-pages-a…
+    212|     expect(workflow).not.toContain("continue-on-error: true");
+System.Management.Automation.RemoteException
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[15/15]⎯
+System.Management.Automation.RemoteException

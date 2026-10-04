@@ -261,6 +261,7 @@
 - 完整验证：`npm.cmd run verify`
 - 构建产物：`dist/`，可部署到任意静态站点或直接作为静态包分发。
 - GitHub Pages 由 `.github/workflows/deploy-pages.yml` 在 `main` 分支推送后自动构建和部署。
+- GitHub Pages 上传部署产物前还执行 `node scripts/check-acceptance.mjs`；全部登记任务须有完整验收材料，并有当前文件版本的记录。未验收、材料缺失或仅有旧版本记录时阻止发布；此检查不替代业务正确性与实际入口验收，操作合同见 `docs/acceptance/README.md`。
 
 ## 验收标准
 

@@ -115,6 +115,8 @@ python dev.py --preview
 npm.cmd run verify
 ```
 
+行为或发布机制修改的任务验收与发布材料检查见 [任务验收记录](docs/acceptance/README.md)。GitHub Pages 上传前还会检查当前版本证据，缺材料的任务会阻止发布。
+
 ## 开源协议
 
 本项目遵循 [MIT License](./LICENSE)。提交改动前请阅读 [贡献指南](./CONTRIBUTING.md)。

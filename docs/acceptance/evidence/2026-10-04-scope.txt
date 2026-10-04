@@ -1,0 +1,12 @@
+Command: git status --porcelain -- src public
+
+No product changes: True
+Command: git diff --check
+warning: in the working copy of '.agents/skills/autoschedule-dev/SKILL.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.github/workflows/deploy-pages.yml', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'AGENTS.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'history.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'rule-propagation-matrix.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'spec.md', LF will be replaced by CRLF the next time Git touches it
+Exit code: 0

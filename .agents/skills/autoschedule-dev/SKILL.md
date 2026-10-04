@@ -12,6 +12,7 @@ description: 维护 autoschedule 机场值机排班项目时使用。适用于�
 1. 读取根目录 `AGENTS.md`。涉及排班规则、数据合同、架构、跨模块产品行为或验收标准时完整读取 `spec.md` 和相关 `README.md`；其他任务读取相关章节和真实入口即可。存在当前任务的 `plan.md` 时一并读取。
 2. 检查 Git 根目录、分支、`git status --short`、全部相关未提交差异、当前真实项目路径、运行入口和验证入口。不得假设 IDE 中的旧路径仍有效。
 3. 区分：已验证事实、owner 提供但未复现的现象、推测、计划和已经完成且验证的事项。
+   行为或构建/发布机制修改先执行根目录 `AGENTS.md` 的三个验收动作，创建或读取 `docs/acceptance/<任务编号>.json`；历史按顶部错误类型索引定向查阅。记录格式由 `scripts/check-acceptance.mjs --init` 生成，不另建第二套验收表。
 4. 涉及自动排班、规则优先级、值班、`KE166`、岗位完整性、疲劳、轮岗、人工调整或反馈时，完整读取 [排班维护经验](references/scheduling-maintenance.md)。
 5. 遇到历史反复问题、规则打架、结果与规则文字不一致、补洞失败、卡死、导入丢配置或“修一处坏一处”时，完整读取 [历史顽疾与防复发手册](references/development-lessons.md)。
 6. owner 要求计划时才读取计划 skill 并维护 `plan.md`；owner 明确免除时不创建。
@@ -29,7 +30,7 @@ owner 的请求已经明确给出无歧义的小改动范围，且不改变上�
 
 ### Owner 只给业务目标时的自动流程
 
-owner 不需要自行选择 Skill、文件或测试范围。主 agent 必须自动完成以下工作，并把结果写入当前任务的计划或交付记录：
+owner 不需要自行选择 Skill、文件或测试范围。主 agent 必须自动完成以下工作，并把证据写入当前任务验收记录；只有 owner 明确要求计划时另建计划：
 
 1. 把自然语言目标转换成业务例子、成功条件、失败回退和明确不变项。
 2. 自动选择本 Skill 及适用的 `autoschedule-rule-evolution`、`investigate-first`、`surgical-patch`、`safe-refactor`、`tdd`、`plan` 或 `verify-and-stop`；只有发生真实冲突时才向 owner 提问。
@@ -153,6 +154,7 @@ npm.cmd run build
 - L4 使用 `npm.cmd run verify`，只用于发布、部署、owner 明确要求完整验收，或当前 commit/push 门槛。仓库目前没有 PR 必需检查，在服务端功能门禁建立并稳定前，不得先弱化现有 commit/push 前完整验证。
 - 同一交付若已在最后一次相关修改后成功完成较高层级，不重复运行被其包含的低层级命令；改动后只重跑受影响层级及必要的最终门禁。
 - commit、push、部署和发布只在 owner 明确授权后执行。
+- 任务交付运行 `node scripts/check-acceptance.mjs --record <任务编号>`；发布前运行不带参数的同一脚本，核对全部登记任务及当前文件版本。未取得真实入口证据的业务任务保持未验收；检查通过也不能代替业务正确性核对。
 
 - 交付时说明根因、实际规则顺序、修改文件、新增回归、真实命令结果、未验证项和剩余风险。
 - 任何未实现、未运行或未验证内容都不得写成已经完成。

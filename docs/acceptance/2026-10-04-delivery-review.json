@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-10-04-delivery-review",
+  "title": "将交付后复盘设为验收必填项",
+  "startedFrom": "a04da9362ef2c8a59d53db59607c08abf1ef2152",
+  "expectation": {
+    "example": "任务的局部测试通过，但后置流程或最终导出仍可能不符合用户目标；交付前必须说明遗漏、根因和同类问题的提前发现动作。",
+    "expected": "验收记录必须包含 missedScope、rootCause、earlyDetection 三项复盘；缺任何一项时单任务检查和整体发布检查都失败。",
+    "unchanged": "不修改 src、public、排班规则、业务数据或真实入口；保留现有三项交付回答、逐项证据、版本指纹和发布拦截。",
+    "fallback": "复盘或原有验收材料不完整时只保留待验收状态并退出 1；不把空白、猜测或旧版本结论当作通过。"
+  },
+  "testedVersion": "",
+  "checks": {
+    "reproduction": {
+      "status": "unverified",
+      "reason": "",
+      "evidence": []
+    },
+    "normalPath": {
+      "status": "unverified",
+      "reason": "",
+      "evidence": []
+    },
+    "alternatePath": {
+      "status": "unverified",
+      "reason": "",
+      "evidence": []
+    },
+    "postProcessing": {
+      "status": "unverified",
+      "reason": "",
+      "evidence": []
+    },
+    "finalGuard": {
+      "status": "unverified",
+      "reason": "",
+      "evidence": []
+    },
+    "unchanged": {
+      "status": "unverified",
+      "reason": "",
+      "evidence": []
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "",
+      "evidence": []
+    }
+  },
+  "answers": {
+    "originalFailure": "",
+    "laterChanges": "",
+    "finalArtifact": ""
+  },
+  "review": {
+    "missedScope": "",
+    "rootCause": "",
+    "earlyDetection": ""
+  }
+}
