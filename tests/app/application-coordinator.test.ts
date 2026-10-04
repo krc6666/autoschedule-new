@@ -510,6 +510,13 @@ describe("application scheduling exclusivity", () => {
     });
 
     await coordinator.handle({ type: "generate-schedule" });
+    const dialog = coordinator.view().dialog;
+    if (dialog?.kind !== "schedule-preflight")
+      throw new Error("missing preflight");
+    await coordinator.handle({
+      type: "confirm-schedule-preflight",
+      selectedIds: dialog.selectedIds,
+    });
 
     expect(coordinator.model().assignments).toHaveLength(1);
     expect(coordinator.model().assignments[0]!.id).toBe("existing");
@@ -534,7 +541,14 @@ describe("application scheduling exclusivity", () => {
       isRunning: () => false,
     });
 
-    await coordinator.handle({ type: "generate-schedule" });
+    await coordinator.handle({ type: "open-reschedule-flight-picker" });
+    const dialog = coordinator.view().dialog;
+    if (dialog?.kind !== "reschedule-flight-picker")
+      throw new Error("missing picker");
+    await coordinator.handle({
+      type: "confirm-reschedule-flight-picker",
+      selectedIds: dialog.selectedIds,
+    });
 
     expect(coordinator.model().activeScheduleDate).toBe(
       coordinator.view().date
@@ -574,7 +588,14 @@ describe("application scheduling exclusivity", () => {
       isRunning: () => running,
     });
 
-    const generate = coordinator.handle({ type: "generate-schedule" });
+    await coordinator.handle({ type: "generate-schedule" });
+    const dialog = coordinator.view().dialog;
+    if (dialog?.kind !== "schedule-preflight")
+      throw new Error("missing preflight");
+    const generate = coordinator.handle({
+      type: "confirm-schedule-preflight",
+      selectedIds: dialog.selectedIds,
+    });
     const toggle = coordinator.handle({
       type: "toggle-administrative-mode",
       enabled: true,

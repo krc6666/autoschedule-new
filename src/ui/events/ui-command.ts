@@ -1,7 +1,12 @@
 import type { SchedulePolicyInput } from "../../app/policy-actions";
 import type { WorkbookImportMode } from "../../app/workbook-import-controller";
 import type { DutyRosterSlot } from "../../domain/duty-roster/roster";
-import type { AppSection, IsoWeekday, ScheduleGroupId } from "../../model";
+import type {
+  AppSection,
+  IsoWeekday,
+  ScheduleGroupId,
+  StaffStatus,
+} from "../../model";
 import type { HalfRestMode } from "../../domain/shared/schedule-run-preferences";
 
 export type EditableValue = string | number | boolean;
@@ -54,6 +59,21 @@ export type UiCommand =
   | { type: "export-share-html" }
   | { type: "export-share-png" }
   | { type: "generate-schedule" }
+  | {
+      type: "update-schedule-preflight-selection";
+      selectedIds: string[];
+    }
+  | {
+      type: "update-schedule-preflight-passengers";
+      candidateId: string;
+      bookedPassengers: number;
+    }
+  | {
+      type: "update-schedule-preflight-staff-status";
+      staffId: string;
+      status: StaffStatus;
+    }
+  | { type: "confirm-schedule-preflight"; selectedIds: string[] }
   | { type: "open-reschedule-flight-picker" }
   | {
       type: "update-reschedule-flight-picker-selection";
@@ -194,6 +214,11 @@ export type UiCommand =
       type: "update-next-workday-flight-picker-passengers";
       candidateId: string;
       bookedPassengers: number;
+    }
+  | {
+      type: "update-next-workday-flight-picker-staff-status";
+      staffId: string;
+      status: StaffStatus;
     }
   | { type: "confirm-next-workday-flight-picker"; selectedIds: string[] }
   | { type: "set-schedule-zoom"; value: number }

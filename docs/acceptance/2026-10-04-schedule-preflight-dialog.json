@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-10-04-schedule-preflight-dialog",
+  "title": "生成排班和归档后天排班增加航班与休假确认",
+  "startedFrom": "5807eb6043776df0d1bfba7994cdb732e595665c",
+  "expectation": {
+    "example": "空白工作区点击生成排班，或已有班表点击归档并排后天；用户先选择航班并核对当前组人员正常/病假/休假状态，再确认后才计算。",
+    "expected": "两个入口都打开同一类预检；选择航班并确认当前组人员状态后才计算。成功后航班、状态与班表一起提交，取消、失败或任一种停止保留原数据。",
+    "unchanged": "不改变重新排班、仅归档、半休选择及其他按钮行为；不新增第二套人员休假事实；A/B 组人员状态仍各自隔离。",
+    "fallback": "未选航班不计算；停止、失败或缺安全凭证时丢弃草稿保留原模型；切换组或日期后拒绝旧草稿。"
+  },
+  "testedVersion": "676d65229c31de0b990d7401a46ddfcbb19cb0d4c3616cd5b205b026e253d5ed",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "原生成命令直接计算已由代码定位确认；定向测试证明空白航班显示模板、两个入口确认前未调用 calculate。未在修改前运行新行为失败测试，不将此日志描述为原版本失败证据。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-04-schedule-preflight-tests.txt",
+          "summary": "8 个定向文件、88 项测试通过；覆盖两个入口、草稿与成功提交、回退、当前组状态往返及原按钮行为。",
+          "sha256": "39bfec50d5409c3e2f77af0bcd9035e653923349ec916b5f9baff934b38d78c3"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "两个入口成功后模型、当前组、真实存储保存恢复和配置 Excel 读写状态一致，另一组不变。测试用安全凭证结果替代计算，不能代替真实 Worker 排班。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-04-schedule-preflight-tests.txt",
+          "summary": "8 个定向文件、88 项测试通过；覆盖两个入口、草稿与成功提交、回退、当前组状态往返及原按钮行为。",
+          "sha256": "39bfec50d5409c3e2f77af0bcd9035e653923349ec916b5f9baff934b38d78c3"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "后天继续按目标星期默认勾选；空白航班、未选航班、取消、配置修改后重新打开、切组/日期后拒绝旧草稿均有断言。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-04-schedule-preflight-tests.txt",
+          "summary": "8 个定向文件、88 项测试通过；覆盖两个入口、草稿与成功提交、回退、当前组状态往返及原按钮行为。",
+          "sha256": "39bfec50d5409c3e2f77af0bcd9035e653923349ec916b5f9baff934b38d78c3"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "两条入口模拟计算改动临时输入后抛错，以及两种停止返回；原航班、人员状态、班表、历史和保存均不变。原求解、补缺、恢复、轮岗规则保持，仍消费临时 Staff.status。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-04-schedule-preflight-tests.txt",
+          "summary": "8 个定向文件、88 项测试通过；覆盖两个入口、草稿与成功提交、回退、当前组状态往返及原按钮行为。",
+          "sha256": "39bfec50d5409c3e2f77af0bcd9035e653923349ec916b5f9baff934b38d78c3"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "两条入口收到无安全凭证的 completed 结果时拒绝提交并保留原模型；确认命令有计算排他保护。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-04-schedule-preflight-tests.txt",
+          "summary": "8 个定向文件、88 项测试通过；覆盖两个入口、草稿与成功提交、回退、当前组状态往返及原按钮行为。",
+          "sha256": "39bfec50d5409c3e2f77af0bcd9035e653923349ec916b5f9baff934b38d78c3"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "重新排班仍不显示人员状态区，原停止并采用合同保留；完整 npm.cmd run verify 退出 0：类型检查、普通测试 121 文件 1113 项、性能测试 5 文件 16 项及生产构建均通过。运行后仅补验收日志和历史验证状态，未改产品代码、测试或构建输入。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-04-schedule-preflight-tests.txt",
+          "summary": "8 个定向文件、88 项测试通过；覆盖两个入口、草稿与成功提交、回退、当前组状态往返及原按钮行为。",
+          "sha256": "39bfec50d5409c3e2f77af0bcd9035e653923349ec916b5f9baff934b38d78c3"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-04-schedule-preflight-build.txt",
+          "summary": "tsc -b 与 Vite 构建退出 0；原样保存 node:module 浏览器外置警告。",
+          "sha256": "c08ae219d66b7f1cdcf06be2e6bb3cf150018bffa6f7c0172c7710c22dd36cf7"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-04-schedule-preflight-verify.txt",
+          "summary": "完整 npm.cmd run verify 退出 0：类型检查、1113 项普通测试、16 项性能测试和生产构建通过；保留 HiGHS node:module 浏览器外置警告。",
+          "sha256": "d8aca4dc781b1de6e1169bd67b99a43ebd45718709c8b0e76101a5ef01120cd0"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "verified",
+      "reason": "完整 npm.cmd run verify 退出 0 后，owner 已实际查看两个入口的预检弹窗、航班选择、休假人员状态确认、确认后排班和最终页面结果，并确认没有问题。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-04-schedule-preflight-owner-page.txt",
+          "summary": "owner 人工查看两个入口及最终页面，确认本次验收范围没有问题；证据不含私有人员或航班明细。",
+          "sha256": "a1111ecaca5f3d66b3028ec5516dc8685df64c99c4408b1f455fccfe4ebbaad1"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "定向日志证明确认前不计算。原版本失败测试未提前运行，保留此流程遗漏事实。",
+    "laterChanges": "计算可能改动输入或失败，安装可能拒绝凭证，弹窗可能因切组/日期过期；两条入口分别验证隔离、回退、凭证与上下文保护。",
+    "finalArtifact": "本次 dist 构建与测试结果通过；owner 已实际查看两个入口和最终页面并确认没有问题，人工验收证据见 owner-page 记录。"
+  },
+  "review": {
+    "missedScope": "初轮生成入口提示出现编码错误、文档改写误删原段后半内容、成功测试缺安全凭证、确认命令缺计算排他登记；核对 UTF-8 差异、保留原段、补凭证和排他测试后修正。完整 verify 已退出 0；真实页面、浏览器真实 Worker 与最终用户班表仍未验。",
+    "rootCause": "原入口未把航班、当前组人员状态和班表放在同一确认与提交流程；开发只看局部输出会遗漏编码、原合同、命令门禁和真实边界。",
+    "earlyDetection": "写前填传播矩阵并先运行失败测试；用 UTF-8 读取并核对 diff；两个入口分别验证草稿不提前保存、成功一次提交、下游改坏后回退、组隔离与原按钮行为，最后等待真实页面证据。"
+  }
+}

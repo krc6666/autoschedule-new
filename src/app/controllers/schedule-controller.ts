@@ -21,6 +21,8 @@ import {
 } from "../../domain/flights/weekly-flight-plan";
 import { isHalfRestWarning } from "../../domain/rules/half-rest";
 import { planTeamLeaderGapFill } from "../../domain/coverage/team-leader-gap-fill";
+import { applyStaffStatusChange } from "../../domain/kernel/schedule-state";
+import type { AppState, ScheduleResult, StaffStatus } from "../../model";
 
 export class ScheduleController implements UiCommandController {
   constructor(private readonly context: ApplicationContext) {}
@@ -29,7 +31,25 @@ export class ScheduleController implements UiCommandController {
     const schedule = this.context.store.getState().schedule;
     switch (command.type) {
       case "generate-schedule":
-        await this.generate(this.context.view().date);
+        this.openSchedulePreflight();
+        return true;
+      case "update-schedule-preflight-selection":
+        this.updateSchedulePreflightSelection(command.selectedIds);
+        return true;
+      case "update-schedule-preflight-passengers":
+        this.updateSchedulePreflightPassengers(
+          command.candidateId,
+          command.bookedPassengers
+        );
+        return true;
+      case "update-schedule-preflight-staff-status":
+        this.updateSchedulePreflightStaffStatus(
+          command.staffId,
+          command.status
+        );
+        return true;
+      case "confirm-schedule-preflight":
+        await this.confirmSchedulePreflight(command.selectedIds);
         return true;
       case "open-reschedule-flight-picker":
         this.openRescheduleFlightPicker();
@@ -178,6 +198,9 @@ export class ScheduleController implements UiCommandController {
           command.bookedPassengers
         );
         return true;
+      case "update-next-workday-flight-picker-staff-status":
+        this.updateNextWorkdayStaffStatus(command.staffId, command.status);
+        return true;
       case "confirm-next-workday-flight-picker":
         await this.confirmNextWorkdayFlightPicker(command.selectedIds);
         return true;
@@ -213,12 +236,6 @@ export class ScheduleController implements UiCommandController {
         return;
       }
       const result = outcome.result;
-      const halfRestWarnings = result.warnings.filter(isHalfRestWarning);
-      const halfRestVacancyCount = result.assignments.filter(
-        (assignment) =>
-          assignment.status === "unfilled" &&
-          assignment.systemNotes?.some(isHalfRestWarning)
-      ).length;
       this.context.store.getState().schedule.install(date, result);
       this.context.updateView({ section: "schedule" });
       this.context.commit(
@@ -228,27 +245,65 @@ export class ScheduleController implements UiCommandController {
             ? `排班已生成，${result.unfilledCount} 个常规岗位待补位`
             : "排班已生成"
       );
-      if (halfRestWarnings.length || halfRestVacancyCount) {
-        this.context.toast(
-          [
-            ...(halfRestVacancyCount
-              ? [
-                  `半休人员较多，${halfRestVacancyCount} 个后续岗位待补位并已标红`,
-                ]
-              : []),
-            ...halfRestWarnings.filter(
-              (message) => !message.includes("岗位保持空缺")
-            ),
-          ].join("；"),
-          "warning"
-        );
-      }
+      this.reportHalfRestWarnings(result);
     } catch (error) {
       this.context.toast(
         `排班生成失败：${error instanceof Error ? error.message : String(error)}`,
         "danger"
       );
     }
+  }
+
+  private reportHalfRestWarnings(result: ScheduleResult): void {
+    const halfRestWarnings = result.warnings.filter(isHalfRestWarning);
+    const halfRestVacancyCount = result.assignments.filter(
+      (assignment) =>
+        assignment.status === "unfilled" &&
+        assignment.systemNotes?.some(isHalfRestWarning)
+    ).length;
+    if (halfRestWarnings.length || halfRestVacancyCount) {
+      this.context.toast(
+        [
+          ...(halfRestVacancyCount
+            ? [`半休人员较多，${halfRestVacancyCount} 个后续岗位待补位并已标红`]
+            : []),
+          ...halfRestWarnings.filter(
+            (message) => !message.includes("岗位保持空缺")
+          ),
+        ].join("；"),
+        "warning"
+      );
+    }
+  }
+
+  private currentStaffStatuses(): Record<string, StaffStatus> {
+    return Object.fromEntries(
+      this.context.model().staff.map((person) => [person.id, person.status])
+    );
+  }
+
+  private applyPreflightStaffStatuses(
+    state: AppState,
+    statuses: Record<string, StaffStatus>
+  ): void {
+    state.staff.forEach((person) => {
+      const status = statuses[person.id];
+      if (status) applyStaffStatusChange(state, person.id, status);
+    });
+  }
+
+  private checkPreflightContext(
+    groupId: AppState["activeGroupId"],
+    date: string
+  ): boolean {
+    if (
+      groupId === this.context.model().activeGroupId &&
+      date === this.context.view().date
+    )
+      return true;
+    this.context.updateView({ dialog: null });
+    this.context.toast("排班组或日期已变化，请重新打开确认窗口", "warning");
+    return false;
   }
 
   private assign(
@@ -464,6 +519,127 @@ export class ScheduleController implements UiCommandController {
     this.context.commit("排班已归档到历史");
   }
 
+  private openSchedulePreflight(): void {
+    const model = this.context.model();
+    const candidates = buildCurrentScheduleFlightCandidates(
+      model.templates,
+      model.flights
+    );
+    if (!candidates.length)
+      return this.context.toast("没有可选择的本地航班", "warning");
+    this.context.updateView({
+      dialog: {
+        kind: "schedule-preflight",
+        date: this.context.view().date,
+        groupId: model.activeGroupId,
+        candidates,
+        selectedIds: candidates
+          .filter((candidate) => candidate.selectedByDefault)
+          .map((candidate) => candidate.id),
+        staffStatuses: this.currentStaffStatuses(),
+      },
+    });
+  }
+
+  private updateSchedulePreflightSelection(selectedIds: string[]): void {
+    const dialog = this.context.view().dialog;
+    if (dialog?.kind !== "schedule-preflight") return;
+    const candidateIds = new Set(
+      dialog.candidates.map((candidate) => candidate.id)
+    );
+    this.context.updateView({
+      dialog: {
+        ...dialog,
+        selectedIds: [...new Set(selectedIds)].filter((id) =>
+          candidateIds.has(id)
+        ),
+      },
+    });
+  }
+
+  private updateSchedulePreflightPassengers(
+    candidateId: string,
+    bookedPassengers: number
+  ): void {
+    const dialog = this.context.view().dialog;
+    if (dialog?.kind !== "schedule-preflight") return;
+    this.context.updateView({
+      dialog: {
+        ...dialog,
+        candidates: updateFlightSelectionBookedPassengers(
+          dialog.candidates,
+          candidateId,
+          bookedPassengers
+        ),
+      },
+    });
+  }
+
+  private updateSchedulePreflightStaffStatus(
+    staffId: string,
+    status: StaffStatus
+  ): void {
+    const dialog = this.context.view().dialog;
+    if (dialog?.kind !== "schedule-preflight") return;
+    if (!this.context.model().staff.some((person) => person.id === staffId))
+      return;
+    this.context.updateView({
+      dialog: {
+        ...dialog,
+        staffStatuses: { ...dialog.staffStatuses, [staffId]: status },
+      },
+    });
+  }
+
+  private async confirmSchedulePreflight(selectedIds: string[]): Promise<void> {
+    const dialog = this.context.view().dialog;
+    if (dialog?.kind !== "schedule-preflight") return;
+    if (!this.checkPreflightContext(dialog.groupId, dialog.date)) return;
+    const flights = materializeCurrentScheduleFlights(
+      dialog.candidates,
+      selectedIds
+    );
+    if (!flights.length) {
+      this.context.toast("请至少选择一个航班", "warning");
+      return;
+    }
+    const temporaryState = structuredClone(this.context.model());
+    this.applyPreflightStaffStatuses(temporaryState, dialog.staffStatuses);
+    temporaryState.flights = flights;
+    temporaryState.assignments = [];
+    temporaryState.activeScheduleDate = null;
+    temporaryState.schedulePolicyStale = false;
+    this.context.updateView({ dialog: null });
+    try {
+      const outcome = await this.context.scheduleRunner.calculate(
+        temporaryState,
+        dialog.date,
+        {
+          halfRestStaffIds: this.context.view().halfRestStaffIds,
+          halfRestModes: this.context.view().halfRestModes,
+        }
+      );
+      if (outcome.kind !== "completed") {
+        this.context.toast("排班已停止，原班表保持不变", "warning");
+        return;
+      }
+      installGeneratedSchedule(temporaryState, dialog.date, outcome.result);
+      this.context.store.getState().replaceModel(temporaryState);
+      this.context.updateView({ section: "schedule" });
+      this.context.commit(
+        outcome.result.unfilledCount
+          ? `排班已生成，${outcome.result.unfilledCount} 个常规岗位待补位`
+          : "排班已生成"
+      );
+      this.reportHalfRestWarnings(outcome.result);
+    } catch (error) {
+      this.context.toast(
+        `排班生成失败，原航班、人员状态和班表保持不变：${error instanceof Error ? error.message : String(error)}`,
+        "danger"
+      );
+    }
+  }
+
   private openRescheduleFlightPicker(): void {
     const model = this.context.model();
     const candidates = buildCurrentScheduleFlightCandidates(
@@ -586,11 +762,14 @@ export class ScheduleController implements UiCommandController {
       dialog: {
         kind: "next-workday-flight-picker",
         date: nextDate,
+        sourceDate: currentDate,
+        groupId: model.activeGroupId,
         weekday: isoWeekdayForDate(nextDate),
         candidates,
         selectedIds: candidates
           .filter((candidate) => candidate.selectedByDefault)
           .map((candidate) => candidate.id),
+        staffStatuses: this.currentStaffStatuses(),
       },
     });
   }
@@ -629,11 +808,28 @@ export class ScheduleController implements UiCommandController {
     });
   }
 
+  private updateNextWorkdayStaffStatus(
+    staffId: string,
+    status: StaffStatus
+  ): void {
+    const dialog = this.context.view().dialog;
+    if (dialog?.kind !== "next-workday-flight-picker") return;
+    if (!this.context.model().staff.some((person) => person.id === staffId))
+      return;
+    this.context.updateView({
+      dialog: {
+        ...dialog,
+        staffStatuses: { ...dialog.staffStatuses, [staffId]: status },
+      },
+    });
+  }
+
   private async confirmNextWorkdayFlightPicker(
     selectedIds: string[]
   ): Promise<void> {
     const dialog = this.context.view().dialog;
     if (dialog?.kind !== "next-workday-flight-picker") return;
+    if (!this.checkPreflightContext(dialog.groupId, dialog.sourceDate)) return;
     const currentDate = this.context.view().date;
     const records = currentScheduleHistory(this.context.model(), currentDate);
     if (!records.length) {
@@ -661,6 +857,7 @@ export class ScheduleController implements UiCommandController {
       return;
 
     const temporaryState = structuredClone(this.context.model());
+    this.applyPreflightStaffStatuses(temporaryState, dialog.staffStatuses);
     temporaryState.history = [
       ...temporaryState.history.filter((item) => item.date !== currentDate),
       ...records,

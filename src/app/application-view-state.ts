@@ -7,7 +7,13 @@ import type { FlightPlanReconciliation } from "../domain/flights/flight-plan-rec
 import type { DutyRosterImportPreview } from "../infrastructure/duty-roster-excel";
 import type { LegacyScheduleImportPreview } from "../infrastructure/legacy-schedule-excel";
 import type { OnlineFlight } from "../infrastructure/flight-query";
-import type { AppSection, AppState, IsoWeekday } from "../model";
+import type {
+  AppSection,
+  AppState,
+  IsoWeekday,
+  ScheduleGroupId,
+  StaffStatus,
+} from "../model";
 import type { ManualSwapAnalysis } from "../domain/reviews/manual-swap-analysis";
 import type { FlightSelectionCandidate } from "../domain/flights/next-workday-flight-plan";
 import type { LatePriorityCountsImportPreview } from "../infrastructure/late-priority-counts-excel";
@@ -18,6 +24,14 @@ import type { HistoryImportSummary } from "./workbook-actions";
 export type ApplicationDialog =
   | { kind: "templates" }
   | {
+      kind: "schedule-preflight";
+      date: string;
+      groupId: ScheduleGroupId;
+      candidates: FlightSelectionCandidate[];
+      selectedIds: string[];
+      staffStatuses: Record<string, StaffStatus>;
+    }
+  | {
       kind: "reschedule-flight-picker";
       date: string;
       candidates: FlightSelectionCandidate[];
@@ -26,9 +40,12 @@ export type ApplicationDialog =
   | {
       kind: "next-workday-flight-picker";
       date: string;
+      sourceDate: string;
+      groupId: ScheduleGroupId;
       weekday: IsoWeekday;
       candidates: FlightSelectionCandidate[];
       selectedIds: string[];
+      staffStatuses: Record<string, StaffStatus>;
     }
   | { kind: "qualification"; positionRuleId: string }
   | {

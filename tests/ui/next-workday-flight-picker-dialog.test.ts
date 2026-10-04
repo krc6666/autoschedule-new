@@ -38,6 +38,9 @@ describe("next workday flight picker dialog", () => {
     });
 
     expect(element.textContent).toContain("确认并重新排班");
+    expect(
+      element.querySelector('section[aria-label="人员状态确认"]')
+    ).toBeNull();
     expect(element.textContent).not.toContain("归档并生成后天排班");
     expect(
       element.querySelectorAll('input[type="checkbox"]:checked').length
@@ -111,6 +114,11 @@ describe("next workday flight picker dialog", () => {
       dialog: {
         kind: "next-workday-flight-picker",
         date: "2026-08-17",
+        sourceDate: "2026-08-15",
+        groupId: model.activeGroupId,
+        staffStatuses: Object.fromEntries(
+          model.staff.map((person) => [person.id, person.status])
+        ),
         weekday: 1,
         candidates,
         selectedIds: candidates
@@ -147,6 +155,11 @@ describe("next workday flight picker dialog", () => {
       dialog: {
         kind: "next-workday-flight-picker",
         date: "2026-08-17",
+        sourceDate: "2026-08-15",
+        groupId: model.activeGroupId,
+        staffStatuses: Object.fromEntries(
+          model.staff.map((person) => [person.id, person.status])
+        ),
         weekday: 1,
         candidates,
         selectedIds: [candidates[0]!.id],
@@ -169,4 +182,96 @@ describe("next workday flight picker dialog", () => {
       bookedPassengers: 128,
     });
   });
+  it("renders staff status controls for schedule preflight", async () => {
+    const model = createDefaultState();
+    const candidates = buildCurrentScheduleFlightCandidates(
+      model.templates,
+      model.flights
+    );
+    const element = await mountElement<
+      HTMLElement & { updateComplete: Promise<unknown> }
+    >("autoschedule-app-dialog", {
+      model,
+      dialog: {
+        kind: "schedule-preflight",
+        date: "2026-08-29",
+        groupId: model.activeGroupId,
+        candidates,
+        selectedIds: candidates
+          .filter((item) => item.selectedByDefault)
+          .map((item) => item.id),
+        staffStatuses: Object.fromEntries(
+          model.staff.map((person) => [person.id, person.status])
+        ),
+      },
+    });
+
+    expect(element.textContent).toContain("确认休假人员");
+    expect(element.querySelectorAll('select[aria-label$="状态"]').length).toBe(
+      model.staff.length
+    );
+  });
+
+  it.each(["schedule-preflight", "next-workday-flight-picker"] as const)(
+    "%s displays configuration statuses and emits draft updates and final confirmation",
+    async (kind) => {
+      const model = createDefaultState();
+      model.staff[0]!.status = "休假";
+      model.staff[1]!.status = "病假";
+      const before = structuredClone(model);
+      const candidates = buildCurrentScheduleFlightCandidates(
+        model.templates,
+        model.flights
+      );
+      const selectedIds = [candidates[0]!.id];
+      const element = await mountElement<
+        HTMLElement & { updateComplete: Promise<unknown> }
+      >("autoschedule-app-dialog", {
+        model,
+        dialog: {
+          kind,
+          date: "2026-08-17",
+          sourceDate: "2026-08-15",
+          weekday: 1,
+          groupId: model.activeGroupId,
+          candidates,
+          selectedIds,
+          staffStatuses: Object.fromEntries(
+            model.staff.map((person) => [person.id, person.status])
+          ),
+        },
+      });
+      const commands: UiCommandEvent["detail"][] = [];
+      element.addEventListener(UI_COMMAND_EVENT, (event) =>
+        commands.push((event as UiCommandEvent).detail)
+      );
+      const selects = element.querySelectorAll<HTMLSelectElement>(
+        'select[aria-label$="状态"]'
+      );
+      expect(selects[0]!.value).toBe("休假");
+      expect(selects[1]!.value).toBe("病假");
+      selects[0]!.value = "正常";
+      selects[0]!.dispatchEvent(new Event("change", { bubbles: true }));
+      expect(commands.at(-1)).toEqual({
+        type:
+          kind === "schedule-preflight"
+            ? "update-schedule-preflight-staff-status"
+            : "update-next-workday-flight-picker-staff-status",
+        staffId: model.staff[0]!.id,
+        status: "正常",
+      });
+      element.querySelector<HTMLButtonElement>("button.btn-success")!.click();
+      expect(commands.at(-1)).toEqual({
+        type:
+          kind === "schedule-preflight"
+            ? "confirm-schedule-preflight"
+            : "confirm-next-workday-flight-picker",
+        selectedIds,
+      });
+      expect(element.textContent).toContain(
+        kind === "schedule-preflight" ? "确认并生成排班" : "归档并生成后天排班"
+      );
+      expect(model).toEqual(before);
+    }
+  );
 });

@@ -1,0 +1,20 @@
+Command: npm.cmd exec vitest -- run tests/app/schedule-preflight.test.ts tests/app/application-coordinator.test.ts tests/ui/next-workday-flight-picker-dialog.test.ts tests/ui/app-dialog-view.test.ts tests/ui/schedule-view.test.ts tests/domain/next-workday-flight-plan.test.ts tests/domain/schedule-state.test.ts tests/architecture/app-command-contract.test.ts --reporter=dot
+Exit code: 0
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+······stderr | tests/ui/next-workday-flight-picker-dialog.test.ts
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+
+stderr | tests/ui/app-dialog-view.test.ts
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+
+············································stderr | tests/ui/schedule-view.test.ts
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+
+······································
+
+ Test Files  8 passed (8)
+      Tests  88 passed (88)
+   Start at  12:27:38
+   Duration  18.35s (transform 9.60s, setup 0ms, import 12.24s, tests 16.55s, environment 2.33s)
