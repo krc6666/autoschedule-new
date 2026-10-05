@@ -7,6 +7,7 @@ import { installGlobalErrorBoundary } from "./infrastructure/global-error-bounda
 import { getLastRestorationReport } from "./infrastructure/state-restoration";
 import { browserStatePersistence } from "./infrastructure/storage";
 import { createBrowserScheduleRunController } from "./app/schedule-run-controller";
+import { installBrowserExitWarning } from "./app/browser-exit-warning";
 
 export interface MountedAutoscheduleApp {
   dispose(): void;
@@ -19,6 +20,9 @@ export function mountAutoscheduleApp(
   const store = createAutoscheduleStore({
     persistence: browserStatePersistence,
   });
+  const removeBrowserExitWarning = installBrowserExitWarning(window, () =>
+    store.getState().hasUnexportedChanges()
+  );
   const restoredScheduleNotice = store.getState().model.assignments.length > 0;
   const restorationIssues = getLastRestorationReport().issues;
   const element: AutoscheduleAppElement =
@@ -51,6 +55,7 @@ export function mountAutoscheduleApp(
   }
   return {
     dispose: () => {
+      removeBrowserExitWarning();
       unsubscribe();
       element.remove();
       errorBoundary.dispose();

@@ -28,6 +28,8 @@ export interface AutoscheduleStoreState {
   replaceModel(state: AppState): void;
   switchGroup(groupId: ScheduleGroupId): boolean;
   isDirty(): boolean;
+  hasUnexportedChanges(): boolean;
+  markExported(): void;
   persist(): StateSaveResult;
   reset(): void;
 }
@@ -120,6 +122,11 @@ function activateGroupProjection(
   model.scheduleRuleFingerprint = group.scheduleRuleFingerprint;
 }
 
+function exportFingerprint(model: AppState): string {
+  const { updatedAt: _updatedAt, ...exportable } = model;
+  return JSON.stringify(exportable);
+}
+
 export function createAutoscheduleStore(
   options: CreateAutoscheduleStoreOptions
 ): AutoscheduleStore {
@@ -131,6 +138,7 @@ export function createAutoscheduleStore(
   return createStore<AutoscheduleStoreState>()(
     immer((set, get) => {
       let dirty = false;
+      let exportedFingerprint = exportFingerprint(initialModel);
       const command: StateCommand = <T>(operation: (state: AppState) => T) => {
         let result!: T;
         set((store) => {
@@ -164,6 +172,11 @@ export function createAutoscheduleStore(
           return switched;
         },
         isDirty: () => dirty,
+        hasUnexportedChanges: () =>
+          exportFingerprint(get().model) !== exportedFingerprint,
+        markExported: () => {
+          exportedFingerprint = exportFingerprint(get().model);
+        },
         persist: () => {
           set((store) => syncActiveGroupProjection(store.model));
           const result = options.persistence.save(get().model);

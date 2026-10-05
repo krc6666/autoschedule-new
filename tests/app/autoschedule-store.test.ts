@@ -30,6 +30,34 @@ describe("autoschedule store", () => {
     expect(store.getState()).not.toHaveProperty("update");
   });
 
+  it("tracks changes that still need a configuration export separately from local saving", () => {
+    const store = createTestAutoscheduleStore(createDefaultState());
+
+    expect(store.getState().hasUnexportedChanges()).toBe(false);
+
+    store.getState().configuration.addStaff();
+    expect(store.getState().hasUnexportedChanges()).toBe(true);
+
+    store.getState().persist();
+    expect(store.getState().hasUnexportedChanges()).toBe(true);
+
+    store.getState().markExported();
+    expect(store.getState().hasUnexportedChanges()).toBe(false);
+  });
+
+  it("marks a replaced model as needing export while leaving no-op view changes clean", () => {
+    const store = createTestAutoscheduleStore(createDefaultState());
+    const replaced = structuredClone(store.getState().model);
+    replaced.staff.push({
+      ...replaced.staff[0]!,
+      id: "replacement-staff",
+      name: "替换人员",
+    });
+    store.getState().replaceModel(replaced);
+
+    expect(store.getState().hasUnexportedChanges()).toBe(true);
+  });
+
   it("adds a flight template while the command is running through Immer", () => {
     const store = createTestAutoscheduleStore(createDefaultState());
     const template = store.getState().model.templates[0]!;

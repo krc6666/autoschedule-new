@@ -41,6 +41,7 @@ export class TransferController implements UiCommandController {
           buildConfigWorkbook(this.context.model()),
           "排班工具配置.xlsx"
         );
+        this.context.store.getState().markExported();
         return true;
       }
       case "export-late-priority-counts": {

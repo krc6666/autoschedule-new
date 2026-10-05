@@ -20,6 +20,7 @@ import {
 } from "../../src/infrastructure/late-priority-counts-excel";
 
 const historicalExportMocks = vi.hoisted(() => ({
+  buildConfigWorkbook: vi.fn(() => ({ SheetNames: [], Sheets: {} })),
   buildScheduleWorkbook: vi.fn(() => ({ SheetNames: [], Sheets: {} })),
   writeWorkbook: vi.fn(),
   exportShareHtml: vi.fn(),
@@ -28,6 +29,7 @@ const historicalExportMocks = vi.hoisted(() => ({
 
 vi.mock("../../src/infrastructure/excel", async (importOriginal) => ({
   ...(await importOriginal<typeof import("../../src/infrastructure/excel")>()),
+  buildConfigWorkbook: historicalExportMocks.buildConfigWorkbook,
   buildScheduleWorkbook: historicalExportMocks.buildScheduleWorkbook,
   writeWorkbook: historicalExportMocks.writeWorkbook,
 }));
@@ -68,6 +70,41 @@ function certifiedResult(
 }
 
 describe("application persistence feedback", () => {
+  it("clears the export warning only after configuration export succeeds", async () => {
+    historicalExportMocks.buildConfigWorkbook.mockClear();
+    historicalExportMocks.writeWorkbook.mockClear();
+    const coordinator = createTestApplicationCoordinator(
+      createTestAutoscheduleStore(createDefaultState()),
+      { preferences }
+    );
+
+    coordinator.store.getState().configuration.addStaff();
+    expect(coordinator.store.getState().hasUnexportedChanges()).toBe(true);
+
+    await coordinator.handle({ type: "export-config" });
+
+    expect(historicalExportMocks.buildConfigWorkbook).toHaveBeenCalledWith(
+      coordinator.model()
+    );
+    expect(coordinator.store.getState().hasUnexportedChanges()).toBe(false);
+  });
+
+  it("keeps the export warning when configuration export fails", async () => {
+    const coordinator = createTestApplicationCoordinator(
+      createTestAutoscheduleStore(createDefaultState()),
+      { preferences }
+    );
+    coordinator.store.getState().configuration.addStaff();
+    historicalExportMocks.writeWorkbook.mockImplementationOnce(() => {
+      throw new Error("导出失败");
+    });
+
+    await expect(coordinator.handle({ type: "export-config" })).rejects.toThrow(
+      "导出失败"
+    );
+    expect(coordinator.store.getState().hasUnexportedChanges()).toBe(true);
+  });
+
   it("切换组前提示保存未保存改动，确认后只显示目标组数据", async () => {
     const state = createDefaultState();
     state.groups.B.staff = [

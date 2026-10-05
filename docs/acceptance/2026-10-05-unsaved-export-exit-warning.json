@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-10-05-unsaved-export-exit-warning",
+  "title": "关闭浏览器标签页前提醒导出未保存配置",
+  "startedFrom": "58728951459c84c860561901ad274a9ddf37e3aa",
+  "expectation": {
+    "example": "用户在页面中修改人员、航班、规则或当前班表后，没有点击“导出配置”，直接关闭浏览器标签页或窗口。",
+    "expected": "关闭动作触发浏览器原生离开提醒；用户选择留下后可以手动导出配置，关闭动作本身不自动保存或自动导出。成功导出配置后再次关闭不再提醒。现有浏览器本地保存机制保持不变。",
+    "unchanged": "现有浏览器本地自动保存、配置导入导出内容、排班计算和页面内其他操作保持不变；只改页面导航、日期、缩放或打开弹窗不触发提醒。",
+    "fallback": "浏览器不支持或用户选择离开时不强行阻止关闭；导出失败时继续保留未导出状态，下一次关闭仍提醒。"
+  },
+  "testedVersion": "a599976fc20a1effd0a88f49cb42ab021ef35fce9d4c96d7802ca838058c8a12",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "实现前定向运行证明 Store 没有未导出状态和关闭提醒入口；实现后同一组定向测试通过。原始失败输出保留在本次会话记录中，文件证据记录实现后的通过结果。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-05-unsaved-export-focused.txt",
+          "summary": "Store、配置导出成功/失败和浏览器关闭提醒共 3 个测试文件、37 项测试通过。",
+          "sha256": "2bfde4a70ed2377e04e8529c39c7c3430663d339b883e91ff975aaa29061932f"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "修改模型后被标记为未导出；本地 persist 不会清除；成功执行 export-config 后清除。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-05-unsaved-export-focused.txt",
+          "summary": "覆盖修改、persist、本地内容比较、浏览器关闭提醒和配置导出成功路径。",
+          "sha256": "2bfde4a70ed2377e04e8529c39c7c3430663d339b883e91ff975aaa29061932f"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "无未导出修改时关闭处理器不阻止离开；导出抛错时仍保留未导出状态；临时历史编辑取消恢复原内容后不误报。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-05-unsaved-export-focused.txt",
+          "summary": "覆盖无修改、导出失败、临时编辑恢复和原生提醒处理器释放。",
+          "sha256": "2bfde4a70ed2377e04e8529c39c7c3430663d339b883e91ff975aaa29061932f"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "not_applicable",
+      "reason": "本功能只接收模型变更状态并监听浏览器关闭，不经过排班生成、补缺、恢复或轮岗后置流程。",
+      "evidence": []
+    },
+    "finalGuard": {
+      "status": "not_applicable",
+      "reason": "本功能不修改排班最终守卫；关闭提醒只由浏览器原生 beforeunload 处理。",
+      "evidence": []
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "现有本地 persist、导入导出主流程和临时历史编辑行为保持；类型检查和完整门禁均通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-05-unsaved-export-focused.txt",
+          "summary": "相关应用测试通过。",
+          "sha256": "2bfde4a70ed2377e04e8529c39c7c3430663d339b883e91ff975aaa29061932f"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-05-unsaved-export-typecheck.txt",
+          "summary": "tsc -b 类型检查退出 0。",
+          "sha256": "6fca04d3c72065bc025ab49945050cc2dfbc1bdaca455b60715aa1bc1e49aa76"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "生产构建已通过，但按协作边界尚未由 owner 在真实浏览器标签页上确认原生离开提醒、留下后手动导出和导出后不再提醒。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-05-unsaved-export-build.txt",
+          "summary": "tsc -b 与 Vite 生产构建退出 0；保留项目原有 node:module 浏览器外置警告。",
+          "sha256": "3c29a84d32a9eb4c203e61003ec2dab20f904ff36cae34bd35a9b4ca52fce66f"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "原实现没有“上次导出内容”和“当前内容”的比较，也没有 beforeunload 监听；实现前定向测试失败，实现后相关 Store、导出和浏览器边界测试通过。",
+    "laterChanges": "本地 persist、临时历史编辑恢复、导出抛错和浏览器关闭处理器都可能改变提醒结果；分别由 Store、应用控制器和浏览器边界测试覆盖。排班后置流程不适用。",
+    "finalArtifact": "生产构建证据已通过；真实浏览器标签页关闭提醒和导出后行为仍待 owner 现场确认。"
+  },
+  "review": {
+    "missedScope": "当前未取得真实浏览器关闭标签页的现场证据；已用浏览器边界单测、配置导出成功/失败测试和构建覆盖代码路径，现场项继续标为未验收。",
+    "rootCause": "原有本地保存状态与配置文件导出状态没有独立事实源，关闭页面也没有离开提醒监听。",
+    "earlyDetection": "以后涉及本地保存、文件导出或页面关闭行为时，改前先列出两种保存语义和浏览器限制，先测修改后/导出成功/导出失败/临时恢复/无修改五条路径，再做真实浏览器确认。"
+  }
+}
