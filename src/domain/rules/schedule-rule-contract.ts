@@ -43,6 +43,12 @@ export const SCHEDULING_RULES = [
     feedbackMode: "aggregated",
   },
   {
+    id: "daily-primary-position-unique",
+    stage: "hard-constraint",
+    label: "同一班表一号岗位单人限一次",
+    feedbackMode: "aggregated",
+  },
+  {
     id: "minimum-flight-transition",
     stage: "hard-constraint",
     label: "普通岗位最小航班衔接间隔",

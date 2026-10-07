@@ -44,6 +44,7 @@ export function createScheduleGuardContext({
   return {
     phase,
     sameFlightStaffExclusionFacts: { state },
+    dailyPrimaryPositionFacts: { state },
     halfRestFacts: runFacts.halfRest,
     airlineRotationFacts: {
       enabled: state.settings.sameDayCrossFlightPriorityEnabled,

@@ -8,6 +8,7 @@ import {
   diagnoseAutomaticStaffEligibility,
   diagnoseMinimumFlightTransitionEligibility,
   diagnoseSameFlightStaffExclusionEligibility,
+  diagnoseDailyPrimaryPositionEligibility,
 } from "../candidates/assignment-eligibility";
 import type {
   AssignmentEligibilityDiagnostic,
@@ -56,6 +57,7 @@ export const CONFIGURABLE_RULE_SETTINGS: Partial<
       | "rollingLoadProtectionEnabled"
       | "positionRotationEnabled"
       | "sameDayCrossFlightPriorityEnabled"
+      | "dailyPrimaryPositionUniqueEnabled"
       | "lateShiftRecoveryEnabled"
       | "workloadBalanceEnabled"
     >
@@ -74,6 +76,7 @@ export const CONFIGURABLE_RULE_SETTINGS: Partial<
   "workload-balance": "workloadBalanceEnabled",
   "position-rotation": "positionRotationEnabled",
   "same-day-cross-flight-priority": "sameDayCrossFlightPriorityEnabled",
+  "daily-primary-position-unique": "dailyPrimaryPositionUniqueEnabled",
 };
 
 type CandidateComparator = (
@@ -203,6 +206,12 @@ const RULE_EXECUTION: Readonly<
     {
       kind: "hard-constraint",
       execute: diagnoseSameFlightStaffExclusionEligibility,
+    },
+  ],
+  "daily-primary-position-unique": [
+    {
+      kind: "hard-constraint",
+      execute: diagnoseDailyPrimaryPositionEligibility,
     },
   ],
   "minimum-flight-transition": [

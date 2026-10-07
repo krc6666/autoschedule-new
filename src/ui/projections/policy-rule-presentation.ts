@@ -45,6 +45,8 @@ const USER_RULE_DESCRIPTIONS: Readonly<Record<SchedulingRuleId, string>> = {
     "人员状态、岗位资质、夜班能力、时间冲突和每日工时都必须符合要求。",
   "same-flight-staff-exclusion":
     "规则页配置的两个人不得被自动安排在同一航班；指定航班时只限制该航班，留空时限制所有航班。人工调整可以突破，但会持续标红提醒。",
+  "daily-primary-position-unique":
+    "同一张生成班表内，每个人最多承担一次非督导首个岗位；没有可用人选时该岗位保留空缺。",
   "minimum-flight-transition":
     "常规跨航班连续工作必须留足准备时间；符合条件的下午分流按提前撤岗配置接续。",
   "strict-next-workday-recovery":

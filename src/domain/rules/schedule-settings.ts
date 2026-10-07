@@ -161,6 +161,14 @@ export const SCHEDULE_SETTING_DEFINITIONS: readonly ScheduleSettingDefinition[] 
       defaultValue: true,
     },
     {
+      key: "dailyPrimaryPositionUniqueEnabled",
+      label: "同一班表一号岗位单人限一次",
+      type: "boolean",
+      description:
+        "同一张生成班表内，每个人最多承担一次非督导首个岗位；无法安排时保留空岗",
+      defaultValue: true,
+    },
+    {
       key: "tr121H02CooldownWorkdays",
       label: "TR121/H02 冷却工作班数",
       type: "number",

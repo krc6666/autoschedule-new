@@ -27,6 +27,7 @@ import {
   matchingSameFlightStaffExclusion,
   sameFlightStaffExclusionPairMessage,
 } from "../rules/same-flight-staff-exclusion";
+import { isDailyPrimaryPosition } from "../rules/daily-primary-position";
 
 export type AssignmentEligibilityViolationCode =
   | "missing-target"
@@ -42,7 +43,8 @@ export type AssignmentEligibilityViolationCode =
   | "position-transition"
   | "regular-staff-priority"
   | "same-airline-priority"
-  | "same-flight-staff-exclusion";
+  | "same-flight-staff-exclusion"
+  | "daily-primary-position-unique";
 
 export interface AssignmentEligibilityViolation {
   code: AssignmentEligibilityViolationCode;
@@ -261,6 +263,38 @@ export function diagnoseSameAirlinePriorityEligibility(
     ? warning(
         "same-airline-priority",
         `${options.person.name} → 已在${conflict.flightNo}/${conflict.position}承担同日${airlineCode(options.flight.flightNo)}航司控制/一号 → 跨航班组合优先避免但当前允许人工落位 → 保留目标岗位并提示 → 可继续安排${options.flight.flightNo}/${options.rule.name}（琥珀色警告）`
+      )
+    : success();
+}
+
+export function diagnoseDailyPrimaryPositionEligibility(
+  options: AutomaticAssignmentEligibilityOptions
+): AssignmentEligibilityDiagnostic {
+  if (options.state.settings.dailyPrimaryPositionUniqueEnabled === false)
+    return success();
+  if (!isDailyPrimaryPosition(options.state, options.flight, options.rule))
+    return success();
+  const conflict = options.assignments.find((assignment) => {
+    if (
+      assignment.status !== "assigned" ||
+      assignment.staffId !== options.person.id ||
+      assignment.flightId === options.flight.id
+    )
+      return false;
+    const existingRule = assignmentRule(options.state, assignment);
+    const existingFlight = options.state.flights.find(
+      (flight) => flight.id === assignment.flightId
+    );
+    return Boolean(
+      existingRule &&
+      existingFlight &&
+      isDailyPrimaryPosition(options.state, existingFlight, existingRule)
+    );
+  });
+  return conflict
+    ? violation(
+        "daily-primary-position-unique",
+        `${options.person.name}已承担${conflict.flightNo}/${conflict.position}的一号岗位，同一班表内不能再次承担非督导一号岗位`
       )
     : success();
 }

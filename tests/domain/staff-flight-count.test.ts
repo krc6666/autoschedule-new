@@ -49,6 +49,7 @@ describe("staff flight count facts", () => {
 
   it("rebalances a post-processing 4-to-2 spread by transferring a whole flight group", () => {
     const state = createDefaultState();
+    state.settings.dailyPrimaryPositionUniqueEnabled = false;
     const [high, low] = state.staff.filter(
       (person) => person.staffType === "常规"
     );

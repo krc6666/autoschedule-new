@@ -11,6 +11,7 @@ import {
   type ScheduleProgressStep,
   visibleScheduleProgressStep,
 } from "./schedule-progress";
+import { ScheduleGuardError } from "./schedule-guard";
 
 export interface SchedulePipelineContext extends ScheduleMutationContext {
   onProgress?: (stage: ScheduleProgressStage, percent: number) => void;
@@ -71,10 +72,21 @@ export async function runScheduleMutationPlan(
     if (progress) context.onProgress?.(progress.stage, progress.percent);
     const proposal = await item.executor.execute(context);
     if (proposal.assignments) {
-      context.ledger.commit({
-        type: "replace",
-        assignments: proposal.assignments,
-      });
+      try {
+        context.ledger.commit({
+          type: "replace",
+          assignments: proposal.assignments,
+        });
+      } catch (error) {
+        if (
+          !(error instanceof ScheduleGuardError) ||
+          !error.violations.some(
+            (violation) => violation.ruleId === "daily-primary-position-unique"
+          )
+        )
+          throw error;
+        warnings.push(`后置调整因最终硬约束未满足而回退：${error.message}`);
+      }
     }
     warnings.push(...proposal.warnings);
   }

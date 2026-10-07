@@ -13,6 +13,7 @@ import { generateSchedule } from "../helpers/generate-schedule";
 
 function scenario(withCounter = true, extraSupervisor = false) {
   const state = createDefaultState();
+  state.settings.dailyPrimaryPositionUniqueEnabled = false;
   const [blocked, needed, replacement, spare] = state.staff;
   state.staff = [
     blocked!,
@@ -156,6 +157,7 @@ function morningPriorityScenario(
   helperType: "常规" | "行政支援" | null = "常规"
 ) {
   const state = createDefaultState();
+  state.settings.dailyPrimaryPositionUniqueEnabled = false;
   const supervisor = state.staff[0]!;
   const helper = state.staff[1]!;
   state.staff = [

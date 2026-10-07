@@ -15,6 +15,7 @@ import type {
 
 export function createOrdinarySchedulingState(): AppState {
   const state = createDefaultState();
+  state.settings.dailyPrimaryPositionUniqueEnabled = false;
   state.staff.forEach((person) => {
     person.teamLeader = false;
   });
@@ -24,8 +25,10 @@ export function createOrdinarySchedulingState(): AppState {
 export function createSchedulingScenario(
   overrides: Partial<ScheduleGenerationFacts> = {}
 ): ScheduleGenerationFacts {
+  const defaults = createScheduleGenerationFacts(createDefaultState());
+  defaults.settings.dailyPrimaryPositionUniqueEnabled = false;
   return {
-    ...createScheduleGenerationFacts(createDefaultState()),
+    ...defaults,
     ...overrides,
   };
 }

@@ -173,6 +173,7 @@ export interface ScheduleSettings {
   rollingLoadMaxFatigue: number;
   positionRotationEnabled: boolean;
   sameDayCrossFlightPriorityEnabled: boolean;
+  dailyPrimaryPositionUniqueEnabled: boolean;
   ordinaryPriorityPositions: OrdinaryPriorityPosition[];
   tr121H02CooldownWorkdays: number;
   latePriorityFlightNumbers: string[];

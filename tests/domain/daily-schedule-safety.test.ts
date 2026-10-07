@@ -144,6 +144,7 @@ function finalSafetyFixture(kind: "ke166" | "team-leader") {
 describe("daily schedule final safety review", () => {
   it("allows a later same-airline control or number-one assignment after post-review changes", () => {
     const state = createDefaultState();
+    state.settings.dailyPrimaryPositionUniqueEnabled = false;
     const person = {
       ...state.staff[0]!,
       id: "same-airline-worker",

@@ -30,6 +30,7 @@ describe("schedule safety session", () => {
     expect(Object.keys(final.context).sort()).toEqual([
       "airlineRotationFacts",
       "crossWorkdayQualificationReservationFacts",
+      "dailyPrimaryPositionFacts",
       "dutyPositionFacts",
       "halfRestFacts",
       "highFatiguePositionFacts",

@@ -71,6 +71,7 @@ import {
   assignmentRule,
   isGuideAssignment,
 } from "../flights/schedule-position-rules";
+import { isDailyPrimaryPosition } from "../rules/daily-primary-position";
 
 /**
  * The phase controls which invariants are meaningful for a partial result.
@@ -160,6 +161,12 @@ export interface ScheduleGuardContext {
   sameFlightStaffExclusionFacts?: {
     state: Pick<ScheduleGenerationFacts, "settings" | "staff">;
   };
+  dailyPrimaryPositionFacts?: {
+    state: Pick<
+      ScheduleGenerationFacts,
+      "settings" | "positionRules" | "flights"
+    >;
+  };
   warningSink?: string[];
 }
 
@@ -182,6 +189,49 @@ export function createSameFlightStaffExclusionScheduleGuard(): ScheduleGuard {
           )}，自动排班拒绝提交`,
         })
       );
+    },
+  });
+}
+
+export function createDailyPrimaryPositionScheduleGuard(): ScheduleGuard {
+  return Object.freeze({
+    id: "daily-primary-position-unique",
+    validate: (
+      assignments: readonly Assignment[],
+      context: ScheduleGuardContext
+    ): readonly ScheduleGuardViolation[] => {
+      const facts = context.dailyPrimaryPositionFacts;
+      if (
+        !facts ||
+        facts.state.settings.dailyPrimaryPositionUniqueEnabled === false
+      )
+        return [];
+      const seen = new Map<string, Assignment>();
+      const violations: ScheduleGuardViolation[] = [];
+      for (const assignment of assignments) {
+        if (assignment.status !== "assigned" || !assignment.staffId) continue;
+        const rule = assignmentRule(facts.state, assignment);
+        const flight = facts.state.flights.find(
+          (item) => item.id === assignment.flightId
+        );
+        if (
+          !rule ||
+          !flight ||
+          !isDailyPrimaryPosition(facts.state, flight, rule)
+        )
+          continue;
+        const prior = seen.get(assignment.staffId);
+        if (prior) {
+          violations.push({
+            ruleId: "daily-primary-position-unique",
+            assignmentId: assignment.id,
+            message: `${assignment.staffName}在${prior.flightNo}/${prior.position}和${assignment.flightNo}/${assignment.position}重复承担非督导一号岗位，自动排班拒绝提交`,
+          });
+        } else {
+          seen.set(assignment.staffId, assignment);
+        }
+      }
+      return violations;
     },
   });
 }
@@ -1075,6 +1125,7 @@ export function createDutyPositionScheduleGuard(): ScheduleGuard {
 export function createDefaultScheduleGuards(): readonly ScheduleGuard[] {
   return Object.freeze([
     createSameFlightStaffExclusionScheduleGuard(),
+    createDailyPrimaryPositionScheduleGuard(),
     createHalfRestScheduleGuard(),
     createSameAirlinePriorityScheduleGuard(),
     createMinimumFlightTransitionScheduleGuard(),

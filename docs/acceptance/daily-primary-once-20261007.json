@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 1,
+  "taskId": "daily-primary-once-20261007",
+  "title": "同一班表一号岗位单人限一次硬约束",
+  "startedFrom": "bc53146be04255465d46528d876c6afbd8158e23",
+  "expectation": {
+    "example": "一张班表有 CA101 和 MU202；张三是两个航班首个非督导岗位的合格人选，另有岗位普通人选；督导岗位不计入。",
+    "expected": "默认开启时张三最多承担一个航班的一号岗位；另一个岗位换安全人选，若无安全人选则留空，整张班表继续生成。",
+    "unchanged": "同日同航司软规则、督导岗位、资质/状态/时间冲突/衔接/工时等既有约束继续按原合同执行；关闭新开关时恢复旧行为。",
+    "fallback": "没有满足新硬约束的候选时保留对应一号岗位空缺，不使整张班表失败。"
+  },
+  "testedVersion": "a23d7d842ee48ebfe56c782ca586f1c47aa37a6154801be1fe249f28a44834bf",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "新增规则回归覆盖默认开启、跨航班第二个一号候选被拒绝。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/daily-primary-once-tests.txt",
+          "summary": "定向规则测试 3 文件 46 项通过。",
+          "sha256": "3d7553050b016c6d060b100c3bcb75ee531b6074adfb10cf9f4100e786edb30f"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "全量功能测试通过，覆盖普通排班路径。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/daily-primary-once-tests.txt",
+          "summary": "全量 123 文件 1124 项通过。",
+          "sha256": "3d7553050b016c6d060b100c3bcb75ee531b6074adfb10cf9f4100e786edb30f"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "覆盖督导豁免、开关关闭和旧场景兼容分支。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/daily-primary-once-tests.txt",
+          "summary": "定向及全量回归通过。",
+          "sha256": "3d7553050b016c6d060b100c3bcb75ee531b6074adfb10cf9f4100e786edb30f"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "后置非法提案被最终硬约束拒绝并回退。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/daily-primary-once-tests.txt",
+          "summary": "全量测试含后置复核回归。",
+          "sha256": "3d7553050b016c6d060b100c3bcb75ee531b6074adfb10cf9f4100e786edb30f"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "最终守卫重复一号岗位反向测试通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/daily-primary-once-tests.txt",
+          "summary": "最终守卫测试通过。",
+          "sha256": "3d7553050b016c6d060b100c3bcb75ee531b6074adfb10cf9f4100e786edb30f"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "既有行为测试在显式关闭新硬规则后保持通过；督导不计入。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/daily-primary-once-tests.txt",
+          "summary": "全量回归通过。",
+          "sha256": "3d7553050b016c6d060b100c3bcb75ee531b6074adfb10cf9f4100e786edb30f"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "verified",
+      "reason": "规则参数默认值、Excel 模板和往返配置已核对；构建通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/daily-primary-once-config.txt",
+          "summary": "配置字段传播与模板证据。",
+          "sha256": "5eaa1f0f43bd6f2d1e9153f2c418d5e16e5fa4679ac7546bbeec6d7a3a90bedb"
+        },
+        {
+          "path": "docs/acceptance/evidence/daily-primary-once-performance-build.txt",
+          "summary": "性能测试与生产构建通过。",
+          "sha256": "5d9a70af63189e44e7f75d0cfc2192f28cdd2ef550424c1636128d4cbb80fb56"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "原规则只有同航司软避免，新增跨航班一号硬互斥后，候选和最终守卫回归通过。",
+    "laterChanges": "模型、补缺候选、后置管线和最终守卫均消费同一规则事实；后置非法提案回归验证为回退。",
+    "finalArtifact": "规则参数 Excel 模板及 full test/build/performance 证据证明配置和代码门禁达到要求；真实页面人工入口尚待 owner 验收。"
+  },
+  "review": {
+    "missedScope": "未取得 owner 在真实页面生成班表并导出的现场证据，保留为待验收边界。",
+    "rootCause": "原有一号控制只属于同日同航司软目标，没有独立的跨航班单人计数事实和最终不变量。",
+    "earlyDetection": "以后新增硬约束先填传播矩阵，并在写代码前同时设计模型、候选、后置和最终守卫反向测试。"
+  }
+}

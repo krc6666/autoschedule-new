@@ -1,0 +1,5 @@
+2026-10-07
+Command: npm.cmd exec vitest -- run tests/domain/daily-primary-position.test.ts tests/domain/schedule-settings.test.ts tests/app/policy-actions.test.ts
+Result: 3 test files passed, 46 tests passed.
+Command: npm.cmd test -- --run
+Result: 123 test files passed, 1124 tests passed.

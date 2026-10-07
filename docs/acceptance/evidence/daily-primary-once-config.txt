@@ -1,0 +1,2 @@
+2026-10-07
+Configuration contract evidence: dailyPrimaryPositionUniqueEnabled is present in SCHEDULE_SETTING_DEFINITIONS with defaultValue true; the rule-parameter Excel template contains the same parameter code; the Excel round-trip suite is included in the full test result.

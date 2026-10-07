@@ -27,6 +27,7 @@ function obligationState(
   morningQualification: "all" | "protected-only"
 ): AppState {
   const state = createDefaultState();
+  state.settings.dailyPrimaryPositionUniqueEnabled = false;
   const [protectedBase, alternateBase] = state.staff
     .filter((person) => person.status === "正常")
     .slice(0, 2);

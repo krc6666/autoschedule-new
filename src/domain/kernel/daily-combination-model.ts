@@ -32,6 +32,7 @@ import {
   sameAirlinePriorityConflict,
 } from "../rules/airline-rotation";
 import { sameFlightStaffExclusionApplies } from "../rules/same-flight-staff-exclusion";
+import { isDailyPrimaryPosition } from "../rules/daily-primary-position";
 
 export interface DailyCombinationChoice {
   id: string;
@@ -295,6 +296,40 @@ function incompatibilityConstraints(
             upperBound: 1,
           });
         }
+      }
+    }
+  }
+  return constraints;
+}
+
+function dailyPrimaryPositionConstraints(
+  state: ScheduleGenerationFacts,
+  staffChoices: readonly DailyCombinationChoice[]
+): LinearConstraint[] {
+  if (state.settings.dailyPrimaryPositionUniqueEnabled === false) return [];
+  const byStaff = new Map<string, DailyCombinationChoice[]>();
+  for (const choice of staffChoices) {
+    if (!isDailyPrimaryPosition(state, choice.task.flight, choice.task.rule))
+      continue;
+    const own = byStaff.get(choice.person.id) ?? [];
+    own.push(choice);
+    byStaff.set(choice.person.id, own);
+  }
+  const constraints: LinearConstraint[] = [];
+  for (const [staffId, choices] of byStaff) {
+    for (let left = 0; left < choices.length; left += 1) {
+      for (let right = left + 1; right < choices.length; right += 1) {
+        const a = choices[left]!;
+        const b = choices[right]!;
+        if (a.task.flight.id === b.task.flight.id) continue;
+        constraints.push({
+          id: `daily-primary-position-unique:${staffId}:${a.id}:${b.id}`,
+          terms: [a, b].map((choice) => ({
+            variableId: choice.id,
+            coefficient: 1,
+          })),
+          upperBound: 1,
+        });
       }
     }
   }
@@ -924,6 +959,7 @@ export function buildDailyCombinationModel(
     variables,
     incompatibilityConstraints: [
       ...incompatibilityConstraints(state, staffChoices),
+      ...dailyPrimaryPositionConstraints(state, staffChoices),
       ...sameFlightStaffExclusionConstraints(state, staffChoices),
     ],
     constraints,

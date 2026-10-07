@@ -19,6 +19,7 @@ const POLICY_FIELDS: readonly (keyof SchedulePolicyInput)[] = [
   "rollingLoadMaxFatigue",
   "positionRotationEnabled",
   "sameDayCrossFlightPriorityEnabled",
+  "dailyPrimaryPositionUniqueEnabled",
   "tr121H02CooldownWorkdays",
   "latePriorityFlightNumbers",
   "lateShiftRecoveryEnabled",
@@ -54,6 +55,8 @@ const POLICY_SETTING_SEARCH_TEXT = [
   "重点岗位优先，普通岗位防止连续第三班",
   "同日同航司控制/一号优先避免",
   "有安全替代时优先分开，无替代时允许安排并报警",
+  "同一班表一号岗位单人限一次",
+  "每个人最多承担一次非督导首个岗位，无法安排时保留空岗",
   "TR121/H02 冷却工作班数",
   "0 表示关闭，默认避开随后 3 个已归档工作班",
   "末班重点岗位航班范围",
@@ -132,6 +135,7 @@ export class PolicySettingsFormElement extends LightDomElement {
             ${this.number("rollingLoadMaxFatigue", "滚动疲劳上限", 0.5, 100, 0.5)}
             ${this.toggle("positionRotationEnabled", "重点岗位频率与轮岗", "重点岗位优先，普通岗位防止连续第三班")}
             ${this.toggle("sameDayCrossFlightPriorityEnabled", "同日同航司控制/一号优先避免", "有安全替代时优先分开，无替代时允许安排并报警")}
+            ${this.toggle("dailyPrimaryPositionUniqueEnabled", "同一班表一号岗位单人限一次", "每个人最多承担一次非督导首个岗位，无法安排时保留空岗")}
             ${this.number("tr121H02CooldownWorkdays", "TR121/H02 冷却工作班数", 0, 30, 1)}
             ${this.latePriorityFlightScope()}
             ${this.ordinaryPriorityPositionCollection()}
