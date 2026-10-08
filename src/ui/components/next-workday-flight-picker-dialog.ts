@@ -5,6 +5,7 @@ import type { AppState, StaffStatus } from "../../model";
 import type { DutyRosterSlot } from "../../domain/duty-roster/roster";
 import { dispatchUiCommand } from "../events/ui-command";
 import { LightDomElement } from "./light-dom-element";
+import { dynamicSelectValue } from "./dynamic-select";
 import { weekdayLabel } from "../../domain/flights/weekly-flight-plan";
 
 type PickerDialog = Extract<
@@ -263,22 +264,23 @@ export class NextWorkdayFlightPickerDialogElement extends LightDomElement {
               <select
                 class="form-select form-select-sm w-auto"
                 aria-label="${label}"
+                ${dynamicSelectValue(selected ?? "")}
                 .value=${selected ?? ""}
                 @change=${(event: Event) =>
-                this.updateDutyRoster(
-                  slot,
-                  (event.currentTarget as HTMLSelectElement).value
-                )}
+                  this.updateDutyRoster(
+                    slot,
+                    (event.currentTarget as HTMLSelectElement).value
+                  )}
               >
                 <option value="">未安排</option>
                 ${this.model.staff
-                .filter((person) =>
-                  this.dutyRosterOptionAllowed(person, slot, selected)
-                )
-                .map(
-                  (person) =>
-                    html`<option value=${person.id}>${person.name}</option>`
-                )}
+                  .filter((person) =>
+                    this.dutyRosterOptionAllowed(person, slot, selected)
+                  )
+                  .map(
+                    (person) =>
+                      html`<option value=${person.id}>${person.name}</option>`
+                  )}
               </select>
             </label>`
         )}

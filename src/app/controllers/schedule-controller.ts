@@ -318,7 +318,11 @@ export class ScheduleController implements UiCommandController {
   ): DutyRosterAssignment {
     const temporaryState = structuredClone(this.context.model());
     this.applyPreflightStaffStatuses(temporaryState, staffStatuses);
-    return getDutyRosterForDate(temporaryState, date);
+    const roster = getDutyRosterForDate(temporaryState, date);
+    return {
+      ...roster,
+      standbyStaffIds: [roster.standbyStaffIds[0], roster.standbyStaffIds[1]],
+    };
   }
 
   private updatePreflightDutyRoster(
@@ -655,7 +659,10 @@ export class ScheduleController implements UiCommandController {
           .filter((candidate) => candidate.selectedByDefault)
           .map((candidate) => candidate.id),
         staffStatuses: this.currentStaffStatuses(),
-        dutyRoster: getDutyRosterForDate(model, this.context.view().date),
+        dutyRoster: this.dutyRosterForDialog(
+          this.context.view().date,
+          this.currentStaffStatuses()
+        ),
       },
     });
   }
@@ -709,7 +716,7 @@ export class ScheduleController implements UiCommandController {
       dialog: {
         ...dialog,
         staffStatuses: statuses,
-        dutyRoster: getDutyRosterForDate(temporaryState, dialog.date),
+        dutyRoster: this.dutyRosterForDialog(dialog.date, statuses),
       },
     });
   }
@@ -732,7 +739,7 @@ export class ScheduleController implements UiCommandController {
       dialog: {
         ...dialog,
         staffStatuses: statuses,
-        dutyRoster: getDutyRosterForDate(temporaryState, dialog.date),
+        dutyRoster: this.dutyRosterForDialog(dialog.date, statuses),
       },
     });
   }
@@ -826,7 +833,10 @@ export class ScheduleController implements UiCommandController {
           .filter((candidate) => candidate.selectedByDefault)
           .map((candidate) => candidate.id),
         staffStatuses: this.currentStaffStatuses(),
-        dutyRoster: getDutyRosterForDate(model, this.context.view().date),
+        dutyRoster: this.dutyRosterForDialog(
+          this.context.view().date,
+          this.currentStaffStatuses()
+        ),
       },
     });
   }
@@ -1025,7 +1035,7 @@ export class ScheduleController implements UiCommandController {
       dialog: {
         ...dialog,
         staffStatuses: statuses,
-        dutyRoster: getDutyRosterForDate(temporaryState, dialog.date),
+        dutyRoster: this.dutyRosterForDialog(dialog.date, statuses),
       },
     });
   }

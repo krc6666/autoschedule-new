@@ -322,4 +322,62 @@ describe("next workday flight picker dialog", () => {
     expect(element.textContent).toContain("次日备勤一");
     expect(element.textContent).toContain("次日备勤二");
   });
+
+  it("renders the four roster selections supplied by statistics", async () => {
+    const model = createDefaultState();
+    model.staff = [
+      ...model.staff,
+      { ...model.staff[0]!, id: "staff-3", name: "丙" },
+      { ...model.staff[0]!, id: "staff-4", name: "丁" },
+    ];
+    model.staff[0]!.cxPreflightQualified = true;
+    model.staff[1]!.dutyQualified = true;
+    model.staff[2]!.standbyQualified = true;
+    model.staff[3]!.standbyQualified = true;
+    const candidates = buildCurrentScheduleFlightCandidates(
+      model.templates,
+      model.flights
+    );
+    const roster = {
+      date: "2026-08-29",
+      cxPreflightStaffId: model.staff[0]!.id,
+      dutyStaffId: model.staff[1]!.id,
+      standbyStaffIds: [model.staff[2]!.id, model.staff[3]!.id] as [
+        string,
+        string,
+      ],
+      adjusted: true,
+    };
+    const element = await mountElement<
+      HTMLElement & { updateComplete: Promise<unknown> }
+    >("autoschedule-app-dialog", {
+      model,
+      dialog: {
+        kind: "schedule-preflight",
+        date: roster.date,
+        groupId: model.activeGroupId,
+        candidates,
+        selectedIds: candidates
+          .filter((item) => item.selectedByDefault)
+          .map((item) => item.id),
+        staffStatuses: Object.fromEntries(
+          model.staff.map((person) => [person.id, person.status])
+        ),
+        dutyRoster: roster,
+      } as never,
+    });
+    await element.updateComplete;
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    const values = [
+      ...element.querySelectorAll<HTMLSelectElement>(
+        'section[aria-label="值班人员确认"] select'
+      ),
+    ].map((select) => select.value);
+    expect(values).toEqual([
+      roster.cxPreflightStaffId,
+      roster.dutyStaffId,
+      roster.standbyStaffIds[0],
+      roster.standbyStaffIds[1],
+    ]);
+  });
 });

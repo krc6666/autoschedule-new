@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "taskId": "schedule-preflight-roster-default-20261008",
+  "title": "准备确认界面回显统计页四槽位轮值",
+  "startedFrom": "a1af1c4bc9c05ed016cb5d8dfbb3b5a7540e3a9a",
+  "expectation": {
+    "example": "统计页在 2026-10-09 已安排 CX 航前、主值班、次日备勤一和次日备勤二，随后打开生成排班、重新排班或归档并排后天的准备确认界面。",
+    "expected": "三个确认窗口的四个下拉默认显示统计页该日期已安排的人员，且界面实际 select.value 与 dialog 轮值一致。",
+    "unchanged": "轮值唯一事实仍是当前活动组 dutyRosterOverrides；预检修改仍是临时草稿，不改变统计页覆盖，病假/休假状态仍阻止计算。",
+    "fallback": "取消、停止、状态冲突或排班失败保留原班表、人员状态和统计页轮值；没有覆盖的槽位继续显示未安排。"
+  },
+  "testedVersion": "96a16a03a85654c68338dd263c51514b1b0cfded01c8370ae9c973c247276925",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "UI 回归在修复前捕获四个 select.value 为空，修复 dynamicSelectValue 后通过；controller 回归覆盖统计页写入后的三入口轮值对象。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/schedule-preflight-roster-default-20261008.txt",
+          "summary": "定向回归与根因说明。",
+          "sha256": "96a16a03a85654c68338dd263c51514b1b0cfded01c8370ae9c973c247276925"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "生成、重新排班和归档后天三个入口均回显 CX 航前、主值班、两名备勤；保存恢复后生成预检仍回显。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/schedule-preflight-roster-default-20261008.txt",
+          "summary": "4 个定向测试文件 67 项通过。",
+          "sha256": "96a16a03a85654c68338dd263c51514b1b0cfded01c8370ae9c973c247276925"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "覆盖状态变化后的预检读取、后天日期覆盖和 localStorage 往返；动态 UI 下拉实际值有断言。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/schedule-preflight-roster-default-20261008.txt",
+          "summary": "三入口、四槽位、状态变化和保存恢复回归。",
+          "sha256": "96a16a03a85654c68338dd263c51514b1b0cfded01c8370ae9c973c247276925"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "既有确认草稿、轮值状态守卫和失败回退测试继续通过；本次只改变读取投影与下拉值保持。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/schedule-preflight-roster-default-20261008.txt",
+          "summary": "定向 app/domain/UI 回归通过。",
+          "sha256": "96a16a03a85654c68338dd263c51514b1b0cfded01c8370ae9c973c247276925"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "生成和重新排班的休假轮值仍被阻止，既有最终安全提交路径未改变；typecheck 与 build 通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/schedule-preflight-roster-default-20261008.txt",
+          "summary": "类型检查、定向回归和构建通过。",
+          "sha256": "96a16a03a85654c68338dd263c51514b1b0cfded01c8370ae9c973c247276925"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "原有取消、停止、异常回退测试通过；统计页覆盖保存恢复回归通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/schedule-preflight-roster-default-20261008.txt",
+          "summary": "回退和持久化路径已覆盖。",
+          "sha256": "96a16a03a85654c68338dd263c51514b1b0cfded01c8370ae9c973c247276925"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "真实浏览器三个入口和 owner 现场班表尚未验收；自动测试不能代替现场证据。",
+      "evidence": []
+    }
+  },
+  "answers": {
+    "originalFailure": "controller 中的 dutyRoster 数据没有丢失，实际故障是 option 渲染后原生 select.value 被重置为空；修复前 UI 回归捕获四个空值。",
+    "laterChanges": "三个入口统一通过 dutyRosterForDialog 读取当前活动组覆盖；状态变更、后天日期和保存恢复均重新验证。",
+    "finalArtifact": "定向 4 文件 67 项测试、typecheck、performance 16 项和 build 通过；真实浏览器现场证据仍待 owner。"
+  },
+  "review": {
+    "missedScope": "此前只断言 dialog 内存对象，没有断言确认窗口 select.value，因此漏掉了 UI 在 option 渲染后被清空的情况；真实入口仍未取得现场证据。",
+    "rootCause": "确认窗口轮值下拉缺少动态值保持指令，属性值设置时机与 option 渲染顺序导致浏览器回落到空选项。",
+    "earlyDetection": "涉及默认回显的 UI 需求必须同时测试 domain/controller 数据和最终 DOM 控件值，并对生成、重新排班、后天三个入口逐项覆盖。"
+  }
+}

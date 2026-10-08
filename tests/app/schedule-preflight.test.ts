@@ -379,3 +379,144 @@ it("重新排班默认读取统计页休假轮值人员并阻止计算", async (
   expect(coordinator.model()).toEqual(before);
   expect(coordinator.view().toast?.message).toContain("主值班人员甲当前为休假");
 });
+
+it.each(["generate-schedule", "open-reschedule-flight-picker"] as const)(
+  "统计页保存的四个轮值槽位在%s预检中默认回显",
+  async (open) => {
+    const state = fixture();
+    const [cx, duty] = state.staff;
+    const standbyOne = { ...duty!, id: `${duty!.id}-standby-1`, name: "丙" };
+    const standbyTwo = { ...duty!, id: `${duty!.id}-standby-2`, name: "丁" };
+    state.staff.push(standbyOne, standbyTwo);
+    cx!.cxPreflightQualified = true;
+    cx!.dutyQualified = false;
+    duty!.dutyQualified = true;
+    standbyOne!.standbyQualified = true;
+    standbyTwo!.standbyQualified = true;
+    const coordinator = createTestApplicationCoordinator(
+      createTestAutoscheduleStore(state),
+      { preferences }
+    );
+
+    await coordinator.handle({
+      type: "update-duty-roster",
+      date,
+      slot: "cx-preflight",
+      staffId: cx!.id,
+    });
+    await coordinator.handle({
+      type: "update-duty-roster",
+      date,
+      slot: "duty",
+      staffId: duty!.id,
+    });
+    await coordinator.handle({
+      type: "update-duty-roster",
+      date,
+      slot: "standby-0",
+      staffId: standbyOne!.id,
+    });
+    await coordinator.handle({
+      type: "update-duty-roster",
+      date,
+      slot: "standby-1",
+      staffId: standbyTwo!.id,
+    });
+
+    await coordinator.handle({ type: open });
+    const dialog = coordinator.view().dialog;
+    if (
+      dialog?.kind !== "schedule-preflight" &&
+      dialog?.kind !== "reschedule-flight-picker"
+    )
+      throw new Error("缺少预检弹窗");
+    expect(dialog.dutyRoster).toMatchObject({
+      date,
+      cxPreflightStaffId: cx!.id,
+      dutyStaffId: duty!.id,
+      standbyStaffIds: [standbyOne!.id, standbyTwo!.id],
+    });
+  }
+);
+
+it("统计页保存的四个后天轮值槽位在归档后天预检中默认回显", async () => {
+  const state = fixture();
+  const [cx, duty] = state.staff;
+  const standbyOne = { ...duty!, id: `${duty!.id}-standby-1`, name: "丙" };
+  const standbyTwo = { ...duty!, id: `${duty!.id}-standby-2`, name: "丁" };
+  state.staff.push(standbyOne, standbyTwo);
+  cx!.cxPreflightQualified = true;
+  cx!.dutyQualified = false;
+  duty!.dutyQualified = true;
+  standbyOne.standbyQualified = true;
+  standbyTwo.standbyQualified = true;
+  const nextDate = "2026-08-17";
+  state.dutyRosterOverrides = [
+    {
+      date: nextDate,
+      cxPreflightStaffId: cx!.id,
+      dutyStaffId: duty!.id,
+      standbyStaffIds: [standbyOne.id, standbyTwo.id],
+    },
+  ];
+  const coordinator = createTestApplicationCoordinator(
+    createTestAutoscheduleStore(state),
+    { preferences }
+  );
+  await coordinator.handle({ type: "archive-next-duty-day" });
+  const dialog = coordinator.view().dialog;
+  if (dialog?.kind !== "next-workday-flight-picker")
+    throw new Error("缺少后天预检弹窗");
+  expect(dialog.dutyRoster).toMatchObject({
+    date: nextDate,
+    cxPreflightStaffId: cx!.id,
+    dutyStaffId: duty!.id,
+    standbyStaffIds: [standbyOne.id, standbyTwo.id],
+  });
+});
+
+it("统计页轮值保存并恢复后仍在生成预检中回显", async () => {
+  const state = fixture();
+  const person = state.staff[0]!;
+  person.cxPreflightQualified = false;
+  person.dutyQualified = true;
+  let raw: string | null = null;
+  const persistence = createStatePersistence({
+    getItem: () => raw,
+    setItem: (_key, value) => {
+      raw = value;
+    },
+    removeItem: vi.fn(),
+  });
+  const coordinator = createTestApplicationCoordinator(
+    createTestAutoscheduleStore(state, persistence),
+    { preferences }
+  );
+  await coordinator.handle({
+    type: "update-duty-roster",
+    date,
+    slot: "duty",
+    staffId: person.id,
+  });
+  expect(coordinator.model().dutyRosterOverrides).toEqual(
+    expect.arrayContaining([
+      expect.objectContaining({ date, dutyStaffId: person.id }),
+    ])
+  );
+  coordinator.commit();
+  const restored = persistence.load();
+  expect(restored.dutyRosterOverrides).toEqual(
+    expect.arrayContaining([
+      expect.objectContaining({ date, dutyStaffId: person.id }),
+    ])
+  );
+  const reopened = createTestApplicationCoordinator(
+    createTestAutoscheduleStore(restored),
+    { preferences }
+  );
+  await reopened.handle({ type: "generate-schedule" });
+  expect(reopened.view().dialog?.kind).toBe("schedule-preflight");
+  expect(reopened.view().dialog).toMatchObject({
+    dutyRoster: expect.objectContaining({ dutyStaffId: person.id }),
+  });
+});
