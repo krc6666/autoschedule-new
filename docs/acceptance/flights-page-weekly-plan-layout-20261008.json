@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "taskId": "flights-page-weekly-plan-layout-20261008",
+  "title": "航班页保留在线查询并承载每周航班计划",
+  "startedFrom": "b8bfab28ddde7dfc071682e72b35fb5f5d8a7e03",
+  "expectation": {
+    "example": "打开航班页，原有模板选择、新增和删除按钮不再显示；在线查询航班保留；每周航班计划在同页显示。",
+    "expected": "航班页只保留在线查询航班入口，并显示每周航班计划的星期选择和航班复选框；配置页不再显示每周航班计划。",
+    "unchanged": "仅调整页面组合和按钮显示；每周航班计划命令、数据字段、保存、导入导出和排班读取逻辑不变。",
+    "fallback": "页面移动失败或无模板时沿用原空状态显示，不修改任何航班或周计划数据。"
+  },
+  "testedVersion": "pending-commit",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "UI 定向测试验证航班页不再显示模板选择、新增和删除入口，并显示每周计划。",
+      "evidence": []
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "航班页与配置页定向测试 6 项通过；周计划复选框仍按原状态显示。",
+      "evidence": []
+    },
+    "alternatePath": {
+      "status": "not_applicable",
+      "reason": "本次仅页面位置和按钮显示调整，不存在另一条业务路径。",
+      "evidence": []
+    },
+    "postProcessing": {
+      "status": "not_applicable",
+      "reason": "未修改排班计算或后置处理。",
+      "evidence": []
+    },
+    "finalGuard": {
+      "status": "not_applicable",
+      "reason": "未修改业务守卫或最终班表。",
+      "evidence": []
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "未改命令、数据字段、Store 或持久化；类型检查和 UI 回归通过。",
+      "evidence": []
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "尚未进行 owner 的真实浏览器页面验收。",
+      "evidence": []
+    }
+  },
+  "answers": {
+    "originalFailure": "原每周航班计划组件挂在配置页，航班页仍有多个当日航班操作入口。",
+    "laterChanges": "只移动 UI 组件并隐藏航班页操作按钮，周计划命令和数据路径未改。",
+    "finalArtifact": "定向 UI 测试 6 项通过，typecheck 通过；真实浏览器验收待 owner。"
+  },
+  "review": {
+    "missedScope": "页面测试需要同时验证移动前后两个页面，不能只看组件是否存在。",
+    "rootCause": "页面组合层分别挂载了航班操作和每周计划，没有按用户工作流统一组织。",
+    "earlyDetection": "外观调整先列出原页面按钮、移动组件和必须不变的数据命令，再对两页面做 DOM 断言。"
+  }
+}

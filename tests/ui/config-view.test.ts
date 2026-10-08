@@ -7,6 +7,7 @@ import { replaceWeeklyFlightPlan } from "../../src/domain/flights/weekly-flight-
 import { UI_COMMAND_EVENT } from "../../src/ui/events/ui-command";
 import "../../src/ui/components/position-rules-section";
 import "../../src/ui/components/config-page";
+import "../../src/ui/components/flights-page";
 import { mountElement } from "./lit-test-helpers";
 
 describe("configuration page", () => {
@@ -21,8 +22,8 @@ describe("configuration page", () => {
     expect(text).toContain("岗位规则");
     expect(text).toContain("排班约束");
     expect(text).toContain("航班计划模板");
-    expect(text).toContain("每周航班计划");
-    expect(element.querySelectorAll("[data-weekday]")).toHaveLength(7);
+    expect(text).not.toContain("每周航班计划");
+    expect(element.querySelectorAll("[data-weekday]")).toHaveLength(0);
     expect(text).not.toContain("排班规则");
     expect(
       element.querySelector(".config-collapsible")?.hasAttribute("open")
@@ -47,7 +48,7 @@ describe("configuration page", () => {
 
     const element = await mountElement<
       HTMLElement & { updateComplete: Promise<unknown> }
-    >("autoschedule-config-page", { model: state });
+    >("autoschedule-flights-page", { model: state });
 
     expect(
       element.querySelector<HTMLInputElement>(

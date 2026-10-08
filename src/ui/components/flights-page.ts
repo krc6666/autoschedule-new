@@ -3,6 +3,7 @@ import { html } from "lit";
 import type { AppState } from "../../model";
 import { dispatchUiCommand, inputValue } from "../events/ui-command";
 import { LightDomElement } from "./light-dom-element";
+import "./weekly-flight-plan-section";
 
 export class FlightsPageElement extends LightDomElement {
   static override properties = { model: { attribute: false } };
@@ -13,33 +14,28 @@ export class FlightsPageElement extends LightDomElement {
       left.startTime.localeCompare(right.startTime)
     );
     return html`<section class="workspace-section">
-      <div class="section-heading">
-        <div>
-          <h3>当日航班计划</h3>
-          <span>输入航班号会自动带出配置模板；预定人数决定启用多少岗位</span>
+        <div class="section-heading">
+          <div>
+            <h3>当日航班计划</h3>
+            <span>输入航班号会自动带出配置模板；预定人数决定启用多少岗位</span>
+          </div>
+          <div class="d-flex flex-wrap gap-2">
+            ${this.actionButton("cloud-download", "在线查询航班", "open-flight-query", "btn-outline-primary")}
+          </div>
         </div>
-        <div class="d-flex flex-wrap gap-2">
-          ${this.actionButton("cloud-download", "在线查询航班", "open-flight-query", "btn-outline-primary")}
-          ${this.actionButton("copy", "选择模板", "open-flight-templates", "btn-outline-secondary")}
-          ${this.actionButton("plus-lg", "新增当日航班", "add-flight", "btn-primary")}
-        </div>
-      </div>
-      <div class="table-responsive">
-        <table class="table align-middle data-table">
-          <thead>
-            <tr>
-              <th>航班号</th>
-              <th>时间</th>
-              <th>预定人数（运力）</th>
-              <th>岗位清单</th>
-              <th>备注</th>
-              <th class="action-col">
-                <span class="visually-hidden">操作</span>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            ${
+        <div class="table-responsive">
+          <table class="table align-middle data-table">
+            <thead>
+              <tr>
+                <th>航班号</th>
+                <th>时间</th>
+                <th>预定人数（运力）</th>
+                <th>岗位清单</th>
+                <th>备注</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${
               flights.length
                 ? flights.map(
                     (flight) =>
@@ -63,35 +59,27 @@ export class FlightsPageElement extends LightDomElement {
                         <td>
                           ${this.field(flight.id, "remark", flight.remark, "备注")}
                         </td>
-                        <td>
-                          <button
-                            class="btn btn-sm btn-outline-danger icon-btn"
-                            type="button"
-                            title="删除航班"
-                            aria-label="删除航班"
-                            @click=${() => dispatchUiCommand(this, { type: "delete-flight", id: flight.id })}
-                          >
-                            <i class="bi bi-trash3"></i>
-                          </button>
-                        </td>
                       </tr>`
                   )
                 : html`<tr>
-                    <td colspan="6" class="empty-cell">尚无航班计划</td>
+                    <td colspan="5" class="empty-cell">尚无航班计划</td>
                   </tr>`
             }
-          </tbody>
-        </table>
-      </div>
-      <datalist id="flight-template-options">
-        ${this.model.templates.map(
+            </tbody>
+          </table>
+        </div>
+        <datalist id="flight-template-options">
+          ${this.model.templates.map(
           (template) =>
             html`<option value=${template.flightNo}>
               ${template.startTime}–${template.endTime}
             </option>`
         )}
-      </datalist>
-    </section>`;
+        </datalist>
+      </section>
+      <autoschedule-weekly-flight-plan
+        .model=${this.model}
+      ></autoschedule-weekly-flight-plan>`;
   }
 
   private field(
@@ -124,7 +112,7 @@ export class FlightsPageElement extends LightDomElement {
   private actionButton(
     icon: string,
     label: string,
-    type: "open-flight-query" | "open-flight-templates" | "add-flight",
+    type: "open-flight-query",
     style: string
   ) {
     return html`<button
