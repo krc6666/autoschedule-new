@@ -1,10 +1,10 @@
 import {
-  cxPreflightEligibleStaff,
-  dutyQualifiedStaff,
+  cxPreflightRosterStaff,
+  dutyRosterStaff,
   getMonthlyDutyRoster,
   getMonthlyDutyRosterStats,
-  rosterEligibleStaff,
-  standbyQualifiedStaff,
+  rosterQualifiedStaff,
+  standbyRosterStaff,
 } from "../../domain/duty-roster/roster";
 import type { AppState } from "../../model";
 
@@ -18,10 +18,10 @@ function countRange(counts: number[]) {
 export function buildDutyRosterPageModel(state: AppState, date: string) {
   const monthly = getMonthlyDutyRoster(state, date);
   const stats = getMonthlyDutyRosterStats(state, date);
-  const cxStaff = cxPreflightEligibleStaff(state);
-  const dutyStaff = dutyQualifiedStaff(state);
-  const regularStaff = rosterEligibleStaff(state);
-  const standbyStaff = standbyQualifiedStaff(state);
+  const cxStaff = cxPreflightRosterStaff(state);
+  const dutyStaff = dutyRosterStaff(state);
+  const regularStaff = rosterQualifiedStaff(state);
+  const standbyStaff = standbyRosterStaff(state);
   const standbyIds = new Set(standbyStaff.map((person) => person.id));
   const standbyStats = stats.filter((item) => standbyIds.has(item.staff.id));
   const cxIds = new Set(cxStaff.map((person) => person.id));

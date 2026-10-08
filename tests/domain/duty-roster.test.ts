@@ -141,6 +141,16 @@ describe("monthly duty roster", () => {
     ).toContain("备勤资质");
   });
 
+  it("keeps a qualified leave-status person in a manual monthly roster override", () => {
+    const state = createOrdinarySchedulingState();
+    const person = state.staff[0]!;
+    person.dutyQualified = true;
+    person.status = "休假";
+    const date = "2026-08-01";
+    expect(updateDutyRosterSlot(state, date, "duty", person.id)).toBeNull();
+    expect(getDutyRosterForDate(state, date).dutyStaffId).toBe(person.id);
+  });
+
   it("drops an override after a standby worker loses qualification", () => {
     const state = createOrdinarySchedulingState();
     const automatic = getDutyRosterForDate(state, "2026-08-01");

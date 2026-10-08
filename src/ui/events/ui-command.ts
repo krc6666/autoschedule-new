@@ -73,6 +73,11 @@ export type UiCommand =
       staffId: string;
       status: StaffStatus;
     }
+  | {
+      type: "update-schedule-preflight-duty-roster";
+      slot: DutyRosterSlot;
+      staffId: string;
+    }
   | { type: "confirm-schedule-preflight"; selectedIds: string[] }
   | { type: "open-reschedule-flight-picker" }
   | {
@@ -91,6 +96,16 @@ export type UiCommand =
       type: "update-reschedule-flight-picker-passengers";
       candidateId: string;
       bookedPassengers: number;
+    }
+  | {
+      type: "update-reschedule-flight-picker-staff-status";
+      staffId: string;
+      status: StaffStatus;
+    }
+  | {
+      type: "update-reschedule-flight-picker-duty-roster";
+      slot: DutyRosterSlot;
+      staffId: string;
     }
   | { type: "confirm-reschedule-flight-picker"; selectedIds: string[] }
   | {
@@ -219,6 +234,11 @@ export type UiCommand =
       type: "update-next-workday-flight-picker-staff-status";
       staffId: string;
       status: StaffStatus;
+    }
+  | {
+      type: "update-next-workday-flight-picker-duty-roster";
+      slot: DutyRosterSlot;
+      staffId: string;
     }
   | { type: "confirm-next-workday-flight-picker"; selectedIds: string[] }
   | { type: "set-schedule-zoom"; value: number }

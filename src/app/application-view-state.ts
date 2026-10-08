@@ -20,6 +20,7 @@ import type { LatePriorityCountsImportPreview } from "../infrastructure/late-pri
 import type { HalfRestMode } from "../domain/shared/schedule-run-preferences";
 import type { TeamLeaderGapFillPreview } from "../domain/coverage/team-leader-gap-fill";
 import type { HistoryImportSummary } from "./workbook-actions";
+import type { DutyRosterAssignment } from "../domain/duty-roster/roster";
 
 export type ApplicationDialog =
   | { kind: "templates" }
@@ -30,12 +31,16 @@ export type ApplicationDialog =
       candidates: FlightSelectionCandidate[];
       selectedIds: string[];
       staffStatuses: Record<string, StaffStatus>;
+      dutyRoster?: DutyRosterAssignment;
     }
   | {
       kind: "reschedule-flight-picker";
       date: string;
+      groupId: ScheduleGroupId;
       candidates: FlightSelectionCandidate[];
       selectedIds: string[];
+      staffStatuses?: Record<string, StaffStatus>;
+      dutyRoster?: DutyRosterAssignment;
     }
   | {
       kind: "next-workday-flight-picker";
@@ -46,6 +51,7 @@ export type ApplicationDialog =
       candidates: FlightSelectionCandidate[];
       selectedIds: string[];
       staffStatuses: Record<string, StaffStatus>;
+      dutyRoster?: DutyRosterAssignment;
     }
   | { kind: "qualification"; positionRuleId: string }
   | {

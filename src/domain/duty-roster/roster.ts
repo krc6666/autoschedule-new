@@ -64,6 +64,27 @@ export function rosterEligibleStaff(state: DutyRosterFacts): Staff[] {
   );
 }
 
+/** Manual monthly roster selection: qualification is required, current leave status is not. */
+export function rosterQualifiedStaff(state: DutyRosterFacts): Staff[] {
+  return state.staff.filter((person) => person.staffType === "常规");
+}
+
+export function cxPreflightRosterStaff(state: DutyRosterFacts): Staff[] {
+  return rosterQualifiedStaff(state).filter(
+    (person) => person.cxPreflightQualified
+  );
+}
+
+export function dutyRosterStaff(state: DutyRosterFacts): Staff[] {
+  return rosterQualifiedStaff(state).filter((person) => person.dutyQualified);
+}
+
+export function standbyRosterStaff(state: DutyRosterFacts): Staff[] {
+  return rosterQualifiedStaff(state).filter(
+    (person) => person.standbyQualified
+  );
+}
+
 export function cxPreflightEligibleStaff(state: DutyRosterFacts): Staff[] {
   return rosterEligibleStaff(state).filter(
     (person) => person.cxPreflightQualified
@@ -361,11 +382,11 @@ function validOverride(
   override: DutyRosterOverride
 ): boolean {
   const cxIds = new Set(
-    cxPreflightEligibleStaff(state).map((person) => person.id)
+    cxPreflightRosterStaff(state).map((person) => person.id)
   );
-  const dutyIds = new Set(dutyQualifiedStaff(state).map((person) => person.id));
+  const dutyIds = new Set(dutyRosterStaff(state).map((person) => person.id));
   const standbyQualifiedIds = new Set(
-    standbyQualifiedStaff(state).map((person) => person.id)
+    standbyRosterStaff(state).map((person) => person.id)
   );
   if (override.cxPreflightStaffId && !cxIds.has(override.cxPreflightStaffId))
     return false;
@@ -413,7 +434,7 @@ export function getMonthlyDutyRosterStats(
   date: string
 ): DutyRosterPersonStats[] {
   const rows = getMonthlyDutyRoster(state, date);
-  return rosterEligibleStaff(state).map((staff) => ({
+  return rosterQualifiedStaff(state).map((staff) => ({
     staff,
     cxPreflightDates: rows
       .filter((row) => row.cxPreflightStaffId === staff.id)
@@ -442,14 +463,14 @@ export function updateDutyRosterSlot(
 ): string | null {
   const current = getDutyRosterForDate(state, date);
   const regularIds = new Set(
-    rosterEligibleStaff(state).map((person) => person.id)
+    rosterQualifiedStaff(state).map((person) => person.id)
   );
   const cxIds = new Set(
-    cxPreflightEligibleStaff(state).map((person) => person.id)
+    cxPreflightRosterStaff(state).map((person) => person.id)
   );
-  const dutyIds = new Set(dutyQualifiedStaff(state).map((person) => person.id));
+  const dutyIds = new Set(dutyRosterStaff(state).map((person) => person.id));
   const standbyIds = new Set(
-    standbyQualifiedStaff(state).map((person) => person.id)
+    standbyRosterStaff(state).map((person) => person.id)
   );
   if (slot === "cx-preflight") {
     if (!cxIds.has(staffId)) return "该人员不具备CX航前资质或当前不可用";
@@ -524,4 +545,24 @@ export function dutyFatigueByStaff(
   return dutyStaffId
     ? new Map([[dutyStaffId, state.settings.dutyFatiguePoints]])
     : new Map();
+}
+
+export function dutyRosterStatusIssues(
+  state: DutyRosterFacts,
+  date: string
+): string[] {
+  const roster = getDutyRosterForDate(state, date);
+  const slots: Array<[string, string | null]> = [
+    ["CX 航前", roster.cxPreflightStaffId],
+    ["主值班", roster.dutyStaffId],
+    ["次日备勤一", roster.standbyStaffIds[0]],
+    ["次日备勤二", roster.standbyStaffIds[1]],
+  ];
+  return slots.flatMap(([label, staffId]) => {
+    if (!staffId) return [];
+    const person = state.staff.find((item) => item.id === staffId);
+    return person && person.status !== "正常"
+      ? [`${label}人员${person.name}当前为${person.status}`]
+      : [];
+  });
 }

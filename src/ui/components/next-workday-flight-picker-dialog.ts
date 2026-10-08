@@ -2,6 +2,7 @@ import { html } from "lit";
 
 import type { ApplicationDialog } from "../../app/application-view-state";
 import type { AppState, StaffStatus } from "../../model";
+import type { DutyRosterSlot } from "../../domain/duty-roster/roster";
 import { dispatchUiCommand } from "../events/ui-command";
 import { LightDomElement } from "./light-dom-element";
 import { weekdayLabel } from "../../domain/flights/weekly-flight-plan";
@@ -29,7 +30,7 @@ export class NextWorkdayFlightPickerDialogElement extends LightDomElement {
     const selectedCount = this.dialog.selectedIds.length;
     const reschedule = this.dialog.kind === "reschedule-flight-picker";
     const schedulePreflight = this.dialog.kind === "schedule-preflight";
-    const hasStaffStatusDraft = this.dialog.kind !== "reschedule-flight-picker";
+    const hasStaffStatusDraft = true;
     return html`<div class="modal-body next-workday-flight-picker">
         ${hasStaffStatusDraft ? html`<h3 class="h6">选择航班</h3>` : null}
         <div class="d-flex flex-wrap gap-2 mb-3">
@@ -99,6 +100,7 @@ export class NextWorkdayFlightPickerDialogElement extends LightDomElement {
           已选择 ${selectedCount} 个航班
         </div>
         ${hasStaffStatusDraft ? this.staffStatusSection() : null}
+        ${this.dutyRosterSection()}
       </div>
       <div class="modal-footer">
         <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">
@@ -189,8 +191,11 @@ export class NextWorkdayFlightPickerDialogElement extends LightDomElement {
   };
 
   private staffStatusSection() {
-    if (this.dialog.kind === "reschedule-flight-picker") return null;
-    const statuses = this.dialog.staffStatuses;
+    const statuses =
+      this.dialog.staffStatuses ??
+      Object.fromEntries(
+        this.model.staff.map((person) => [person.id, person.status])
+      );
     return html`<section class="mt-4" aria-label="人员状态确认">
       <h3 class="h6 mb-2">确认休假人员</h3>
       <p class="small text-secondary">
@@ -229,9 +234,80 @@ export class NextWorkdayFlightPickerDialogElement extends LightDomElement {
       type:
         this.dialog.kind === "schedule-preflight"
           ? "update-schedule-preflight-staff-status"
-          : "update-next-workday-flight-picker-staff-status",
+          : this.dialog.kind === "reschedule-flight-picker"
+            ? "update-reschedule-flight-picker-staff-status"
+            : "update-next-workday-flight-picker-staff-status",
       staffId,
       status,
+    });
+  }
+
+  private dutyRosterSection() {
+    const roster = this.dialog.dutyRoster;
+    if (!roster) return null;
+    const slots: Array<[DutyRosterSlot, string, string | null]> = [
+      ["cx-preflight", "CX 航前", roster.cxPreflightStaffId],
+      ["duty", "主值班", roster.dutyStaffId],
+      ["standby-0", "次日备勤一", roster.standbyStaffIds[0]],
+      ["standby-1", "次日备勤二", roster.standbyStaffIds[1]],
+    ];
+    return html`<section class="mt-4" aria-label="值班人员确认">
+      <h3 class="h6 mb-2">值班人员确认</h3>
+      <div class="list-group">
+        ${slots.map(
+          ([slot, label, selected]) =>
+            html`<label
+              class="list-group-item d-flex align-items-center justify-content-between gap-3"
+            >
+              <span>${label}</span>
+              <select
+                class="form-select form-select-sm w-auto"
+                aria-label="${label}"
+                .value=${selected ?? ""}
+                @change=${(event: Event) =>
+                this.updateDutyRoster(
+                  slot,
+                  (event.currentTarget as HTMLSelectElement).value
+                )}
+              >
+                <option value="">未安排</option>
+                ${this.model.staff
+                .filter((person) =>
+                  this.dutyRosterOptionAllowed(person, slot, selected)
+                )
+                .map(
+                  (person) =>
+                    html`<option value=${person.id}>${person.name}</option>`
+                )}
+              </select>
+            </label>`
+        )}
+      </div>
+    </section>`;
+  }
+
+  private dutyRosterOptionAllowed(
+    person: AppState["staff"][number],
+    slot: DutyRosterSlot,
+    selected: string | null
+  ): boolean {
+    if (person.id === selected) return true;
+    if (person.staffType !== "常规") return false;
+    if (slot === "cx-preflight") return person.cxPreflightQualified;
+    if (slot === "duty") return person.dutyQualified;
+    return person.standbyQualified;
+  }
+
+  private updateDutyRoster(slot: DutyRosterSlot, staffId: string): void {
+    dispatchUiCommand(this, {
+      type:
+        this.dialog.kind === "schedule-preflight"
+          ? "update-schedule-preflight-duty-roster"
+          : this.dialog.kind === "reschedule-flight-picker"
+            ? "update-reschedule-flight-picker-duty-roster"
+            : "update-next-workday-flight-picker-duty-roster",
+      slot,
+      staffId,
     });
   }
 }

@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "taskId": "schedule-preflight-duty-status-20261007",
+  "title": "三个排班入口统一确认航班、状态与轮值",
+  "startedFrom": "49b16894e2fd35ac24253df7e1871ef3e41abeb3",
+  "expectation": {
+    "example": "在当前日期点击生成排班、重新排班，或从当前班表点击归档并排后天；弹窗同时列出航班计划、每个航班预定人数、目标日期人员状态和CX航前/主值班/次日备勤一/次日备勤二四个槽位。",
+    "expected": "三种入口都显示并允许临时修改四类输入；人员状态和轮值默认读取该排班日期的统计页结果，后天没有单独状态记录时人员状态默认正常；确认后计算使用这些草稿。",
+    "unchanged": "航班模板、周计划、原班表、历史、人员配置和月度轮值覆盖在弹窗编辑及计算失败前保持不变；既有轮值资质、重复人员和状态校验继续生效。",
+    "fallback": "取消、停止、无可行结果或异常时丢弃全部预检草稿，原班表、航班、人员状态、历史和配置保持不变。"
+  },
+  "testedVersion": "f05eafecaff9d3e6bd63cb621fb17e74d033a09399d9ba0bddc39d1844b6a52a",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "代码定位确认当前状态过滤同时用于统计页候选和人工覆盖，导致休假人员消失；新增回归在修改后通过，未保留修改前失败测试证据。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-07-schedule-preflight-duty-status-verify.txt",
+          "summary": "本次实际命令结果摘要：verify 退出 0；1131 项普通测试、16 项性能测试及构建通过。",
+          "sha256": "270f94fc51ce4622f053bf9add9896525ab9372a2fd8387a43d3370f5b5e06e2"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "三个预检入口、人员状态和四个轮值槽位定向测试通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-07-schedule-preflight-duty-status-verify.txt",
+          "summary": "本次实际命令结果摘要：verify 退出 0；1131 项普通测试、16 项性能测试及构建通过。",
+          "sha256": "270f94fc51ce4622f053bf9add9896525ab9372a2fd8387a43d3370f5b5e06e2"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "测试覆盖后天预检默认正常、统计页休假值班人员回显、生成与重新排班阻止休假值班人员计算；并未逐槽位验证病假及后天状态阻止。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-07-schedule-preflight-duty-status-verify.txt",
+          "summary": "本次实际命令结果摘要：verify 退出 0；1131 项普通测试、16 项性能测试及构建通过。",
+          "sha256": "270f94fc51ce4622f053bf9add9896525ab9372a2fd8387a43d3370f5b5e06e2"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "确认时将草稿注入临时状态，原有排班管线继续消费；停止和失败回退测试通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-07-schedule-preflight-duty-status-verify.txt",
+          "summary": "本次实际命令结果摘要：verify 退出 0；1131 项普通测试、16 项性能测试及构建通过。",
+          "sha256": "270f94fc51ce4622f053bf9add9896525ab9372a2fd8387a43d3370f5b5e06e2"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "生成与重新排班确认前阻止休假主值班人员调用 calculate，原模型不变；此证据不等同于最终 assignments 反向守卫测试。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-07-schedule-preflight-duty-status-verify.txt",
+          "summary": "本次实际命令结果摘要：verify 退出 0；1131 项普通测试、16 项性能测试及构建通过。",
+          "sha256": "270f94fc51ce4622f053bf9add9896525ab9372a2fd8387a43d3370f5b5e06e2"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "取消、停止、异常路径不替换原模型的回归通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-07-schedule-preflight-duty-status-verify.txt",
+          "summary": "本次实际命令结果摘要：verify 退出 0；1131 项普通测试、16 项性能测试及构建通过。",
+          "sha256": "270f94fc51ce4622f053bf9add9896525ab9372a2fd8387a43d3370f5b5e06e2"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "真实浏览器入口、用户配置导入和四槽位默认值现场证据尚未取得；自动测试与构建通过不能替代现场验收。",
+      "evidence": []
+    }
+  },
+  "answers": {
+    "originalFailure": "重新排班原先没有人员状态，三个入口原先没有完整轮值草稿；定向测试固定了这些缺口。",
+    "laterChanges": "人员状态变化会重算预检轮值；确认后的临时状态继续经过原排班、后置流程和安全检查。",
+    "finalArtifact": "npm.cmd run verify 退出 0；页面最终显示证据待 owner 真实入口验收。"
+  },
+  "review": {
+    "missedScope": "真实浏览器中的三入口点击和导入后持久化尚未由 owner 提供现场证据。",
+    "rootCause": "月度计划资质与当天可用状态共用过滤函数，预检读取过滤后的轮值；之前验收记录还误用旧日志并将现场未验收标为通过。",
+    "earlyDetection": "逐项区分统计页人工覆盖、预检默认回显、当天状态阻止和最终产物；记录仅引用本次真实证据，现场缺证据保持未验收。"
+  }
+}

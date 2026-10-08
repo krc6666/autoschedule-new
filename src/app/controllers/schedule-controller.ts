@@ -22,6 +22,13 @@ import {
 import { isHalfRestWarning } from "../../domain/rules/half-rest";
 import { planTeamLeaderGapFill } from "../../domain/coverage/team-leader-gap-fill";
 import { applyStaffStatusChange } from "../../domain/kernel/schedule-state";
+import {
+  getDutyRosterForDate,
+  dutyRosterStatusIssues,
+  updateDutyRosterSlot,
+  type DutyRosterAssignment,
+  type DutyRosterSlot,
+} from "../../domain/duty-roster/roster";
 import type { AppState, ScheduleResult, StaffStatus } from "../../model";
 
 export class ScheduleController implements UiCommandController {
@@ -48,6 +55,9 @@ export class ScheduleController implements UiCommandController {
           command.status
         );
         return true;
+      case "update-schedule-preflight-duty-roster":
+        this.updatePreflightDutyRoster(command.slot, command.staffId);
+        return true;
       case "confirm-schedule-preflight":
         await this.confirmSchedulePreflight(command.selectedIds);
         return true;
@@ -62,6 +72,12 @@ export class ScheduleController implements UiCommandController {
           command.candidateId,
           command.bookedPassengers
         );
+        return true;
+      case "update-reschedule-flight-picker-staff-status":
+        this.updateRescheduleStaffStatus(command.staffId, command.status);
+        return true;
+      case "update-reschedule-flight-picker-duty-roster":
+        this.updatePreflightDutyRoster(command.slot, command.staffId);
         return true;
       case "confirm-reschedule-flight-picker":
         await this.confirmRescheduleFlightPicker(command.selectedIds);
@@ -201,6 +217,9 @@ export class ScheduleController implements UiCommandController {
       case "update-next-workday-flight-picker-staff-status":
         this.updateNextWorkdayStaffStatus(command.staffId, command.status);
         return true;
+      case "update-next-workday-flight-picker-duty-roster":
+        this.updatePreflightDutyRoster(command.slot, command.staffId);
+        return true;
       case "confirm-next-workday-flight-picker":
         await this.confirmNextWorkdayFlightPicker(command.selectedIds);
         return true;
@@ -222,6 +241,11 @@ export class ScheduleController implements UiCommandController {
   }
 
   async generate(date: string): Promise<void> {
+    const dutyIssues = dutyRosterStatusIssues(this.context.model(), date);
+    if (dutyIssues.length) {
+      this.context.toast(`不能生成排班：${dutyIssues.join("；")}`, "danger");
+      return;
+    }
     try {
       const outcome = await this.context.scheduleRunner.calculate(
         this.context.model(),
@@ -282,6 +306,78 @@ export class ScheduleController implements UiCommandController {
     );
   }
 
+  private normalStaffStatuses(): Record<string, StaffStatus> {
+    return Object.fromEntries(
+      this.context.model().staff.map((person) => [person.id, "正常"])
+    );
+  }
+
+  private dutyRosterForDialog(
+    date: string,
+    staffStatuses: Record<string, StaffStatus>
+  ): DutyRosterAssignment {
+    const temporaryState = structuredClone(this.context.model());
+    this.applyPreflightStaffStatuses(temporaryState, staffStatuses);
+    return getDutyRosterForDate(temporaryState, date);
+  }
+
+  private updatePreflightDutyRoster(
+    slot: DutyRosterSlot,
+    staffId: string
+  ): void {
+    const dialog = this.context.view().dialog;
+    if (
+      !dialog ||
+      (dialog.kind !== "schedule-preflight" &&
+        dialog.kind !== "reschedule-flight-picker" &&
+        dialog.kind !== "next-workday-flight-picker")
+    )
+      return;
+    const statuses = dialog.staffStatuses ?? this.currentStaffStatuses();
+    const temporaryState = structuredClone(this.context.model());
+    this.applyPreflightStaffStatuses(temporaryState, statuses);
+    const current =
+      dialog.dutyRoster ?? this.dutyRosterForDialog(dialog.date, statuses);
+    if (!staffId) {
+      const next: DutyRosterAssignment = {
+        ...current,
+        standbyStaffIds: [...current.standbyStaffIds],
+      };
+      if (slot === "cx-preflight") next.cxPreflightStaffId = null;
+      else if (slot === "duty") next.dutyStaffId = null;
+      else next.standbyStaffIds[slot === "standby-0" ? 0 : 1] = null;
+      this.context.updateView({ dialog: { ...dialog, dutyRoster: next } });
+      return;
+    }
+    temporaryState.dutyRosterOverrides = [
+      ...temporaryState.dutyRosterOverrides.filter(
+        (item) => item.date !== dialog.date
+      ),
+      {
+        date: dialog.date,
+        cxPreflightStaffId: current.cxPreflightStaffId,
+        dutyStaffId: current.dutyStaffId,
+        standbyStaffIds: [...current.standbyStaffIds],
+      },
+    ];
+    const error = updateDutyRosterSlot(
+      temporaryState,
+      dialog.date,
+      slot,
+      staffId
+    );
+    if (error) {
+      this.context.toast(error, "warning");
+      return;
+    }
+    this.context.updateView({
+      dialog: {
+        ...dialog,
+        dutyRoster: getDutyRosterForDate(temporaryState, dialog.date),
+      },
+    });
+  }
+
   private applyPreflightStaffStatuses(
     state: AppState,
     statuses: Record<string, StaffStatus>
@@ -290,6 +386,28 @@ export class ScheduleController implements UiCommandController {
       const status = statuses[person.id];
       if (status) applyStaffStatusChange(state, person.id, status);
     });
+  }
+
+  private preflightDutyRosterIssues(
+    date: string,
+    statuses: Record<string, StaffStatus>,
+    roster: DutyRosterAssignment | undefined
+  ): string[] {
+    if (!roster) return [];
+    const temporaryState = structuredClone(this.context.model());
+    this.applyPreflightStaffStatuses(temporaryState, statuses);
+    temporaryState.dutyRosterOverrides = [
+      ...temporaryState.dutyRosterOverrides.filter(
+        (item) => item.date !== date
+      ),
+      {
+        date,
+        cxPreflightStaffId: roster.cxPreflightStaffId,
+        dutyStaffId: roster.dutyStaffId,
+        standbyStaffIds: [...roster.standbyStaffIds],
+      },
+    ];
+    return dutyRosterStatusIssues(temporaryState, date);
   }
 
   private checkPreflightContext(
@@ -537,6 +655,7 @@ export class ScheduleController implements UiCommandController {
           .filter((candidate) => candidate.selectedByDefault)
           .map((candidate) => candidate.id),
         staffStatuses: this.currentStaffStatuses(),
+        dutyRoster: getDutyRosterForDate(model, this.context.view().date),
       },
     });
   }
@@ -583,10 +702,37 @@ export class ScheduleController implements UiCommandController {
     if (dialog?.kind !== "schedule-preflight") return;
     if (!this.context.model().staff.some((person) => person.id === staffId))
       return;
+    const statuses = { ...dialog.staffStatuses, [staffId]: status };
+    const temporaryState = structuredClone(this.context.model());
+    this.applyPreflightStaffStatuses(temporaryState, statuses);
     this.context.updateView({
       dialog: {
         ...dialog,
-        staffStatuses: { ...dialog.staffStatuses, [staffId]: status },
+        staffStatuses: statuses,
+        dutyRoster: getDutyRosterForDate(temporaryState, dialog.date),
+      },
+    });
+  }
+
+  private updateRescheduleStaffStatus(
+    staffId: string,
+    status: StaffStatus
+  ): void {
+    const dialog = this.context.view().dialog;
+    if (dialog?.kind !== "reschedule-flight-picker") return;
+    if (!this.context.model().staff.some((person) => person.id === staffId))
+      return;
+    const statuses = {
+      ...(dialog.staffStatuses ?? this.currentStaffStatuses()),
+      [staffId]: status,
+    };
+    const temporaryState = structuredClone(this.context.model());
+    this.applyPreflightStaffStatuses(temporaryState, statuses);
+    this.context.updateView({
+      dialog: {
+        ...dialog,
+        staffStatuses: statuses,
+        dutyRoster: getDutyRosterForDate(temporaryState, dialog.date),
       },
     });
   }
@@ -603,8 +749,30 @@ export class ScheduleController implements UiCommandController {
       this.context.toast("请至少选择一个航班", "warning");
       return;
     }
+    const dutyIssues = this.preflightDutyRosterIssues(
+      dialog.date,
+      dialog.staffStatuses,
+      dialog.dutyRoster
+    );
+    if (dutyIssues.length) {
+      this.context.toast(`不能生成排班：${dutyIssues.join("；")}`, "danger");
+      return;
+    }
     const temporaryState = structuredClone(this.context.model());
     this.applyPreflightStaffStatuses(temporaryState, dialog.staffStatuses);
+    if (dialog.dutyRoster) {
+      temporaryState.dutyRosterOverrides = [
+        ...temporaryState.dutyRosterOverrides.filter(
+          (item) => item.date !== dialog.date
+        ),
+        {
+          date: dialog.date,
+          cxPreflightStaffId: dialog.dutyRoster.cxPreflightStaffId,
+          dutyStaffId: dialog.dutyRoster.dutyStaffId,
+          standbyStaffIds: [...dialog.dutyRoster.standbyStaffIds],
+        },
+      ];
+    }
     temporaryState.flights = flights;
     temporaryState.assignments = [];
     temporaryState.activeScheduleDate = null;
@@ -652,10 +820,13 @@ export class ScheduleController implements UiCommandController {
       dialog: {
         kind: "reschedule-flight-picker",
         date: this.context.view().date,
+        groupId: model.activeGroupId,
         candidates,
         selectedIds: candidates
           .filter((candidate) => candidate.selectedByDefault)
           .map((candidate) => candidate.id),
+        staffStatuses: this.currentStaffStatuses(),
+        dutyRoster: getDutyRosterForDate(model, this.context.view().date),
       },
     });
   }
@@ -699,6 +870,7 @@ export class ScheduleController implements UiCommandController {
   ): Promise<void> {
     const dialog = this.context.view().dialog;
     if (dialog?.kind !== "reschedule-flight-picker") return;
+    if (!this.checkPreflightContext(dialog.groupId, dialog.date)) return;
     const flights = materializeCurrentScheduleFlights(
       dialog.candidates,
       selectedIds
@@ -708,7 +880,33 @@ export class ScheduleController implements UiCommandController {
       return;
     }
     const date = dialog.date;
+    const dutyIssues = this.preflightDutyRosterIssues(
+      date,
+      dialog.staffStatuses ?? this.currentStaffStatuses(),
+      dialog.dutyRoster
+    );
+    if (dutyIssues.length) {
+      this.context.toast(`不能重新排班：${dutyIssues.join("；")}`, "danger");
+      return;
+    }
     const temporaryState = structuredClone(this.context.model());
+    this.applyPreflightStaffStatuses(
+      temporaryState,
+      dialog.staffStatuses ?? this.currentStaffStatuses()
+    );
+    if (dialog.dutyRoster) {
+      temporaryState.dutyRosterOverrides = [
+        ...temporaryState.dutyRosterOverrides.filter(
+          (item) => item.date !== date
+        ),
+        {
+          date,
+          cxPreflightStaffId: dialog.dutyRoster.cxPreflightStaffId,
+          dutyStaffId: dialog.dutyRoster.dutyStaffId,
+          standbyStaffIds: [...dialog.dutyRoster.standbyStaffIds],
+        },
+      ];
+    }
     temporaryState.flights = flights;
     temporaryState.assignments = [];
     temporaryState.activeScheduleDate = null;
@@ -769,7 +967,11 @@ export class ScheduleController implements UiCommandController {
         selectedIds: candidates
           .filter((candidate) => candidate.selectedByDefault)
           .map((candidate) => candidate.id),
-        staffStatuses: this.currentStaffStatuses(),
+        staffStatuses: this.normalStaffStatuses(),
+        dutyRoster: this.dutyRosterForDialog(
+          nextDate,
+          this.normalStaffStatuses()
+        ),
       },
     });
   }
@@ -816,10 +1018,14 @@ export class ScheduleController implements UiCommandController {
     if (dialog?.kind !== "next-workday-flight-picker") return;
     if (!this.context.model().staff.some((person) => person.id === staffId))
       return;
+    const statuses = { ...dialog.staffStatuses, [staffId]: status };
+    const temporaryState = structuredClone(this.context.model());
+    this.applyPreflightStaffStatuses(temporaryState, statuses);
     this.context.updateView({
       dialog: {
         ...dialog,
-        staffStatuses: { ...dialog.staffStatuses, [staffId]: status },
+        staffStatuses: statuses,
+        dutyRoster: getDutyRosterForDate(temporaryState, dialog.date),
       },
     });
   }
@@ -849,6 +1055,18 @@ export class ScheduleController implements UiCommandController {
       return;
     }
     const nextDate = dialog.date;
+    const dutyIssues = this.preflightDutyRosterIssues(
+      nextDate,
+      dialog.staffStatuses,
+      dialog.dutyRoster
+    );
+    if (dutyIssues.length) {
+      this.context.toast(
+        `不能生成后天排班：${dutyIssues.join("；")}`,
+        "danger"
+      );
+      return;
+    }
     if (
       !this.context.confirm(
         `归档 ${currentDate}，并根据已选择的 ${flights.length} 个航班生成后天 ${nextDate} 排班？`
@@ -858,6 +1076,19 @@ export class ScheduleController implements UiCommandController {
 
     const temporaryState = structuredClone(this.context.model());
     this.applyPreflightStaffStatuses(temporaryState, dialog.staffStatuses);
+    if (dialog.dutyRoster) {
+      temporaryState.dutyRosterOverrides = [
+        ...temporaryState.dutyRosterOverrides.filter(
+          (item) => item.date !== nextDate
+        ),
+        {
+          date: nextDate,
+          cxPreflightStaffId: dialog.dutyRoster.cxPreflightStaffId,
+          dutyStaffId: dialog.dutyRoster.dutyStaffId,
+          standbyStaffIds: [...dialog.dutyRoster.standbyStaffIds],
+        },
+      ];
+    }
     temporaryState.history = [
       ...temporaryState.history.filter((item) => item.date !== currentDate),
       ...records,

@@ -62,12 +62,12 @@ export class AppDialogElement extends LightDomElement {
   private titleText(): string {
     const dialog = this.dialog;
     if (dialog?.kind === "schedule-preflight")
-      return "确认 " + dialog.date + " 航班与人员状态";
+      return "确认 " + dialog.date + " 航班、状态与轮值";
     if (dialog?.kind === "templates") return "从模板添加航班";
     if (dialog?.kind === "reschedule-flight-picker")
-      return `确认 ${dialog.date} 航班与人数`;
+      return `确认 ${dialog.date} 航班、状态与轮值`;
     if (dialog?.kind === "next-workday-flight-picker")
-      return `确认 ${dialog.date}（${weekdayLabel(dialog.weekday)}）航班`;
+      return `确认 ${dialog.date}（${weekdayLabel(dialog.weekday)}）航班、状态与轮值`;
     if (dialog?.kind === "qualification") {
       const rule = this.model.positionRules.find(
         (item) => item.id === dialog.positionRuleId

@@ -1,0 +1,17 @@
+2026-10-07 schedule preflight duty status verification
+
+npm.cmd run typecheck: passed
+npm.cmd test: passed (123 files, 1131 tests)
+npm.cmd run test:performance: passed (5 files, 16 tests)
+npm.cmd run build: passed
+
+Summary of observed command results, not a raw command log.
+The first full verify failed on a 15-second kernel test timeout.
+That test passed alone; the second full verify exited 0.
+
+Focused regressions and limits:
+- qualified leave-status staff remains selectable in the statistics monthly roster
+- UI tests render four roster controls in all three preflight dialogs
+- a leave-status main duty member blocks generation and rescheduling before calculate
+- original model remains unchanged on the blocked path
+- no browser acceptance or exhaustive per-slot/sick-status/next-workday blocking evidence

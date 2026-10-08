@@ -260,7 +260,9 @@ describe.each(entries)("排班前确认：$name", (entry) => {
       reopened?.kind !== "next-workday-flight-picker"
     )
       throw new Error("缺少重开的预检弹窗");
-    expect(reopened.staffStatuses[before.staff[0]!.id]).toBe("病假");
+    expect(reopened.staffStatuses[before.staff[0]!.id]).toBe(
+      entry.kind === "next-workday-flight-picker" ? "正常" : "病假"
+    );
   });
 
   it.each(["switch-group", "change-date"] as const)(
@@ -299,4 +301,81 @@ it("空白航班显示模板，勾选确认前不运行排班", async () => {
   expect(dialog.candidates.length).toBeGreaterThan(0);
   expect(dialog.selectedIds).toEqual([]);
   expect(calculate).not.toHaveBeenCalled();
+});
+
+it("同日轮值人员状态为休假时报警并阻止生成，原模型保留", async () => {
+  const state = fixture();
+  const person = state.staff[0]!;
+  person.dutyQualified = true;
+  state.dutyRosterOverrides = [
+    {
+      date,
+      cxPreflightStaffId: null,
+      dutyStaffId: person.id,
+      standbyStaffIds: [null, null],
+    },
+  ];
+  const coordinator = createTestApplicationCoordinator(
+    createTestAutoscheduleStore(state),
+    { preferences }
+  );
+  const calculate = vi.fn();
+  setTestScheduleRunner(coordinator, { calculate, isRunning: () => false });
+  const before = structuredClone(coordinator.model());
+
+  await coordinator.handle({ type: "generate-schedule" });
+  const dialog = coordinator.view().dialog;
+  if (dialog?.kind !== "schedule-preflight") throw new Error("缺少预检弹窗");
+  expect(dialog.dutyRoster?.dutyStaffId).toBe(person.id);
+  await coordinator.handle({
+    type: "update-schedule-preflight-staff-status",
+    staffId: person.id,
+    status: "休假",
+  });
+  const updated = coordinator.view().dialog;
+  if (updated?.kind !== "schedule-preflight") throw new Error("预检已关闭");
+  await coordinator.handle({
+    type: "confirm-schedule-preflight",
+    selectedIds: updated.selectedIds,
+  });
+
+  expect(calculate).not.toHaveBeenCalled();
+  expect(coordinator.model()).toEqual(before);
+  expect(coordinator.view().toast?.message).toContain("主值班人员甲当前为休假");
+});
+
+it("重新排班默认读取统计页休假轮值人员并阻止计算", async () => {
+  const state = fixture();
+  const person = state.staff[0]!;
+  person.dutyQualified = true;
+  person.status = "休假";
+  state.dutyRosterOverrides = [
+    {
+      date,
+      cxPreflightStaffId: null,
+      dutyStaffId: person.id,
+      standbyStaffIds: [null, null],
+    },
+  ];
+  const coordinator = createTestApplicationCoordinator(
+    createTestAutoscheduleStore(state),
+    { preferences }
+  );
+  const calculate = vi.fn();
+  setTestScheduleRunner(coordinator, { calculate, isRunning: () => false });
+  const before = structuredClone(coordinator.model());
+
+  await coordinator.handle({ type: "open-reschedule-flight-picker" });
+  const dialog = coordinator.view().dialog;
+  if (dialog?.kind !== "reschedule-flight-picker")
+    throw new Error("缺少重新排班预检");
+  expect(dialog.dutyRoster?.dutyStaffId).toBe(person.id);
+  await coordinator.handle({
+    type: "confirm-reschedule-flight-picker",
+    selectedIds: dialog.selectedIds,
+  });
+
+  expect(calculate).not.toHaveBeenCalled();
+  expect(coordinator.model()).toEqual(before);
+  expect(coordinator.view().toast?.message).toContain("主值班人员甲当前为休假");
 });

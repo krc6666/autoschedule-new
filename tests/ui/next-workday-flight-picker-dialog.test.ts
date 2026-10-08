@@ -40,7 +40,7 @@ describe("next workday flight picker dialog", () => {
     expect(element.textContent).toContain("确认并重新排班");
     expect(
       element.querySelector('section[aria-label="人员状态确认"]')
-    ).toBeNull();
+    ).not.toBeNull();
     expect(element.textContent).not.toContain("归档并生成后天排班");
     expect(
       element.querySelectorAll('input[type="checkbox"]:checked').length
@@ -274,4 +274,52 @@ describe("next workday flight picker dialog", () => {
       expect(model).toEqual(before);
     }
   );
+
+  it.each([
+    "schedule-preflight",
+    "reschedule-flight-picker",
+    "next-workday-flight-picker",
+  ] as const)("%s displays all four duty slots", async (kind) => {
+    const model = createDefaultState();
+    const candidates = buildCurrentScheduleFlightCandidates(
+      model.templates,
+      model.flights
+    );
+    const element = await mountElement<
+      HTMLElement & { updateComplete: Promise<unknown> }
+    >("autoschedule-app-dialog", {
+      model,
+      dialog: {
+        kind,
+        date: "2026-08-29",
+        sourceDate: "2026-08-27",
+        weekday: 6,
+        groupId: model.activeGroupId,
+        candidates,
+        selectedIds: candidates
+          .filter((item) => item.selectedByDefault)
+          .map((item) => item.id),
+        staffStatuses: Object.fromEntries(
+          model.staff.map((person) => [person.id, person.status])
+        ),
+        dutyRoster: {
+          date: "2026-08-29",
+          cxPreflightStaffId: null,
+          dutyStaffId: null,
+          standbyStaffIds: [null, null],
+          adjusted: false,
+        },
+      } as never,
+    });
+    expect(
+      element.querySelector('section[aria-label="人员状态确认"]')
+    ).not.toBeNull();
+    expect(
+      element.querySelectorAll('section[aria-label="值班人员确认"] select')
+    ).toHaveLength(4);
+    expect(element.textContent).toContain("CX 航前");
+    expect(element.textContent).toContain("主值班");
+    expect(element.textContent).toContain("次日备勤一");
+    expect(element.textContent).toContain("次日备勤二");
+  });
 });

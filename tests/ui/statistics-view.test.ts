@@ -773,6 +773,31 @@ describe("statistics page", () => {
     ).toBe(selected.id);
   });
 
+  it("allows a qualified leave-status person in the selected monthly duty roster", async () => {
+    const state = createDefaultState();
+    const selected = state.staff.find(
+      (person) => person.staffType === "常规" && person.dutyQualified
+    )!;
+    selected.status = "休假";
+    const rosterDate = getMonthlyDutyRoster(state, "2026-07-18")[0]!.date;
+    state.dutyRosterOverrides = [
+      {
+        date: rosterDate,
+        cxPreflightStaffId: null,
+        dutyStaffId: selected.id,
+        standbyStaffIds: [null, null],
+      },
+    ];
+    const element = await mountElement<
+      HTMLElement & { updateComplete: Promise<unknown> }
+    >("autoschedule-statistics-page", { model: state, date: "2026-07-18" });
+    expect(
+      element.querySelector<HTMLSelectElement>(
+        `select[aria-label="${rosterDate} 值班人员"]`
+      )?.value
+    ).toBe(selected.id);
+  });
+
   it("keeps the opened adjustment attached to the same person after a count update", async () => {
     const state = createDefaultState();
     const rule = state.positionRules.find(
