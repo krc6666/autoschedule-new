@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-10-08-vitest-solver-timeout",
+  "title": "避免完整排班回归测试受15秒测试时限波动影响",
+  "startedFrom": "a523b8569927782bd882de5101da3d0c4c442345",
+  "expectation": {
+    "example": "在4核开发机运行提交钩子的完整Vitest套件，其中完整班表语义测试会启动本地HiGHS/WASM排班求解；两条排班回归测试超过15秒后被Vitest判失败。",
+    "expected": "仅将实际受影响的完整排班语义测试时限调整到合理余量，保留所有班表结果断言和独立性能测试的20秒/压力上限。",
+    "unchanged": "排班规则、求解器参数、性能测试阈值、其他测试时限和应用运行行为保持不变。",
+    "fallback": "若测试仍超时或性能基准超限，恢复对排班实现的性能调查，不以继续放宽时限掩盖计算退化。"
+  },
+  "testedVersion": "1003803a49ab5e84205309b03132307348a27d6af15d4db4eeaec032cc123862",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "原提交钩子记录了两条完整排班测试因15秒超时失败；修复后同一完整验证命令通过。单项对照也分别通过，确认是测试预算/运行负载问题而非断言稳定失败。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-08-vitest-solver-timeout-verify.txt",
+          "summary": "npm.cmd run verify 返回 VERIFY_EXIT:0；普通测试123文件1136项通过。",
+          "sha256": "b22e7d777d6fa54cec83ea02a96274d3e4f2ede8cc7a54eecb91a2a025a99e34"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "两条受影响的排班语义测试保留原断言并在30秒预算内通过；全量普通测试全部通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-08-vitest-solver-timeout-verify.txt",
+          "summary": "普通测试123个文件、1136项通过。",
+          "sha256": "b22e7d777d6fa54cec83ea02a96274d3e4f2ede8cc7a54eecb91a2a025a99e34"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "独立性能测试仍执行原有规模和耗时门槛，未因功能测试时限调整而放宽。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-08-vitest-solver-timeout-verify.txt",
+          "summary": "性能测试5个文件、16项通过。",
+          "sha256": "b22e7d777d6fa54cec83ea02a96274d3e4f2ede8cc7a54eecb91a2a025a99e34"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "not_applicable",
+      "reason": "本次只调整测试用例超时预算，不改变排班后置流程。",
+      "evidence": []
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "排班语义测试原有完整性、资格和人工调班冲突断言均保留并通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-08-vitest-solver-timeout-verify.txt",
+          "summary": "全量普通测试1136项通过，未删减业务断言。",
+          "sha256": "b22e7d777d6fa54cec83ea02a96274d3e4f2ede8cc7a54eecb91a2a025a99e34"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "类型检查、独立性能测试和生产构建通过；排班实现、求解器设置与性能阈值未修改。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-08-vitest-solver-timeout-verify.txt",
+          "summary": "verify 返回0，性能测试16项通过，Vite构建完成。",
+          "sha256": "b22e7d777d6fa54cec83ea02a96274d3e4f2ede8cc7a54eecb91a2a025a99e34"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "verified",
+      "reason": "本次交付产物是测试门禁和验收记录；完整verify已返回0。真实浏览器业务入口不受本次测试时限改动影响。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-08-vitest-solver-timeout-verify.txt",
+          "summary": "类型检查、普通测试、性能测试和构建均完成且退出码为0。",
+          "sha256": "b22e7d777d6fa54cec83ea02a96274d3e4f2ede8cc7a54eecb91a2a025a99e34"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "提交钩子中两条完整排班测试超过15秒而失败；修复后同一测试链通过。",
+    "laterChanges": "独立性能测试仍检查10航班/15人20秒门槛和更大压力场景；全量性能测试16项通过。",
+    "finalArtifact": "docs/acceptance/evidence/2026-10-08-vitest-solver-timeout-verify.txt 记录本次verify退出0。"
+  },
+  "review": {
+    "missedScope": "未做CPU剖析，因此不能把并行资源争抢认定为唯一原因；本次只修复已观察到的功能测试时限不足。",
+    "rootCause": "完整排班功能测试共用15秒预算，无法覆盖本地HiGHS/WASM求解和机器负载波动；这与独立性能门槛是两种不同的检查。",
+    "earlyDetection": "发现超时时先做单项与全量对照，确认断言失败还是时间预算；同时保留独立性能基准，30秒仍超时或性能门槛失败时继续查算法耗时。"
+  }
+}

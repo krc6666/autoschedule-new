@@ -7,7 +7,7 @@ import { prepareSchedule } from "../../src/domain/kernel/schedule-preparation";
 import { evaluateAutomaticHardConstraints } from "../../src/domain/rules/built-in-rule-registry";
 import { generateSchedule } from "../helpers/generate-schedule";
 
-describe("scheduler semantic quality", { timeout: 15_000 }, () => {
+describe("scheduler semantic quality", { timeout: 30_000 }, () => {
   it("keeps the default schedule complete, eligible, and broadly shared without fixing staff names", async () => {
     const date = "2026-07-18";
     const state = createDefaultState();

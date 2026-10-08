@@ -3303,7 +3303,7 @@ describe("scheduler domain", { timeout: 15_000 }, () => {
     expect(canAssignStaff(state, pair.other.id, pair.first.staffId!)).toMatch(
       /时段/
     );
-  });
+  }, 30_000);
 
   it("allows assigning a regular position when the only same-flight overlap is a guide assignment", async () => {
     const state = createOrdinarySchedulingState();
