@@ -24,6 +24,26 @@ export type ConfigurationValue = string | number | boolean;
 
 const clearSchedule = clearActiveSchedule;
 
+function renameActiveFlightReferences(
+  state: AppState,
+  previousFlightNo: string,
+  nextFlightNo: string
+): void {
+  const previous = normalizeWeeklyFlightNo(previousFlightNo);
+  const next = nextFlightNo.trim().toUpperCase();
+  if (!previous || !next || previous === normalizeWeeklyFlightNo(next)) return;
+  state.positionRules.forEach((rule) => {
+    if (normalizeWeeklyFlightNo(rule.flightNo) === previous)
+      rule.flightNo = next;
+  });
+  state.settings.mobileSupervisorFillRules.forEach((policy) => {
+    if (normalizeWeeklyFlightNo(policy.sourceFlightNo) === previous)
+      policy.sourceFlightNo = next;
+    if (normalizeWeeklyFlightNo(policy.targetFlightNo) === previous)
+      policy.targetFlightNo = next;
+  });
+}
+
 function createFlightFromTemplate(
   template: FlightTemplate,
   flightNo = template.flightNo
@@ -469,6 +489,7 @@ export function updateConfigurationField(
   if (entity === "flight") {
     const flight = state.flights.find((item) => item.id === id);
     if (!flight) return "missing";
+    const previousFlightNo = flight.flightNo;
     if (field === "positions") flight.positions = splitList(value);
     else {
       const nextValue =
@@ -477,6 +498,7 @@ export function updateConfigurationField(
           : value;
       (flight as unknown as Record<string, unknown>)[field] = nextValue;
       if (field === "flightNo" && typeof nextValue === "string") {
+        renameActiveFlightReferences(state, previousFlightNo, nextValue);
         const template = state.templates.find(
           (item) => item.flightNo.toUpperCase() === nextValue
         );

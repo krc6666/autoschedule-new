@@ -3,6 +3,7 @@ import type {
   ApplicationContext,
   UiCommandController,
 } from "../application-context";
+import { diagnoseSupervisorFillRuleConfiguration } from "../../domain/coverage/supervisor-fill-facts";
 
 export class PolicyController implements UiCommandController {
   constructor(private readonly context: ApplicationContext) {}
@@ -17,15 +18,31 @@ export class PolicyController implements UiCommandController {
         );
         return true;
       case "update-policy":
-        if (
-          policy.updateEntity(
+        {
+          const result = policy.updateEntity(
             command.entity,
             command.id,
             command.field,
             command.value
-          ) !== "missing"
-        )
-          this.context.commit();
+          );
+          if (result !== "missing") {
+            this.context.commit();
+            if (command.entity === "supervisor-fill") {
+              const rule = this.context
+                .model()
+                .settings.mobileSupervisorFillRules.find(
+                  (item) => item.id === command.id
+                );
+              const issue = rule
+                ? diagnoseSupervisorFillRuleConfiguration(
+                    this.context.model(),
+                    rule
+                  )
+                : null;
+              if (issue) this.context.toast(issue.message, "warning");
+            }
+          }
+        }
         return true;
       case "add-ordinary-priority-position":
         policy.addOrdinaryPriorityPosition();

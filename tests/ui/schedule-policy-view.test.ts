@@ -83,6 +83,46 @@ describe("rules page", () => {
     ]);
   });
 
+  it("reports when a configured target position is not marked for supervisor fill", async () => {
+    const state = createDefaultState();
+    const flightNo = state.flights[0]!.flightNo;
+    state.positionRules.push({
+      ...state.positionRules[0]!,
+      id: "target-h05",
+      flightNo,
+      name: "H05",
+      category: "常规",
+      coverageRole: "none",
+    });
+    state.positionRules.push({
+      ...state.positionRules[0]!,
+      id: "source-supervisor",
+      flightNo,
+      name: "机动督导",
+      category: "机动督导",
+      coverageRole: "none",
+    });
+    state.settings.mobileSupervisorFillRules = [
+      {
+        id: "ke166-h05-fill",
+        enabled: true,
+        sourceFlightNo: flightNo,
+        sourcePositionKeyword: "机动督导",
+        targetFlightNo: flightNo,
+        targetPositionKeyword: "H05",
+        allowAutomatic: true,
+        allowManual: true,
+      },
+    ];
+
+    const element = await mountElement<
+      HTMLElement & { updateComplete: Promise<unknown> }
+    >("autoschedule-policy-page", { model: state });
+    const card = element.querySelector<HTMLElement>("[data-supervisor-fill]")!;
+
+    expect(card.textContent).toContain("目标岗位未标记为督导补位");
+  });
+
   it("configures cross-flight priority by current-group people instead of positions", async () => {
     const state = createDefaultState();
     const selected = state.staff[0]!;

@@ -3,6 +3,7 @@ import { html, nothing } from "lit";
 import type { AppState } from "../../model";
 import { STRUCTURED_POLICY_DEFINITIONS } from "../../domain/rules/structured-policy-settings";
 import type { StructuredPolicyKey } from "../../domain/rules/structured-policy-contract";
+import { diagnoseSupervisorFillRuleConfiguration } from "../../domain/coverage/supervisor-fill-facts";
 import { dispatchUiCommand, inputValue } from "../events/ui-command";
 import {
   matchesPolicySearch,
@@ -523,19 +524,33 @@ export class PolicyStructuredRulesElement extends LightDomElement {
           ${this.addButton("mobileSupervisorFillRules", "新增补位关系")}
         </div>
         <div class="supervisor-coverage-list">
-          ${items.map(
-            (rule) =>
-              html`<div class="supervisor-coverage-row">
-                ${this.toggle("supervisor-fill", rule.id, "enabled", rule.enabled, "启用")}
-                ${this.field("supervisor-fill", rule.id, "sourceFlightNo", rule.sourceFlightNo, "来源航班")}
-                ${this.field("supervisor-fill", rule.id, "sourcePositionKeyword", rule.sourcePositionKeyword, "来源岗位")}
-                ${this.field("supervisor-fill", rule.id, "targetFlightNo", rule.targetFlightNo, "目标航班")}
-                ${this.field("supervisor-fill", rule.id, "targetPositionKeyword", rule.targetPositionKeyword, "目标岗位")}
-                ${this.toggle("supervisor-fill", rule.id, "allowAutomatic", rule.allowAutomatic, "自动补位")}
-                ${this.toggle("supervisor-fill", rule.id, "allowManual", rule.allowManual, "人工补位")}
-                ${this.deleteButton("mobileSupervisorFillRules", rule.id)}
-              </div>`
-          )}
+          ${items.map((rule) => {
+            const issue = diagnoseSupervisorFillRuleConfiguration(
+              this.model,
+              rule
+            );
+            return html`<div class="supervisor-coverage-row">
+              ${this.toggle("supervisor-fill", rule.id, "enabled", rule.enabled, "启用")}
+              ${this.field("supervisor-fill", rule.id, "sourceFlightNo", rule.sourceFlightNo, "来源航班")}
+              ${this.field("supervisor-fill", rule.id, "sourcePositionKeyword", rule.sourcePositionKeyword, "来源岗位")}
+              ${this.field("supervisor-fill", rule.id, "targetFlightNo", rule.targetFlightNo, "目标航班")}
+              ${this.field("supervisor-fill", rule.id, "targetPositionKeyword", rule.targetPositionKeyword, "目标岗位")}
+              ${this.toggle("supervisor-fill", rule.id, "allowAutomatic", rule.allowAutomatic, "自动补位")}
+              ${this.toggle("supervisor-fill", rule.id, "allowManual", rule.allowManual, "人工补位")}
+              ${this.deleteButton("mobileSupervisorFillRules", rule.id)}
+              ${
+                  issue
+                    ? html`<div
+                        class="alert alert-warning py-2 mt-2 mb-0"
+                        role="alert"
+                      >
+                        <i class="bi bi-exclamation-triangle me-2"></i
+                        >${issue.message}
+                      </div>`
+                    : nothing
+                }
+            </div>`;
+          })}
         </div>
       </div>
     </details>`;

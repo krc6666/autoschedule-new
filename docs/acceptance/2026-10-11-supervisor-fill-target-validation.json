@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-10-11-supervisor-fill-target-validation",
+  "title": "机动督导指定补位柜台配置校验与完整链路",
+  "startedFrom": "3ce016d4fb0f63467012a59858494cd6eae14bde",
+  "expectation": {
+    "example": "规则页配置来源航班/岗位与目标航班/柜台后生成排班；目标岗位可能忘记设置“督导补位”性质，或目标柜台已有安全普通人员。",
+    "expected": "保存或展示配置时明确指出目标岗位是否存在、是否标记为督导补位、关系是否启用且允许自动；满足现有短员条件时指定柜台保留机动督导结构化关联。",
+    "unchanged": "有安全普通人员时继续保留普通人员；不新增强制覆盖语义；人员状态、资质、时间冲突、工时、岗位完整性和最终守卫不放宽。",
+    "fallback": "目标岗位不存在或未标记督导补位时不静默生效，显示明确原因；无法形成完整合法连环时恢复原班表并保留失败说明。"
+  },
+  "testedVersion": "6f0e677dd4b441162d86fe942e51ba4de47030dced9af36db97644b81c867684",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "修改前新增的最小规则页回归稳定失败：关系存在但目标岗位 coverageRole 为 none 时没有任何提示；修复后同一用例与保存入口警告用例通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-11-supervisor-fill-target-validation-targeted.txt",
+          "summary": "规则页、保存 controller、航班改名同步、机动督导排班和收尾用例共 7 个测试文件、170 项通过；TARGETED_EXIT:0。",
+          "sha256": "22e04f40fe08611c5cb32b75fd0374f0032295e96aafadc43fdfac1dc4b36cda"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "完整配置、目标柜台空缺且无安全普通候选时，自动收尾写入督导来源关联、规则 ID，工时和疲劳保持为 0；相关 domain 回归通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-11-supervisor-fill-target-validation-targeted.txt",
+          "summary": "mobile-supervisor-scheduling 与 schedule-adjustment 测试通过，覆盖指定补位、连环腾挪和后置收尾。",
+          "sha256": "22e04f40fe08611c5cb32b75fd0374f0032295e96aafadc43fdfac1dc4b36cda"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "目标柜台已有安全普通人员时仍保留普通人员；多个柜台短员时指定关系优先，无法安全连环时维持原有回退语义；Excel 与 localStorage 往返回归通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-11-supervisor-fill-target-validation-targeted.txt",
+          "summary": "自动排班边界、普通候选保留、连环调整、Excel 导入导出和状态恢复测试通过。",
+          "sha256": "22e04f40fe08611c5cb32b75fd0374f0032295e96aafadc43fdfac1dc4b36cda"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "机动督导收尾、人工调整后的关系恢复和连环腾挪均由现有后置测试覆盖；本次没有新增第二套补位执行路径。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-11-supervisor-fill-target-validation-targeted.txt",
+          "summary": "schedule-adjustment 与 mobile-supervisor-scheduling 后置路径测试通过。",
+          "sha256": "22e04f40fe08611c5cb32b75fd0374f0032295e96aafadc43fdfac1dc4b36cda"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "最终守卫仍要求来源关联、来源岗位、规则 ID、同一人员以及补位工时/疲劳结构化一致；相关反向测试和全量测试通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-11-supervisor-fill-target-validation-verify.txt",
+          "summary": "npm run verify 的 123 个普通测试文件 1139 项、5 个性能测试文件 16 项和构建均通过，VERIFY_EXIT:0。",
+          "sha256": "56b801ed1e43da3c23b3ebd66653966a376b6a8b6d2b8adc2dfe298c8d6aa8c9"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "没有新增强制覆盖语义；安全普通候选、人员状态、资质、时间冲突、工时、岗位完整性和最终守卫保持原规则。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-11-supervisor-fill-target-validation-verify.txt",
+          "summary": "类型检查、普通测试（1139 项）、性能测试（16 项）和生产构建全部通过。",
+          "sha256": "56b801ed1e43da3c23b3ebd66653966a376b6a8b6d2b8adc2dfe298c8d6aa8c9"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "verified",
+      "reason": "规则页显示配置诊断，保存入口给出同一警告，完整配置仍可生成结构化补位；这些用户可观察结果由 UI/controller/domain 回归和生产构建证明。真实浏览器现场点击仍待 owner 验收。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-11-supervisor-fill-target-validation-targeted.txt",
+          "summary": "规则页提示与保存警告测试通过，目标行为已进入最终构建。",
+          "sha256": "22e04f40fe08611c5cb32b75fd0374f0032295e96aafadc43fdfac1dc4b36cda"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "最小回归先在关系存在、目标岗位 coverageRole 为 none 时稳定失败；修复后规则页和保存 controller 同一用例通过，见 targeted 证据。",
+    "laterChanges": "普通初排、机动督导收尾、人工连环腾挪、最终守卫、localStorage 和 Excel 是可能改写结果的后续环节；定向链路和全量 verify 均覆盖并通过。",
+    "finalArtifact": "最终产物是新增配置诊断、保存警告、测试和构建；targeted 证据证明用户会看到明确提示，verify 证据证明最终代码可构建。"
+  },
+  "review": {
+    "missedScope": "真实浏览器入口尚未由 owner 按实际配置点击验收；自动测试覆盖了规则页渲染和 controller 保存，但不能替代现场操作。",
+    "rootCause": "配置关系和目标岗位补位性质是两个独立字段，保存关系时没有做交叉校验；运行时事实判断因此拒绝漏标性质的目标岗位，而原测试夹具预先填满了该字段。",
+    "earlyDetection": "以后保存跨页面关系时先跑“关系存在但目标性质缺失”的最小红灯，并在规则页和保存入口共享同一诊断；随后沿初排、后置、最终 assignments、守卫和导出逐段复核。"
+  }
+}

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { createDefaultState } from "../../src/defaults";
+import { updateConfigurationField } from "../../src/app/configuration-actions";
 import {
   addCrossWorkdayQualificationReservation,
   addCrossFlightPriorityPolicy,
@@ -80,6 +81,59 @@ function addActiveSchedule(state: ReturnType<typeof createDefaultState>): void {
 }
 
 describe("policy actions", () => {
+  it("keeps supervisor-fill references aligned when an active flight is renamed", () => {
+    const state = createDefaultState();
+    const flight = state.flights[0]!;
+    const base = state.positionRules[0]!;
+    state.positionRules.push(
+      {
+        ...base,
+        id: "source-supervisor",
+        flightNo: flight.flightNo,
+        name: "机动督导",
+        category: "机动督导",
+      },
+      {
+        ...base,
+        id: "target-h05",
+        flightNo: flight.flightNo,
+        name: "H05",
+        category: "常规",
+        coverageRole: "supervisor-fill",
+      }
+    );
+    state.settings.mobileSupervisorFillRules = [
+      {
+        id: "fill-rule",
+        enabled: true,
+        sourceFlightNo: flight.flightNo,
+        sourcePositionKeyword: "机动督导",
+        targetFlightNo: flight.flightNo,
+        targetPositionKeyword: "H05",
+        allowAutomatic: true,
+        allowManual: true,
+      },
+    ];
+
+    expect(
+      updateConfigurationField(state, "flight", flight.id, "flightNo", "NEW931")
+    ).toBe("updated");
+
+    expect(state.positionRules).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: "source-supervisor",
+          flightNo: "NEW931",
+        }),
+        expect.objectContaining({ id: "target-h05", flightNo: "NEW931" }),
+      ])
+    );
+    expect(state.settings.mobileSupervisorFillRules[0]).toMatchObject({
+      sourceFlightNo: "NEW931",
+      targetFlightNo: "NEW931",
+    });
+  });
+
   it("adds, edits, and deletes a structured supervisor-fill relationship", () => {
     const state = createDefaultState();
     state.settings.mobileSupervisorFillRules = [];

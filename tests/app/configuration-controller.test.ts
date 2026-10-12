@@ -33,6 +33,59 @@ function memoryStorage(): Storage {
 }
 
 describe("configuration controller", () => {
+  it("warns when saving a supervisor-fill relation whose target lacks the fill role", async () => {
+    const initial = createDefaultState();
+    const flight = initial.flights[0]!;
+    const base = initial.positionRules[0]!;
+    initial.positionRules.push(
+      {
+        ...base,
+        id: "source-supervisor",
+        flightNo: flight.flightNo,
+        name: "机动督导",
+        category: "机动督导",
+        coverageRole: "none",
+      },
+      {
+        ...base,
+        id: "target-h05",
+        flightNo: flight.flightNo,
+        name: "H05",
+        category: "常规",
+        coverageRole: "none",
+      }
+    );
+    initial.settings.mobileSupervisorFillRules = [
+      {
+        id: "fill-rule",
+        enabled: true,
+        sourceFlightNo: flight.flightNo,
+        sourcePositionKeyword: "机动督导",
+        targetFlightNo: flight.flightNo,
+        targetPositionKeyword: "H05",
+        allowAutomatic: true,
+        allowManual: true,
+      },
+    ];
+    const store = createTestAutoscheduleStore(initial);
+    const coordinator = createTestApplicationCoordinator(store, {
+      preferences,
+    });
+
+    await coordinator.handle({
+      type: "update-policy",
+      entity: "supervisor-fill",
+      id: "fill-rule",
+      field: "allowAutomatic",
+      value: true,
+    });
+
+    expect(coordinator.view().toast).toMatchObject({
+      message: "目标岗位未标记为督导补位（H05），当前关系不会生效",
+      tone: "warning",
+    });
+  });
+
   it("overwrites the late flight rules with the selected early flight rules", async () => {
     const initial = createDefaultState();
     const sourceFlightNo = "CX937 （早）";

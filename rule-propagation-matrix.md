@@ -1,6 +1,28 @@
 本矩阵用于业务硬规则、机制策略、持久化字段三类。
 先填矩阵再改代码。
 
+## 2026-10-11：机动督导指定补位柜台配置校验与诊断
+
+### 规则基本信息
+
+- 类别：机制策略、持久化配置、页面诊断。
+- 规则名：督导补位关系必须同时匹配来源/目标航班与岗位，目标岗位必须标记 `coverageRole = supervisor-fill`；自动补位仍只在人手不足且没有安全普通候选时生效。
+- 唯一事实源：`state.settings.mobileSupervisorFillRules` 保存关系；`state.positionRules[].coverageRole` 保存目标岗位性质；`evaluateSupervisorFillFacts` 是运行时唯一匹配与合法性判断。
+- 失败回退：目标岗位不存在或未标记督导补位时显示具体配置错误，不静默声称已生效；合法链无法完成时恢复原安排并走原有兼任回退。
+
+### 传播矩阵
+
+| 环节                        | 必须消费/检查                                             | 唯一入口或事实                                                        | 失败/回退               |
+| --------------------------- | --------------------------------------------------------- | --------------------------------------------------------------------- | ----------------------- |
+| 输入事实                    | 关系字段、目标岗位存在性、目标岗位补位性质、自动/人工开关 | `mobileSupervisorFillRules` + `positionRules.coverageRole`            | 保存/展示时指出缺失条件 |
+| 候选 / 求解                 | 不改变普通候选优先；只有无安全普通候选时允许配置补位      | `evaluateSupervisorFillFacts` 与现有 `supervisor-fill` executor       | 普通安全候选保留        |
+| 补缺 / 恢复 / 轮岗          | 指定目标优先于通用机动督导兼任，但不得突破硬约束          | `prepareConfiguredSupervisorFill*`、`fillConfiguredSupervisorTargets` | 连环无解恢复快照        |
+| 人工调整                    | 人工补位仍检查关系、目标性质和跨航班安全                  | `schedule-adjustment.ts` 复用唯一事实                                 | 非法关联拒绝            |
+| 最终复核 / 守卫 / 凭证      | 关联来源、规则 ID、同人员、零工时和合法关系全部成立       | `schedule-guard.ts`、安全凭证                                         | 拒绝拆开的关联          |
+| 保存 / 展示                 | 规则页显示目标岗位缺失/未标记原因；最终班表显示结构化关联 | policy UI + final assignments                                         | 不把静默跳过当成功      |
+| localStorage / Excel / 迁移 | 关系字段与岗位性质往返保留；岗位/航班改名同步关系         | storage restoration + rule settings Excel                             | 导入警告具体化          |
+| 测试                        | A-E 场景、配置往返、后置回退和普通人员不被替换            | domain/app/UI/infrastructure tests                                    | 缺一项不得交付          |
+
 ## 2026-10-07：统计页轮值保留休假人员，排班预检阻止不可用轮值
 
 ### 规则基本信息
