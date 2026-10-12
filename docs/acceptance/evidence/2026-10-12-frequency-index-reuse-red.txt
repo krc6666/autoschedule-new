@@ -1,0 +1,17 @@
+Task: 2026-10-12-frequency-index-reuse
+Command: npm.cmd exec vitest -- run tests/domain/position-frequency-review.test.ts tests/domain/schedule-safety-session.test.ts
+When: before implementation
+Exit code: 1
+Result: 2 test files failed; 2 failed, 9 passed.
+
+The review-path regression failed at createScheduleFrequencyFacts ->
+assessPositionFrequencyAlert -> applyFrequencyAlertEvidence ->
+reviewSamePositionFrequency with "frequency review rebuilt the history index".
+
+The guard-path regression failed at createScheduleFrequencyFacts ->
+assessPositionFrequencyAlert -> createPositionFrequencyScheduleGuard with
+"position-frequency guard rebuilt the history index".
+
+Both failures were caused by consumers rebuilding facts despite the test
+providing the run's precomputed frequency facts. These tests passed after the
+consumers were connected to ScheduleRunFacts.scheduleFrequency.

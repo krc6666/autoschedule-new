@@ -151,7 +151,7 @@ export interface ScheduleGuardContext {
   strictNextWorkdayRecoveryFacts?: StrictNextWorkdayRecoveryFacts;
   highFatiguePositionFacts?: PositionRotationFacts;
   positionTransitionFacts?: PositionTransitionFacts;
-  positionFrequencyFacts?: Pick<PositionRotationFacts, "state" | "date">;
+  positionFrequencyFacts?: PositionRotationFacts;
   workloadBalanceFacts?: WorkloadBalanceFacts;
   sameDayLateObligationFacts?: SnapshotRuleFacts;
   lateShiftPositionReliefFacts?: SnapshotRuleFacts;
@@ -823,7 +823,8 @@ export function createPositionFrequencyScheduleGuard(): ScheduleGuard {
         const assessment = assessPositionFrequencyAlert(
           facts.state,
           assignment,
-          facts.date
+          facts.date,
+          facts.scheduleFrequency
         );
         return assessment?.needsAttention
           ? [

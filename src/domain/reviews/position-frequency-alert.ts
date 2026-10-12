@@ -5,6 +5,7 @@ import { assignmentRule } from "../flights/schedule-position-rules";
 import {
   createScheduleFrequencyFacts,
   positionFrequencyProfileForAssignment,
+  type ScheduleFrequencyFacts,
 } from "../statistics/schedule-frequency";
 
 export const POSITION_FREQUENCY_ALERT_WORKDAY_COUNT = 8;
@@ -33,7 +34,8 @@ function spread(values: readonly number[]): number {
 export function assessPositionFrequencyAlert(
   state: ScheduleGenerationFacts,
   assignment: Assignment,
-  date: string
+  date: string,
+  scheduleFrequency?: ScheduleFrequencyFacts
 ): PositionFrequencyAlertAssessment | null {
   const rule = assignmentRule(state, assignment);
   const flight = state.flights.find((item) => item.id === assignment.flightId);
@@ -42,7 +44,10 @@ export function assessPositionFrequencyAlert(
   if (!eligibleStaff.some((person) => person.id === assignment.staffId))
     return null;
 
-  const frequencyFacts = createScheduleFrequencyFacts(state, date);
+  const frequencyFacts =
+    scheduleFrequency?.date === date
+      ? scheduleFrequency
+      : createScheduleFrequencyFacts(state, date);
   const counts = eligibleStaff.map((person) => {
     const profile = positionFrequencyProfileForAssignment(
       state,

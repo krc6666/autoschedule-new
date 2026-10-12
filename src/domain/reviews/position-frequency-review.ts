@@ -58,7 +58,8 @@ function applyFrequencyAlertEvidence(
   state: ScheduleGenerationFacts,
   assignments: Assignment[],
   date: string,
-  attemptedReasons: ReadonlyMap<string, readonly string[]>
+  attemptedReasons: ReadonlyMap<string, readonly string[]>,
+  frequencyFacts: ScheduleFrequencyFacts
 ): string[] {
   const warnings: string[] = [];
   for (const assignment of assignments) {
@@ -73,7 +74,12 @@ function applyFrequencyAlertEvidence(
       !assignment.staffId
     )
       continue;
-    const assessment = assessPositionFrequencyAlert(state, assignment, date);
+    const assessment = assessPositionFrequencyAlert(
+      state,
+      assignment,
+      date,
+      frequencyFacts
+    );
     if (!assessment?.needsAttention) {
       const existing = assignment.decisionTrace?.filter(
         (decision) => decision.ruleId === "position-frequency-review"
@@ -337,6 +343,7 @@ export async function reviewSamePositionFrequency(
     state,
     assignments,
     date,
-    attemptedReasonsByAssignment
+    attemptedReasonsByAssignment,
+    frequencyFacts
   );
 }

@@ -9,6 +9,8 @@ import type {
 } from "../../src/model";
 import { reviewSamePositionFrequency } from "../../src/domain/reviews/position-frequency-review";
 import { assessPositionFrequencyAlert } from "../../src/domain/reviews/position-frequency-alert";
+import { createScheduleRunFacts } from "../../src/domain/shared/schedule-run-facts";
+import { createScheduleFrequencyFacts } from "../../src/domain/statistics/schedule-frequency";
 import { defaultHighsSolver } from "../../src/infrastructure/solver/highs-solver";
 
 const DATE = "2026-08-18";
@@ -357,5 +359,50 @@ describe("priority-position frequency warning", () => {
       assessment?.periods.find((period) => period.label === "最近8个工作日")
     ).toMatchObject({ assignedCount: 1, difference: 1 });
     expect(assessment?.needsAttention).toBe(false);
+  });
+
+  it("reuses the run frequency facts when recording alert evidence", async () => {
+    const { state, first } = frequencyState();
+    state.settings.positionRotationEnabled = true;
+    const runFacts = createScheduleRunFacts(state, DATE);
+    const stateWithoutHistoryReads = new Proxy(state, {
+      get(target, property, receiver) {
+        if (property === "history")
+          throw new Error("frequency review rebuilt the history index");
+        return Reflect.get(target, property, receiver);
+      },
+    });
+
+    const warnings = await reviewSamePositionFrequency(
+      defaultHighsSolver,
+      stateWithoutHistoryReads,
+      [assignment(first)],
+      DATE,
+      new Set(),
+      runFacts
+    );
+
+    expect(warnings).toEqual([]);
+  });
+
+  it("rebuilds frequency facts when the cached date does not match", () => {
+    const { state, first } = frequencyState();
+    const staleFacts = createScheduleFrequencyFacts(state, "2026-08-17");
+    const stateWithoutHistoryReads = new Proxy(state, {
+      get(target, property, receiver) {
+        if (property === "history")
+          throw new Error("target date needs its own frequency index");
+        return Reflect.get(target, property, receiver);
+      },
+    });
+
+    expect(() =>
+      assessPositionFrequencyAlert(
+        stateWithoutHistoryReads,
+        assignment(first),
+        DATE,
+        staleFacts
+      )
+    ).toThrow("target date needs its own frequency index");
   });
 });

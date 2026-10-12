@@ -86,6 +86,7 @@ export function createScheduleGuardContext({
     positionFrequencyFacts: {
       state,
       date,
+      scheduleFrequency: runFacts.scheduleFrequency,
     },
     workloadBalanceFacts: {
       state,
