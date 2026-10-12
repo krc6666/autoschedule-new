@@ -9,7 +9,7 @@
     "unchanged": "相同输入的航班、岗位、人员、空缺、频率告警和安全检查结果不变；不改候选顺序、求解目标、规则阈值或持久化合同。",
     "fallback": "没有传入本次运行频率事实或日期不匹配时，独立调用仍按现有入口创建事实；运行异常仍由原失败路径处理，不提交部分排班。"
   },
-  "testedVersion": "08de56ed6866b69ecedf478a01b8b187d6dadc076348e1b797bb6882037f4ef6",
+  "testedVersion": "dc2f6c2cbcad6b90a1fd620a1d44147cebd5c006e26c2e3787496b18ab3189b5",
   "checks": {
     "reproduction": {
       "status": "verified",
