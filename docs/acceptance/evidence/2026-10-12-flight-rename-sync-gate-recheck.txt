@@ -1,0 +1,27 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ✓ tests/architecture/acceptance-gate.test.ts > acceptance release gate > rejects a repository with no task records 334ms
+ ✓ tests/architecture/acceptance-gate.test.ts > acceptance release gate > accepts complete evidence for the actual current files 733ms
+ ✓ tests/architecture/acceptance-gate.test.ts > acceptance release gate > rejects unverified final output even when another current task passes 1643ms
+ ✓ tests/architecture/acceptance-gate.test.ts > acceptance release gate > rejects a formerly valid record after a later source rewrite 1036ms
+ ✓ tests/architecture/acceptance-gate.test.ts > acceptance release gate > also catches changed build settings and newly added source files 1259ms
+ ✓ tests/architecture/acceptance-gate.test.ts > acceptance release gate > rejects evidence altered after a successful check 991ms
+ ✓ tests/architecture/acceptance-gate.test.ts > acceptance release gate > rejects missing evidence and verified checks without evidence 1319ms
+ ✓ tests/architecture/acceptance-gate.test.ts > acceptance release gate > rejects omitted required checks and empty delivery answers 1084ms
+ ✓ tests/architecture/acceptance-gate.test.ts > acceptance release gate > requires a completed delivery review for missed scope, root cause, and early detection 775ms
+ ✓ tests/architecture/acceptance-gate.test.ts > acceptance release gate > requires reasons for inapplicable paths and cannot exempt final output 1402ms
+ ✓ tests/architecture/acceptance-gate.test.ts > acceptance release gate > rejects malformed JSON and evidence outside the repository evidence folder 1226ms
+ ✓ tests/architecture/acceptance-gate.test.ts > acceptance release gate > keeps completed historical records while requiring current-version evidence 1598ms
+ ✓ tests/architecture/acceptance-gate.test.ts > acceptance release gate > normalizes Git line endings and separately hashes evidence consistently 970ms
+ ✓ tests/architecture/acceptance-gate.test.ts > acceptance release gate > does not invalidate code evidence for record updates or local cursor files 1015ms
+ ✓ tests/architecture/acceptance-gate.test.ts > acceptance release gate > initializes an incomplete record without silently approving it or overwriting it 963ms
+ ✓ tests/architecture/acceptance-gate.test.ts > acceptance release gate > runs the same release checker before Pages artifacts are uploaded 1ms
+
+ Test Files  1 passed (1)
+      Tests  16 passed (16)
+   Start at  13:04:07
+   Duration  16.63s (transform 41ms, setup 0ms, import 61ms, tests 16.35s, environment 0ms)
+
+
+EXIT_CODE=0

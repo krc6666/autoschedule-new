@@ -6,6 +6,12 @@ import { dispatchUiCommand } from "../events/ui-command";
 import { matchesPolicySearch } from "../projections/policy-search";
 import { LightDomElement } from "./light-dom-element";
 import { latePriorityFlightScopeCandidates } from "../../domain/statistics/late-priority-flight-scope";
+import {
+  diagnoseLatePriorityScope,
+  diagnoseOrdinaryPriorityPosition,
+  diagnoseScalarPolicySetting,
+} from "../../domain/rules/policy-configuration-diagnostics";
+import { renderPolicyDiagnostics } from "./policy-diagnostic";
 
 const POLICY_FIELDS: readonly (keyof SchedulePolicyInput)[] = [
   "maxDailyHours",
@@ -174,16 +180,18 @@ export class PolicySettingsFormElement extends LightDomElement {
     label: string,
     note: string
   ) {
-    return html`<label class="policy-switch"
-      ><span><strong>${label}</strong><small>${note}</small></span
-      ><span class="form-check form-switch m-0"
-        ><input
-          class="form-check-input"
-          data-policy-setting=${field}
-          type="checkbox"
-          .checked=${Boolean(this.draft[field])}
-          @change=${(event: Event) => this.updateDraft(field, (event.currentTarget as HTMLInputElement).checked as never)} /></span
-    ></label>`;
+    return html`<div>
+      <label class="policy-switch"
+        ><span><strong>${label}</strong><small>${note}</small></span
+        ><span class="form-check form-switch m-0"
+          ><input
+            class="form-check-input"
+            data-policy-setting=${field}
+            type="checkbox"
+            .checked=${Boolean(this.draft[field])}
+            @change=${(event: Event) => this.updateDraft(field, (event.currentTarget as HTMLInputElement).checked as never)} /></span></label
+      >${this.settingDiagnostics(field, label)}
+    </div>`;
   }
 
   private number(
@@ -193,33 +201,47 @@ export class PolicySettingsFormElement extends LightDomElement {
     max: number,
     step: number
   ) {
-    return html`<label class="form-label"
-      >${label}<input
-        class="form-control"
-        data-policy-setting=${field}
-        type="number"
-        min=${min}
-        max=${max}
-        step=${step}
-        .value=${String(this.draft[field])}
-        @input=${(event: Event) => this.updateDraft(field, Number((event.currentTarget as HTMLInputElement).value) as never)}
-    /></label>`;
+    return html`<div>
+      <label class="form-label"
+        >${label}<input
+          class="form-control"
+          data-policy-setting=${field}
+          type="number"
+          min=${min}
+          max=${max}
+          step=${step}
+          .value=${String(this.draft[field])}
+          @input=${(event: Event) => this.updateDraft(field, Number((event.currentTarget as HTMLInputElement).value) as never)} /></label
+      >${this.settingDiagnostics(field, label)}
+    </div>`;
   }
 
   private time(field: keyof SchedulePolicyInput, label: string) {
-    return html`<label class="form-label"
-      >${label}<input
-        class="form-control"
-        type="time"
-        .value=${String(this.draft[field])}
-        @input=${(event: Event) => this.updateDraft(field, (event.currentTarget as HTMLInputElement).value as never)}
-    /></label>`;
+    return html`<div>
+      <label class="form-label"
+        >${label}<input
+          class="form-control"
+          type="time"
+          .value=${String(this.draft[field])}
+          @input=${(event: Event) => this.updateDraft(field, (event.currentTarget as HTMLInputElement).value as never)} /></label
+      >${this.settingDiagnostics(field, label)}
+    </div>`;
+  }
+
+  private settingDiagnostics(field: keyof SchedulePolicyInput, label: string) {
+    return renderPolicyDiagnostics(
+      diagnoseScalarPolicySetting(field, this.draft[field], label),
+      `corePolicySettings:${field}`
+    );
   }
 
   private latePriorityFlightScope() {
-    const candidates = latePriorityFlightScopeCandidates(
-      this.model.positionRules
-    );
+    const candidates = [
+      ...new Set([
+        ...latePriorityFlightScopeCandidates(this.model.positionRules),
+        ...this.draft.latePriorityFlightNumbers,
+      ]),
+    ];
     const selected = new Set(this.draft.latePriorityFlightNumbers);
     const setScope = (flightNumbers: string[]): void =>
       this.updateDraft("latePriorityFlightNumbers", flightNumbers);
@@ -279,6 +301,7 @@ export class PolicySettingsFormElement extends LightDomElement {
               >`
         }
       </div>
+      ${renderPolicyDiagnostics(diagnoseLatePriorityScope(this.model, this.draft.latePriorityFlightNumbers), "latePriorityFlightNumbers")}
     </fieldset>`;
   }
 
@@ -362,6 +385,7 @@ export class PolicySettingsFormElement extends LightDomElement {
                     <i class="bi bi-trash3" aria-hidden="true"></i>
                   </button>
                 </div>
+                ${renderPolicyDiagnostics(diagnoseOrdinaryPriorityPosition(this.model, index), `ordinaryPriorityPositions:${index}`)}
               </div>`
           )}
         </div>

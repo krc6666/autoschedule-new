@@ -8,6 +8,261 @@ import "../../src/ui/components/policy-page";
 import { mountElement, settleLit } from "./lit-test-helpers";
 
 describe("rules page", () => {
+  function tw616FillState() {
+    const state = createDefaultState();
+    state.templates.push({
+      ...state.templates[0]!,
+      id: "tw-template",
+      flightNo: "tw616",
+      positions: ["督导", "G16"],
+    });
+    state.positionRules.push(
+      {
+        ...state.positionRules[0]!,
+        id: "tw-source",
+        flightNo: "TW616",
+        name: "督导",
+        category: "机动督导",
+      },
+      {
+        ...state.positionRules[0]!,
+        id: "tw-target",
+        flightNo: "TW616",
+        name: "G16",
+        category: "常规",
+        coverageRole: "supervisor-fill",
+      }
+    );
+    state.settings.mobileSupervisorFillRules = [
+      {
+        id: "tw-fill",
+        enabled: true,
+        sourceFlightNo: "TW616",
+        sourcePositionKeyword: "督导",
+        targetFlightNo: "TW616",
+        targetPositionKeyword: "G16",
+        allowAutomatic: true,
+        allowManual: true,
+      },
+    ];
+    return state;
+  }
+
+  it("does not call a configured TW616 template nonexistent when today's plan omits it", async () => {
+    const state = tw616FillState();
+    const element = await mountElement<
+      HTMLElement & { updateComplete: Promise<unknown> }
+    >("autoschedule-policy-page", { model: state });
+    const card = element.querySelector<HTMLElement>("[data-supervisor-fill]")!;
+    expect(card.textContent).not.toContain("TW616 不存在");
+    expect(card.textContent).toContain("当前航班计划未包含");
+  });
+
+  it("keeps repair instructions collapsed and identifies the field to change", async () => {
+    const state = tw616FillState();
+    state.positionRules.find((rule) => rule.id === "tw-target")!.coverageRole =
+      "none";
+    const element = await mountElement<
+      HTMLElement & { updateComplete: Promise<unknown> }
+    >("autoschedule-policy-page", { model: state });
+    const card = element.querySelector<HTMLElement>("[data-supervisor-fill]")!;
+    const help = card.querySelector<HTMLDetailsElement>(
+      "details[data-policy-diagnostic]"
+    );
+    expect(help).not.toBeNull();
+    expect(help!.open).toBe(false);
+    expect(help!.querySelector("summary")?.textContent).toContain(
+      "查看原因与处理方法"
+    );
+    expect(help!.textContent).toContain("配置 → 岗位配置");
+    expect(help!.textContent).toContain("补位性质");
+    expect(help!.textContent).toContain("督导补位");
+  });
+
+  it("explains unmatched rules beyond supervisor fill and keeps all help closed", async () => {
+    const state = createDefaultState();
+    state.settings.dutyPositionPriorities = [
+      {
+        id: "missing-duty",
+        enabled: true,
+        flightNo: "MISSING",
+        positionKeyword: "柜台",
+      },
+    ];
+    state.settings.crossFlightPriorityPolicies = [
+      {
+        id: "missing-people",
+        enabled: true,
+        flightNo: state.templates[0]!.flightNo,
+        staffIds: [],
+      },
+    ];
+    const element = await mountElement<
+      HTMLElement & { updateComplete: Promise<unknown> }
+    >("autoschedule-policy-page", { model: state });
+    const duty = element.querySelector<HTMLElement>(
+      '[data-policy-diagnostics="dutyPositionPriorities:missing-duty"]'
+    );
+    expect(duty?.textContent).toContain("没有对应航班配置");
+    expect(duty?.textContent).toContain("配置 → 航班计划模板");
+    expect(
+      element.querySelector(
+        '[data-policy-diagnostics="crossFlightPriorityPolicies:missing-people"]'
+      )?.textContent
+    ).toContain("优先人员未选择");
+    expect(
+      [
+        ...element.querySelectorAll<HTMLDetailsElement>(
+          "details[data-policy-diagnostic]"
+        ),
+      ].every((detail) => !detail.open)
+    ).toBe(true);
+  });
+
+  it("shows an obsolete selected late scope and lets the user deselect it", async () => {
+    const state = createDefaultState();
+    state.settings.latePriorityFlightNumbers = ["MISSING"];
+    const element = await mountElement<
+      HTMLElement & { updateComplete: Promise<unknown> }
+    >("autoschedule-policy-page", { model: state });
+    const scope = element.querySelector<HTMLElement>(
+      ".late-priority-flight-scope"
+    )!;
+    expect(scope.textContent).toContain("MISSING 没有符合范围");
+    const check = [
+      ...scope.querySelectorAll<HTMLInputElement>('input[type="checkbox"]'),
+    ].find((input) =>
+      input.closest("label")?.textContent?.includes("MISSING")
+    )!;
+    expect(check?.checked).toBe(true);
+    check.checked = false;
+    check.dispatchEvent(new Event("change", { bubbles: true }));
+    await settleLit();
+    expect(scope.textContent).toContain("未选择航班");
+    expect(scope.textContent).not.toContain("MISSING 没有符合范围");
+  });
+
+  it("explains disabled core switches from the current draft before saving", async () => {
+    const state = createDefaultState();
+    state.settings.highLoadProtectionEnabled = true;
+    const element = await mountElement<
+      HTMLElement & { updateComplete: Promise<unknown> }
+    >("autoschedule-policy-page", { model: state });
+    const field = element.querySelector<HTMLInputElement>(
+      'input[data-policy-setting="highLoadProtectionEnabled"]'
+    )!;
+    field.checked = false;
+    field.dispatchEvent(new Event("change", { bubbles: true }));
+    await settleLit();
+    expect(
+      element.querySelector(
+        '[data-policy-diagnostics="corePolicySettings:highLoadProtectionEnabled"]'
+      )?.textContent
+    ).toContain("高负荷岗位恢复已关闭");
+    expect(state.settings.highLoadProtectionEnabled).toBe(true);
+  });
+
+  it("connects every structured-rule row to its explanation", async () => {
+    const state = tw616FillState();
+    state.settings.sameFlightStaffExclusions = [
+      {
+        id: "pair",
+        enabled: true,
+        flightNo: "MISSING",
+        firstStaffId: state.staff[0]!.id,
+        secondStaffId: state.staff[1]!.id,
+      },
+    ];
+    state.settings.crossFlightPriorityPolicies = [
+      {
+        id: "priority",
+        enabled: true,
+        flightNo: "MISSING",
+        staffIds: [state.staff[0]!.id],
+      },
+    ];
+    state.settings.dutyPositionPriorities = [
+      {
+        id: "duty",
+        enabled: true,
+        flightNo: "MISSING",
+        positionKeyword: "岗位",
+      },
+    ];
+    state.settings.crossWorkdayQualificationReservations = [
+      {
+        id: "reserve",
+        enabled: true,
+        flightNo: "MISSING",
+        matchField: "position",
+        keyword: "岗位",
+        minimumStaffCount: 1,
+      },
+    ];
+    state.settings.lateShiftRecoveryPositionRules = [
+      {
+        id: "late",
+        enabled: true,
+        flightNo: "MISSING",
+        matchField: "position",
+        keyword: "岗位",
+        nextWorkdayCutoffTime: "",
+      },
+    ];
+    state.settings.nextWorkdayRecoveryTargets = [
+      {
+        id: "recovery",
+        enabled: true,
+        flightNo: "MISSING",
+        positionKeyword: "岗位",
+      },
+    ];
+    state.settings.mobileSupervisorCoverageRules = [
+      {
+        id: "cover",
+        enabled: true,
+        flightNo: "MISSING",
+        matchField: "position",
+        keyword: "岗位",
+        mode: "allow",
+      },
+    ];
+    state.settings.positionTransitionPolicies = [
+      {
+        id: "transition",
+        name: "规则",
+        enabled: true,
+        sourceFlightNo: "MISSING",
+        sourcePositions: [],
+        targetFlightNo: "MISSING",
+        targetPosition: "岗位",
+        minimumGapMinutes: 90,
+        mode: "forbid",
+      },
+    ];
+    const element = await mountElement<
+      HTMLElement & { updateComplete: Promise<unknown> }
+    >("autoschedule-policy-page", { model: state });
+    for (const [key, id] of [
+      ["sameFlightStaffExclusions", "pair"],
+      ["crossFlightPriorityPolicies", "priority"],
+      ["dutyPositionPriorities", "duty"],
+      ["crossWorkdayQualificationReservations", "reserve"],
+      ["lateShiftRecoveryPositionRules", "late"],
+      ["nextWorkdayRecoveryTargets", "recovery"],
+      ["mobileSupervisorCoverageRules", "cover"],
+      ["positionTransitionPolicies", "transition"],
+      ["mobileSupervisorFillRules", "tw-fill"],
+    ]) {
+      const help = element.querySelector<HTMLDetailsElement>(
+        `[data-policy-diagnostics="${key}:${id}"] details[data-policy-diagnostic]`
+      );
+      expect(help, key).not.toBeNull();
+      expect(help!.open, key).toBe(false);
+      expect(help!.querySelectorAll("li").length, key).toBeGreaterThan(0);
+    }
+  });
+
   it("offers the two flight-count exemption checkboxes and saves their values", async () => {
     const state = createDefaultState();
     const element = await mountElement<

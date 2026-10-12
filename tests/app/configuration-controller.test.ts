@@ -33,6 +33,60 @@ function memoryStorage(): Storage {
 }
 
 describe("configuration controller", () => {
+  it("does not give a save warning when a configured flight is merely absent from today's plan", async () => {
+    const initial = createDefaultState();
+    initial.templates = [
+      { ...initial.templates[0]!, id: "tw", flightNo: "TW616" },
+    ];
+    initial.flights = [];
+    const base = initial.positionRules[0]!;
+    initial.positionRules = [
+      {
+        ...base,
+        id: "source",
+        flightNo: "TW616",
+        name: "督导",
+        category: "机动督导",
+      },
+      {
+        ...base,
+        id: "target",
+        flightNo: "TW616",
+        name: "G16",
+        category: "常规",
+        coverageRole: "supervisor-fill",
+      },
+    ];
+    initial.settings.mobileSupervisorFillRules = [
+      {
+        id: "fill",
+        enabled: true,
+        sourceFlightNo: "TW616",
+        sourcePositionKeyword: "督导",
+        targetFlightNo: "TW616",
+        targetPositionKeyword: "G16",
+        allowAutomatic: true,
+        allowManual: true,
+      },
+    ];
+    const store = createTestAutoscheduleStore(initial);
+    const coordinator = createTestApplicationCoordinator(store, {
+      preferences,
+    });
+    await coordinator.handle({
+      type: "update-policy",
+      entity: "supervisor-fill",
+      id: "fill",
+      field: "allowAutomatic",
+      value: true,
+    });
+    expect(coordinator.view().toast?.tone).not.toBe("warning");
+    expect(
+      store.getState().model.settings.mobileSupervisorFillRules[0]
+        ?.sourceFlightNo
+    ).toBe("TW616");
+  });
+
   it("warns when saving a supervisor-fill relation whose target lacks the fill role", async () => {
     const initial = createDefaultState();
     const flight = initial.flights[0]!;

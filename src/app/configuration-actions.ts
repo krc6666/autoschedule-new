@@ -1,6 +1,7 @@
 import { isAuxiliaryCategory } from "../domain/flights/schedule-position-rules";
 import type { FlightPlanReconciliation } from "../domain/flights/flight-plan-reconciliation";
 import type { AppState, Flight, FlightTemplate, IsoWeekday } from "../model";
+import { currentFlightsWithoutTemplates } from "../domain/flights/next-workday-flight-plan";
 import { clearActiveSchedule } from "../domain/kernel/schedule-lifecycle";
 import { clearUnqualifiedStandbyOverrides } from "../domain/duty-roster/roster";
 import {
@@ -23,6 +24,134 @@ import {
 export type ConfigurationValue = string | number | boolean;
 
 const clearSchedule = clearActiveSchedule;
+
+function flightRenameConflicts(
+  state: AppState,
+  previous: string,
+  next: string
+): boolean {
+  const oldNo = normalizeWeeklyFlightNo(previous);
+  const newNo = normalizeWeeklyFlightNo(next);
+  if (oldNo === newNo) return false;
+  return [
+    state.flights,
+    ...Object.entries(state.groups)
+      .filter(([id]) => id !== state.activeGroupId)
+      .map(([, group]) => group.flights),
+  ].some(
+    (flights) =>
+      flights.some(
+        (flight) => normalizeWeeklyFlightNo(flight.flightNo) === oldNo
+      ) &&
+      flights.some(
+        (flight) => normalizeWeeklyFlightNo(flight.flightNo) === newNo
+      )
+  );
+}
+
+/** Both explicit rename paths update the same references and group facts. */
+function renameFlightConfigurationReferences(
+  state: AppState,
+  previousFlightNo: string,
+  nextFlightNo: string
+): void {
+  const previous = normalizeWeeklyFlightNo(previousFlightNo);
+  const next = normalizeWeeklyFlightNo(nextFlightNo);
+  const rename = (flightNo: string) =>
+    normalizeWeeklyFlightNo(flightNo) === previous ? next : flightNo;
+  state.weeklyFlightPlans = replaceWeeklyFlightNumber(
+    state.weeklyFlightPlans,
+    previous,
+    next
+  );
+  state.positionRules.forEach((rule) => {
+    rule.flightNo = rename(rule.flightNo);
+  });
+  state.positionRules = orderPositionRules(state.positionRules);
+  state.settings.latePriorityFlightNumbers =
+    state.settings.latePriorityFlightNumbers.map(rename);
+  state.settings.positionTransitionPolicies.forEach((policy) => {
+    policy.sourceFlightNo = rename(policy.sourceFlightNo);
+    policy.targetFlightNo = rename(policy.targetFlightNo);
+  });
+  state.settings.dutyPositionPriorities.forEach((policy) => {
+    policy.flightNo = rename(policy.flightNo);
+  });
+  state.settings.nextWorkdayRecoveryTargets.forEach((policy) => {
+    policy.flightNo = rename(policy.flightNo);
+  });
+  state.settings.lateShiftRecoveryPositionRules.forEach((policy) => {
+    policy.flightNo = rename(policy.flightNo);
+  });
+  state.settings.mobileSupervisorCoverageRules.forEach((policy) => {
+    policy.flightNo = rename(policy.flightNo);
+  });
+  state.settings.mobileSupervisorFillRules.forEach((policy) => {
+    policy.sourceFlightNo = rename(policy.sourceFlightNo);
+    policy.targetFlightNo = rename(policy.targetFlightNo);
+  });
+  state.settings.crossWorkdayQualificationReservations.forEach((policy) => {
+    policy.flightNo = rename(policy.flightNo);
+  });
+  state.settings.crossFlightPriorityPolicies.forEach((policy) => {
+    policy.flightNo = rename(policy.flightNo);
+  });
+  state.settings.sameFlightStaffExclusions.forEach((policy) => {
+    policy.flightNo = rename(policy.flightNo);
+  });
+  state.settings.teamLeaderGapFillPositionPolicies =
+    state.settings.teamLeaderGapFillPositionPolicies.map((policy) => ({
+      ...policy,
+      flightNo: rename(policy.flightNo),
+    }));
+  for (const workspace of [
+    state,
+    ...Object.entries(state.groups)
+      .filter(([id]) => id !== state.activeGroupId)
+      .map(([, group]) => group),
+  ]) {
+    const affected =
+      workspace.flights.some(
+        (flight) => normalizeWeeklyFlightNo(flight.flightNo) === previous
+      ) ||
+      workspace.assignments.some(
+        (assignment) =>
+          normalizeWeeklyFlightNo(assignment.flightNo) === previous
+      );
+    workspace.flights.forEach((flight) => {
+      flight.flightNo = rename(flight.flightNo);
+    });
+    workspace.latePriorityFrequencyAdjustments.forEach((adjustment) => {
+      adjustment.flightNo = rename(adjustment.flightNo);
+    });
+    if (affected) clearSchedule(workspace);
+  }
+}
+
+export function renameCurrentFlightToTemplate(
+  state: AppState,
+  flightId: string,
+  templateId: string
+): "updated" | "missing" | "duplicate" | "invalid-source" {
+  const flight = state.flights.find((item) => item.id === flightId);
+  const template = state.templates.find((item) => item.id === templateId);
+  if (!flight || !template || !normalizeWeeklyFlightNo(template.flightNo))
+    return "missing";
+  if (
+    !currentFlightsWithoutTemplates(state.templates, state.flights).some(
+      (item) => item.id === flightId
+    )
+  )
+    return "invalid-source";
+  if (flightRenameConflicts(state, flight.flightNo, template.flightNo))
+    return "duplicate";
+  renameFlightConfigurationReferences(
+    state,
+    flight.flightNo,
+    template.flightNo
+  );
+  return "updated";
+}
 
 function renameActiveFlightReferences(
   state: AppState,
@@ -567,7 +696,7 @@ export function updateConfigurationField(
     if (!template) return "missing";
     const previousFlightNo = template.flightNo;
     if (field === "flightNo" && typeof value === "string") {
-      const next = value.trim().toUpperCase();
+      const next = normalizeWeeklyFlightNo(value);
       const normalizedNext = normalizeWeeklyFlightNo(next);
       if (
         !next ||
@@ -575,7 +704,8 @@ export function updateConfigurationField(
           (item) =>
             item.id !== id &&
             normalizeWeeklyFlightNo(item.flightNo) === normalizedNext
-        )
+        ) ||
+        flightRenameConflicts(state, previousFlightNo, next)
       )
         return "duplicate";
     }
@@ -583,62 +713,10 @@ export function updateConfigurationField(
     else
       (template as unknown as Record<string, unknown>)[field] =
         typeof value === "string" && field === "flightNo"
-          ? value.toUpperCase()
+          ? normalizeWeeklyFlightNo(value)
           : value;
     if (field === "flightNo" && typeof value === "string") {
-      state.weeklyFlightPlans = replaceWeeklyFlightNumber(
-        state.weeklyFlightPlans,
-        previousFlightNo,
-        value
-      );
-      const previous = normalizeWeeklyFlightNo(previousFlightNo);
-      const next = value.trim().toUpperCase();
-      state.positionRules.forEach((rule) => {
-        if (normalizeWeeklyFlightNo(rule.flightNo) === previous)
-          rule.flightNo = next;
-      });
-      state.positionRules = orderPositionRules(state.positionRules);
-      const rename = (flightNo: string) =>
-        normalizeWeeklyFlightNo(flightNo) === previous ? next : flightNo;
-      state.settings.latePriorityFlightNumbers =
-        state.settings.latePriorityFlightNumbers.map(rename);
-      state.settings.positionTransitionPolicies.forEach((policy) => {
-        policy.sourceFlightNo = rename(policy.sourceFlightNo);
-        policy.targetFlightNo = rename(policy.targetFlightNo);
-      });
-      state.settings.dutyPositionPriorities.forEach(
-        (policy) => (policy.flightNo = rename(policy.flightNo))
-      );
-      state.settings.nextWorkdayRecoveryTargets.forEach(
-        (policy) => (policy.flightNo = rename(policy.flightNo))
-      );
-      state.settings.lateShiftRecoveryPositionRules.forEach(
-        (policy) => (policy.flightNo = rename(policy.flightNo))
-      );
-      state.settings.mobileSupervisorCoverageRules.forEach(
-        (policy) => (policy.flightNo = rename(policy.flightNo))
-      );
-      state.settings.mobileSupervisorFillRules.forEach((policy) => {
-        policy.sourceFlightNo = rename(policy.sourceFlightNo);
-        policy.targetFlightNo = rename(policy.targetFlightNo);
-      });
-      state.settings.crossWorkdayQualificationReservations.forEach(
-        (policy) => (policy.flightNo = rename(policy.flightNo))
-      );
-      state.settings.crossFlightPriorityPolicies.forEach(
-        (policy) => (policy.flightNo = rename(policy.flightNo))
-      );
-      state.settings.sameFlightStaffExclusions.forEach(
-        (rule) => (rule.flightNo = rename(rule.flightNo))
-      );
-      state.settings.teamLeaderGapFillPositionPolicies =
-        state.settings.teamLeaderGapFillPositionPolicies.map((policy) => ({
-          ...policy,
-          flightNo: rename(policy.flightNo),
-        }));
-      state.latePriorityFrequencyAdjustments.forEach(
-        (adjustment) => (adjustment.flightNo = rename(adjustment.flightNo))
-      );
+      renameFlightConfigurationReferences(state, previousFlightNo, value);
       clearSchedule(state);
     }
     return "updated";

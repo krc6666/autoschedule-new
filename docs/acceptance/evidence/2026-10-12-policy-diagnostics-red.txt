@@ -1,0 +1,116 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+npm.cmd : stderr | tests/ui/schedule-policy-view.test.ts
+所在位置 行:2 字符: 18
++ ... nosticRed = & npm.cmd exec vitest -- run tests/ui/schedule-policy-vie ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (stderr | tests/...cy-view.test.ts:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+
+ ✓ tests/ui/schedule-policy-view.test.ts > rules page > does not call a configured TW616 template nonexistent when today's plan omits it 104ms
+ × tests/ui/schedule-policy-view.test.ts > rules page > keeps repair instructions collapsed and identifies the field to change 87ms
+   → expected null not to be null
+ × tests/ui/schedule-policy-view.test.ts > rules page > explains unmatched rules beyond supervisor fill and keeps all help closed 56ms
+   → the given combination of arguments (undefined and string) is invalid for this assertion. You can use an array, a map, an object, a set, a string, or a weakset instead of a string
+ × tests/ui/schedule-policy-view.test.ts > rules page > shows an obsolete selected late scope and lets the user deselect it 58ms
+   → expected '\n      \n        末班重点岗位航班范围勾选后参与末班岗位…' to contain 'MISSING 没有符合范围'
+ ✓ tests/ui/schedule-policy-view.test.ts > rules page > offers the two flight-count exemption checkboxes and saves their values 74ms
+ ✓ tests/ui/schedule-policy-view.test.ts > rules page > shows editable supervisor-fill relationships separately from coverage rules 99ms
+ ✓ tests/ui/schedule-policy-view.test.ts > rules page > reports when a configured target position is not marked for supervisor fill 46ms
+ ✓ tests/ui/schedule-policy-view.test.ts > rules page > configures cross-flight priority by current-group people instead of positions 59ms
+ ✓ tests/ui/schedule-policy-view.test.ts > rules page > renders configurable same-flight staff exclusions with an optional flight 70ms
+ ✓ tests/ui/schedule-policy-view.test.ts > rules page > keeps the ordinary-priority position collection compact and editable 72ms
+ ✓ tests/ui/schedule-policy-view.test.ts > rules page > projects settings, structured rules, and the central rule ledger 50ms
+ ✓ tests/ui/schedule-policy-view.test.ts > rules page > shows concrete gap-fill positions and emits single-position and category updates 60ms
+ ✓ tests/ui/schedule-policy-view.test.ts > rules page > emits the selected recovery mode from the recovery module 40ms
+ ✓ tests/ui/schedule-policy-view.test.ts > rules page > searches actual structured-rule values and hides unrelated rule cards 71ms
+ ✓ tests/ui/schedule-policy-view.test.ts > rules page > searches field labels and central rule descriptions across the whole page 48ms
+ ✓ tests/ui/schedule-policy-view.test.ts > rules page > shows persisted non-default structured-rule selections after remount 60ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/ui/schedule-policy-view.test.ts > rules page > keeps repair instructions collapsed and identifies the fiel
+d to change
+AssertionError: expected null not to be null
+ ❯ tests/ui/schedule-policy-view.test.ts:44:22
+     42|     const card = element.querySelector<HTMLElement>("[data-supervisor-…
+     43|     const help = card.querySelector<HTMLDetailsElement>("details[data-…
+     44|     expect(help).not.toBeNull();
+       |                      ^
+     45|     expect(help!.open).toBe(false);
+     46|     expect(help!.querySelector("summary")?.textContent).toContain("查看原…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  tests/ui/schedule-policy-view.test.ts > rules page > explains unmatched rules beyond supervisor fill and keeps a
+ll help closed
+AssertionError: the given combination of arguments (undefined and string) is invalid for this assertion. You can use an
+ array, a map, an object, a set, a string, or a weakset instead of a string
+ ❯ tests/ui/schedule-policy-view.test.ts:58:31
+     56|     const element = await mountElement<HTMLElement & { updateComplete:…
+     57|     const duty = element.querySelector<HTMLElement>('[data-policy-diag…
+     58|     expect(duty?.textContent).toContain("没有对应航班配置");
+       |                               ^
+     59|     expect(duty?.textContent).toContain("配置 → 航班配置模板");
+     60|     expect(element.querySelector('[data-policy-diagnostics="crossFligh…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  tests/ui/schedule-policy-view.test.ts > rules page > shows an obsolete selected late scope and lets the user des
+elect it
+AssertionError: expected '\n      \n        末班重点岗位航班范围勾选后参与末班岗位…' to contain 'MISSING 没有符合范围'
+
+- Expected
++ Received
+
+- MISSING 没有符合范围
++
++
++         末班重点岗位航班范围勾选后参与末班岗位轮换、统计及上一班末班人员晚班轻岗保护
++
++
++             全选
++
++
++             清空
++
++
++
++
++
++
++                     CX937
++
++
++                     FD573
++
++
++                     CX931
++
++
++                     TR121
++
++
++
+
+ ❯ tests/ui/schedule-policy-view.test.ts:69:31
+     67|     const element = await mountElement<HTMLElement & { updateComplete:…
+     68|     const scope = element.querySelector<HTMLElement>(".late-priority-f…
+     69|     expect(scope.textContent).toContain("MISSING 没有符合范围");
+       |                               ^
+     70|     const check = [...scope.querySelectorAll<HTMLInputElement>('input[…
+     71|     expect(check?.checked).toBe(true);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  3 failed | 13 passed (16)
+   Start at  11:44:16
+   Duration  2.54s (transform 726ms, setup 0ms, import 881ms, tests 1.06s, environment 387ms)
+
+
+EXIT_CODE=1

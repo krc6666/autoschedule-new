@@ -37,6 +37,17 @@ function matchesTarget(
   return normalize(value).includes(keyword);
 }
 
+export function mobileSupervisorCoverageRuleMatchesTarget(
+  rule: MobileSupervisorCoverageRule,
+  target: MobileSupervisorCoverageTarget
+): boolean {
+  return (
+    rule.enabled &&
+    appliesToFlight(rule, target.flightNo) &&
+    matchesTarget(rule, target)
+  );
+}
+
 export function evaluateMobileSupervisorCoverage(
   state: ScheduleSettingsFacts,
   target: MobileSupervisorCoverageTarget
@@ -48,7 +59,9 @@ export function evaluateMobileSupervisorCoverage(
       normalize(rule.keyword)
   );
   const forbidden = applicable.find(
-    (rule) => rule.mode === "forbid" && matchesTarget(rule, target)
+    (rule) =>
+      rule.mode === "forbid" &&
+      mobileSupervisorCoverageRuleMatchesTarget(rule, target)
   );
   if (forbidden) {
     const field = forbidden.matchField === "remark" ? "岗位备注" : "岗位名称";
@@ -61,7 +74,9 @@ export function evaluateMobileSupervisorCoverage(
   const allowedRules = applicable.filter((rule) => rule.mode === "allow");
   if (
     allowedRules.length &&
-    !allowedRules.some((rule) => matchesTarget(rule, target))
+    !allowedRules.some((rule) =>
+      mobileSupervisorCoverageRuleMatchesTarget(rule, target)
+    )
   ) {
     return {
       allowed: false,

@@ -1,0 +1,6 @@
+Read-only HTTP asset check: 127.0.0.1:52454/src/ui/components/configuration-settings-section.ts
+HTTP=200
+Contains data-flight-name-repair=true
+Contains rename-current-flight-to-template=true
+Owner screenshot: configuration template TW616 and updated rename description visible; collapsed name-check entry appears below the template table. No confirmation or final prepare result captured yet.
+Owner later screenshot (same local date/port): name-check details expanded, exact old name TWB616 shown and template selector still at its empty placeholder. This confirms repair entry visibility and correct old-name projection; it does not yet prove rename confirmation or final default selection.

@@ -6,6 +6,8 @@ import { isOrdinaryPriorityPosition } from "../../domain/reviews/position-rotati
 import { dispatchUiCommand } from "../events/ui-command";
 import { matchesPolicySearch } from "../projections/policy-search";
 import { LightDomElement } from "./light-dom-element";
+import { diagnoseGapFillReferences } from "../../domain/rules/policy-configuration-diagnostics";
+import { renderPolicyDiagnostics } from "./policy-diagnostic";
 
 const POSITION_CATEGORIES: readonly PositionRule["category"][] = [
   "常规",
@@ -61,6 +63,7 @@ export class TeamLeaderGapFillProtectionSettingsElement extends LightDomElement 
         ><i class="bi bi-chevron-down"></i>
       </summary>
       <div class="policy-rule-content">
+        ${renderPolicyDiagnostics(diagnoseGapFillReferences(this.model), "teamLeaderGapFillPositionPolicies")}
         <div class="alert alert-light border py-2 mb-3" role="note">
           <strong>固定保护</strong
           >：值班人员当前岗位、KE166、人工岗位、行政支援、已补差落地岗位、督导兼任关联格和特殊布局关联格。

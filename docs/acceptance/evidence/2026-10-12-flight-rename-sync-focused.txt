@@ -1,0 +1,174 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+stderr | tests/ui/schedule-policy-view.test.ts
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+
+stderr | tests/ui/config-view.test.ts
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+
+ ✓ tests/ui/config-view.test.ts > configuration page > offers a collapsed explicit template choice for an old current flight without guessing a match 41ms
+ ✓ tests/ui/config-view.test.ts > configuration page > keeps people, position rules, templates, and constraints separated 275ms
+ ✓ tests/ui/config-view.test.ts > configuration page > shows the selected weekday preset as checked template rows 13ms
+ ✓ tests/ui/config-view.test.ts > configuration page > shows persisted non-default staff and position selections after remount 205ms
+ ✓ tests/ui/config-view.test.ts > configuration page > shows a regular position's supervisor-fill role 177ms
+ ✓ tests/ui/config-view.test.ts > configuration page > dispatches the selected target when copying a position group 142ms
+ ✓ tests/app/configuration-controller.test.ts > configuration controller > does not give a save warning when a configured flight is merely absent from today's plan 21ms
+ ✓ tests/app/configuration-controller.test.ts > configuration controller > warns when saving a supervisor-fill relation whose target lacks the fill role 10ms
+ ✓ tests/app/configuration-controller.test.ts > configuration controller > overwrites the late flight rules with the selected early flight rules 15ms
+ ✓ tests/app/configuration-controller.test.ts > configuration controller > persists a staff status change when background rescheduling fails 6ms
+ ✓ tests/app/schedule-preflight.test.ts > 排班前确认：'生成排班' > 确认前只改草稿，取消不保存任何数据 60ms
+ ✓ tests/app/schedule-preflight.test.ts > 排班前确认：'生成排班' > 成功一起提交，配置、当前组、保存恢复与 Excel 状态一致 84ms
+ ✓ tests/app/schedule-preflight.test.ts > 排班前确认：'生成排班' > error 时班表、人员状态、航班、历史和保存均不变 15ms
+ ✓ tests/app/schedule-preflight.test.ts > 排班前确认：'生成排班' > stopped-without-result 时班表、人员状态、航班、历史和保存均不变 16ms
+ ✓ tests/app/schedule-preflight.test.ts > 排班前确认：'生成排班' > stopped-with-result 时班表、人员状态、航班、历史和保存均不变 33ms
+ ✓ tests/app/schedule-preflight.test.ts > 排班前确认：'生成排班' > unsafe 时班表、人员状态、航班、历史和保存均不变 13ms
+ ✓ tests/app/schedule-preflight.test.ts > 排班前确认：'生成排班' > 未选航班不能计算，配置状态重新打开时重新读取 16ms
+ ✓ tests/app/schedule-preflight.test.ts > 排班前确认：'生成排班' > switch-group 后拒绝旧草稿 11ms
+ ✓ tests/domain/mobile-supervisor-scheduling.test.ts > all-flight mobile-supervisor scheduling > uses a renamed flight through preparation, final supervisor fill, safety credential and export 232ms
+ ✓ tests/app/flight-rename-sync.test.ts > flight rename synchronization > passes the new name from 'schedule-preflight' selection into the runner and committed state 76ms
+ ✓ tests/app/flight-rename-sync.test.ts > flight rename synchronization > passes the new name from 'reschedule-flight-picker' selection into the runner and committed state 28ms
+ ✓ tests/app/schedule-preflight.test.ts > 排班前确认：'生成排班' > change-date 后拒绝旧草稿 10ms
+ ✓ tests/app/schedule-preflight.test.ts > 排班前确认：'归档并排后天' > 确认前只改草稿，取消不保存任何数据 13ms
+ ✓ tests/app/schedule-preflight.test.ts > 排班前确认：'归档并排后天' > 成功一起提交，配置、当前组、保存恢复与 Excel 状态一致 51ms
+ ✓ tests/app/schedule-preflight.test.ts > 排班前确认：'归档并排后天' > error 时班表、人员状态、航班、历史和保存均不变 11ms
+ ✓ tests/app/schedule-preflight.test.ts > 排班前确认：'归档并排后天' > stopped-without-result 时班表、人员状态、航班、历史和保存均不变 11ms
+ ✓ tests/app/schedule-preflight.test.ts > 排班前确认：'归档并排后天' > stopped-with-result 时班表、人员状态、航班、历史和保存均不变 27ms
+stderr | tests/infrastructure/policy-diagnostics-roundtrip.test.ts
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+
+ ✓ tests/app/flight-rename-sync.test.ts > flight rename synchronization > passes the new name from 'next-workday-flight-picker' selection into the runner and committed state 32ms
+ ✓ tests/app/flight-rename-sync.test.ts > flight rename synchronization > clears affected group schedules but leaves unrelated group schedules and history alone 7ms
+ ✓ tests/app/flight-rename-sync.test.ts > flight rename synchronization > retains the renamed default choice and relation through storage and both groups' Excel exports 44ms
+ ✓ tests/app/flight-rename-sync.test.ts > flight rename synchronization > exposes an old restored name for explicit repair, then persists the correction without aliases 22ms
+ ✓ tests/app/schedule-preflight.test.ts > 排班前确认：'归档并排后天' > unsafe 时班表、人员状态、航班、历史和保存均不变 12ms
+ ✓ tests/app/schedule-preflight.test.ts > 排班前确认：'归档并排后天' > 未选航班不能计算，配置状态重新打开时重新读取 19ms
+ ✓ tests/app/schedule-preflight.test.ts > 排班前确认：'归档并排后天' > switch-group 后拒绝旧草稿 9ms
+ ✓ tests/app/schedule-preflight.test.ts > 排班前确认：'归档并排后天' > change-date 后拒绝旧草稿 5ms
+ ✓ tests/app/schedule-preflight.test.ts > 空白航班显示模板，勾选确认前不运行排班 9ms
+ ✓ tests/app/schedule-preflight.test.ts > 同日轮值人员状态为休假时报警并阻止生成，原模型保留 15ms
+ ✓ tests/app/schedule-preflight.test.ts > 重新排班默认读取统计页休假轮值人员并阻止计算 11ms
+ ✓ tests/app/schedule-preflight.test.ts > 统计页保存的四个轮值槽位在generate-schedule预检中默认回显 24ms
+ ✓ tests/domain/mobile-supervisor-scheduling.test.ts > all-flight mobile-supervisor scheduling > fills a configured supervisor-fill target only when no safe regular candidate exists 60ms
+ ✓ tests/app/schedule-preflight.test.ts > 统计页保存的四个轮值槽位在open-reschedule-flight-picker预检中默认回显 17ms
+ ✓ tests/app/schedule-preflight.test.ts > 统计页保存的四个后天轮值槽位在归档后天预检中默认回显 6ms
+ ✓ tests/app/schedule-preflight.test.ts > 统计页轮值保存并恢复后仍在生成预检中回显 17ms
+ ✓ tests/app/flight-rename-sync.test.ts > flight rename synchronization > rejects unsafe or stale explicit repair choices without changing anything 36ms
+ ✓ tests/app/flight-rename-sync.test.ts > flight rename synchronization > repairs an already saved old flight only after an explicit template choice and confirmation 13ms
+ ✓ tests/app/flight-rename-sync.test.ts > flight rename synchronization > uses the renamed flight by default in prepare and retains operational data in both groups 8ms
+ ✓ tests/app/flight-rename-sync.test.ts > flight rename synchronization > rejects a rename atomically if group A already has the target flight 7ms
+ ✓ tests/app/flight-rename-sync.test.ts > flight rename synchronization > rejects a rename atomically if group B already has the target flight 8ms
+ ✓ tests/app/flight-rename-sync.test.ts > flight rename synchronization > preserves an independent non-template flight through rename and prepare 4ms
+ ✓ tests/domain/mobile-supervisor-scheduling.test.ts > all-flight mobile-supervisor scheduling > when short-staffed, binds KE166 supervisor to the configured fill counter instead of another concurrent counter 255ms
+ ✓ tests/domain/mobile-supervisor-scheduling.test.ts > all-flight mobile-supervisor scheduling > when short-staffed, does not dump an unqualified H05 person onto another counter 6ms
+ ✓ tests/domain/mobile-supervisor-scheduling.test.ts > all-flight mobile-supervisor scheduling > when short-staffed on many counters, frees H07 for a qualified refill and binds supervisor fill on H05 3ms
+ ✓ tests/ui/schedule-policy-view.test.ts > rules page > does not call a configured TW616 template nonexistent when today's plan omits it 273ms
+ ✓ tests/domain/mobile-supervisor-scheduling.test.ts > all-flight mobile-supervisor scheduling > refuses refill candidates blocked by half-rest isStaffAllowed during shortage prepare 3ms
+ ✓ tests/domain/mobile-supervisor-scheduling.test.ts > all-flight mobile-supervisor scheduling > generateSchedule keeps H05 with safe regular when an independent supervisor candidate exists 144ms
+ ✓ tests/infrastructure/policy-diagnostics-roundtrip.test.ts > configuration diagnostics after persistence > recomputes the same explanation after a localStorage round trip 295ms
+ ✓ tests/domain/mobile-supervisor-scheduling.test.ts > all-flight mobile-supervisor scheduling > generateSchedule prioritizes configured H05 fill before repeated KE166 counter reuse 174ms
+ ✓ tests/domain/policy-configuration-diagnostics.test.ts > configuration diagnostics > distinguishes a missing plan from missing configuration without changing data 12ms
+ ✓ tests/domain/policy-configuration-diagnostics.test.ts > configuration diagnostics > does not turn TWB616 or TW626 into TW616 2ms
+ ✓ tests/domain/policy-configuration-diagnostics.test.ts > configuration diagnostics > reports the target role before the plan absence and accepts any matching eligible position 3ms
+ ✓ tests/domain/policy-configuration-diagnostics.test.ts > configuration diagnostics > treats intentionally disabled fill modes as information 3ms
+ ✓ tests/domain/policy-configuration-diagnostics.test.ts > configuration diagnostics > explains unmatched sameFlightStaffExclusions and treats disabled entries neutrally 4ms
+ ✓ tests/domain/policy-configuration-diagnostics.test.ts > configuration diagnostics > explains unmatched crossFlightPriorityPolicies and treats disabled entries neutrally 2ms
+ ✓ tests/domain/policy-configuration-diagnostics.test.ts > configuration diagnostics > explains unmatched dutyPositionPriorities and treats disabled entries neutrally 2ms
+ ✓ tests/domain/policy-configuration-diagnostics.test.ts > configuration diagnostics > explains unmatched crossWorkdayQualificationReservations and treats disabled entries neutrally 3ms
+ ✓ tests/domain/policy-configuration-diagnostics.test.ts > configuration diagnostics > explains unmatched lateShiftRecoveryPositionRules and treats disabled entries neutrally 3ms
+ ✓ tests/domain/policy-configuration-diagnostics.test.ts > configuration diagnostics > explains unmatched nextWorkdayRecoveryTargets and treats disabled entries neutrally 3ms
+ ✓ tests/domain/policy-configuration-diagnostics.test.ts > configuration diagnostics > explains unmatched mobileSupervisorCoverageRules and treats disabled entries neutrally 5ms
+ ✓ tests/domain/policy-configuration-diagnostics.test.ts > configuration diagnostics > explains unmatched positionTransitionPolicies and treats disabled entries neutrally 2ms
+ ✓ tests/domain/policy-configuration-diagnostics.test.ts > configuration diagnostics > uses the existing duty matcher including whitespace normalization and an empty keyword 3ms
+ ✓ tests/domain/policy-configuration-diagnostics.test.ts > configuration diagnostics > does not call retained other-group personnel deleted 16ms
+ ✓ tests/domain/policy-configuration-diagnostics.test.ts > configuration diagnostics > does not require next-workday targets to be in today's plan 2ms
+ ✓ tests/domain/policy-configuration-diagnostics.test.ts > configuration diagnostics > keeps an archived late-shift source valid after its flight template is removed 2ms
+ ✓ tests/domain/policy-configuration-diagnostics.test.ts > configuration diagnostics > explains an allow rule blocked by an existing forbid rule 2ms
+ ✓ tests/domain/policy-configuration-diagnostics.test.ts > configuration diagnostics > reports orphan ordinary and gap-fill references using actual field and worksheet names 4ms
+ ✓ tests/domain/policy-configuration-diagnostics.test.ts > configuration diagnostics > uses the central scalar contract for invalid numbers, times and intentional zeros 3ms
+ ✓ tests/domain/policy-configuration-diagnostics.test.ts > configuration diagnostics > keeps a renamed template, current prepare selection and fill relation consistent 6ms
+ ✓ tests/ui/schedule-policy-view.test.ts > rules page > keeps repair instructions collapsed and identifies the field to change 232ms
+ ✓ tests/app/autoschedule-store.test.ts > autoschedule store > exposes one state owner and commits named commands through Immer 24ms
+ ✓ tests/app/autoschedule-store.test.ts > autoschedule store > returns domain command results without exposing a generic mutable draft 7ms
+ ✓ tests/app/autoschedule-store.test.ts > autoschedule store > tracks changes that still need a configuration export separately from local saving 16ms
+ ✓ tests/app/autoschedule-store.test.ts > autoschedule store > marks a replaced model as needing export while leaving no-op view changes clean 11ms
+ ✓ tests/app/autoschedule-store.test.ts > autoschedule store > adds a flight template while the command is running through Immer 9ms
+ ✓ tests/app/autoschedule-store.test.ts > autoschedule store > adds online-query selections while the command is running through Immer 6ms
+ ✓ tests/app/autoschedule-store.test.ts > autoschedule store > 切换组前后只交换当前组投影，且保存后两组互不串历史 8ms
+ ✓ tests/app/autoschedule-store.test.ts > autoschedule store > replaces imported current-group data into the active workspace projection 6ms
+ ✓ tests/infrastructure/policy-diagnostics-roundtrip.test.ts > configuration diagnostics after persistence > recomputes matching and missing-role help after Excel export and config import 194ms
+ ✓ tests/domain/mobile-supervisor-scheduling.test.ts > all-flight mobile-supervisor scheduling > uses a legal same-flight counter chain before falling back from configured H05 fill 11ms
+ ✓ tests/domain/mobile-supervisor-scheduling.test.ts > all-flight mobile-supervisor scheduling > generateSchedule short-staff with only counter-bound staff frees H05 for supervisor fill 73ms
+ ✓ tests/domain/mobile-supervisor-scheduling.test.ts > all-flight mobile-supervisor scheduling > prepare rejects a source supervisor blocked by cross-flight time conflict and restores 2ms
+ ✓ tests/domain/mobile-supervisor-scheduling.test.ts > all-flight mobile-supervisor scheduling > prepare leaves manual-status and below-threshold counters untouched 2ms
+ ✓ tests/domain/mobile-supervisor-scheduling.test.ts > all-flight mobile-supervisor scheduling > prepare rejects a source supervisor blocked only by minimum flight transition and restores 3ms
+ ✓ tests/domain/mobile-supervisor-scheduling.test.ts > all-flight mobile-supervisor scheduling > finalizeMobileSupervisors passes real halfRest facts so banned refill stays off counters 7ms
+ ✓ tests/domain/mobile-supervisor-scheduling.test.ts > all-flight mobile-supervisor scheduling > prepare failure restores state and records the generic-coverage fallback reason 9ms
+ ✓ tests/ui/schedule-policy-view.test.ts > rules page > explains unmatched rules beyond supervisor fill and keeps all help closed 141ms
+ ✓ tests/domain/next-workday-flight-plan.test.ts > next workday flight plan > shows every template plus unmatched current flights and selects only today's flights 30ms
+ ✓ tests/domain/next-workday-flight-plan.test.ts > next workday flight plan > materializes the selected current schedule while preserving existing flight ids 1ms
+ ✓ tests/domain/next-workday-flight-plan.test.ts > next workday flight plan > uses the target weekday plan instead of the current shift as the default selection 1ms
+ ✓ tests/domain/next-workday-flight-plan.test.ts > next workday flight plan > materializes only selected flights with their entered booked passengers 2ms
+ ✓ tests/domain/next-workday-flight-plan.test.ts > next workday flight plan > normalizes invalid passenger input without changing other candidates 1ms
+ ✓ tests/domain/mobile-supervisor-scheduling.test.ts > all-flight mobile-supervisor scheduling > rejects orphan supervisorFillRuleId without a source link 3ms
+ ✓ tests/domain/mobile-supervisor-scheduling.test.ts > all-flight mobile-supervisor scheduling > rejects supervisor-fill whose source assignment id does not exist 2ms
+ ✓ tests/domain/mobile-supervisor-scheduling.test.ts > all-flight mobile-supervisor scheduling > rejects supervisor-fill whose fill rule id does not match a valid recorded link 3ms
+ ✓ tests/domain/mobile-supervisor-scheduling.test.ts > all-flight mobile-supervisor scheduling > prepare rejects a source supervisor who would exceed daily hours and restores 3ms
+ ✓ tests/domain/mobile-supervisor-scheduling.test.ts > all-flight mobile-supervisor scheduling > keeps a configured supervisor-fill target with its safe regular worker 54ms
+ ✓ tests/domain/mobile-supervisor-scheduling.test.ts > all-flight mobile-supervisor scheduling > does not fill an unconfigured empty counter 52ms
+ ✓ tests/domain/mobile-supervisor-scheduling.test.ts > all-flight mobile-supervisor scheduling > treats a same-flight exclusion as making the regular candidate unsafe 2ms
+ ✓ tests/domain/mobile-supervisor-scheduling.test.ts > all-flight mobile-supervisor scheduling > keeps an overlapping cross-flight supervisor-fill target unfilled 49ms
+ ✓ tests/domain/mobile-supervisor-scheduling.test.ts > all-flight mobile-supervisor scheduling > ignores a legal guide display when a cross-flight supervisor fill starts after release 2ms
+ ✓ tests/domain/mobile-supervisor-scheduling.test.ts > all-flight mobile-supervisor scheduling > automatically binds a non-KE166 supervisor to an allowed counter when staffing is short 49ms
+ ✓ tests/ui/schedule-policy-view.test.ts > rules page > shows an obsolete selected late scope and lets the user deselect it 170ms
+ ✓ tests/app/configuration-actions.test.ts > configuration actions > keeps team-leader gap-fill position references synchronized on rename and delete 8ms
+ ✓ tests/app/configuration-actions.test.ts > configuration actions > updates only the selected weekday and keeps template references synchronized 4ms
+ ✓ tests/app/configuration-actions.test.ts > configuration actions > renames matching position rules together with a flight template 5ms
+ ✓ tests/app/configuration-actions.test.ts > configuration actions > copies a complete position group and qualifications to another flight 4ms
+ ✓ tests/app/configuration-actions.test.ts > configuration actions > does not overwrite an existing target position group without confirmation 2ms
+ ✓ tests/app/configuration-actions.test.ts > configuration actions > defaults standby qualification by staff type and clears it for administrative support 4ms
+ ✓ tests/app/configuration-actions.test.ts > configuration actions > rejects a staff id that belongs to the other group 3ms
+ ✓ tests/app/configuration-actions.test.ts > configuration actions > allocates new staff ids without colliding with the other group 1ms
+ ✓ tests/app/configuration-actions.test.ts > configuration actions > updates only the active group's qualifications in shared position rules 2ms
+ ✓ tests/app/configuration-actions.test.ts > configuration actions > applies a flight template and invalidates the active schedule 2ms
+ ✓ tests/app/configuration-actions.test.ts > configuration actions > keeps mobile-supervisor positions automatic and removes a deleted staff member from references 2ms
+ ✓ tests/app/configuration-actions.test.ts > configuration actions > adds selected online-query templates without duplicating or overwriting existing flights 3ms
+ ✓ tests/app/configuration-actions.test.ts > configuration actions > atomically applies selected additions and confirmed removals 4ms
+ ✓ tests/app/configuration-actions.test.ts > configuration actions > does not remove flights when reconciliation removal is blocked 2ms
+ ✓ tests/app/configuration-actions.test.ts > configuration actions > keeps same-flight exclusion flight scope synchronized when a template is renamed 2ms
+ ✓ tests/app/configuration-actions.test.ts > configuration actions > keeps same-flight exclusion people synchronized when a staff id is renamed 10ms
+ ✓ tests/app/configuration-actions.test.ts > configuration actions > removes same-flight exclusions that reference a deleted staff member 2ms
+ ✓ tests/app/configuration-actions.test.ts > configuration actions > keeps cross-flight priority people synchronized on rename and delete 2ms
+ ✓ tests/domain/mobile-supervisor-scheduling.test.ts > all-flight mobile-supervisor scheduling > keeps a non-KE166 supervisor independent when an idle candidate exists 45ms
+ ✓ tests/domain/mobile-supervisor-scheduling.test.ts > all-flight mobile-supervisor scheduling > rebuilds and clears a previous manual supervisor binding on rerun 40ms
+ ✓ tests/domain/mobile-supervisor-scheduling.test.ts > all-flight mobile-supervisor scheduling > does not bind a non-KE166 supervisor to a forbidden counter 33ms
+ ✓ tests/domain/mobile-supervisor-coverage.test.ts > mobile supervisor coverage rules > forbids the default remarked positions 13ms
+ ✓ tests/domain/mobile-supervisor-coverage.test.ts > mobile supervisor coverage rules > uses allow rules as a whitelist while keeping forbid rules stronger 3ms
+ ✓ tests/domain/mobile-supervisor-scheduling.test.ts > all-flight mobile-supervisor scheduling > uses the existing safe reassignment before binding a non-KE166 supervisor 22ms
+ ✓ tests/domain/mobile-supervisor-scheduling.test.ts > all-flight mobile-supervisor scheduling > does not apply the KE166 consecutive-supervisor preference to another flight 6ms
+ ✓ tests/domain/mobile-supervisor-scheduling.test.ts > all-flight mobile-supervisor scheduling > rejects a later write that breaks a valid mobile-supervisor link 13ms
+ ✓ tests/domain/mobile-supervisor-scheduling.test.ts > all-flight mobile-supervisor scheduling > allows a guide to reuse a KE166 supervisor without a counter link 4ms
+ ✓ tests/ui/schedule-policy-view.test.ts > rules page > explains disabled core switches from the current draft before saving 167ms
+ ✓ tests/domain/schedule-guard.test.ts > unified schedule guard > keeps a legal result safe, then rejects a post-stage move before noon 5ms
+ ✓ tests/domain/schedule-guard.test.ts > unified schedule guard > allows manual assignments in the automatic guard boundary 1ms
+ ✓ tests/ui/schedule-policy-view.test.ts > rules page > connects every structured-rule row to its explanation 92ms
+ ✓ tests/ui/schedule-policy-view.test.ts > rules page > offers the two flight-count exemption checkboxes and saves their values 58ms
+ ✓ tests/ui/schedule-policy-view.test.ts > rules page > shows editable supervisor-fill relationships separately from coverage rules 65ms
+ ✓ tests/ui/schedule-policy-view.test.ts > rules page > reports when a configured target position is not marked for supervisor fill 73ms
+ ✓ tests/ui/schedule-policy-view.test.ts > rules page > configures cross-flight priority by current-group people instead of positions 54ms
+ ✓ tests/ui/schedule-policy-view.test.ts > rules page > renders configurable same-flight staff exclusions with an optional flight 67ms
+ ✓ tests/ui/schedule-policy-view.test.ts > rules page > keeps the ordinary-priority position collection compact and editable 63ms
+ ✓ tests/ui/schedule-policy-view.test.ts > rules page > projects settings, structured rules, and the central rule ledger 49ms
+ ✓ tests/ui/schedule-policy-view.test.ts > rules page > shows concrete gap-fill positions and emits single-position and category updates 58ms
+ ✓ tests/ui/schedule-policy-view.test.ts > rules page > emits the selected recovery mode from the recovery module 45ms
+ ✓ tests/ui/schedule-policy-view.test.ts > rules page > searches actual structured-rule values and hides unrelated rule cards 72ms
+ ✓ tests/ui/schedule-policy-view.test.ts > rules page > searches field labels and central rule descriptions across the whole page 67ms
+ ✓ tests/ui/schedule-policy-view.test.ts > rules page > shows persisted non-default structured-rule selections after remount 48ms
+
+ Test Files  13 passed (13)
+      Tests  154 passed (154)
+   Start at  13:01:02
+   Duration  4.87s (transform 9.89s, setup 0ms, import 14.56s, tests 5.69s, environment 2.02s)
+
+
+EXIT_CODE=0

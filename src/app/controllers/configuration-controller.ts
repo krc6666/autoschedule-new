@@ -65,7 +65,7 @@ export class ConfigurationController implements UiCommandController {
           this.context.toast(
             command.entity === "staff"
               ? "人员编号不能重复"
-              : "航班模板号不能重复",
+              : "航班号不能重复或为空；请检查模板和两组当前航班是否已有新名称，未修改任何配置",
             "danger"
           );
         else if (result !== "missing") this.context.commit();
@@ -99,6 +99,39 @@ export class ConfigurationController implements UiCommandController {
         commands.addTemplate();
         this.context.commit("已新增航班模板");
         return true;
+      case "rename-current-flight-to-template": {
+        const model = this.context.model();
+        const flight = model.flights.find(
+          (item) => item.id === command.flightId
+        );
+        const template = model.templates.find(
+          (item) => item.id === command.templateId
+        );
+        if (!flight || !template) {
+          this.context.toast("航班或模板已变更，请重新选择", "warning");
+          return true;
+        }
+        if (
+          !this.context.confirm(
+            `确认修正航班名称 ${flight.flightNo} → ${template.flightNo}？两组同旧名称的当前航班将同步改名，保留时段、人数、岗位和备注，清除受影响班表；历史不变。`
+          )
+        )
+          return true;
+        const result = commands.renameCurrentFlightToTemplate(
+          command.flightId,
+          command.templateId
+        );
+        if (result === "updated")
+          this.context.commit("航班名称已修正，请重新生成排班");
+        else
+          this.context.toast(
+            result === "duplicate"
+              ? "两组当前航班中已存在目标名称，本次修正未执行；请先核对重复航班，不能自动合并"
+              : "当前航班或模板已变更；有对应模板的航班请直接修改模板名称",
+            "warning"
+          );
+        return true;
+      }
       case "delete-template":
         commands.deleteTemplate(command.id);
         this.context.commit("模板已删除");

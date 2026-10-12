@@ -1,0 +1,124 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ × tests/ui/schedule-policy-view.test.ts > rules page > does not call a configured TW616 template nonexistent when today's plan omits it 142ms
+   → expected '\n      \n        督导补位关系1 条启用 ·\n    …' not to contain 'TW616 不存在'
+ × tests/ui/schedule-policy-view.test.ts > rules page > keeps repair instructions collapsed and identifies the field to change 93ms
+   → expected null not to be null
+ × tests/ui/schedule-policy-view.test.ts > rules page > explains unmatched rules beyond supervisor fill and keeps all help closed 69ms
+   → the given combination of arguments (undefined and string) is invalid for this assertion. You can use an array, a map, an object, a set, a string, or a weakset instead of a string
+ ✓ tests/ui/schedule-policy-view.test.ts > rules page > shows an obsolete selected late scope and lets the user deselect it 91ms
+ ✓ tests/ui/schedule-policy-view.test.ts > rules page > explains disabled core switches from the current draft before saving 79ms
+ × tests/ui/schedule-policy-view.test.ts > rules page > connects every structured-rule row to its explanation 59ms
+   → sameFlightStaffExclusions: expected null not to be null
+ ✓ tests/ui/schedule-policy-view.test.ts > rules page > offers the two flight-count exemption checkboxes and saves their values 61ms
+ ✓ tests/ui/schedule-policy-view.test.ts > rules page > shows editable supervisor-fill relationships separately from coverage rules 48ms
+ ✓ tests/ui/schedule-policy-view.test.ts > rules page > reports when a configured target position is not marked for supervisor fill 102ms
+ ✓ tests/ui/schedule-policy-view.test.ts > rules page > configures cross-flight priority by current-group people instead of positions 48ms
+ ✓ tests/ui/schedule-policy-view.test.ts > rules page > renders configurable same-flight staff exclusions with an optional flight 52ms
+ ✓ tests/ui/schedule-policy-view.test.ts > rules page > keeps the ordinary-priority position collection compact and editable 66ms
+ ✓ tests/ui/schedule-policy-view.test.ts > rules page > projects settings, structured rules, and the central rule ledger 76ms
+ ✓ tests/ui/schedule-policy-view.test.ts > rules page > shows concrete gap-fill positions and emits single-position and category updates 46ms
+ ✓ tests/ui/schedule-policy-view.test.ts > rules page > emits the selected recovery mode from the recovery module 57ms
+ ✓ tests/ui/schedule-policy-view.test.ts > rules page > searches actual structured-rule values and hides unrelated rule cards 49ms
+ ✓ tests/ui/schedule-policy-view.test.ts > rules page > searches field labels and central rule descriptions across the whole page 71ms
+ ✓ tests/ui/schedule-policy-view.test.ts > rules page > shows persisted non-default structured-rule selections after remount 44ms
+
+ Test Files  1 failed (1)
+      Tests  4 failed | 14 passed (18)
+   Start at  11:59:36
+   Duration  3.10s (transform 981ms, setup 0ms, import 1.17s, tests 1.26s, environment 415ms)
+
+stderr | tests/ui/schedule-policy-view.test.ts
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/ui/schedule-policy-view.test.ts > rules page > does not call a configured TW616 template nonexistent when today's plan omits it
+AssertionError: expected '\n      \n        督导补位关系1 条启用 ·\n    …' not to contain 'TW616 不存在'
+
+- Expected
++ Received
+
+- TW616 不存在
++
++
++         督导补位关系1 条启用 ·
++             仅在人手不足且没有安全普通候选时生效
++
++
++
++
++       新增补位关系
++
++
++
++
++               启用
++               来源航班
++               来源岗位
++               目标航班
++               目标岗位
++               自动补位
++               人工补位
++
++
++
++
++                         来源航班 TW616 不存在，督导补位关系不会生效
++
++
++
++
++
+
+ ❯ tests/ui/schedule-policy-view.test.ts:57:34
+     55|     >("autoschedule-policy-page", { model: state });
+     56|     const card = element.querySelector<HTMLElement>("[data-supervisor-…
+     57|     expect(card.textContent).not.toContain("TW616 不存在");
+       |                                  ^
+     58|     expect(card.textContent).toContain("当前航班计划未包含");
+     59|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  tests/ui/schedule-policy-view.test.ts > rules page > keeps repair instructions collapsed and identifies the field to change
+AssertionError: expected null not to be null
+ ❯ tests/ui/schedule-policy-view.test.ts:72:22
+     70|       "details[data-policy-diagnostic]"
+     71|     );
+     72|     expect(help).not.toBeNull();
+       |                      ^
+     73|     expect(help!.open).toBe(false);
+     74|     expect(help!.querySelector("summary")?.textContent).toContain(
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  tests/ui/schedule-policy-view.test.ts > rules page > explains unmatched rules beyond supervisor fill and keeps all help closed
+AssertionError: the given combination of arguments (undefined and string) is invalid for this assertion. You can use an array, a map, an object, a set, a string, or a weakset instead of a string
+ ❯ tests/ui/schedule-policy-view.test.ts:106:31
+    104|       '[data-policy-diagnostics="dutyPositionPriorities:missing-duty"]'
+    105|     );
+    106|     expect(duty?.textContent).toContain("没有对应航班配置");
+       |                               ^
+    107|     expect(duty?.textContent).toContain("配置 → 航班计划模板");
+    108|     expect(
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  tests/ui/schedule-policy-view.test.ts > rules page > connects every structured-rule row to its explanation
+AssertionError: sameFlightStaffExclusions: expected null not to be null
+ ❯ tests/ui/schedule-policy-view.test.ts:260:29
+    258|         `[data-policy-diagnostics="${key}:${id}"] details[data-policy-…
+    259|       );
+    260|       expect(help, key).not.toBeNull();
+       |                             ^
+    261|       expect(help!.open, key).toBe(false);
+    262|       expect(help!.querySelectorAll("li").length, key).toBeGreaterThan…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+EXIT_CODE=1
+Baseline replay: only the two task-owned implementation files temporarily read from HEAD; restored in finally.

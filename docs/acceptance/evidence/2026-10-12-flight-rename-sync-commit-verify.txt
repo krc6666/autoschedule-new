@@ -1,0 +1,84 @@
+
+> autoschedule@1.0.0 verify
+> npm run typecheck && npm test && npm run test:performance && npm run build
+
+
+> autoschedule@1.0.0 typecheck
+> tsc -b --pretty false
+
+
+> autoschedule@1.0.0 test
+> vitest run --exclude tests/performance/**
+
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/architecture/acceptance-gate.test.ts (16 tests | 3 failed) 55733ms
+     × rejects a formerly valid record after a later source rewrite 6702ms
+     × also catches changed build settings and newly added source files 5546ms
+     × requires reasons for inapplicable paths and cannot exempt final output 7688ms
+ ❯ tests/domain/scheduling-kernel.test.ts (135 tests | 1 failed) 99142ms
+     × assigns only available and qualified staff without time conflicts 30278ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/architecture/acceptance-gate.test.ts > acceptance release gate > rejects a formerly valid record after a later source rewrite
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ tests/architecture/acceptance-gate.test.ts:145:3
+    143|   });
+    144|
+    145|   it("rejects a formerly valid record after a later source rewrite", (…
+       |   ^
+    146|     const root = fixture();
+    147|     save(root, record(root));
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  tests/architecture/acceptance-gate.test.ts > acceptance release gate > also catches changed build settings and newly added source files
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ tests/architecture/acceptance-gate.test.ts:155:3
+    153|   });
+    154|
+    155|   it("also catches changed build settings and newly added source files…
+       |   ^
+    156|     const root = fixture();
+    157|     save(root, record(root));
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  tests/architecture/acceptance-gate.test.ts > acceptance release gate > requires reasons for inapplicable paths and cannot exempt final output
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ tests/architecture/acceptance-gate.test.ts:214:3
+    212|   });
+    213|
+    214|   it("requires reasons for inapplicable paths and cannot exempt final …
+       |   ^
+    215|     const root = fixture();
+    216|     const value = record(root);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  tests/domain/scheduling-kernel.test.ts > scheduler domain > assigns only available and qualified staff without time conflicts
+Error: Test timed out in 30000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ tests/domain/scheduling-kernel.test.ts:656:3
+    654|   });
+    655|
+    656|   it("assigns only available and qualified staff without time conflict…
+       |   ^
+    657|     const state = createOrdinarySchedulingState();
+    658|     const result = await generateSchedule(state, "2026-07-18");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  2 failed | 124 passed (126)
+      Tests  4 failed | 1178 passed (1182)
+   Start at  13:46:45
+   Duration  102.38s (transform 26.08s, setup 0ms, import 59.45s, tests 366.22s, environment 16.72s)
+
+
+EXIT_CODE=1

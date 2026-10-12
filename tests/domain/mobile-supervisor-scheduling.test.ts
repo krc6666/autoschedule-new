@@ -13,6 +13,12 @@ import { createScheduleSafetySession } from "../../src/domain/kernel/schedule-sa
 import { createScheduleRunFacts } from "../../src/domain/shared/schedule-run-facts";
 import { evaluateSupervisorFillFacts } from "../../src/domain/coverage/supervisor-fill-facts";
 import { evaluateAutomaticHardConstraints } from "../../src/domain/rules/built-in-rule-registry";
+import { updateConfigurationField } from "../../src/app/configuration-actions";
+import {
+  buildCurrentScheduleFlightCandidates,
+  materializeCurrentScheduleFlights,
+} from "../../src/domain/flights/next-workday-flight-plan";
+import { buildScheduleWorkbook } from "../../src/infrastructure/excel";
 import { schedulingDecision } from "../../src/domain/rules/schedule-rule-contract";
 import {
   fillConfiguredSupervisorTargets,
@@ -148,6 +154,59 @@ describe("all-flight mobile-supervisor scheduling", { timeout: 15_000 }, () => {
     ];
     return { state, supervisor, regular };
   }
+
+  it("uses a renamed flight through preparation, final supervisor fill, safety credential and export", async () => {
+    const { state, supervisor } = configuredSupervisorFillState(false);
+    const flight = state.flights[0]!;
+    flight.flightNo = "TWB616";
+    state.templates = [{ ...flight, id: "renamed-template" }];
+    state.positionRules.forEach((rule) => {
+      rule.flightNo = "TWB616";
+    });
+    const fill = state.settings.mobileSupervisorFillRules[0]!;
+    fill.sourceFlightNo = fill.targetFlightNo = "TWB616";
+    expect(
+      updateConfigurationField(
+        state,
+        "template",
+        "renamed-template",
+        "flightNo",
+        "TW616"
+      )
+    ).toBe("updated");
+    const choices = buildCurrentScheduleFlightCandidates(
+      state.templates,
+      state.flights
+    );
+    state.flights = materializeCurrentScheduleFlights(
+      choices,
+      choices.filter((item) => item.selectedByDefault).map((item) => item.id)
+    );
+    const result = await generateSchedule(state, DATE);
+    expect(result.assignments).toHaveLength(2);
+    expect(
+      result.assignments.every((assignment) => assignment.flightNo === "TW616")
+    ).toBe(true);
+    const source = result.assignments.find(
+      (assignment) => assignment.positionRuleId === "ke166-supervisor"
+    )!;
+    const target = result.assignments.find(
+      (assignment) => assignment.positionRuleId === "ke166-h05"
+    )!;
+    expect(target).toMatchObject({
+      staffId: supervisor.id,
+      status: "assigned",
+      supervisorSourceAssignmentId: source.id,
+      supervisorFillRuleId: fill.id,
+      workHours: 0,
+      fatiguePoints: 0,
+    });
+    expect(result.safetyCredential).toBeDefined();
+    state.assignments = result.assignments;
+    const exported = JSON.stringify(buildScheduleWorkbook(state, DATE).Sheets);
+    expect(exported).toContain("TW616");
+    expect(exported).not.toContain("TWB616");
+  });
 
   it("fills a configured supervisor-fill target only when no safe regular candidate exists", async () => {
     const { state, supervisor } = configuredSupervisorFillState(false);

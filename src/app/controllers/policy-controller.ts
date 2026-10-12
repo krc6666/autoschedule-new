@@ -39,7 +39,8 @@ export class PolicyController implements UiCommandController {
                     rule
                   )
                 : null;
-              if (issue) this.context.toast(issue.message, "warning");
+              if (issue?.severity === "warning")
+                this.context.toast(issue.message, "warning");
             }
           }
         }

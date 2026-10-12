@@ -17,6 +17,19 @@ function normalizeBookedPassengers(value: number): number {
   return Number.isFinite(value) ? Math.max(0, Math.trunc(value)) : 0;
 }
 
+/** Unlinked flights may be intentional; only an explicit user choice can rename them. */
+export function currentFlightsWithoutTemplates(
+  templates: readonly FlightTemplate[],
+  currentFlights: readonly Flight[]
+): Flight[] {
+  const configured = new Set(
+    templates.map((template) => normalizeWeeklyFlightNo(template.flightNo))
+  );
+  return currentFlights.filter(
+    (flight) => !configured.has(normalizeWeeklyFlightNo(flight.flightNo))
+  );
+}
+
 export function buildNextWorkdayFlightCandidates(
   templates: readonly FlightTemplate[],
   defaultFlightNos: readonly string[]

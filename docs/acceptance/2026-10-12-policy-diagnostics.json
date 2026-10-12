@@ -1,0 +1,171 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-10-12-policy-diagnostics",
+  "title": "TW616 配置诊断误报与规则页折叠处理指引",
+  "startedFrom": "2c5cb5b6df5bfe4f5dc408623ce7740c603e5c36",
+  "expectation": {
+    "example": "owner 确认准确航班号为 TW616，本次没有选 TW616，准备窗口还可见旧名称。仅模板中存在 TW616 时，旧诊断把当前计划缺席误报为航班不存在。",
+    "expected": "区分配置失配、本次计划不含、主动关闭和另一组人员；短原因常显，查看原因与处理方法默认收起，展开写明页面和字段。",
+    "unchanged": "不同航班不自动转换；当前计划保留旧航班；有安全普通人员时不强制替换；排班资格、优先级、最终守卫和持久化合同不变。",
+    "fallback": "无法匹配时保留原数据并给修正步骤，不猜测或自动修改航班名；owner 本机浏览器的最终表现未取得时保持未验收。"
+  },
+  "testedVersion": "73d26870438e631a376ae2ba30a23aa923dde346d7cab3893faae867f193139c",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "已保留可变红的真实规则页症状：模板存在但本次未选，旧代码错误说不存在；最后版回归通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-policy-diagnostics-baseline-red.txt",
+          "summary": "原诊断及规则组件读取 HEAD 版本重放：TW616 仅模板存在时仍报警不存在，详情入口缺失；4 项失败/14 项通过。两份本任务实现文件已在 finally 恢复。",
+          "sha256": "5fbe9437570127e194f3283e372774078ea0f1a5b8723ba39541144cc4f7359e"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-policy-diagnostics-focused.txt",
+          "summary": "最后配置诊断版本：11 文件/198 项通过；包含九类规则展示、其他组、历史来源、旧航班保留、恢复/导入、原督导补位与安全回退。",
+          "sha256": "a64d42ddd0ed6829180a6de91c031018c262508728beab03038b80a1912b3d88"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-flight-rename-sync-verify-final.txt",
+          "summary": "最终 npm.cmd run verify 退出 0：126 功能文件/1182 项、5 性能文件/16 项、类型检查与生产构建全部通过；未修改测试时限。",
+          "sha256": "2d3d903bfe25cdddc6e8444157704a1bfb26a271c794a2e9519d128cddadf418"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-flight-rename-sync-commit-verify-final.txt",
+          "summary": "提交钩子格式化后完整复验退出0：126功能文件/1182项、5性能文件/16项、类型检查与生产构建通过。仅本次进程设置VITEST_MAX_WORKERS=2；未改测试时限或断言。",
+          "sha256": "1ab9e09da39cb7decbe219eaf29cd3ab10571785e63c1a8982c0ded984374e8d"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "完整配置及仅当前计划缺席分别返回合法/中性说明；岗位性质缺失警告，详情默认收起且包含实际页面字段；关闭说明读取草稿。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-policy-diagnostics-focused.txt",
+          "summary": "最后配置诊断版本：11 文件/198 项通过；包含九类规则展示、其他组、历史来源、旧航班保留、恢复/导入、原督导补位与安全回退。",
+          "sha256": "a64d42ddd0ed6829180a6de91c031018c262508728beab03038b80a1912b3d88"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-flight-rename-sync-verify-final.txt",
+          "summary": "最终 npm.cmd run verify 退出 0：126 功能文件/1182 项、5 性能文件/16 项、类型检查与生产构建全部通过；未修改测试时限。",
+          "sha256": "2d3d903bfe25cdddc6e8444157704a1bfb26a271c794a2e9519d128cddadf418"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-flight-rename-sync-commit-verify-final.txt",
+          "summary": "提交钩子格式化后完整复验退出0：126功能文件/1182项、5性能文件/16项、类型检查与生产构建通过。仅本次进程设置VITEST_MAX_WORKERS=2；未改测试时限或断言。",
+          "sha256": "1ab9e09da39cb7decbe219eaf29cd3ab10571785e63c1a8982c0ded984374e8d"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "Excel导出、配置导入、localStorage保存恢复后重新计算同一诊断并渲染；多匹配、跨工作日、另一组、改名旧当前航班及历史来源均覆盖。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-policy-diagnostics-focused.txt",
+          "summary": "最后配置诊断版本：11 文件/198 项通过；包含九类规则展示、其他组、历史来源、旧航班保留、恢复/导入、原督导补位与安全回退。",
+          "sha256": "a64d42ddd0ed6829180a6de91c031018c262508728beab03038b80a1912b3d88"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-flight-rename-sync-verify-final.txt",
+          "summary": "最终 npm.cmd run verify 退出 0：126 功能文件/1182 项、5 性能文件/16 项、类型检查与生产构建全部通过；未修改测试时限。",
+          "sha256": "2d3d903bfe25cdddc6e8444157704a1bfb26a271c794a2e9519d128cddadf418"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-flight-rename-sync-commit-verify-final.txt",
+          "summary": "提交钩子格式化后完整复验退出0：126功能文件/1182项、5性能文件/16项、类型检查与生产构建通过。仅本次进程设置VITEST_MAX_WORKERS=2；未改测试时限或断言。",
+          "sha256": "1ab9e09da39cb7decbe219eaf29cd3ab10571785e63c1a8982c0ded984374e8d"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "not_applicable",
+      "reason": "本任务只读诊断不产生或改写assignments，不改变收尾与腾挪；原补位、失败回退回归仍运行通过。",
+      "evidence": []
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "没有调整排班资格、安全守卫或关联语义；原机动督导补位普通候选保留、结构化关联、零工时/疲劳、连环腾挪失败回退及全量功能通过。架构失败已在后续相关检查通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-policy-diagnostics-focused.txt",
+          "summary": "最后配置诊断版本：11 文件/198 项通过；包含九类规则展示、其他组、历史来源、旧航班保留、恢复/导入、原督导补位与安全回退。",
+          "sha256": "a64d42ddd0ed6829180a6de91c031018c262508728beab03038b80a1912b3d88"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-policy-diagnostics-verify-final.txt",
+          "summary": "npm.cmd run verify 退出 0：125 个功能文件/1167 项、5 个性能文件/16 项、类型检查与构建。功能阶段早于最后历史来源补项；受影响诊断由之后的198项定向与本日志的后续构建重新验证。",
+          "sha256": "eee6fc142736ff2cf1f9440a93f17019569f9dac98b300a237245ba719854845"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-policy-diagnostics-verify.txt",
+          "summary": "第一次完整验证：1166 项通过、1 项 AppState 依赖架构失败。已收窄配置事实接口，未放宽架构门禁。",
+          "sha256": "a4d0824b1c38caf1aebe0c659d6679a8713ea493e612e88db6847aecbe5d7f46"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-flight-rename-sync-verify-final.txt",
+          "summary": "最终 npm.cmd run verify 退出 0：126 功能文件/1182 项、5 性能文件/16 项、类型检查与生产构建全部通过；未修改测试时限。",
+          "sha256": "2d3d903bfe25cdddc6e8444157704a1bfb26a271c794a2e9519d128cddadf418"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-flight-rename-sync-commit-verify-final.txt",
+          "summary": "提交钩子格式化后完整复验退出0：126功能文件/1182项、5性能文件/16项、类型检查与生产构建通过。仅本次进程设置VITEST_MAX_WORKERS=2；未改测试时限或断言。",
+          "sha256": "1ab9e09da39cb7decbe219eaf29cd3ab10571785e63c1a8982c0ded984374e8d"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "诊断仍为只读，原安全判断与数值/往返合同不变。另由改名修复任务同步当前航班（owner授权），不把前轮保留旧名的错误断言作为不变规则。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-policy-diagnostics-focused.txt",
+          "summary": "最后配置诊断版本：11 文件/198 项通过；包含九类规则展示、其他组、历史来源、旧航班保留、恢复/导入、原督导补位与安全回退。",
+          "sha256": "a64d42ddd0ed6829180a6de91c031018c262508728beab03038b80a1912b3d88"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-policy-diagnostics-verify-final.txt",
+          "summary": "npm.cmd run verify 退出 0：125 个功能文件/1167 项、5 个性能文件/16 项、类型检查与构建。功能阶段早于最后历史来源补项；受影响诊断由之后的198项定向与本日志的后续构建重新验证。",
+          "sha256": "eee6fc142736ff2cf1f9440a93f17019569f9dac98b300a237245ba719854845"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-flight-rename-sync-verify-final.txt",
+          "summary": "最终 npm.cmd run verify 退出 0：126 功能文件/1182 项、5 性能文件/16 项、类型检查与生产构建全部通过；未修改测试时限。",
+          "sha256": "2d3d903bfe25cdddc6e8444157704a1bfb26a271c794a2e9519d128cddadf418"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-flight-rename-sync-commit-verify-final.txt",
+          "summary": "提交钩子格式化后完整复验退出0：126功能文件/1182项、5性能文件/16项、类型检查与生产构建通过。仅本次进程设置VITEST_MAX_WORKERS=2；未改测试时限或断言。",
+          "sha256": "1ab9e09da39cb7decbe219eaf29cd3ab10571785e63c1a8982c0ded984374e8d"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-flight-rename-sync-commit-verify.txt",
+          "summary": "格式化后默认并行首轮复验退出1：1178项通过，验收脚本3项超过5秒、完整排班1项超过30秒；未报告业务断言失败。随后2-worker完整验证全部通过。",
+          "sha256": "60d89319690541653dc50b3c6e53554e6ad863ce76abed9d4496c18130ef1a99"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "规则页短提示与展开指引的完整现场验收仍未取得；owner已在改名修复任务中确认旧名消失、新名默认勾选且人数/时段保留。此记录不冒充全部规则页现场通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-policy-diagnostics-focused.txt",
+          "summary": "最后配置诊断版本：11 文件/198 项通过；包含九类规则展示、其他组、历史来源、旧航班保留、恢复/导入、原督导补位与安全回退。",
+          "sha256": "a64d42ddd0ed6829180a6de91c031018c262508728beab03038b80a1912b3d88"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "证据 baseline-red 可稳定看到“来源航班 TW616 不存在”及详情缺失；focused 中原症状与九类规则行连接全部通过。模板存在性与当天适用性已经分开。",
+    "laterChanges": "页面编辑、模板改名、当前计划保留、保存恢复和Excel导入可能改变引用；focused 覆盖这些入口并重新计算。运行时排班不消费这些提示，不因此改写安全规则或班表。",
+    "finalArtifact": "focused 是实际组件渲染与恢复/导入后页面断言；verify-final 提供生产构建。真实本机页面还未由owner核对，finalArtifact仍为unverified。"
+  },
+  "review": {
+    "missedScope": "逐一检查九类结构化规则、核心草稿、末班过期范围、普通重点和补差保护；补查发现并覆盖另一组人员与历史来源不能按当前名单误报。现场旧名称关系及真实浏览器展开/窄屏布局仍缺证据，不宣称完成现场验收。 后续 owner 现场证据确认源头遗漏当前航班改名，同一事故第三次修复详见 2026-10-12-flight-rename-sync；前轮旧名保留断言已更正，不能作为源头需求完成证据。",
+    "rootCause": "旧存在性判断只读取当前班flights，把局部计划当完整配置，漏看templates；岗位关键词仅取首个匹配项也可能误报。第一次测试未包含模板存在但当前未选，详情字段指引也未验。",
+    "earlyDetection": "编写引用诊断前先列出完整配置、本次计划、当前组与历史来源的各自时点；失败测试先覆盖模板有而当前没有、多匹配、恢复导入和用户可执行字段指引，再查全部UI消费者与事实边界。"
+  }
+}

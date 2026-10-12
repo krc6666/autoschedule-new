@@ -1,8 +1,16 @@
-import type { AppState, ScheduleResult } from "../../model";
+import type { AppState, GroupWorkspace, ScheduleResult } from "../../model";
 import { assertScheduleSafetyCredential } from "./schedule-safety-session";
 import { scheduleRuleFingerprint } from "../rules/schedule-rule-fingerprint";
 
-export function clearActiveSchedule(state: AppState): void {
+export function clearActiveSchedule(
+  state: Pick<
+    GroupWorkspace,
+    | "assignments"
+    | "activeScheduleDate"
+    | "schedulePolicyStale"
+    | "scheduleRuleFingerprint"
+  >
+): void {
   state.assignments = [];
   state.activeScheduleDate = null;
   state.schedulePolicyStale = false;

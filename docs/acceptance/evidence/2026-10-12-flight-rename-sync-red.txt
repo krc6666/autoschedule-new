@@ -1,0 +1,155 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ✓ tests/domain/policy-configuration-diagnostics.test.ts > configuration diagnostics > distinguishes a missing plan from missing configuration without changing data 7ms
+ ✓ tests/domain/policy-configuration-diagnostics.test.ts > configuration diagnostics > does not turn TWB616 or TW626 into TW616 1ms
+ ✓ tests/domain/policy-configuration-diagnostics.test.ts > configuration diagnostics > reports the target role before the plan absence and accepts any matching eligible position 1ms
+ ✓ tests/domain/policy-configuration-diagnostics.test.ts > configuration diagnostics > treats intentionally disabled fill modes as information 1ms
+ ✓ tests/domain/policy-configuration-diagnostics.test.ts > configuration diagnostics > explains unmatched sameFlightStaffExclusions and treats disabled entries neutrally 2ms
+ ✓ tests/domain/policy-configuration-diagnostics.test.ts > configuration diagnostics > explains unmatched crossFlightPriorityPolicies and treats disabled entries neutrally 1ms
+ ✓ tests/domain/policy-configuration-diagnostics.test.ts > configuration diagnostics > explains unmatched dutyPositionPriorities and treats disabled entries neutrally 3ms
+ ✓ tests/domain/policy-configuration-diagnostics.test.ts > configuration diagnostics > explains unmatched crossWorkdayQualificationReservations and treats disabled entries neutrally 2ms
+ ✓ tests/domain/policy-configuration-diagnostics.test.ts > configuration diagnostics > explains unmatched lateShiftRecoveryPositionRules and treats disabled entries neutrally 1ms
+ ✓ tests/domain/policy-configuration-diagnostics.test.ts > configuration diagnostics > explains unmatched nextWorkdayRecoveryTargets and treats disabled entries neutrally 1ms
+ ✓ tests/domain/policy-configuration-diagnostics.test.ts > configuration diagnostics > explains unmatched mobileSupervisorCoverageRules and treats disabled entries neutrally 1ms
+ ✓ tests/domain/policy-configuration-diagnostics.test.ts > configuration diagnostics > explains unmatched positionTransitionPolicies and treats disabled entries neutrally 1ms
+ ✓ tests/domain/policy-configuration-diagnostics.test.ts > configuration diagnostics > uses the existing duty matcher including whitespace normalization and an empty keyword 1ms
+ ✓ tests/domain/policy-configuration-diagnostics.test.ts > configuration diagnostics > does not call retained other-group personnel deleted 2ms
+ ✓ tests/domain/policy-configuration-diagnostics.test.ts > configuration diagnostics > does not require next-workday targets to be in today's plan 1ms
+ ✓ tests/domain/policy-configuration-diagnostics.test.ts > configuration diagnostics > keeps an archived late-shift source valid after its flight template is removed 1ms
+ ✓ tests/domain/policy-configuration-diagnostics.test.ts > configuration diagnostics > explains an allow rule blocked by an existing forbid rule 1ms
+ ✓ tests/domain/policy-configuration-diagnostics.test.ts > configuration diagnostics > reports orphan ordinary and gap-fill references using actual field and worksheet names 2ms
+ ✓ tests/domain/policy-configuration-diagnostics.test.ts > configuration diagnostics > uses the central scalar contract for invalid numbers, times and intentional zeros 1ms
+ × tests/domain/policy-configuration-diagnostics.test.ts > configuration diagnostics > keeps a renamed template, current prepare selection and fill relation consistent 23ms
+   → expected [ [ 'TW616', false ], …(1) ] to deeply equal [ [ 'TW616', true ] ]
+ × tests/app/flight-rename-sync.test.ts > flight rename synchronization > uses the renamed flight by default in prepare and retains operational data in both groups 20ms
+   → expected [ { flightNo: 'TWB616', …(6) } ] to deeply equal [ { flightNo: 'TW616', …(6) } ]
+ × tests/app/flight-rename-sync.test.ts > flight rename synchronization > rejects a rename atomically if group A already has the target flight 6ms
+   → expected 'updated' to be 'duplicate' // Object.is equality
+ × tests/app/flight-rename-sync.test.ts > flight rename synchronization > rejects a rename atomically if group B already has the target flight 3ms
+   → expected 'updated' to be 'duplicate' // Object.is equality
+ × tests/app/flight-rename-sync.test.ts > flight rename synchronization > preserves an independent non-template flight through rename and prepare 17ms
+   → expected [ [ 'EXTRA900', true ], …(2) ] to deeply equal [ [ 'EXTRA900', true ], …(1) ]
+npx.cmd :
+所在位置 行:3 字符: 1
++ & npx.cmd vitest run tests/app/flight-rename-sync.test.ts tests/domai ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/app/flight-rename-sync.test.ts > flight rename synchronization > uses the renamed flight by default in pre
+pare and retains operational data in both groups
+AssertionError: expected [ { flightNo: 'TWB616', …(6) } ] to deeply equal [ { flightNo: 'TW616', …(6) } ]
+
+- Expected
++ Received
+
+@@ -1,10 +1,10 @@
+  [
+    {
+      "bookedPassengers": 123,
+      "endTime": "00:10",
+-     "flightNo": "TW616",
++     "flightNo": "TWB616",
+      "id": "a-flight",
+      "positions": [
+        "督导",
+        "G20",
+        "G19",
+
+ ❯ tests/app/flight-rename-sync.test.ts:24:27
+     22|     expect(store.getState().configuration.updateField("template", "tw"…
+     23|     const state = store.getState().model;
+     24|     expect(state.flights).toEqual(before.flights.map((flight) => ({ ..…
+       |                           ^
+     25|     expect(state.groups.B.flights).toEqual(before.groups.B.flights.map…
+     26|     expect(state.history).toEqual(before.history);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  tests/app/flight-rename-sync.test.ts > flight rename synchronization > rejects a rename atomically if group A al
+ready has the target flight
+ FAIL  tests/app/flight-rename-sync.test.ts > flight rename synchronization > rejects a rename atomically if group B al
+ready has the target flight
+AssertionError: expected 'updated' to be 'duplicate' // Object.is equality
+
+Expected: "duplicate"
+Received: "updated"
+
+ ❯ tests/app/flight-rename-sync.test.ts:43:95
+     41|     store.getState().replaceModel(input);
+     42|     const before = structuredClone(store.getState().model);
+     43|     expect(store.getState().configuration.updateField("template", "tw"…
+       |                                                                                               ^
+     44|     expect(store.getState().model).toEqual(before);
+     45|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  tests/app/flight-rename-sync.test.ts > flight rename synchronization > preserves an independent non-template fli
+ght through rename and prepare
+AssertionError: expected [ [ 'EXTRA900', true ], …(2) ] to deeply equal [ [ 'EXTRA900', true ], …(1) ]
+
+- Expected
++ Received
+
+@@ -3,8 +3,12 @@
+      "EXTRA900",
+      true,
+    ],
+    [
+      "TW616",
++     false,
++   ],
++   [
++     "TWB616",
+      true,
+    ],
+  ]
+
+ ❯ tests/app/flight-rename-sync.test.ts:56:137
+     54|     const state = store.getState().model;
+     55|     expect(state.flights.find((flight) => flight.id === "independent")…
+     56|     expect(buildCurrentScheduleFlightCandidates(state.templates, state…
+       |
+                          ^
+     57|   });
+     58| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL  tests/domain/policy-configuration-diagnostics.test.ts > configuration diagnostics > keeps a renamed template, cu
+rrent prepare selection and fill relation consistent
+AssertionError: expected [ [ 'TW616', false ], …(1) ] to deeply equal [ [ 'TW616', true ] ]
+
+- Expected
++ Received
+
+  [
+    [
+      "TW616",
++     false,
++   ],
++   [
++     "TWB616",
+      true,
+    ],
+  ]
+
+ ❯ tests/domain/policy-configuration-diagnostics.test.ts:528:7
+    526|     expect(
+    527|       choices.map((choice) => [choice.flightNo, choice.selectedByDefau…
+    528|     ).toEqual([
+       |       ^
+    529|       ["TW616", true],
+    530|     ]);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  5 failed | 19 passed (24)
+   Start at  12:53:17
+   Duration  1.61s (transform 1.73s, setup 0ms, import 2.10s, tests 102ms, environment 0ms)

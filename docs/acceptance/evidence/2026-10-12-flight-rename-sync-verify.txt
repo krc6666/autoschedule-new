@@ -1,0 +1,41 @@
+
+> autoschedule@1.0.0 verify
+> npm run typecheck && npm test && npm run test:performance && npm run build
+
+
+> autoschedule@1.0.0 typecheck
+> tsc -b --pretty false
+
+
+> autoschedule@1.0.0 test
+> vitest run --exclude tests/performance/**
+
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/architecture/acceptance-gate.test.ts (16 tests | 1 failed) 40489ms
+     × keeps completed historical records while requiring current-version evidence 5157ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/architecture/acceptance-gate.test.ts > acceptance release gate > keeps completed historical records while requiring current-version evidence
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ tests/architecture/acceptance-gate.test.ts:253:3
+    251|   });
+    252|
+    253|   it("keeps completed historical records while requiring current-versi…
+       |   ^
+    254|     const root = fixture();
+    255|     save(root, record(root, "previous"));
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 125 passed (126)
+      Tests  1 failed | 1181 passed (1182)
+   Start at  13:01:52
+   Duration  95.92s (transform 20.59s, setup 0ms, import 51.68s, tests 322.18s, environment 16.88s)
+
+
+EXIT_CODE=1

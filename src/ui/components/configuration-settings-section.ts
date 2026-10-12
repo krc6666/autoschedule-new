@@ -1,6 +1,7 @@
 import { html } from "lit";
 
 import type { AppState, FlightTemplate } from "../../model";
+import { currentFlightsWithoutTemplates } from "../../domain/flights/next-workday-flight-plan";
 import { dispatchUiCommand } from "../events/ui-command";
 import { configurationInput } from "./configuration-field";
 import { LightDomElement } from "./light-dom-element";
@@ -28,7 +29,7 @@ export class ConfigurationSettingsSectionElement extends LightDomElement {
         <div class="section-heading">
           <div>
             <h3>航班计划模板</h3>
-            <span>每日航班页输入航班号后自动带出时间、岗位和备注</span>
+            <span>改名会同步两组对应的当前航班和规则，保留当天人数与时段</span>
           </div>
           <button
             class="btn btn-primary"
@@ -45,8 +46,50 @@ export class ConfigurationSettingsSectionElement extends LightDomElement {
               : html`<div class="empty-state">尚无航班模板</div>`
           }
         </div>
+        ${this.flightNameRepair()}
       </div>
     </section>`;
+  }
+
+  private flightNameRepair() {
+    const unmatched = currentFlightsWithoutTemplates(
+      this.model.templates,
+      this.model.flights
+    );
+    if (!unmatched.length) return null;
+    return html`<details
+      class="config-collapsible mt-3"
+      data-flight-name-repair
+    >
+      <summary>检查当前航班名称（${unmatched.length} 项未匹配模板）</summary>
+      <p>
+        这些航班可以是独立添加的航班，可继续保留。如果是改名后遗留的旧名称，请选择正确模板并确认修正。只改名称，保留当天人数、时段、岗位和备注；历史不变。
+      </p>
+      ${unmatched.map(
+        (flight) =>
+          html`<label class="form-label d-block">
+            ${flight.flightNo} →
+            <select
+              class="form-select"
+              aria-label=${`修正 ${flight.flightNo} 的航班名称`}
+              @change=${(event: Event) => {
+                const select = event.currentTarget as HTMLSelectElement;
+                const templateId = select.value;
+                select.value = "";
+                if (templateId)
+                  dispatchUiCommand(this, {
+                    type: "rename-current-flight-to-template",
+                    flightId: flight.id,
+                    templateId,
+                  });
+              }}
+            >
+              <option value="">选择正确的模板航班号</option>
+              ${this.model.templates.map((template) => html`<option value=${template.id}>${template.flightNo}</option>`)}
+            </select>
+          </label>`
+      )}
+    </details>`;
   }
 
   private setting(

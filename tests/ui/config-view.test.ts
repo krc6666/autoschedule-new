@@ -11,6 +11,38 @@ import "../../src/ui/components/flights-page";
 import { mountElement } from "./lit-test-helpers";
 
 describe("configuration page", () => {
+  it("offers a collapsed explicit template choice for an old current flight without guessing a match", async () => {
+    const state = createDefaultState();
+    state.templates = [{ ...state.templates[0]!, id: "tw", flightNo: "TW616" }];
+    state.flights = [
+      { ...state.flights[0]!, id: "old-flight", flightNo: "TWB616" },
+    ];
+    const element = await mountElement<
+      HTMLElement & { updateComplete: Promise<unknown> }
+    >("autoschedule-configuration-settings", { model: state });
+    const details = element.querySelector<HTMLDetailsElement>(
+      "[data-flight-name-repair]"
+    );
+    expect(details).not.toBeNull();
+    expect(details!.open).toBe(false);
+    expect(details!.textContent).toContain("TWB616");
+    const select = details!.querySelector<HTMLSelectElement>("select")!;
+    expect(select.value).toBe("");
+    const commands: unknown[] = [];
+    element.addEventListener(UI_COMMAND_EVENT, (event) =>
+      commands.push((event as CustomEvent).detail)
+    );
+    select.value = "tw";
+    select.dispatchEvent(new Event("change", { bubbles: true }));
+    expect(commands).toEqual([
+      {
+        type: "rename-current-flight-to-template",
+        flightId: "old-flight",
+        templateId: "tw",
+      },
+    ]);
+  });
+
   it("keeps people, position rules, templates, and constraints separated", async () => {
     const state = createDefaultState();
     const element = await mountElement<

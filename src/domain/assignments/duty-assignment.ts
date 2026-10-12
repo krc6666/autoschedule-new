@@ -46,23 +46,24 @@ export function dutyLatePositionPriority(
   return 4;
 }
 
-function matchesDutyPositionPriority(
-  priority: ScheduleGenerationFacts["settings"]["dutyPositionPriorities"][number],
-  target: Pick<Assignment, "flightNo" | "position" | "remark">
-): boolean {
-  const flightNo = target.flightNo
+export function normalizeDutyPriorityFlightNo(value: string): string {
+  return value
     .trim()
     .toUpperCase()
     .replaceAll(/[^A-Z0-9]/g, "");
+}
+
+export function matchesDutyPositionPriority(
+  priority: ScheduleGenerationFacts["settings"]["dutyPositionPriorities"][number],
+  target: Pick<Assignment, "flightNo" | "position" | "remark">
+): boolean {
+  const flightNo = normalizeDutyPriorityFlightNo(target.flightNo);
   const positionText = `${target.position} ${target.remark}`
     .trim()
     .toLowerCase();
   return (
     priority.enabled &&
-    priority.flightNo
-      .trim()
-      .toUpperCase()
-      .replaceAll(/[^A-Z0-9]/g, "") === flightNo &&
+    normalizeDutyPriorityFlightNo(priority.flightNo) === flightNo &&
     (!priority.positionKeyword.trim() ||
       positionText.includes(priority.positionKeyword.trim().toLowerCase()))
   );

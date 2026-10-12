@@ -1,6 +1,13 @@
 import type { Assignment, Flight, PositionRule, Staff } from "../../model";
+import {
+  policyDiagnostic,
+  type PolicyDiagnostic,
+} from "../rules/policy-diagnostic";
 import type { MobileSupervisorFillRule } from "../rules/structured-policy-contract";
-import type { AssignmentEligibilityFacts } from "../shared/scheduling-facts";
+import type {
+  AssignmentEligibilityFacts,
+  ScheduleGenerationFacts,
+} from "../shared/scheduling-facts";
 import { evaluateAutomaticHardConstraints } from "../rules/built-in-rule-registry";
 import { assignmentRule } from "../flights/schedule-position-rules";
 import { isDisplayOnlyGuideReuse } from "../candidates/assignment-eligibility-facts";
@@ -14,7 +21,7 @@ export interface SupervisorFillEvaluation {
   hasSafeRegularCandidate: boolean;
 }
 
-export interface SupervisorFillConfigurationIssue {
+export interface SupervisorFillConfigurationIssue extends PolicyDiagnostic {
   code:
     | "source-flight-missing"
     | "source-position-missing"
@@ -22,8 +29,10 @@ export interface SupervisorFillConfigurationIssue {
     | "target-flight-missing"
     | "target-position-missing"
     | "target-position-not-fill"
-    | "no-operation-enabled";
-  message: string;
+    | "no-operation-enabled"
+    | "disabled"
+    | "automatic-disabled"
+    | "current-plan-not-applicable";
 }
 
 export function clearSupervisorFillRule(
@@ -66,12 +75,12 @@ function matches(value: string, keyword: string): boolean {
   );
 }
 
-function positionForKeyword(
+function positionsForKeyword(
   state: Pick<AssignmentEligibilityFacts, "positionRules">,
   flightNo: string,
   keyword: string
-): PositionRule | undefined {
-  return state.positionRules.find(
+): PositionRule[] {
+  return state.positionRules.filter(
     (rule) =>
       normalize(rule.flightNo) === normalize(flightNo) &&
       matches(rule.name, keyword)
@@ -83,60 +92,145 @@ function positionForKeyword(
  * Runtime assignment eligibility remains owned by evaluateSupervisorFillFacts.
  */
 export function diagnoseSupervisorFillRuleConfiguration(
-  state: Pick<AssignmentEligibilityFacts, "positionRules" | "flights">,
+  state: Pick<
+    ScheduleGenerationFacts,
+    "positionRules" | "flights" | "templates"
+  >,
   rule: MobileSupervisorFillRule
 ): SupervisorFillConfigurationIssue | null {
-  const sourceFlight = state.flights.find(
+  const issue = (
+    code: SupervisorFillConfigurationIssue["code"],
+    message: string,
+    explanation: string,
+    steps: string[],
+    severity: PolicyDiagnostic["severity"] = "warning"
+  ): SupervisorFillConfigurationIssue => ({
+    ...policyDiagnostic(code, message, explanation, steps, severity),
+    code,
+  });
+  if (!rule.enabled)
+    return issue(
+      "disabled",
+      "已停用，保留配置",
+      "这条关系的启用开关已关闭，不参与补位。",
+      ["如需使用，在本条督导补位关系中打开“启用”。"],
+      "info"
+    );
+  const configuredFlights = [...state.templates, ...state.flights];
+  const sourceFlight = configuredFlights.find(
     (flight) => normalize(flight.flightNo) === normalize(rule.sourceFlightNo)
   );
   if (!sourceFlight)
-    return {
-      code: "source-flight-missing",
-      message: `来源航班 ${rule.sourceFlightNo || "（空）"} 不存在，督导补位关系不会生效`,
-    };
-  const sourceRule = positionForKeyword(
+    return issue(
+      "source-flight-missing",
+      `来源航班 ${rule.sourceFlightNo || "（空）"} 不存在，督导补位关系不会生效`,
+      "航班模板和当前航班计划中都没有这个名称；不同航班号不会自动当作同一个航班。",
+      [
+        "在配置 → 航班计划模板核对准确航班号。",
+        "回到规则 → 督导补位关系，将“来源航班”填成相同名称；若改过名，检查这里是否仍是旧名称。",
+      ]
+    );
+  const sourceRules = positionsForKeyword(
     state,
     sourceFlight.flightNo,
     rule.sourcePositionKeyword
   );
-  if (!sourceRule)
-    return {
-      code: "source-position-missing",
-      message: `来源航班 ${sourceFlight.flightNo} 没有匹配“${rule.sourcePositionKeyword}”的岗位，督导补位关系不会生效`,
-    };
-  if (sourceRule.category !== "机动督导")
-    return {
-      code: "source-position-not-supervisor",
-      message: `来源岗位“${sourceRule.name}”不是机动督导，督导补位关系不会生效`,
-    };
-  const targetFlight = state.flights.find(
+  if (!sourceRules.length)
+    return issue(
+      "source-position-missing",
+      `来源航班 ${sourceFlight.flightNo} 没有匹配“${rule.sourcePositionKeyword}”的岗位，督导补位关系不会生效`,
+      "来源岗位关键词没有命中该航班的岗位名称。",
+      [
+        `在配置 → 岗位配置查看 ${sourceFlight.flightNo} 的岗位名称。`,
+        "回到本条关系，修改“来源岗位”关键词，使它包含在正确的机动督导岗位名称中；关键词不能为空。",
+      ]
+    );
+  if (!sourceRules.some((position) => position.category === "机动督导"))
+    return issue(
+      "source-position-not-supervisor",
+      `来源岗位“${sourceRules[0]!.name}”不是机动督导，督导补位关系不会生效`,
+      "匹配到的来源岗位均未设置为机动督导，不能充当补位来源。",
+      [
+        `在配置 → 岗位配置找到 ${sourceFlight.flightNo} 对应来源岗位，将“分类”设为“机动督导”；或改用已配置的机动督导岗位。`,
+      ]
+    );
+  const targetFlight = configuredFlights.find(
     (flight) => normalize(flight.flightNo) === normalize(rule.targetFlightNo)
   );
   if (!targetFlight)
-    return {
-      code: "target-flight-missing",
-      message: `目标航班 ${rule.targetFlightNo || "（空）"} 不存在，督导补位关系不会生效`,
-    };
-  const targetRule = positionForKeyword(
+    return issue(
+      "target-flight-missing",
+      `目标航班 ${rule.targetFlightNo || "（空）"} 不存在，督导补位关系不会生效`,
+      "航班模板和当前航班计划中都没有目标航班的名称。",
+      [
+        "在配置 → 航班计划模板核对航班号。",
+        "回到本条关系，将“目标航班”填成准确名称，不要混用不同航班号。",
+      ]
+    );
+  const targetRules = positionsForKeyword(
     state,
     targetFlight.flightNo,
     rule.targetPositionKeyword
   );
-  if (!targetRule)
-    return {
-      code: "target-position-missing",
-      message: `目标航班 ${targetFlight.flightNo} 没有匹配“${rule.targetPositionKeyword}”的岗位，督导补位关系不会生效`,
-    };
-  if (targetRule.coverageRole !== "supervisor-fill")
-    return {
-      code: "target-position-not-fill",
-      message: `目标岗位未标记为督导补位（${targetRule.name}），当前关系不会生效`,
-    };
+  if (!targetRules.length)
+    return issue(
+      "target-position-missing",
+      `目标航班 ${targetFlight.flightNo} 没有匹配“${rule.targetPositionKeyword}”的岗位，督导补位关系不会生效`,
+      "目标岗位关键词没有命中该航班的岗位名称。",
+      [
+        `在配置 → 岗位配置核对 ${targetFlight.flightNo} 的柜台名称。`,
+        "在本条关系修改“目标岗位”关键词；关键词不能为空，并应包含在指定柜台名称中。",
+      ]
+    );
+  if (
+    !targetRules.some((position) => position.coverageRole === "supervisor-fill")
+  )
+    return issue(
+      "target-position-not-fill",
+      `目标岗位未标记为督导补位（${targetRules[0]!.name}），当前关系不会生效`,
+      "只填来源与目标关系还不够；目标柜台也必须允许督导补位。",
+      [
+        `在配置 → 岗位配置找到 ${targetFlight.flightNo} / ${targetRules[0]!.name}。`,
+        "将该岗位“补位性质”设为“督导补位”，再核对本条关系的目标岗位关键词。",
+        "完整配置仍只在柜台缺人且没有安全普通候选时补位，不会强制替换已安排的普通人员。",
+      ]
+    );
   if (!rule.allowAutomatic && !rule.allowManual)
-    return {
-      code: "no-operation-enabled",
-      message: "自动补位和人工补位均未开启，督导补位关系不会生效",
-    };
+    return issue(
+      "no-operation-enabled",
+      "自动补位和人工补位均未开启，督导补位关系不会生效",
+      "关系保留，但两个补位入口都已关闭。",
+      [
+        "需要生成时自动补位，打开本条关系的“自动补位”；需要手工补位，打开“人工补位”。",
+      ],
+      "info"
+    );
+  if (!rule.allowAutomatic)
+    return issue(
+      "automatic-disabled",
+      "自动补位已关闭，仅允许人工补位",
+      "自动生成排班不会使用这条关系，人工补位仍需通过安全检查。",
+      ["如果希望生成排班时自动使用，在本条关系打开“自动补位”。"],
+      "info"
+    );
+  const missingFromPlan = [rule.sourceFlightNo, rule.targetFlightNo].filter(
+    (flightNo) =>
+      !state.flights.some(
+        (flight) => normalize(flight.flightNo) === normalize(flightNo)
+      )
+  );
+  if (missingFromPlan.length)
+    return issue(
+      "current-plan-not-applicable",
+      `当前航班计划未包含 ${[...new Set(missingFromPlan)].join("、")}，本次不适用`,
+      "长期配置已能匹配，但当前班没有对应航班，因此这次不会执行这条补位关系。",
+      [
+        "在排班页点击“生成排班”或“重新排班”，在准备确认窗口勾选对应航班。",
+        "如模板已经改名、当前班仍有旧名称，在配置页“航班计划模板”下展开“检查当前航班名称”，为旧航班选择正确模板并确认修正；也可在准备窗口取消旧航班并勾选正确模板。",
+        "本次不需要该航班时可以保留此配置，无需修改；是否能实际补位仍取决于人员和安全条件。",
+      ],
+      "info"
+    );
   return null;
 }
 

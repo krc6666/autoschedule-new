@@ -132,6 +132,11 @@ export type UiCommand =
   | { type: "add-template" }
   | { type: "delete-template"; id: string }
   | {
+      type: "rename-current-flight-to-template";
+      flightId: string;
+      templateId: string;
+    }
+  | {
       type: "set-weekly-flight-template";
       weekday: IsoWeekday;
       flightNo: string;

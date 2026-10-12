@@ -3,7 +3,8 @@ import { html, nothing } from "lit";
 import type { AppState } from "../../model";
 import { STRUCTURED_POLICY_DEFINITIONS } from "../../domain/rules/structured-policy-settings";
 import type { StructuredPolicyKey } from "../../domain/rules/structured-policy-contract";
-import { diagnoseSupervisorFillRuleConfiguration } from "../../domain/coverage/supervisor-fill-facts";
+import { diagnosePolicyConfiguration } from "../../domain/rules/policy-configuration-diagnostics";
+import { renderPolicyDiagnostics } from "./policy-diagnostic";
 import { dispatchUiCommand, inputValue } from "../events/ui-command";
 import {
   matchesPolicySearch,
@@ -105,6 +106,7 @@ export class PolicyStructuredRulesElement extends LightDomElement {
                 )}
                 ${this.flightScopeSelect(item.id, item.flightNo)}
                 ${this.deleteButton("sameFlightStaffExclusions", item.id)}
+                ${this.diagnostics("sameFlightStaffExclusions", item.id)}
               </div>`
           )}
         </div>
@@ -161,6 +163,7 @@ export class PolicyStructuredRulesElement extends LightDomElement {
                 <div class="d-flex gap-1">
                   ${this.moveCrossFlightPriority(item.id, -1, index === 0)}${this.moveCrossFlightPriority(item.id, 1, index === items.length - 1)}${this.deleteButton("crossFlightPriorityPolicies", item.id)}
                 </div>
+                ${this.diagnostics("crossFlightPriorityPolicies", item.id)}
               </div>`
           )}
         </div>
@@ -233,6 +236,7 @@ export class PolicyStructuredRulesElement extends LightDomElement {
                   ${this.moveReservation(item.id, 1, index === items.length - 1)}
                   ${this.deleteButton("crossWorkdayQualificationReservations", item.id)}
                 </div>
+                ${this.diagnostics("crossWorkdayQualificationReservations", item.id)}
               </div>`
           )}
         </div>
@@ -284,6 +288,7 @@ export class PolicyStructuredRulesElement extends LightDomElement {
                 <div class="duty-priority-actions">
                   ${this.moveDuty(item.id, -1, index === 0)}${this.moveDuty(item.id, 1, index === items.length - 1)}${this.deleteButton("dutyPositionPriorities", item.id)}
                 </div>
+                ${this.diagnostics("dutyPositionPriorities", item.id)}
               </div>`
           )}
         </div>
@@ -390,6 +395,7 @@ export class PolicyStructuredRulesElement extends LightDomElement {
                 ${this.field("late-shift-recovery-position", rule.id, "keyword", rule.keyword, "关键词")}
                 ${this.field("late-shift-recovery-position", rule.id, "nextWorkdayCutoffTime", rule.nextWorkdayCutoffTime, "次班截止时间", "", "time")}
                 ${this.deleteButton("lateShiftRecoveryPositionRules", rule.id)}
+                ${this.diagnostics("lateShiftRecoveryPositionRules", rule.id)}
               </div>`
           )}
         </div>
@@ -405,6 +411,7 @@ export class PolicyStructuredRulesElement extends LightDomElement {
                 ${this.field("recovery-target", target.id, "flightNo", target.flightNo, "目标航班")}
                 ${this.field("recovery-target", target.id, "positionKeyword", target.positionKeyword, "岗位或备注关键词")}
                 ${this.deleteButton("nextWorkdayRecoveryTargets", target.id)}
+                ${this.diagnostics("nextWorkdayRecoveryTargets", target.id)}
               </div>`
           )}
         </div>
@@ -478,6 +485,7 @@ export class PolicyStructuredRulesElement extends LightDomElement {
                   ]
                 )}
                 ${this.deleteButton("mobileSupervisorCoverageRules", rule.id)}
+                ${this.diagnostics("mobileSupervisorCoverageRules", rule.id)}
               </div>`
           )}
         </div>
@@ -525,11 +533,9 @@ export class PolicyStructuredRulesElement extends LightDomElement {
         </div>
         <div class="supervisor-coverage-list">
           ${items.map((rule) => {
-            const issue = diagnoseSupervisorFillRuleConfiguration(
-              this.model,
-              rule
-            );
-            return html`<div class="supervisor-coverage-row">
+            return html`<div
+              class="supervisor-coverage-row supervisor-fill-row"
+            >
               ${this.toggle("supervisor-fill", rule.id, "enabled", rule.enabled, "启用")}
               ${this.field("supervisor-fill", rule.id, "sourceFlightNo", rule.sourceFlightNo, "来源航班")}
               ${this.field("supervisor-fill", rule.id, "sourcePositionKeyword", rule.sourcePositionKeyword, "来源岗位")}
@@ -538,17 +544,7 @@ export class PolicyStructuredRulesElement extends LightDomElement {
               ${this.toggle("supervisor-fill", rule.id, "allowAutomatic", rule.allowAutomatic, "自动补位")}
               ${this.toggle("supervisor-fill", rule.id, "allowManual", rule.allowManual, "人工补位")}
               ${this.deleteButton("mobileSupervisorFillRules", rule.id)}
-              ${
-                  issue
-                    ? html`<div
-                        class="alert alert-warning py-2 mt-2 mb-0"
-                        role="alert"
-                      >
-                        <i class="bi bi-exclamation-triangle me-2"></i
-                        >${issue.message}
-                      </div>`
-                    : nothing
-                }
+              ${this.diagnostics("mobileSupervisorFillRules", rule.id)}
             </div>`;
           })}
         </div>
@@ -628,6 +624,7 @@ export class PolicyStructuredRulesElement extends LightDomElement {
                 <div>
                   ${this.deleteButton("positionTransitionPolicies", rule.id)}
                 </div>
+                ${this.diagnostics("positionTransitionPolicies", rule.id)}
               </article>`
           )}
         </div>
@@ -802,6 +799,13 @@ export class PolicyStructuredRulesElement extends LightDomElement {
     >
       <i class="bi bi-plus-lg me-1"></i>${label}
     </button>`;
+  }
+
+  private diagnostics(key: PolicyStructuredRuleKey, id: string) {
+    return renderPolicyDiagnostics(
+      diagnosePolicyConfiguration(this.model, key, id),
+      `${key}:${id}`
+    );
   }
 
   private deleteButton(key: PolicyStructuredRuleKey, id: string) {

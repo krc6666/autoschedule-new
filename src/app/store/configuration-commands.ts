@@ -12,6 +12,7 @@ import {
   deleteStaff,
   deleteTemplate,
   movePosition,
+  renameCurrentFlightToTemplate,
   saveQualified,
   setWeeklyFlightPlanFlight,
   sortCountersDescending,
@@ -29,6 +30,10 @@ export function createConfigurationCommands(command: StateCommand) {
     addTemplate: () => command(addTemplate),
     deleteTemplate: (id: string) =>
       command((state) => deleteTemplate(state, id)),
+    renameCurrentFlightToTemplate: (flightId: string, templateId: string) =>
+      command((state) =>
+        renameCurrentFlightToTemplate(state, flightId, templateId)
+      ),
     setWeeklyFlightPlanFlight: (
       weekday: IsoWeekday,
       flightNo: string,

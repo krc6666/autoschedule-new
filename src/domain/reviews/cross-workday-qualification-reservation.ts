@@ -25,8 +25,8 @@ function normalized(value: string): string {
   return value.trim().toUpperCase();
 }
 
-function matchingPositionRules(
-  state: ScheduleGenerationFacts,
+export function matchingPositionRules(
+  state: Pick<ScheduleGenerationFacts, "positionRules">,
   reservation: CrossWorkdayQualificationReservation
 ): PositionRule[] {
   const flightNo = normalized(reservation.flightNo);

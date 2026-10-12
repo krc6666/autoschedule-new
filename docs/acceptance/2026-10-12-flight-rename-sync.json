@@ -1,0 +1,197 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-10-12-flight-rename-sync",
+  "title": "航班模板改名同步当天航班及遗留名称显式修正",
+  "startedFrom": "2c5cb5b6df5bfe4f5dc408623ce7740c603e5c36",
+  "expectation": {
+    "example": "owner 本机 2026-10-12：配置/周计划已为 TW616，准备窗口仍默认选 TWB616。上一轮临时探针已复现模板改名只更新引用、不更新当天航班。",
+    "expected": "明确模板改名同步 A/B 两组同旧名称航班；生成/重排默认使用新名，督导关系命中。已遗留旧名通过配置页明确选择正确模板修正，保存恢复后保持。",
+    "unchanged": "航班 ID、时段、人数、岗位清单和备注保留；真正独立非模板航班保留；历史不改；不改变普通候选保留、资格、工时、安全守卫或排班规则优先级。 Owner 随后明确认可保留显式修正入口；不删除全部非模板当前航班。",
+    "fallback": "任何组已同时有新旧航班号时拒绝整个修改，说明冲突；取消修正不写状态；不猜旧名称映射。只清理受影响的失效班表。"
+  },
+  "testedVersion": "73d26870438e631a376ae2ba30a23aa923dde346d7cab3893faae867f193139c",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "原精确错误已稳定变红并转绿。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-flight-rename-sync-red.txt",
+          "summary": "修改前真实 Store/准备候选链路 5 项失败、19 项通过：旧名称未同步、两组碰撞未拒绝、新名未默认选中。",
+          "sha256": "ebc9d1ddcb2e784005714af7b9be984980030bd2c3b2064f4310a62035b8caf5"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-flight-rename-sync-focused.txt",
+          "summary": "13 文件/154 项通过，包含三入口传入/提交新名、两组切换、取消/冲突回退、storage/Excel、真实 kernel 补位关联与新名导出。",
+          "sha256": "0e40a7124f3a07fd8165bc1e59388a7d5652155939b1827cf8027840b5d38bb2"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-flight-rename-sync-commit-verify-final.txt",
+          "summary": "提交钩子格式化后完整复验退出0：126功能文件/1182项、5性能文件/16项、类型检查与生产构建通过。仅本次进程设置VITEST_MAX_WORKERS=2；未改测试时限或断言。",
+          "sha256": "1ab9e09da39cb7decbe219eaf29cd3ab10571785e63c1a8982c0ded984374e8d"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "模板改名→当前默认选择→计算输入→Store 提交；真实 kernel 再验证最终补位及导出。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-flight-rename-sync-focused.txt",
+          "summary": "13 文件/154 项通过，包含三入口传入/提交新名、两组切换、取消/冲突回退、storage/Excel、真实 kernel 补位关联与新名导出。",
+          "sha256": "0e40a7124f3a07fd8165bc1e59388a7d5652155939b1827cf8027840b5d38bb2"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-flight-rename-sync-verify-final.txt",
+          "summary": "最终 npm.cmd run verify 退出 0：126 功能文件/1182 项、5 性能文件/16 项、类型检查与生产构建全部通过；未修改测试时限。",
+          "sha256": "2d3d903bfe25cdddc6e8444157704a1bfb26a271c794a2e9519d128cddadf418"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-flight-rename-sync-commit-verify-final.txt",
+          "summary": "提交钩子格式化后完整复验退出0：126功能文件/1182项、5性能文件/16项、类型检查与生产构建通过。仅本次进程设置VITEST_MAX_WORKERS=2；未改测试时限或断言。",
+          "sha256": "1ab9e09da39cb7decbe219eaf29cd3ab10571785e63c1a8982c0ded984374e8d"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "跨组、已有旧名显式修正、取消、重复名称拒绝、无模板独立航班与恢复/导入已覆盖。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-flight-rename-sync-focused.txt",
+          "summary": "13 文件/154 项通过，包含三入口传入/提交新名、两组切换、取消/冲突回退、storage/Excel、真实 kernel 补位关联与新名导出。",
+          "sha256": "0e40a7124f3a07fd8165bc1e59388a7d5652155939b1827cf8027840b5d38bb2"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-flight-rename-sync-verify-final.txt",
+          "summary": "最终 npm.cmd run verify 退出 0：126 功能文件/1182 项、5 性能文件/16 项、类型检查与生产构建全部通过；未修改测试时限。",
+          "sha256": "2d3d903bfe25cdddc6e8444157704a1bfb26a271c794a2e9519d128cddadf418"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-flight-rename-sync-commit-verify-final.txt",
+          "summary": "提交钩子格式化后完整复验退出0：126功能文件/1182项、5性能文件/16项、类型检查与生产构建通过。仅本次进程设置VITEST_MAX_WORKERS=2；未改测试时限或断言。",
+          "sha256": "1ab9e09da39cb7decbe219eaf29cd3ab10571785e63c1a8982c0ded984374e8d"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "真实排班用例经过初排和督导后置收尾，最终仍记录新名称与合法关联；受影响旧班表被清理。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-flight-rename-sync-focused.txt",
+          "summary": "13 文件/154 项通过，包含三入口传入/提交新名、两组切换、取消/冲突回退、storage/Excel、真实 kernel 补位关联与新名导出。",
+          "sha256": "0e40a7124f3a07fd8165bc1e59388a7d5652155939b1827cf8027840b5d38bb2"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-flight-rename-sync-verify-final.txt",
+          "summary": "最终 npm.cmd run verify 退出 0：126 功能文件/1182 项、5 性能文件/16 项、类型检查与生产构建全部通过；未修改测试时限。",
+          "sha256": "2d3d903bfe25cdddc6e8444157704a1bfb26a271c794a2e9519d128cddadf418"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-flight-rename-sync-commit-verify-final.txt",
+          "summary": "提交钩子格式化后完整复验退出0：126功能文件/1182项、5性能文件/16项、类型检查与生产构建通过。仅本次进程设置VITEST_MAX_WORKERS=2；未改测试时限或断言。",
+          "sha256": "1ab9e09da39cb7decbe219eaf29cd3ab10571785e63c1a8982c0ded984374e8d"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "真实 kernel 返回安全凭证、正确 source assignment/rule ID，补位工时疲劳为零；原 guard 反向回归仍通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-flight-rename-sync-focused.txt",
+          "summary": "13 文件/154 项通过，包含三入口传入/提交新名、两组切换、取消/冲突回退、storage/Excel、真实 kernel 补位关联与新名导出。",
+          "sha256": "0e40a7124f3a07fd8165bc1e59388a7d5652155939b1827cf8027840b5d38bb2"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-flight-rename-sync-verify-final.txt",
+          "summary": "最终 npm.cmd run verify 退出 0：126 功能文件/1182 项、5 性能文件/16 项、类型检查与生产构建全部通过；未修改测试时限。",
+          "sha256": "2d3d903bfe25cdddc6e8444157704a1bfb26a271c794a2e9519d128cddadf418"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-flight-rename-sync-commit-verify-final.txt",
+          "summary": "提交钩子格式化后完整复验退出0：126功能文件/1182项、5性能文件/16项、类型检查与生产构建通过。仅本次进程设置VITEST_MAX_WORKERS=2；未改测试时限或断言。",
+          "sha256": "1ab9e09da39cb7decbe219eaf29cd3ab10571785e63c1a8982c0ded984374e8d"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "运营字段与历史保留，独立航班保留；不改变原普通候选保留和硬约束。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-flight-rename-sync-focused.txt",
+          "summary": "13 文件/154 项通过，包含三入口传入/提交新名、两组切换、取消/冲突回退、storage/Excel、真实 kernel 补位关联与新名导出。",
+          "sha256": "0e40a7124f3a07fd8165bc1e59388a7d5652155939b1827cf8027840b5d38bb2"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-flight-rename-sync-verify-final.txt",
+          "summary": "最终 npm.cmd run verify 退出 0：126 功能文件/1182 项、5 性能文件/16 项、类型检查与生产构建全部通过；未修改测试时限。",
+          "sha256": "2d3d903bfe25cdddc6e8444157704a1bfb26a271c794a2e9519d128cddadf418"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-flight-rename-sync-verify.txt",
+          "summary": "首轮完整门禁退出 1：验收脚本的一项测试超过5秒时限，另外1181项通过；后续单独和完整重跑通过。",
+          "sha256": "32c0cb799ae8bc7612d37e8972c4edcd2b54f19cf125e2179f5f6a30cf5d9349"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-flight-rename-sync-gate-recheck.txt",
+          "summary": "独立复跑验收脚本测试：16项通过，原超时项1598毫秒；未改断言或预算。",
+          "sha256": "d56f7689ebb610a446077743eb24c2325940967c82ba207a860be56f5053b285"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-flight-rename-sync-audit.txt",
+          "summary": "git diff --check 退出0；没有提交、推送或发布。",
+          "sha256": "dc47ef9c56005f03058e36c0260845ecdee8e6dab52de9695fba13f295152c10"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-flight-rename-sync-commit-verify-final.txt",
+          "summary": "提交钩子格式化后完整复验退出0：126功能文件/1182项、5性能文件/16项、类型检查与生产构建通过。仅本次进程设置VITEST_MAX_WORKERS=2；未改测试时限或断言。",
+          "sha256": "1ab9e09da39cb7decbe219eaf29cd3ab10571785e63c1a8982c0ded984374e8d"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-flight-rename-sync-commit-verify.txt",
+          "summary": "格式化后默认并行首轮复验退出1：1178项通过，验收脚本3项超过5秒、完整排班1项超过30秒；未报告业务断言失败。随后2-worker完整验证全部通过。",
+          "sha256": "60d89319690541653dc50b3c6e53554e6ad863ce76abed9d4496c18130ef1a99"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "verified",
+      "reason": "owner完成本机配置显式修正并核对生成准备名单，确认旧名消失、新名默认选中且运营字段保留；自动链路另覆盖最终kernel补位、守卫和导出。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-flight-rename-sync-owner-confirmation.txt",
+          "summary": "owner明确确认修正后旧名消失、新名默认勾选，原人数与时段保留；本机真实入口验收闭合。",
+          "sha256": "d371b5465f750e09e28dc0a1c887389dfe207b5dd62a6287a19513fadc98c279"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-flight-rename-sync-focused.txt",
+          "summary": "13 文件/154 项通过，包含三入口传入/提交新名、两组切换、取消/冲突回退、storage/Excel、真实 kernel 补位关联与新名导出。",
+          "sha256": "0e40a7124f3a07fd8165bc1e59388a7d5652155939b1827cf8027840b5d38bb2"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-flight-rename-sync-dev-asset.txt",
+          "summary": "本机端口实际提供新组件；owner连续截图验证入口从收起到展开，列出TWB616；尚未取得确认修正后准备名单。",
+          "sha256": "93167c3ca16e2364d69ca95ea25c5bf72a00e24a41ab2b8f670dbad98b725631"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-flight-rename-sync-commit-verify-final.txt",
+          "summary": "提交钩子格式化后完整复验退出0：126功能文件/1182项、5性能文件/16项、类型检查与生产构建通过。仅本次进程设置VITEST_MAX_WORKERS=2；未改测试时限或断言。",
+          "sha256": "1ab9e09da39cb7decbe219eaf29cd3ab10571785e63c1a8982c0ded984374e8d"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "red 证明改名后旧名仍入默认名单；focused 证明同链路改为仅新名默认，并进入三入口 runner/提交。",
+    "laterChanges": "切组、重排、归档后天、恢复与导入可能重新带入旧名；focused 分别验证。真实 kernel 后置补位关联与最终凭证/导出被独立断言。",
+    "finalArtifact": "owner-confirmation记录真实本机准备名单与字段保留；focused包含真实kernel最终assignments、安全凭证与Excel工作表断言；verify-final为当前代码完整门禁退出0。"
+  },
+  "review": {
+    "missedScope": "核对两组、遗留修正入口、碰撞/取消、恢复与导出；owner截图及最后明确回复已验证配置修正后的真实准备名单。真实机上完整排班导出未另跑，不把自动kernel/Excel断言冒充现场导出。其余规则详情的视觉验收按前轮诊断记录单独保存。",
+    "rootCause": "模板改名遗漏当前航班；准备窗口读取模板和旧当前航班，默认选旧名，后续新名关系失配。前一轮误将独立航班保留合同用于已明确改名航班，测试固化了错误行为。",
+    "earlyDetection": "改名前建立用户操作链红灯：模板改名后断言两组默认名单、实际 runner 输入、最终补位关联与导出；在持久化边界恢复旧数据并测试显式修正和碰撞回退。"
+  }
+}

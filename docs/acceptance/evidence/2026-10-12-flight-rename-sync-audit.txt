@@ -1,0 +1,27 @@
+git diff --check
+EXIT_CODE=0
+
+warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'history.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'rule-propagation-matrix.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'spec.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/configuration-actions.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/controllers/configuration-controller.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/controllers/policy-controller.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/store/configuration-commands.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/domain/assignments/duty-assignment.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/domain/coverage/mobile-supervisor-coverage.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/domain/coverage/supervisor-fill-facts.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/domain/flights/next-workday-flight-plan.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/domain/kernel/schedule-lifecycle.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/domain/reviews/cross-workday-qualification-reservation.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/styles.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/ui/components/configuration-settings-section.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/ui/components/policy-settings-form.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/ui/components/policy-structured-rules.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/ui/components/team-leader-gap-fill-protection-settings.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/ui/events/ui-command.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/app/configuration-controller.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/domain/mobile-supervisor-scheduling.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/ui/config-view.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/ui/schedule-policy-view.test.ts', LF will be replaced by CRLF the next time Git touches it
