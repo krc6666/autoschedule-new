@@ -28,6 +28,7 @@ export type UiCommand =
   | { type: "update-legacy-schedule-import-date"; date: string }
   | { type: "dismiss-toast" }
   | { type: "export-config" }
+  | { type: "export-schedule-failure-details" }
   | { type: "export-late-priority-counts"; date: string }
   | { type: "apply-late-priority-counts-import" }
   | { type: "add-ordinary-priority-position" }

@@ -1,0 +1,6 @@
+Actual tool output excerpt, private names removed.
+Command: npx.cmd vitest run tests/ui/app-toast.test.ts tests/domain/ke166-initial-reservation.test.ts -t "failure help|rejects a post-stage" --maxWorkers=1
+Start at 14:43:16; duration 2.71s.
+Test Files 2 failed (2); Tests 2 failed | 12 skipped (14).
+Domain assertion: expected guard violation to contain details; received only ruleId, assignmentId and generic message.
+UI assertion: expected details element not to be null; received null.

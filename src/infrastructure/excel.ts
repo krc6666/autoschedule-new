@@ -985,6 +985,7 @@ export function buildConfigWorkbook(state: AppState): XLSX.WorkBook {
         "历史覆盖范围",
         "分队长补差",
         "航班截载时间",
+        "系统说明",
       ],
       ...state.history.map((record) => [
         record.id,
@@ -1264,9 +1265,10 @@ export function buildScheduleWorkbook(
             : "待补位",
         state.flights.find((flight) => flight.id === item.flightId)?.endTime ??
           item.endTime,
+        (item.systemNotes ?? []).join("；"),
       ]),
     ],
-    [12, 12, 16, 14, 12, 12, 16, 12, 24, 12, 12]
+    [12, 12, 16, 14, 12, 12, 16, 12, 24, 12, 12, 60]
   );
   const people = new Map<string, Assignment[]>();
   assignments

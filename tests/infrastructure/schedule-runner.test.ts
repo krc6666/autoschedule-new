@@ -37,6 +37,39 @@ function createRun(halfRestStaffIds: string[] = []) {
 }
 
 describe("background schedule runner", () => {
+  it.each([true, false])(
+    "preserves guard evidence with details=%s across a serialized worker message",
+    async (withDetails) => {
+      const { run, worker } = createRun();
+      const violations = [
+        {
+          ruleId: "ke166-supervisor",
+          assignmentId: "counter",
+          message: "原检查错误",
+          ...(withDetails
+            ? {
+                details: {
+                  code: "ke166-distinct-staff-capacity" as const,
+                  reason: "人员甲可承担KE166/H05",
+                  facts: ["人员甲没有重叠岗位"],
+                  steps: ["导出诊断记录"],
+                },
+              }
+            : {}),
+        },
+      ];
+      worker.emit(
+        JSON.parse(
+          JSON.stringify({ type: "error", message: "原检查错误", violations })
+        )
+      );
+      await expect(run.result).rejects.toMatchObject({
+        name: "ScheduleGuardError",
+        violations,
+      });
+      expect(worker.terminate).toHaveBeenCalledOnce();
+    }
+  );
   it("sends only the active group's staff and history to the worker", () => {
     const initial = createDefaultState();
     initial.groups.B.staff = [

@@ -1,0 +1,30 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/domain/schedule-local-recovery.test.ts (9 tests | 2 failed) 208ms
+     × generates the other flight when half-rest early-finish work cannot be assigned 123ms
+     × generates the other flight when half-rest late-start work cannot be assigned 24ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/domain/schedule-local-recovery.test.ts > automatic schedule local vacancy recovery > generates the other flight when half-rest early-finish work cannot be assigned
+ FAIL  tests/domain/schedule-local-recovery.test.ts > automatic schedule local vacancy recovery > generates the other flight when half-rest late-start work cannot be assigned
+TypeError: halfRestAllowedAssignmentCount is not a function
+ ❯ finalizeSchedule src/domain/kernel/schedule-finalizer.ts:231:9
+    229|   for (const staffId of runFacts.halfRest.activeStaffIds) {
+    230|     const mode = runFacts.halfRest.modesByStaffId.get(staffId) ?? "ear…
+    231|     if (halfRestAllowedAssignmentCount(assignments, staffId, mode)) co…
+       |         ^
+    232|     const name = state.staff.find((person) => person.id === staffId)?.…
+    233|     postReviewWarnings.push(`${HALF_REST_WARNING_PREFIX}${name}今天没有排到符…
+ ❯ generateSchedule src/domain/kernel/scheduling-kernel.ts:191:18
+ ❯ tests/domain/schedule-local-recovery.test.ts:107:20
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+
+ Test Files  1 failed | 6 passed (7)
+      Tests  2 failed | 132 passed (134)
+   Start at  17:06:55
+   Duration  15.22s (transform 1.74s, setup 0ms, import 3.41s, tests 9.83s, environment 404ms)
+

@@ -101,12 +101,12 @@ describe("daily schedule failure diagnostics", () => {
       flight("morning", "AM100", "08:00", "10:00", ["A1"]),
       flight("afternoon", "PM200", "14:00", "16:00", ["B1"]),
     ]);
-    state.staff[0]!.name = "肖萍";
+    state.staff[0]!.name = "人员甲";
     state.staff[0]!.teamLeader = false;
     const blockedWorker = {
       ...state.staff[0]!,
       id: "blocked-worker",
-      name: "严晓珂",
+      name: "人员乙",
     };
     state.staff.push(blockedWorker);
     state.positionRules.find(
@@ -142,9 +142,9 @@ describe("daily schedule failure diagnostics", () => {
     });
 
     await expect(failure).rejects.toThrow(
-      "严晓珂选择了下午半休，只能安排上午岗位；但当前上午没有严晓珂能上的岗位（资质或其他条件不符合），会导致全天没有航班，因此本次重新排班未采用。"
+      "人员乙选择了下午半休，当前上午没有能上的岗位，允许当天无岗。这不会单独阻止整张班表生成"
     );
-    await expect(failure).rejects.not.toThrow(/肖萍.*冲突/);
+    await expect(failure).rejects.not.toThrow(/人员甲.*冲突/);
   });
 
   it("explains when a strict recovery target has no remaining candidate", () => {
@@ -191,7 +191,8 @@ describe("daily schedule failure diagnostics", () => {
     const diagnosis = diagnose(state);
     expect(diagnosis.join(" ")).toContain("CX937/G18");
     expect(diagnosis.join(" ")).toMatch(/严格.*恢复|优先避开|次班恢复/);
-    expect(diagnosis.join(" ")).toMatch(/调整|配置|空缺/);
+    expect(diagnosis.join(" ")).toContain("允许留空");
+    expect(diagnosis.join(" ")).toContain("需要检查程序");
   });
 
   it("points to the actual task when mandatory strict targets compete for one person", () => {
@@ -311,7 +312,7 @@ describe("daily schedule failure diagnostics", () => {
         date: "2026-08-03",
         preparation,
       })
-    ).rejects.toThrow(/CX937\/G18.*严格次班恢复/);
+    ).rejects.toThrow(/CX937\/G18.*严格次班恢复.*允许留空/);
   });
 
   it("identifies the daily-hours setting when one person is mandatory for multiple strict tasks", () => {

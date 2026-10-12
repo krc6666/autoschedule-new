@@ -91,15 +91,22 @@ export function assessKe166AssignmentSnapshot(
   });
 }
 
-export function assessKe166DistinctStaffCapacitySnapshot(
+export interface Ke166DistinctStaffCapacityViolation {
+  counter: Assignment;
+  supervisor: Assignment;
+  candidate: { id: string; name: string };
+  blockingAssignment: Assignment | null;
+}
+
+export function assessKe166DistinctStaffCapacityFacts(
   state: ScheduleGenerationFacts,
   assignments: readonly Assignment[]
-): string[] {
+): Ke166DistinctStaffCapacityViolation[] {
   const plannedState: ScheduleGenerationFacts = {
     ...state,
     assignments: assignments.map((assignment) => ({ ...assignment })),
   };
-  const violations: string[] = [];
+  const violations: Ke166DistinctStaffCapacityViolation[] = [];
   for (const supervisor of assignments) {
     if (
       supervisor.status !== "assigned" ||
@@ -130,7 +137,8 @@ export function assessKe166DistinctStaffCapacitySnapshot(
       (rule) => rule.id === counter.positionRuleId
     );
     if (!counterRule) continue;
-    const canUseSeparateRegular = eligibleStaffForRule(
+    let blockingAssignment: Assignment | null = null;
+    const candidate = eligibleStaffForRule(
       plannedState,
       supervisorFlight,
       counterRule
@@ -139,7 +147,7 @@ export function assessKe166DistinctStaffCapacitySnapshot(
         (person) =>
           person.staffType === "常规" && person.id !== supervisor.staffId
       )
-      .some((person) => {
+      .find((person) => {
         const ke166Rank = crossFlightPriorityPolicyRank(state, {
           flightNo: supervisorFlight.flightNo,
           staffId: person.id,
@@ -162,16 +170,18 @@ export function assessKe166DistinctStaffCapacitySnapshot(
         if (blockingAssignments.length !== 1) return false;
         const blocking = blockingAssignments[0]!;
         const blockingRank = crossFlightPriorityPolicyRank(state, blocking);
-        return (
+        const available =
           blockingRank !== null &&
           blockingRank > ke166Rank &&
           canAssignStaff(plannedState, counter.id, person.id, blocking.id) ===
-            null
-        );
+            null;
+        if (available) blockingAssignment = blocking;
+        return available;
       });
-    if (canUseSeparateRegular) violations.push(counter.id);
+    if (candidate)
+      violations.push({ counter, supervisor, candidate, blockingAssignment });
   }
-  return [...new Set(violations)];
+  return violations;
 }
 
 function isAutomaticRegularAssignment(

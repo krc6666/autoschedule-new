@@ -72,7 +72,7 @@ function strictTaskDiagnostics({
           ? `基础合格的 ${baseEligible.length} 人全部被上一班末班重点岗位避让排除`
           : `基础合格 ${baseEligible.length} 人，但严格恢复过滤后剩余 0 人`;
     diagnostics.push(
-      `${taskLabel(task)}：严格次班恢复禁止空缺，${reason}。可检查“次班重点岗位避让”的目标航班/岗位、严格/优先模式，或上一班末班重点岗位记录。`
+      `${taskLabel(task)}：${reason}。按严格次班恢复设置，这个岗位允许留空；单凭这项不能说明整张班表为什么计算失败，需要检查程序。`
     );
   }
 
@@ -103,7 +103,7 @@ function strictTaskDiagnostics({
       );
       if (compatiblePair) continue;
       diagnostics.push(
-        `${taskLabel(left)} 与 ${taskLabel(right)}：严格恢复都禁止空缺，但现有候选无法同时承担，疑似时间冲突、最小航班衔接不足或同航班重复占位。可检查这两个航班的时段、最小衔接分钟和岗位资质配置。`
+        `${taskLabel(left)} 与 ${taskLabel(right)}：现有候选无法同时承担，可能有时间冲突、航班之间间隔不足或同航班重复占位。岗位允许留空，单凭这项不能说明整张班表为什么失败，需要检查程序。`
       );
     }
   }
@@ -135,7 +135,7 @@ function halfRestDiagnostics({
       const restPeriod = mode === "late-start" ? "上午" : "下午";
       const workPeriod = mode === "late-start" ? "下午" : "上午";
       noAllowedPositionDiagnostics.push(
-        `${person.name}选择了${restPeriod}半休，只能安排${workPeriod}岗位；但当前${workPeriod}没有${person.name}能上的岗位（资质或其他条件不符合），会导致全天没有航班，因此本次重新排班未采用。`
+        `${person.name}选择了${restPeriod}半休，当前${workPeriod}没有能上的岗位，允许当天无岗。这不会单独阻止整张班表生成；本次计算失败还需要检查程序。`
       );
     } else {
       workersWithChoices.push(
@@ -146,7 +146,7 @@ function halfRestDiagnostics({
   if (noAllowedPositionDiagnostics.length) return noAllowedPositionDiagnostics;
   if (!workersWithChoices.length) return [];
   return [
-    `${workersWithChoices.join("、")}在可上班的半天都有候选岗位，但整批安排与其他航班发生冲突，无法保证每人至少上一班，因此本次重新排班未采用。`,
+    `${workersWithChoices.join("、")}在可上班的半天有候选岗位；半休允许无岗，不能据此推断计算失败原因，需要检查程序。`,
   ];
 }
 
@@ -189,7 +189,7 @@ function strictCapacityDiagnostics({
       ...new Set(choices.map((choice) => taskLabel(choice.task))),
     ];
     diagnostics.push(
-      `${labels.join("、")}：严格恢复候选集中只有${person.name}可用，合计 ${totalHours.toFixed(2)} 小时会超过每日 ${state.settings.maxDailyHours} 小时上限。可增加对应岗位合格人员、调整航班/岗位时段，或核对每日工时上限配置。`
+      `${labels.join("、")}：只有${person.name}可用，合计 ${totalHours.toFixed(2)} 小时会超过每日 ${state.settings.maxDailyHours} 小时上限。可核对合格人员、时段和工时上限配置；岗位允许留空，这不应单独导致整班失败。`
     );
   }
   return diagnostics;
@@ -214,6 +214,6 @@ export function diagnoseDailyScheduleFailure(
     ];
   }
   return [
-    "未定位到单个岗位的直接阻塞项，可能是多个岗位的时间冲突、最小航班衔接或组合容量共同造成；请优先检查同一人员被安排的重叠航班、最小衔接分钟和每日工时上限。",
+    "尚未查明计算失败原因。岗位允许留空，局部缺人或时间冲突不应单独阻止整张班表；请导出诊断记录交给开发人员检查程序。",
   ];
 }

@@ -1,0 +1,147 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-10-12-ke166-fill-capacity",
+  "title": "KE166指定补位腾挪后释放安全柜台人员导致整班拒绝",
+  "startedFrom": "c91562fcc7565344d3fd4f22c47ceadd18783716",
+  "expectation": {
+    "example": "2026-10-14后天生成现场诊断显示督导兼任KE166/H05，另一常规人员无重叠岗位可替代；匿名三人真实收尾稳定复现相同报错。",
+    "expected": "配置补位形成后核对实际容量；安全空闲普通候选按真实柜台工时恢复，并独立安排督导；不能安全恢复则撤回草稿再走原合法安排；兜底仍违规则保留原柜台，仅留空督导。",
+    "unchanged": "人员状态、资质、夜班、工时、衔接、半休、锁定、配置关联、缺员时指定补位和最终安全检查不放宽；不新增配置字段。",
+    "fallback": "配置腾挪只在草稿中完成并核对容量；不合法时恢复此前柜台，继续原有兼任；兜底仍违规则只留空当前KE166督导，其他安全错误仍拒绝整班。"
+  },
+  "testedVersion": "5975c4653923f429a9acbad2778504f19331a79a51ddf3bd909028243a841a4d",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "匿名真实收尾复现与现场相同H05兼任且普通人员无重叠可替代的报错，修复后通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-ke166-fill-capacity-red.txt",
+          "summary": "匿名三人真实收尾修复前变红：H05督导补位释放普通人员，容量检查拒绝。",
+          "sha256": "3d404db5dd9d8921c6f5f4a7f8e59c484fd321b084a0486ad337ee464c5589c1"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-ke166-fill-capacity-focused.txt",
+          "summary": "3文件47项通过：安全H05恢复、独立督导、仅督导空缺回退、后置拒绝、真实kernel安全凭证与Excel、合法缺员补位和连环。",
+          "sha256": "954d8ca2cd560887ddec7d1d5f15268372a0f712978986aca4daf720dc36a0ad"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-ke166-fill-capacity-verify-final.txt",
+          "summary": "npm.cmd run verify退出0；129功能文件1194项、5性能文件16项、typecheck和build通过。最终完整运行单worker，未改测试预算。",
+          "sha256": "e55df4c68080873b64fae0560c1b424badc283c01126abafc728f77a7a5cf8b2"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "腾挪释放的普通候选按真实柜台工时、半休和硬约束检查，通过后恢复普通H05并独立安排督导。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-ke166-fill-capacity-focused.txt",
+          "summary": "3文件47项通过：安全H05恢复、独立督导、仅督导空缺回退、后置拒绝、真实kernel安全凭证与Excel、合法缺员补位和连环。",
+          "sha256": "954d8ca2cd560887ddec7d1d5f15268372a0f712978986aca4daf720dc36a0ad"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-ke166-fill-capacity-verify-final.txt",
+          "summary": "npm.cmd run verify退出0；129功能文件1194项、5性能文件16项、typecheck和build通过。最终完整运行单worker，未改测试预算。",
+          "sha256": "e55df4c68080873b64fae0560c1b424badc283c01126abafc728f77a7a5cf8b2"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "不能安全接回则撤回草稿；兜底仍违规时保留原独立督导或只留空督导；合法短员指定补位和连环继续通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-ke166-fill-capacity-focused.txt",
+          "summary": "3文件47项通过：安全H05恢复、独立督导、仅督导空缺回退、后置拒绝、真实kernel安全凭证与Excel、合法缺员补位和连环。",
+          "sha256": "954d8ca2cd560887ddec7d1d5f15268372a0f712978986aca4daf720dc36a0ad"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-ke166-fill-capacity-verify-final.txt",
+          "summary": "npm.cmd run verify退出0；129功能文件1194项、5性能文件16项、typecheck和build通过。最终完整运行单worker，未改测试预算。",
+          "sha256": "e55df4c68080873b64fae0560c1b424badc283c01126abafc728f77a7a5cf8b2"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "形成完整配置关联后核对容量；后置再次制造非法H05兼任仍拒绝。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-ke166-fill-capacity-focused.txt",
+          "summary": "3文件47项通过：安全H05恢复、独立督导、仅督导空缺回退、后置拒绝、真实kernel安全凭证与Excel、合法缺员补位和连环。",
+          "sha256": "954d8ca2cd560887ddec7d1d5f15268372a0f712978986aca4daf720dc36a0ad"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-ke166-fill-capacity-verify-final.txt",
+          "summary": "npm.cmd run verify退出0；129功能文件1194项、5性能文件16项、typecheck和build通过。最终完整运行单worker，未改测试预算。",
+          "sha256": "e55df4c68080873b64fae0560c1b424badc283c01126abafc728f77a7a5cf8b2"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "真实kernel结果有安全凭证；督导空缺为warning，非法兼任仍为error。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-ke166-fill-capacity-focused.txt",
+          "summary": "3文件47项通过：安全H05恢复、独立督导、仅督导空缺回退、后置拒绝、真实kernel安全凭证与Excel、合法缺员补位和连环。",
+          "sha256": "954d8ca2cd560887ddec7d1d5f15268372a0f712978986aca4daf720dc36a0ad"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-ke166-fill-capacity-verify-final.txt",
+          "summary": "npm.cmd run verify退出0；129功能文件1194项、5性能文件16项、typecheck和build通过。最终完整运行单worker，未改测试预算。",
+          "sha256": "e55df4c68080873b64fae0560c1b424badc283c01126abafc728f77a7a5cf8b2"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "正常柜台与下午岗位保留；既有合法补位、连环、资质与容量检查不放宽。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-ke166-fill-capacity-focused.txt",
+          "summary": "3文件47项通过：安全H05恢复、独立督导、仅督导空缺回退、后置拒绝、真实kernel安全凭证与Excel、合法缺员补位和连环。",
+          "sha256": "954d8ca2cd560887ddec7d1d5f15268372a0f712978986aca4daf720dc36a0ad"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-ke166-fill-capacity-verify-final.txt",
+          "summary": "npm.cmd run verify退出0；129功能文件1194项、5性能文件16项、typecheck和build通过。最终完整运行单worker，未改测试预算。",
+          "sha256": "e55df4c68080873b64fae0560c1b424badc283c01126abafc728f77a7a5cf8b2"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "verified",
+      "reason": "owner按原条件在本机重试2026-10-14后明确确认：生成成功，KE166安排正常。完整逐格班表文件未取得，不扩大现场结论。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-ke166-fill-capacity-focused.txt",
+          "summary": "3文件47项通过：安全H05恢复、独立督导、仅督导空缺回退、后置拒绝、真实kernel安全凭证与Excel、合法缺员补位和连环。",
+          "sha256": "954d8ca2cd560887ddec7d1d5f15268372a0f712978986aca4daf720dc36a0ad"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-ke166-failure-details-onsite.txt",
+          "summary": "owner提供真实页面详情和已导出诊断TXT，只证明提示与导出现场出现。",
+          "sha256": "4fd85cda5a5d805bfd4668857e49a64bfe33ab1db95c3e065682dafd6557cb86"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-ke166-fill-capacity-onsite.txt",
+          "summary": "owner真实入口重试确认生成成功、KE166安排正常；不推断其他未提供结果。",
+          "sha256": "4ad5caa55e187ef2f9233c66c5a1fca133ddae800fca0945d5cbafcfaf5fefc5"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "红灯与focused证据证明真实收尾释放普通候选后仍按缺员补位；修复重新核对并恢复正常柜台。",
+    "laterChanges": "配置腾挪、通用兼任和后续轮岗恢复可重造非法关联；共享容量事实及最终守卫反向测试继续拒绝。",
+    "finalArtifact": "focused与verify-final证明自动链路及完整门禁；onsite证据记录owner确认原条件下14日生成成功、KE166安排正常。"
+  },
+  "review": {
+    "missedScope": "第一版回退可能多留督导空岗，已补普通人员恢复及kernel无空岗回归。owner现已确认14日生成成功、KE166正常；未取得完整逐格班表，不推断其他航班或现场缺员留空分支。",
+    "rootCause": "短员配置腾挪释放H05普通人员，却沿用腾挪前缺员决定并绕过普通候选保留；形成完整关联后未核对第二真人容量。",
+    "earlyDetection": "提交配置腾挪前消费与最终守卫相同容量事实；回归同时覆盖腾挪后人员变空闲、完整合法结果及失败原柜台恢复。"
+  }
+}

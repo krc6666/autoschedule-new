@@ -104,11 +104,16 @@ export interface DailyScheduleModel {
     readonly string[]
   >;
   readonly dailyFlightCountBalanceEnforced: boolean;
+  readonly strictRecoveryExcludedStaffIdsByTask: ReadonlyMap<
+    string,
+    readonly string[]
+  >;
 }
 
 interface StaffChoiceBuild {
   choices: DailyScheduleStaffChoice[];
   halfRestAffectedStaffIdsByTask: Map<string, readonly string[]>;
+  strictRecoveryExcludedStaffIdsByTask: Map<string, string[]>;
 }
 
 interface WorkloadModel {
@@ -528,6 +533,7 @@ function staffChoicesForTasks(
   ]);
   const choices: DailyScheduleStaffChoice[] = [];
   const halfRestAffectedStaffIdsByTask = new Map<string, readonly string[]>();
+  const strictRecoveryExcludedStaffIdsByTask = new Map<string, string[]>();
   for (const task of scheduledTasks) {
     const candidates = state.staff.filter(
       (person) =>
@@ -602,6 +608,10 @@ function staffChoicesForTasks(
         ) &&
         !strictRecoveryHalfRestBackfill
       ) {
+        const excluded =
+          strictRecoveryExcludedStaffIdsByTask.get(task.key) ?? [];
+        excluded.push(person.id);
+        strictRecoveryExcludedStaffIdsByTask.set(task.key, excluded);
         continue;
       }
       const priority = priorities.get(person.id)!;
@@ -639,6 +649,7 @@ function staffChoicesForTasks(
   return {
     choices,
     halfRestAffectedStaffIdsByTask,
+    strictRecoveryExcludedStaffIdsByTask,
   };
 }
 
@@ -646,13 +657,19 @@ function dutyModel(
   preparation: SchedulePreparation,
   staffChoices: readonly DailyScheduleStaffChoice[]
 ): {
+  variables: SolverProblem["variables"];
   constraints: LinearConstraint[];
   objectives: LexicographicObjective[];
   reliefObjectives: LexicographicObjective[];
 } {
   const dutyStaffId = preparation.dutyStaffId;
   if (!dutyStaffId)
-    return { constraints: [], objectives: [], reliefObjectives: [] };
+    return {
+      variables: [],
+      constraints: [],
+      objectives: [],
+      reliefObjectives: [],
+    };
   const dutyTargetTaskKeys = new Set([
     ...(preparation.preferredDutyMorningTaskKey
       ? [preparation.preferredDutyMorningTaskKey]
@@ -672,22 +689,6 @@ function dutyModel(
       choice.person.id === dutyStaffId &&
       isHalfRestMorningStart(choice.task.flight.startTime)
   );
-  const hasMorningTasks = preparation.tasks.some((task) =>
-    isHalfRestMorningStart(task.flight.startTime)
-  );
-  const dutyMorningBlockedByHalfRest =
-    hasMorningTasks &&
-    preparation.runFacts.halfRest.lateStartStaffIds.has(dutyStaffId);
-  if (morningChoices.length || dutyMorningBlockedByHalfRest) {
-    constraints.push({
-      id: "duty:morning",
-      terms: morningChoices.map((choice) => ({
-        variableId: choice.id,
-        coefficient: 1,
-      })),
-      lowerBound: 1,
-    });
-  }
   const preferredMorningChoice = preparation.preferredDutyMorningTaskKey
     ? choiceForTask(preparation.preferredDutyMorningTaskKey)
     : undefined;
@@ -713,8 +714,37 @@ function dutyModel(
       !dutyTargetTaskKeys.has(choice.task.key)
   );
   return {
-    constraints,
+    variables: morningChoices.length
+      ? [{ id: "duty:morning-worked", type: "binary" }]
+      : [],
+    constraints: [
+      ...constraints,
+      ...(morningChoices.length
+        ? [
+            {
+              id: "duty:morning",
+              terms: [
+                { variableId: "duty:morning-worked", coefficient: 1 },
+                ...morningChoices.map((choice) => ({
+                  variableId: choice.id,
+                  coefficient: -1,
+                })),
+              ],
+              upperBound: 0,
+            },
+          ]
+        : []),
+    ],
     objectives: [
+      ...(morningChoices.length
+        ? [
+            {
+              id: "duty:morning",
+              direction: "maximize" as const,
+              terms: [{ variableId: "duty:morning-worked", coefficient: 1 }],
+            },
+          ]
+        : []),
       ...(lateChoices.length
         ? [
             {
@@ -775,8 +805,7 @@ function dutyModel(
 function assignmentConstraints(
   tasks: readonly AssignmentTask[],
   staffChoices: readonly DailyScheduleStaffChoice[],
-  vacancyChoices: readonly DailyScheduleVacancyChoice[],
-  strictRecoveryTargetTaskKeys: ReadonlySet<string>
+  vacancyChoices: readonly DailyScheduleVacancyChoice[]
 ): LinearConstraint[] {
   return tasks.map((task, index) => ({
     id: `assignment:${index}`,
@@ -790,11 +819,7 @@ function assignmentConstraints(
         )!.id,
         coefficient: 1,
       },
-    ].filter((term) =>
-      term.variableId.startsWith("vacancy:")
-        ? !strictRecoveryTargetTaskKeys.has(task.key)
-        : true
-    ),
+    ],
     lowerBound: 1,
     upperBound: 1,
   }));
@@ -1649,24 +1674,6 @@ export function buildDailyScheduleModel({
     staffChoices,
     vacancyChoices
   );
-  const strictRecoveryTargetTaskKeys = new Set(
-    scheduledTasks
-      .filter(
-        (task) =>
-          isStrictNextWorkdayRecoveryTarget(state, {
-            flightNo: task.flight.flightNo,
-            position: task.rule.name,
-            remark: task.rule.remark,
-          }) &&
-          task.rule.qualifiedStaffIds.some((staffId) =>
-            preparation.runFacts.crossDayRecovery.previousWorkday.protectedStaffIds.has(
-              staffId
-            )
-          ) &&
-          !staffChoiceBuild.halfRestAffectedStaffIdsByTask.has(task.key)
-      )
-      .map((task) => task.key)
-  );
   const staffCoverage = staffCoverageModel(state, staffChoices);
   const dailyFlightCountBalance = dailyFlightCountBalanceModel(
     state,
@@ -1892,6 +1899,8 @@ export function buildDailyScheduleModel({
       dailyFlightCountBalance.objectives.length > 0,
     halfRestAffectedStaffIdsByTask:
       staffChoiceBuild.halfRestAffectedStaffIdsByTask,
+    strictRecoveryExcludedStaffIdsByTask:
+      staffChoiceBuild.strictRecoveryExcludedStaffIdsByTask,
     problem: {
       variables: [
         ...staffChoices.map(({ id }) => ({ id })),
@@ -1905,14 +1914,10 @@ export function buildDailyScheduleModel({
         ...crossFlightPriority.variables,
         ...ke166Availability.variables,
         ...halfRest.variables,
+        ...duty.variables,
       ],
       constraints: [
-        ...assignmentConstraints(
-          scheduledTasks,
-          staffChoices,
-          vacancyChoices,
-          strictRecoveryTargetTaskKeys
-        ),
+        ...assignmentConstraints(scheduledTasks, staffChoices, vacancyChoices),
         ...combinations.incompatibilityConstraints,
         ...capacityConstraints(state, staffChoices),
         ...staffCoverage.constraints,

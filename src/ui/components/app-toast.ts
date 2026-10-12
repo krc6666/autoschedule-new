@@ -23,7 +23,42 @@ export class AppToastElement extends LightDomElement {
         @hidden.bs.toast=${this.dismiss}
       >
         <div class="d-flex">
-          <div class="toast-body">${this.toast?.message ?? ""}</div>
+          <div class="toast-body">
+            ${this.toast?.message ?? ""}
+            ${
+              this.toast?.details?.code === "local-vacancies"
+                ? html`<ul
+                    class="mt-2 mb-0 ps-3"
+                    style="max-height: 50vh; overflow-y: auto;"
+                  >
+                    ${this.toast.details.facts.map((fact) => html`<li>${fact}</li>`)}
+                  </ul>`
+                : this.toast?.details
+                  ? html`<details .open=${false} data-schedule-failure-details>
+                      <summary>查看原因和解决办法</summary>
+                      <div
+                        class="mt-2"
+                        style="max-height: 50vh; overflow-y: auto;"
+                      >
+                        <p>
+                          ${this.toast.details.date}：${this.toast.details.reason}
+                        </p>
+                        ${this.toast.details.facts.map((fact) => html`<p>${fact}</p>`)}
+                        <ol>
+                          ${this.toast.details.steps.map((step) => html`<li class="mb-2">${step}</li>`)}
+                        </ol>
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-light"
+                          @click=${() => dispatchUiCommand(this, { type: "export-schedule-failure-details" })}
+                        >
+                          导出诊断记录
+                        </button>
+                      </div>
+                    </details>`
+                  : null
+            }
+          </div>
           <button
             type="button"
             class="btn-close btn-close-white me-2 m-auto"
@@ -40,7 +75,7 @@ export class AppToastElement extends LightDomElement {
     Toast.getInstance(this.toastRef.value)?.dispose();
     Toast.getOrCreateInstance(this.toastRef.value, {
       animation: false,
-      autohide: this.toast.tone !== "danger",
+      autohide: this.toast.tone !== "danger" && !this.toast.details,
       delay: 3600,
     }).show();
   }

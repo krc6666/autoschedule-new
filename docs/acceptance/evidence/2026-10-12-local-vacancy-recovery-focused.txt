@@ -1,0 +1,223 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/domain/daily-schedule-optimizer.test.ts (63 tests | 3 failed) 3158ms
+     × requires a non-team-leader half-rest worker to take one allowed-period assignment 48ms
+     × keeps the minimum one allowed-period assignment for non-team-leaders 15ms
+     × keeps strict recovery mandatory when no half-rest backfill is involved 5ms
+ ❯ tests/domain/daily-schedule-safety.test.ts (8 tests | 1 failed) 116ms
+     × rejects an all-day-empty non-team-leader half-rest result 6ms
+ ❯ tests/domain/rotation-review-safety.test.ts (12 tests | 1 failed) 51ms
+     × rejects post-review plans that leave a non-team-leader half-rest worker empty 5ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/domain/daily-schedule-optimizer.test.ts > daily schedule module interfaces > requires a non-team-leader half-rest worker to take one allowed-period assignment
+AssertionError: expected [ { id: 'assignment:0', …(3) }, …(2) ] to deeply equal ArrayContaining{…}
+
+- Expected
++ Received
+
+- ArrayContaining [
+-   ObjectContaining {
+-     "id": "half-rest:minimum-work:worker",
++ [
++   {
++     "id": "assignment:0",
+      "lowerBound": 1,
++     "terms": [
++       {
++         "coefficient": 1,
++         "variableId": "vacancy:0",
++       },
++     ],
++     "upperBound": 1,
++   },
++   {
++     "id": "hours:0",
++     "terms": [],
++     "upperBound": 12,
++   },
++   {
++     "id": "half-rest:morning-work:worker",
++     "terms": [
++       {
++         "coefficient": 1,
++         "variableId": "half-rest:worked:worker",
++       },
++     ],
++     "upperBound": 0,
+    },
+  ]
+
+ ❯ tests/domain/daily-schedule-optimizer.test.ts:178:33
+    176|     });
+    177|
+    178|     expect(problem.constraints).toEqual(
+       |                                 ^
+    179|       expect.arrayContaining([
+    180|         expect.objectContaining({
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  tests/domain/daily-schedule-optimizer.test.ts > daily schedule module interfaces > keeps the minimum one allowed-period assignment for non-team-leaders
+AssertionError: expected [ { id: 'assignment:0', …(3) }, …(5) ] to deeply equal ArrayContaining{…}
+
+- Expected
++ Received
+
+- ArrayContaining [
+-   ObjectContaining {
+-     "id": "half-rest:minimum-work:worker",
++ [
++   {
++     "id": "assignment:0",
++     "lowerBound": 1,
++     "terms": [
++       {
++         "coefficient": 1,
++         "variableId": "vacancy:0",
++       },
++     ],
++     "upperBound": 1,
++   },
++   {
++     "id": "assignment:1",
+      "lowerBound": 1,
++     "terms": [
++       {
++         "coefficient": 1,
++         "variableId": "staff:0",
++       },
++       {
++         "coefficient": 1,
++         "variableId": "vacancy:1",
++       },
++     ],
++     "upperBound": 1,
++   },
++   {
++     "id": "hours:0",
++     "terms": [
++       {
++         "coefficient": 5,
++         "variableId": "staff:0",
++       },
++     ],
++     "upperBound": 12,
++   },
++   {
++     "id": "worked:minimum:worker",
++     "lowerBound": 0,
++     "terms": [
++       {
++         "coefficient": 1,
++         "variableId": "staff:0",
++       },
++       {
++         "coefficient": -1,
++         "variableId": "worked:worker",
++       },
++     ],
++   },
++   {
++     "id": "worked:maximum:worker",
++     "terms": [
++       {
++         "coefficient": 1,
++         "variableId": "staff:0",
++       },
++       {
++         "coefficient": -1,
++         "variableId": "worked:worker",
++       },
++     ],
++     "upperBound": 0,
++   },
++   {
++     "id": "half-rest:morning-work:worker",
++     "terms": [
++       {
++         "coefficient": 1,
++         "variableId": "half-rest:worked:worker",
++       },
++       {
++         "coefficient": -1,
++         "variableId": "staff:0",
++       },
++     ],
++     "upperBound": 0,
+    },
+  ]
+
+ ❯ tests/domain/daily-schedule-optimizer.test.ts:388:33
+    386|       halfRestModes: { [state.staff[0]!.id]: "late-start" },
+    387|     });
+    388|     expect(problem.constraints).toEqual(
+       |                                 ^
+    389|       expect.arrayContaining([
+    390|         expect.objectContaining({
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  tests/domain/daily-schedule-optimizer.test.ts > daily schedule module interfaces > keeps strict recovery mandatory when no half-rest backfill is involved
+AssertionError: expected [ { variableId: 'vacancy:0', …(1) } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "coefficient": 1,
++     "variableId": "vacancy:0",
++   },
++ ]
+
+ ❯ tests/domain/daily-schedule-optimizer.test.ts:918:7
+    916|         (constraint) => constraint.id === "assignment:0"
+    917|       )?.terms
+    918|     ).toEqual([]);
+       |       ^
+    919|   });
+    920|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL  tests/domain/daily-schedule-safety.test.ts > daily schedule final safety review > rejects an all-day-empty non-team-leader half-rest result
+AssertionError: expected [Function] to throw an error
+
+- Expected:
+null
+
++ Received:
+undefined
+
+ ❯ tests/domain/daily-schedule-safety.test.ts:390:7
+    388|         },
+    389|       })
+    390|     ).toThrow("必须至少安排一个");
+       |       ^
+    391|   });
+    392|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+ FAIL  tests/domain/rotation-review-safety.test.ts > rotation review safety > rejects post-review plans that leave a non-team-leader half-rest worker empty
+AssertionError: expected [ '调整会使半休人员失去12点前岗位' ] to include '半休硬约束：非分队长下午半休人员必须至少安排一个12点前岗位'
+ ❯ tests/domain/rotation-review-safety.test.ts:131:21
+    129|       }
+    130|     );
+    131|     expect(reasons).toContain(
+       |                     ^
+    132|       "半休硬约束：非分队长下午半休人员必须至少安排一个12点前岗位"
+    133|     );
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯
+
+
+ Test Files  3 failed | 2 passed (5)
+      Tests  5 failed | 130 passed (135)
+   Start at  16:54:35
+   Duration  8.33s (transform 2.10s, setup 0ms, import 2.99s, tests 4.14s, environment 1ms)
+

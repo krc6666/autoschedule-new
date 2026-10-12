@@ -38,7 +38,7 @@ import {
 } from "./daily-same-day-late-obligation-model";
 import {
   assessKe166AssignmentSnapshot,
-  assessKe166DistinctStaffCapacitySnapshot,
+  assessKe166DistinctStaffCapacityFacts,
 } from "../assignments/ke166-assignment";
 import { assessDutyPositionSnapshot } from "../assignments/duty-assignment";
 import { assessScarceQualificationSnapshot } from "../candidates/candidate-priority";
@@ -72,6 +72,7 @@ import {
   isGuideAssignment,
 } from "../flights/schedule-position-rules";
 import { isDailyPrimaryPosition } from "../rules/daily-primary-position";
+import type { ScheduleFailureDetails } from "../shared/schedule-failure-details";
 
 /**
  * The phase controls which invariants are meaningful for a partial result.
@@ -237,6 +238,7 @@ export function createDailyPrimaryPositionScheduleGuard(): ScheduleGuard {
 }
 
 export interface ScheduleGuardViolation {
+  readonly details?: ScheduleFailureDetails;
   readonly ruleId: string;
   readonly assignmentId?: string;
   readonly message: string;
@@ -328,7 +330,11 @@ export function createHalfRestScheduleGuard(): ScheduleGuard {
       if (context.phase === "final") {
         violations.push(
           ...halfRestMinimumWorkViolation({ assignments, facts }).map(
-            (message) => ({ ruleId: "half-rest", message })
+            (message) => ({
+              ruleId: "half-rest",
+              message,
+              severity: "warning" as const,
+            })
           )
         );
       }
@@ -1063,14 +1069,29 @@ export function createKe166SnapshotScheduleGuard(): ScheduleGuard {
       const facts = context.ke166SnapshotFacts;
       if (!facts || context.phase !== "final") return [];
       return [
-        ...assessKe166DistinctStaffCapacitySnapshot(
-          facts.state,
-          assignments
-        ).map((assignmentId) => ({
-          ruleId: "ke166-supervisor",
-          assignmentId,
-          message: `KE166机动督导兼任时仍有第二名常规真人可用，拒绝把该人员让给较低优先航班`,
-        })),
+        ...assessKe166DistinctStaffCapacityFacts(facts.state, assignments).map(
+          ({ counter, supervisor, candidate, blockingAssignment }) => ({
+            ruleId: "ke166-supervisor",
+            assignmentId: counter.id,
+            message: `KE166机动督导兼任时仍有第二名常规真人可用：${candidate.name}可承担${counter.flightNo}/${counter.position}，本次安排未通过检查`,
+            details: {
+              code: "ke166-distinct-staff-capacity" as const,
+              reason: `系统让${supervisor.staffName}既做KE166督导，又做${counter.flightNo}/${counter.position}柜台。但最后检查认为${candidate.name}也可以做这个柜台，按设置应让两个人分别做督导和柜台，所以没有采用这份新班表。`,
+              facts: [
+                `${supervisor.staffName}既做KE166督导，也做${counter.flightNo}/${counter.position}柜台，柜台工作时间为${counter.startTime}—${counter.endTime}。`,
+                blockingAssignment
+                  ? `${candidate.name}被安排到${blockingAssignment.flightNo}/${blockingAssignment.position}（${blockingAssignment.startTime}—${blockingAssignment.endTime}）。按设置的先后顺序，最后检查认为应先让这个人做KE166柜台，再考虑这项工作。`
+                  : `${candidate.name}在${counter.startTime}—${counter.endTime}没有其他工作，最后检查认为这个人可以做${counter.flightNo}/${counter.position}柜台。`,
+                "以上是最后检查发现的安排；尚未确定是排班过程漏安排，还是检查对可用人员判断有误。",
+              ],
+              steps: [
+                "原班表已保留。本次失败的新班表不能采用；有岗位空缺通常仍可生成，这次是人员安排未通过检查。",
+                "先核对准备窗口中这些人员的状态，以及规则页“跨航班重点人员优先”中的KE166人员选择；若与实际不符，按真实情况修正后再生成。",
+                "如果配置符合实际，这是需要检查的程序问题。请导出下面的诊断记录，交给开发人员核对排班过程与最后检查；不要为通过排班而关闭安全规则或随意改人员资质。",
+              ],
+            },
+          })
+        ),
         ...assessKe166AssignmentSnapshot(facts.state, assignments).map(
           (assignmentId) => ({
             ruleId: "ke166-supervisor",

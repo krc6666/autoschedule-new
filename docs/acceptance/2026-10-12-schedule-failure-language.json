@@ -1,0 +1,116 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-10-12-schedule-failure-language",
+  "title": "三个排班入口统一通俗失败原因和折叠处理办法",
+  "startedFrom": "c91562fcc7565344d3fd4f22c47ceadd18783716",
+  "expectation": {
+    "example": "owner看到KE166报错中的‘没有重叠的已排岗位’仍不懂，确认生成、重排、归档并排后天一起改；已提供实际失败提示原文。",
+    "expected": "所有计算失败显示简短人话，默认收起具体原因和处理办法；已知问题说明人员、岗位或限制，未知原因明确未确定；原始错误只保留在诊断导出。",
+    "unchanged": "排班规则、资格、工时、关联、最终安全检查、允许普通缺员、成功和停止流程不变；只改失败展示。",
+    "fallback": "失败不采用新方案，保留原班表及原数据；信息不足不猜网络或配置根因，不建议关闭安全规则。"
+  },
+  "testedVersion": "5897d5770b630f476666acbca567a9924ed0d65f26d0b8bc3e21e91da71fb05f",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "原三入口只有专业原文且无通用详情，普通守卫Worker丢结构及KE166空闲用语均稳定变红；修复后完整功能通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-schedule-failure-language-red.txt",
+          "summary": "11项失败准确定位本轮缺失，含三个入口、普通守卫传输及难懂用语；姓名已脱敏。",
+          "sha256": "be29ae3cc7a23ab5e0e8a84925aa84e1f86a07fae60acf847bd2f74c9e09fc5f"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-schedule-failure-language-functional.txt",
+          "summary": "完整功能130文件1233项通过，退出0，单worker；保持原测试时限。",
+          "sha256": "61f1091f03d1bcab3f3759c0d8de4f4883774e3a7d80b97692a434e612d54590"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "三个预检确认后失败均调用app唯一解释点，已有KE166说明继续可展开；目标日期正确。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-schedule-failure-language-functional.txt",
+          "summary": "130文件1233项，含真实controller三个确认入口与原模型回退。",
+          "sha256": "61f1091f03d1bcab3f3759c0d8de4f4883774e3a7d80b97692a434e612d54590"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "覆盖无详情守卫、超时、无解、凭证拒绝、后台启动/发送、未知异常、主线程generate和多条问题全部保留；原始报错只导出。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-schedule-failure-language-functional.txt",
+          "summary": "含Worker真实序列化发送、runner接收和main-thread回退，多错误投影与TXT内容核对。",
+          "sha256": "61f1091f03d1bcab3f3759c0d8de4f4883774e3a7d80b97692a434e612d54590"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "展示不参与排班后置改写；原后置非法兼任仍被guard拒绝且ledger回退，收尾容量修复测试保留。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-schedule-failure-language-functional.txt",
+          "summary": "包括ke166-initial-reservation反向改坏与ke166-fill-capacity真实收尾用例。",
+          "sha256": "61f1091f03d1bcab3f3759c0d8de4f4883774e3a7d80b97692a434e612d54590"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "只修改错误证据文字及传输，检查判定、凭证和拒绝不变；最终非法结果仍拒绝，不因新提示提交。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-schedule-failure-language-functional.txt",
+          "summary": "守卫、credential、kernel以及三个入口拒绝结果保留原状态的断言通过。",
+          "sha256": "61f1091f03d1bcab3f3759c0d8de4f4883774e3a7d80b97692a434e612d54590"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-schedule-failure-language-performance.txt",
+          "summary": "npm.cmd run test:performance -- --maxWorkers=1退出0，5文件16项通过，361.62秒；不改变性能门槛，不宣称算法变快。",
+          "sha256": "4eb704e8915d7b070a410a7e8640354c8205be8dda7f7dbfbb6273c23635d712"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "失败原航班/状态/人数/历史/班表保持；原成功、两种停止和空岗流程通过；导出不修改模型，不含完整私有配置。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-schedule-failure-language-functional.txt",
+          "summary": "1233项完整功能回归及诊断Blob实际文本验证。",
+          "sha256": "61f1091f03d1bcab3f3759c0d8de4f4883774e3a7d80b97692a434e612d54590"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-schedule-failure-language-typecheck.txt",
+          "summary": "npm.cmd run typecheck退出0。",
+          "sha256": "6fca04d3c72065bc025ab49945050cc2dfbc1bdaca455b60715aa1bc1e49aa76"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-schedule-failure-language-build-final.txt",
+          "summary": "npm.cmd run build真实退出0，含Worker与WASM产物；已有node:module浏览器外置提示，未修改依赖。",
+          "sha256": "ef5ae745d462abafd635ddcc327123873e4a884b40c5a99e2fc0f21b0b9fc1ea"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "自动组件证明短提示/默认收起/展开/导出内容正确；本轮真实本机页面仍待owner证据，不用旧KE166现场或自动测试代替。",
+      "evidence": []
+    }
+  },
+  "answers": {
+    "originalFailure": "red记录11项失败，功能最终130文件1233项通过，覆盖普通错误三入口、Worker丢检查结构和KE166难懂句子。",
+    "laterChanges": "Worker丢结构、controller只接专项、toast泄露原词、导出用错日期都可能改坏；实际发送/接收、三入口、多错误、组件和Blob内容测试拦住；原后置非法安排仍由guard拒绝。",
+    "finalArtifact": "自动功能覆盖实际toast投影、Lit折叠及TXT的内容，构建产生Worker与WASM；本轮真实页面尚未核对，最终产物现场状态保持未验收。"
+  },
+  "review": {
+    "missedScope": "已静态核对三个确认catch和直接generate均共用解释；预检输入警告、人工修改及其他页面报错不在授权范围。本轮真实页面尚未验收。",
+    "rootCause": "此前只接KE166专项，其他catch原样透传错误，Worker又只给专项传结构；只验证抛错与回退，没有按用户能理解的输出验收。",
+    "earlyDetection": "错误解释设计时列全失败入口与传输消费者，保留普通/专项/未知报错的三入口回归，同时检查可见文本与仅导出的原始错误，不能只做单函数或专项测试。"
+  }
+}

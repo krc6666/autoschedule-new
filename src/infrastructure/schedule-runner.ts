@@ -1,4 +1,5 @@
 import type { AppState, ScheduleResult } from "../model";
+import { ScheduleGuardError } from "../domain/kernel/schedule-guard";
 import { createScheduleGenerationFacts } from "../domain/shared/scheduling-facts";
 import {
   generateSchedule,
@@ -164,6 +165,12 @@ export function runScheduleInBackground(
       terminateWorker();
       settled = true;
       resolveResult({ kind: "completed", result: message.result });
+      return;
+    }
+    if (message.violations?.length) {
+      terminateWorker();
+      settled = true;
+      rejectResult(new ScheduleGuardError(message.violations));
       return;
     }
     rejectWorkerFailure("Worker 运行失败", message.message);

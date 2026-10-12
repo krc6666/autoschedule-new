@@ -1,0 +1,54 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/domain/duty-morning-global-selection.test.ts (1 test | 1 failed) 157ms
+     × keeps a strict recovery target feasible when the preferred morning task overlaps it 156ms
+ ❯ tests/domain/daily-schedule-diagnostics.test.ts (5 tests | 1 failed) 75ms
+     × explains when a strict recovery target has no remaining candidate 11ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/domain/daily-schedule-diagnostics.test.ts > daily schedule failure diagnostics > explains when a strict recovery target has no remaining candidate
+AssertionError: expected 'CX937/G18：基础合格的 1 人全部被上一班末班重点岗位避让排除。按…' to match /调整|配置|空缺/
+
+- Expected:
+/调整|配置|空缺/
+
++ Received:
+"CX937/G18：基础合格的 1 人全部被上一班末班重点岗位避让排除。按严格次班恢复设置，这个岗位允许留空；单凭这项不能说明整张班表为什么计算失败，需要检查程序。"
+
+ ❯ tests/domain/daily-schedule-diagnostics.test.ts:194:33
+    192|     expect(diagnosis.join(" ")).toContain("CX937/G18");
+    193|     expect(diagnosis.join(" ")).toMatch(/严格.*恢复|优先避开|次班恢复/);
+    194|     expect(diagnosis.join(" ")).toMatch(/调整|配置|空缺/);
+       |                                 ^
+    195|   });
+    196|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/domain/duty-morning-global-selection.test.ts > duty morning global selection > keeps a strict recovery target feasible when the preferred morning task overlaps it
+AssertionError: expected 1 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 1
+
+ ❯ tests/domain/duty-morning-global-selection.test.ts:114:34
+    112|     );
+    113|
+    114|     expect(result.unfilledCount).toBe(0);
+       |                                  ^
+    115|     expect(strictTarget?.staffId).toBe(dutyWorker!.id);
+    116|     expect(preferredMorning?.staffId).toBe(protectedWorker!.id);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed | 6 passed (8)
+      Tests  2 failed | 242 passed (244)
+   Start at  17:19:08
+   Duration  77.05s (transform 2.25s, setup 0ms, import 4.22s, tests 70.81s, environment 1ms)
+

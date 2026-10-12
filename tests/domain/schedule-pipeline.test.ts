@@ -31,7 +31,7 @@ describe("schedule pipeline contract", () => {
     ).not.toContain("team-leader-concurrent-supervision");
   });
 
-  it("rejects an illegal post-stage proposal at the pipeline ledger boundary", async () => {
+  it("withdraws an illegal post-stage proposal and keeps the legal schedule", async () => {
     const state = createSchedulingScenario();
     const halfRestFacts: HalfRestFacts = {
       requestedStaffIds: ["half-rest-worker"],
@@ -93,21 +93,46 @@ describe("schedule pipeline contract", () => {
       finalizeMobileSupervisors: async () => undefined,
     };
 
-    await expect(
-      runScheduleMutationPlan(context, [
-        {
-          ruleId: "half-rest-morning",
-          label: "test",
-          stage: "test-illegal-proposal",
-          executor: {
-            kind: "coverage",
-            id: "test-illegal-proposal",
-            pass: "primary",
-            execute: async () => ({ assignments: [illegal], warnings: [] }),
+    const warnings = await runScheduleMutationPlan(context, [
+      {
+        ruleId: "half-rest-morning",
+        label: "test",
+        stage: "test-illegal-proposal",
+        executor: {
+          kind: "coverage",
+          id: "test-illegal-proposal",
+          pass: "primary",
+          execute: async () => {
+            ledger.commit({
+              type: "replace",
+              assignments: [{ ...legal, staffName: "中途改动" }],
+            });
+            context.lockedAssignmentIds.add("new-lock");
+            throw new ScheduleGuardError([
+              {
+                ruleId: "half-rest",
+                assignmentId: illegal.id,
+                message: "上午半休人员不得安排12点前岗位",
+              },
+            ]);
           },
         },
-      ])
-    ).rejects.toBeInstanceOf(ScheduleGuardError);
+      },
+      {
+        ruleId: "half-rest-morning",
+        label: "后续岗位",
+        stage: "following-stage",
+        executor: {
+          kind: "coverage",
+          id: "following-stage",
+          pass: "primary",
+          execute: async () => ({ warnings: ["其他岗位继续处理"] }),
+        },
+      },
+    ]);
+    expect(warnings.join("；")).toContain("保留调整前的安排");
+    expect(warnings).toContain("其他岗位继续处理");
+    expect(context.lockedAssignmentIds.size).toBe(0);
     expect(ledger.snapshot()).toEqual([legal]);
   });
 

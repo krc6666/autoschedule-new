@@ -1,0 +1,30 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/app/schedule-preflight.test.ts (26 tests | 1 failed) 416ms
+   × 归档并排后天遇到休假主值班仍采用其他合法岗位，并提供处理办法 9ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/app/schedule-preflight.test.ts > 归档并排后天遇到休假主值班仍采用其他合法岗位，并提供处理办法
+TypeError: (this.options.confirm ?? globalThis.confirm) is not a function
+ ❯ ApplicationCoordinator.confirm src/app/application-coordinator.ts:235:48
+    233|
+    234|   confirm(message: string): boolean {
+    235|     return (this.options.confirm ?? globalThis.confirm)(message);
+       |                                                ^
+    236|   }
+    237|
+ ❯ ScheduleController.confirmNextWorkdayFlightPicker src/app/controllers/schedule-controller.ts:1045:21
+ ❯ ScheduleController.handle src/app/controllers/schedule-controller.ts:247:20
+ ❯ ApplicationCoordinator.handle src/app/application-coordinator.ts:258:30
+ ❯ tests/app/schedule-preflight.test.ts:403:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 8 passed (9)
+      Tests  1 failed | 106 passed (107)
+   Start at  17:14:47
+   Duration  24.99s (transform 1.81s, setup 0ms, import 3.41s, tests 19.19s, environment 362ms)
+

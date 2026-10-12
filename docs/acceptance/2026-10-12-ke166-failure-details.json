@@ -1,0 +1,177 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-10-12-ke166-failure-details",
+  "title": "KE166第二人员检查失败的通俗原因与折叠处理办法",
+  "startedFrom": "c91562fcc7565344d3fd4f22c47ceadd18783716",
+  "expectation": {
+    "example": "归档2026-10-12并生成2026-10-14时出现KE166兼任第二真人报错；owner选择先只完善此条提示，提供实际配置、前班结果、14日人员状态和轮值。",
+    "expected": "短提示无需理解Worker或守卫术语；展开显示实际柜台、督导、可替代人员与其占岗；明确检查发现的事实不等于根因已确认；提供处理步骤及本次诊断导出。",
+    "unchanged": "全部排班规则、候选安全检查、优先级、失败拒绝与原班表回退不变；其他报错不扩展。",
+    "fallback": "诊断信息缺失时保持原错误显示，不编造姓名、原因或可执行解决方案；不自动修改配置或采用不安全结果。"
+  },
+  "testedVersion": "5975c4653923f429a9acbad2778504f19331a79a51ddf3bd909028243a841a4d",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "这次授权的提示缺失已有红灯，原排班失败根因仍未确认。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-ke166-failure-details-focused.txt",
+          "summary": "直接相关6文件59项通过，含真实守卫/Worker发送与接收/三个入口/页面折叠/导出。",
+          "sha256": "b3ec79f0714517b6f4b4d724e9dde5f758cf19d11c692ae9a03126c01339e82b"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-ke166-failure-details-red.txt",
+          "summary": "原容量检查缺少详情和页面缺少折叠入口均可变红，2项失败；已脱敏。",
+          "sha256": "476e4f9db505fb881a8b23993934d0e7bb7034193d04cfd60b444790dead3403"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-ke166-failure-details-replay.txt",
+          "summary": "记录实际文件指纹与各轮诊断结果；原报错未复现，另一个错误不能冒充根因。",
+          "sha256": "d577ffcd21f02d94f7c804ba080e506a68c11f366fa0f287a204e49032d62790"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-ke166-failure-details-verify-final.txt",
+          "summary": "npm.cmd run verify退出0：128功能文件1189项、5性能文件16项、类型检查和构建通过；本次进程2workers，未改测试时限。",
+          "sha256": "248aabfc694af1d47778b5e05c6b5d6af9b0daf12a8e9fc3b9aa41496945b0af"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-ke166-fill-capacity-verify-final.txt",
+          "summary": "npm.cmd run verify退出0；129功能文件1194项、5性能文件16项、typecheck和build通过。最终完整运行单worker，未改测试预算。",
+          "sha256": "e55df4c68080873b64fae0560c1b424badc283c01126abafc728f77a7a5cf8b2"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "同一次容量事实检查生成详情，经Worker结构化传输至toast。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-ke166-failure-details-focused.txt",
+          "summary": "直接相关6文件59项通过，含真实守卫/Worker发送与接收/三个入口/页面折叠/导出。",
+          "sha256": "b3ec79f0714517b6f4b4d724e9dde5f758cf19d11c692ae9a03126c01339e82b"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-ke166-failure-details-verify-final.txt",
+          "summary": "npm.cmd run verify退出0：128功能文件1189项、5性能文件16项、类型检查和构建通过；本次进程2workers，未改测试时限。",
+          "sha256": "248aabfc694af1d47778b5e05c6b5d6af9b0daf12a8e9fc3b9aa41496945b0af"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-ke166-fill-capacity-verify-final.txt",
+          "summary": "npm.cmd run verify退出0；129功能文件1194项、5性能文件16项、typecheck和build通过。最终完整运行单worker，未改测试预算。",
+          "sha256": "e55df4c68080873b64fae0560c1b424badc283c01126abafc728f77a7a5cf8b2"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "空闲和低优先占岗分别说明；三个入口同样展示并保持原状态；未知错误原处理不变。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-ke166-failure-details-focused.txt",
+          "summary": "直接相关6文件59项通过，含真实守卫/Worker发送与接收/三个入口/页面折叠/导出。",
+          "sha256": "b3ec79f0714517b6f4b4d724e9dde5f758cf19d11c692ae9a03126c01339e82b"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-ke166-failure-details-verify-final.txt",
+          "summary": "npm.cmd run verify退出0：128功能文件1189项、5性能文件16项、类型检查和构建通过；本次进程2workers，未改测试时限。",
+          "sha256": "248aabfc694af1d47778b5e05c6b5d6af9b0daf12a8e9fc3b9aa41496945b0af"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-ke166-fill-capacity-verify-final.txt",
+          "summary": "npm.cmd run verify退出0；129功能文件1194项、5性能文件16项、typecheck和build通过。最终完整运行单worker，未改测试预算。",
+          "sha256": "e55df4c68080873b64fae0560c1b424badc283c01126abafc728f77a7a5cf8b2"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "原后置改坏容量用例继续拒绝非法结果、保留ledger；现在同时断言真实证据。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-ke166-failure-details-focused.txt",
+          "summary": "直接相关6文件59项通过，含真实守卫/Worker发送与接收/三个入口/页面折叠/导出。",
+          "sha256": "b3ec79f0714517b6f4b4d724e9dde5f758cf19d11c692ae9a03126c01339e82b"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-ke166-failure-details-verify-final.txt",
+          "summary": "npm.cmd run verify退出0：128功能文件1189项、5性能文件16项、类型检查和构建通过；本次进程2workers，未改测试时限。",
+          "sha256": "248aabfc694af1d47778b5e05c6b5d6af9b0daf12a8e9fc3b9aa41496945b0af"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-ke166-fill-capacity-verify-final.txt",
+          "summary": "npm.cmd run verify退出0；129功能文件1194项、5性能文件16项、typecheck和build通过。最终完整运行单worker，未改测试预算。",
+          "sha256": "e55df4c68080873b64fae0560c1b424badc283c01126abafc728f77a7a5cf8b2"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "保持原资格及阻断判断，仅将已有检查中候选与占岗证据返回，不让提示修改排班。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-ke166-failure-details-focused.txt",
+          "summary": "直接相关6文件59项通过，含真实守卫/Worker发送与接收/三个入口/页面折叠/导出。",
+          "sha256": "b3ec79f0714517b6f4b4d724e9dde5f758cf19d11c692ae9a03126c01339e82b"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-ke166-failure-details-verify-final.txt",
+          "summary": "npm.cmd run verify退出0：128功能文件1189项、5性能文件16项、类型检查和构建通过；本次进程2workers，未改测试时限。",
+          "sha256": "248aabfc694af1d47778b5e05c6b5d6af9b0daf12a8e9fc3b9aa41496945b0af"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-ke166-fill-capacity-verify-final.txt",
+          "summary": "npm.cmd run verify退出0；129功能文件1194项、5性能文件16项、typecheck和build通过。最终完整运行单worker，未改测试预算。",
+          "sha256": "e55df4c68080873b64fae0560c1b424badc283c01126abafc728f77a7a5cf8b2"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "三个入口失败不提交临时状态；危险通知不自动消失、成功通知仍定时消失；诊断导出不改配置。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-ke166-failure-details-focused.txt",
+          "summary": "直接相关6文件59项通过，含真实守卫/Worker发送与接收/三个入口/页面折叠/导出。",
+          "sha256": "b3ec79f0714517b6f4b4d724e9dde5f758cf19d11c692ae9a03126c01339e82b"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-ke166-failure-details-verify-final.txt",
+          "summary": "npm.cmd run verify退出0：128功能文件1189项、5性能文件16项、类型检查和构建通过；本次进程2workers，未改测试时限。",
+          "sha256": "248aabfc694af1d47778b5e05c6b5d6af9b0daf12a8e9fc3b9aa41496945b0af"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-ke166-fill-capacity-verify-final.txt",
+          "summary": "npm.cmd run verify退出0；129功能文件1194项、5性能文件16项、typecheck和build通过。最终完整运行单worker，未改测试预算。",
+          "sha256": "e55df4c68080873b64fae0560c1b424badc283c01126abafc728f77a7a5cf8b2"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "verified",
+      "reason": "owner真实页面看到通俗短提示、具体柜台与候选、处理步骤，并成功导出TXT。排班算法修复单独验收。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-ke166-failure-details-onsite.txt",
+          "summary": "owner提供真实页面详情和已导出诊断TXT，只证明提示与导出现场出现。",
+          "sha256": "4fd85cda5a5d805bfd4668857e49a64bfe33ab1db95c3e065682dafd6557cb86"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-ke166-fill-capacity-verify-final.txt",
+          "summary": "npm.cmd run verify退出0；129功能文件1194项、5性能文件16项、typecheck和build通过。最终完整运行单worker，未改测试预算。",
+          "sha256": "e55df4c68080873b64fae0560c1b424badc283c01126abafc728f77a7a5cf8b2"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "red固定检查缺具体人员和页面缺展开入口；focused验证修补后同一条错误产生可读证据。原KE166失败本身尚未稳定复现。",
+    "laterChanges": "Worker丢字段、入口只显示message、toast更新或导出用错日期会丢证据；实际发送/接收、三个入口回退、UI折叠、导出内容测试覆盖。",
+    "finalArtifact": "真实页面原文与导出TXT脱敏核对见onsite证据；算法修复的14日现场另行验收。"
+  },
+  "review": {
+    "missedScope": "只完善KE166容量报错；实际提示与导出已取得，算法修复不冒充提示任务验证。",
+    "rootCause": "提示缺信息已确认：容量检查舍弃匹配人员与占岗，仅返回柜台ID，Worker再只转message；旧文字对空闲候选也说让给低优先航班。算法故障根因未确认。",
+    "earlyDetection": "错误设计时用同一次检查保留具体证据，再以真实Worker序列化→失败入口→折叠组件→导出断言防丢失；不能只断言抛错或把其他错误当原故障。"
+  }
+}

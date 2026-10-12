@@ -206,8 +206,15 @@ export function orderDailyObjectiveBuckets(
     ...(coverageBeforeKe166 ? buckets.coverage.slice(0, 2) : []),
     ...buckets.ke166Reservation,
     ...(buckets.ke166Availability ?? []),
-    ...buckets.duty,
+    ...buckets.duty.filter(
+      (objective) => objective.id !== "duty:preferred-morning"
+    ),
     ...(coverageBeforeKe166 ? buckets.coverage.slice(2) : buckets.coverage),
+    // A preferred morning counter must not manufacture a vacancy when the
+    // duty worker can keep morning work on another safe counter.
+    ...buckets.duty.filter(
+      (objective) => objective.id === "duty:preferred-morning"
+    ),
     ...buckets.crossWorkdayReservation,
     ...buckets.strictTransition,
     ...buckets.crossFlightPriority,

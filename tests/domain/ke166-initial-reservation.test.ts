@@ -409,6 +409,38 @@ describe(
         ledger.commit({ type: "replace", assignments: illegal })
       ).toThrow(/KE166.*真人/);
       expect(ledger.snapshot()).toEqual(result.assignments);
+      const violations = createKe166SnapshotScheduleGuard().validate(illegal, {
+        phase: "final",
+        ke166SnapshotFacts: { state, date: "2026-09-24" },
+      });
+      expect(violations[0]).toMatchObject({
+        details: {
+          code: "ke166-distinct-staff-capacity",
+          reason: expect.stringContaining(flexibleWorker.name),
+          facts: expect.arrayContaining([expect.stringContaining("CX937/G20")]),
+          steps: expect.arrayContaining([expect.stringContaining("程序")]),
+        },
+      });
+      const idleCandidate = illegal.map((assignment) =>
+        assignment.positionRuleId === "cx-counter"
+          ? {
+              ...assignment,
+              staffId: null,
+              staffName: "",
+              status: "unfilled" as const,
+            }
+          : assignment
+      );
+      const idleViolations = createKe166SnapshotScheduleGuard().validate(
+        idleCandidate,
+        { phase: "final", ke166SnapshotFacts: { state, date: "2026-09-24" } }
+      );
+      expect(idleViolations[0]?.details?.facts.join(" ")).toContain(
+        "没有其他工作"
+      );
+      expect(idleViolations[0]?.details?.facts.join(" ")).not.toContain(
+        "优先顺序低于"
+      );
     });
 
     it("leaves the lower-priority CX937 position vacant without emptying an unrelated unique position", async () => {

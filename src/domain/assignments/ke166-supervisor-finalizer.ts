@@ -4,7 +4,10 @@ import { buildAssignmentDecisionTrace } from "./assignment-decision-trace";
 import { createAssignedPosition } from "./assignment-factory";
 import { applyEarlyReleases } from "./assignment-timing";
 import { diversionTransferCount } from "./diversion-release-usage";
-import { assignMobileSupervisorByCounterCoverage } from "./ke166-assignment";
+import {
+  assignMobileSupervisorByCounterCoverage,
+  assessKe166DistinctStaffCapacityFacts,
+} from "./ke166-assignment";
 import { strictOverrideNotes } from "./schedule-decision-notes";
 import { selectAssignmentCandidate } from "../candidates/candidate-selection";
 import { makeUnfilled } from "../flights/schedule-position-rules";
@@ -72,7 +75,44 @@ export async function finalizeMobileSupervisors({
 
   for (const task of tasks) {
     const ke166 = isKe166MobileSupervisor(task.flight, task.rule);
+    const originalCounters = ke166 ? structuredClone(assignments) : [];
     const hours = durationHours(task.flight.startTime, task.flight.endTime);
+    const preserveLegalCounters = (supervisor: Assignment): void => {
+      if (!ke166) return;
+      const violation = assessKe166DistinctStaffCapacityFacts(
+        state,
+        assignments
+      ).find((item) => item.supervisor.id === supervisor.id);
+      if (!violation) return;
+      assignments.splice(0, assignments.length, ...originalCounters);
+      const independent = orderedCandidates[0];
+      if (independent) {
+        const restored = createAssignedPosition(
+          task,
+          independent,
+          hours,
+          [],
+          [
+            schedulingDecision(
+              "ke166-supervisor",
+              "fallback",
+              "兼任方案仍有安全普通候选，已恢复原柜台并保留合法独立督导"
+            ),
+          ]
+        );
+        assignments.push(restored);
+        return;
+      }
+      const unfilled = makeUnfilled(task.flight, task.rule.name, task.rule);
+      unfilled.decisionTrace = [
+        schedulingDecision(
+          "ke166-supervisor",
+          "fallback",
+          `${violation.candidate.name}仍可安全承担${violation.counter.flightNo}/${violation.counter.position}，不能采用督导兼任方案；已恢复原柜台安排，KE166机动督导留空，请人工复核`
+        ),
+      ];
+      assignments.push(unfilled);
+    };
     const selection = selectAssignmentCandidate({
       state,
       date,
@@ -140,11 +180,12 @@ export async function finalizeMobileSupervisors({
       ];
     };
     const preparePreferredConfiguredFill = async () => {
+      const proposedAssignments = structuredClone(assignments);
       const byReassignment =
         await prepareConfiguredSupervisorFillUnderShortageByReassignment(
           solver,
           state,
-          assignments,
+          proposedAssignments,
           task.flight,
           task.rule,
           date,
@@ -159,11 +200,11 @@ export async function finalizeMobileSupervisors({
             }),
           recordConfiguredFillFailure
         );
-      return (
+      const proposedSupervisor =
         byReassignment ??
         prepareConfiguredSupervisorFillUnderShortage(
           state,
-          assignments,
+          proposedAssignments,
           task.flight,
           task.rule,
           lockedAssignmentIds,
@@ -175,8 +216,84 @@ export async function finalizeMobileSupervisors({
               startTime: task.flight.startTime,
             }),
           recordConfiguredFillFailure
-        )
-      );
+        );
+      if (!proposedSupervisor) return null;
+      if (ke166) {
+        const probeAssignments = structuredClone(proposedAssignments);
+        const probeSource = createAssignedPosition(
+          task,
+          proposedSupervisor,
+          hours,
+          [],
+          []
+        );
+        probeAssignments.push(probeSource);
+        fillConfiguredSupervisorTargets(
+          state,
+          probeAssignments,
+          probeSource,
+          "automatic",
+          { ignoreSafeRegularCandidate: true }
+        );
+        const violation = assessKe166DistinctStaffCapacityFacts(
+          state,
+          probeAssignments
+        ).find((item) => item.supervisor.id === probeSource.id);
+        if (violation) {
+          const target = proposedAssignments.find(
+            (item) => item.id === violation.counter.id
+          );
+          const targetFlight = state.flights.find(
+            (item) => item.id === target?.flightId
+          );
+          const targetRule = state.positionRules.find(
+            (item) => item.id === target?.positionRuleId
+          );
+          const candidate = state.staff.find(
+            (item) => item.id === violation.candidate.id
+          );
+          if (
+            !violation.blockingAssignment &&
+            target &&
+            targetFlight &&
+            targetRule &&
+            candidate &&
+            !halfRestPeriodViolation({
+              facts: preparation.runFacts.halfRest,
+              staffId: candidate.id,
+              startTime: target.startTime,
+            }) &&
+            evaluateAutomaticHardConstraints({
+              state,
+              assignments: probeAssignments.filter(
+                (item) => item.id !== target.id
+              ),
+              flight: targetFlight,
+              rule: targetRule,
+              person: candidate,
+              workHours: durationHours(target.startTime, target.endTime),
+              transitionMode: "forbid",
+            }).eligible
+          ) {
+            Object.assign(target, {
+              staffId: candidate.id,
+              staffName: candidate.name,
+              status: "assigned",
+              workHours: durationHours(target.startTime, target.endTime),
+              fatiguePoints: targetRule.fatiguePoints,
+            });
+            configuredFillFallbackReason = `腾挪后${candidate.name}可安全承担${target.flightNo}/${target.position}，已恢复普通柜台并独立安排督导`;
+            assignments.splice(0, assignments.length, ...proposedAssignments);
+            return proposedSupervisor;
+          }
+          recordConfiguredFillFailure(
+            `腾挪后${violation.candidate.name}仍可安全承担${violation.counter.flightNo}/${violation.counter.position}，无需让督导补位该柜台`
+          );
+          return null;
+        }
+      }
+      assignments.splice(0, assignments.length, ...proposedAssignments);
+      return proposedSupervisor;
     };
     const repeatedIndependentSupervisorCanBeReleased = Boolean(
       ke166 &&
@@ -222,6 +339,7 @@ export async function finalizeMobileSupervisors({
       if (reused) {
         addConfiguredFillFallback(reused);
         assignments.push(reused);
+        preserveLegalCounters(reused);
         processedTasks.add(task.key);
         continue;
       }
@@ -247,6 +365,7 @@ export async function finalizeMobileSupervisors({
       if (reused) {
         addConfiguredFillFallback(reused);
         assignments.push(reused);
+        preserveLegalCounters(reused);
         processedTasks.add(task.key);
         continue;
       }
@@ -331,6 +450,7 @@ export async function finalizeMobileSupervisors({
       "automatic",
       preferredConfiguredFill ? { ignoreSafeRegularCandidate: true } : undefined
     );
+    preserveLegalCounters(supervisorAssignment);
     processedTasks.add(task.key);
   }
   return assignments;

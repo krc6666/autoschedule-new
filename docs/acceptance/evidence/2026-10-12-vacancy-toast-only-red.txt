@@ -1,0 +1,173 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+stderr | tests/ui/app-toast.test.ts
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+
+ ❯ tests/ui/app-toast.test.ts (6 tests | 1 failed) 46ms
+     × shows only vacant positions directly in the yellow schedule notification 27ms
+ ❯ tests/app/schedule-preflight.test.ts (35 tests | 9 failed) 562ms
+     × 只根据最终空岗列清单 true / [ '重点岗位频率需要复核', '半休人员没有合适岗位' ] 52ms
+     × 只根据最终空岗列清单 false / [ '重点岗位频率需要复核' ] 14ms
+     × 只根据最终空岗列清单 true / [] 14ms
+     × 只根据最终空岗列清单 true / [ '重点岗位频率需要复核', '半休人员没有合适岗位' ] 11ms
+     × 只根据最终空岗列清单 false / [ '重点岗位频率需要复核' ] 12ms
+     × 只根据最终空岗列清单 true / [] 12ms
+     × 只根据最终空岗列清单 true / [ '重点岗位频率需要复核', '半休人员没有合适岗位' ] 14ms
+     × 只根据最终空岗列清单 false / [ '重点岗位频率需要复核' ] 13ms
+     × 只根据最终空岗列清单 true / [] 12ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 10 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/app/schedule-preflight.test.ts > 黄色空岗提醒：'generate-schedule' > 只根据最终空岗列清单 true / [ '重点岗位频率需要复核', '半休人员没有合适岗位' ]
+ FAIL  tests/app/schedule-preflight.test.ts > 黄色空岗提醒：'open-reschedule-flight-picker' > 只根据最终空岗列清单 true / [ '重点岗位频率需要复核', '半休人员没有合适岗位' ]
+ FAIL  tests/app/schedule-preflight.test.ts > 黄色空岗提醒：'archive-next-duty-day' > 只根据最终空岗列清单 true / [ '重点岗位频率需要复核', '半休人员没有合适岗位' ]
+AssertionError: expected [ '重点岗位频率需要复核', '半休人员没有合适岗位' ] to deeply equal [ 'KE166 / H05：空岗', 'TR121 / H03：空岗' ]
+
+- Expected
++ Received
+
+  [
+-   "KE166 / H05：空岗",
+-   "TR121 / H03：空岗",
++   "重点岗位频率需要复核",
++   "半休人员没有合适岗位",
+  ]
+
+ ❯ tests/app/schedule-preflight.test.ts:119:37
+    117|     if (vacancies) {
+    118|       expect(toast?.tone).toBe("warning");
+    119|       expect(toast?.details?.facts).toEqual(["KE166 / H05：空岗", "TR121 …
+       |                                     ^
+    120|       expect(toast?.details?.steps).toEqual([]);
+    121|       expect(JSON.stringify(toast)).not.toContain("频率");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/10]⎯
+
+ FAIL  tests/app/schedule-preflight.test.ts > 黄色空岗提醒：'generate-schedule' > 只根据最终空岗列清单 false / [ '重点岗位频率需要复核' ]
+ FAIL  tests/app/schedule-preflight.test.ts > 黄色空岗提醒：'open-reschedule-flight-picker' > 只根据最终空岗列清单 false / [ '重点岗位频率需要复核' ]
+ FAIL  tests/app/schedule-preflight.test.ts > 黄色空岗提醒：'archive-next-duty-day' > 只根据最终空岗列清单 false / [ '重点岗位频率需要复核' ]
+AssertionError: expected 'warning' to be 'success' // Object.is equality
+
+Expected: "success"
+Received: "warning"
+
+ ❯ tests/app/schedule-preflight.test.ts:124:27
+    122|       expect(JSON.stringify(toast)).not.toContain("半休");
+    123|     } else {
+    124|       expect(toast?.tone).toBe("success");
+       |                           ^
+    125|       expect(toast?.details).toBeUndefined();
+    126|     }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/10]⎯
+
+ FAIL  tests/app/schedule-preflight.test.ts > 黄色空岗提醒：'generate-schedule' > 只根据最终空岗列清单 true / []
+ FAIL  tests/app/schedule-preflight.test.ts > 黄色空岗提醒：'open-reschedule-flight-picker' > 只根据最终空岗列清单 true / []
+ FAIL  tests/app/schedule-preflight.test.ts > 黄色空岗提醒：'archive-next-duty-day' > 只根据最终空岗列清单 true / []
+AssertionError: expected 'success' to be 'warning' // Object.is equality
+
+Expected: "warning"
+Received: "success"
+
+ ❯ tests/app/schedule-preflight.test.ts:118:27
+    116|     const toast = coordinator.view().toast;
+    117|     if (vacancies) {
+    118|       expect(toast?.tone).toBe("warning");
+       |                           ^
+    119|       expect(toast?.details?.facts).toEqual(["KE166 / H05：空岗", "TR121 …
+    120|       expect(toast?.details?.steps).toEqual([]);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/10]⎯
+
+ FAIL  tests/ui/app-toast.test.ts > application toast > shows only vacant positions directly in the yellow schedule notification
+AssertionError: expected <details …(1)>…(2)</details> to be null
+
+- Expected:
+null
+
++ Received:
+<details
+  data-schedule-failure-details=""
+>
+  
+                    
+  <summary>
+    查看原因和解决办法
+  </summary>
+  
+                    
+  <div
+    class="mt-2"
+    style="max-height: 50vh; overflow-y: auto;"
+  >
+    
+                      
+    <p>
+      
+                        
+      <!--?lit$488092090$-->
+      2026-10-14
+      ：
+      <!--?lit$488092090$-->
+      以下岗位留空
+      
+                      
+    </p>
+    
+                      
+    <!--?lit$488092090$-->
+    <!---->
+    <p>
+      <!--?lit$488092090$-->
+      KE166 / H05：空岗
+    </p>
+    <!---->
+    <!---->
+    <p>
+      <!--?lit$488092090$-->
+      TR121 / H03：空岗
+    </p>
+    <!---->
+    
+                      
+    <ol>
+      
+                        
+      <!--?lit$488092090$-->
+      
+                      
+    </ol>
+    
+                      
+    <button
+      class="btn btn-sm btn-light"
+      type="button"
+    >
+      
+                        导出诊断记录
+                      
+    </button>
+    
+                    
+  </div>
+  
+                  
+</details>
+
+ ❯ tests/ui/app-toast.test.ts:35:46
+     33|     expect(element.textContent).toContain("KE166 / H05：空岗");
+     34|     expect(element.textContent).toContain("TR121 / H03：空岗");
+     35|     expect(element.querySelector("details")).toBeNull();
+       |                                              ^
+     36|     expect(element.textContent).not.toContain("查看原因和解决办法");
+     37|     expect(element.textContent).not.toContain("导出诊断记录");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/10]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  10 failed | 31 passed (41)
+   Start at  17:56:53
+   Duration  2.60s (transform 1.53s, setup 0ms, import 1.92s, tests 608ms, environment 451ms)
+

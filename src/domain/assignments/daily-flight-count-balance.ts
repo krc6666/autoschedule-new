@@ -13,6 +13,8 @@ import {
   normalizeStaffFlightNumber,
 } from "../statistics/staff-flight-count";
 import { setAutomaticVacancyEvidence } from "./vacancy-evidence";
+import { clearAutomaticAssignmentEvidence } from "./assignment-evidence";
+import { clearSupervisorFillLink } from "../coverage/supervisor-fill-facts";
 
 export interface DailyFlightCountBalanceEnforcementOptions {
   dutyStaffId: string | null;
@@ -20,6 +22,8 @@ export interface DailyFlightCountBalanceEnforcementOptions {
   lockedAssignmentIds?: ReadonlySet<string>;
   candidateStaffIds?: ReadonlySet<string>;
   useFullEligibility?: boolean;
+  /** Vacancy fallback may release a locked group but must not reassign it. */
+  allowTransfers?: boolean;
 }
 
 export interface DailyFlightCountBalanceEnforcementResult {
@@ -139,6 +143,8 @@ function releaseFlightGroup(
   validReplacements.forEach(({ assignment, vacancy }) => {
     vacancy.id = assignment.id;
     vacancy.manualRemark = assignment.manualRemark;
+    clearAutomaticAssignmentEvidence(assignment);
+    clearSupervisorFillLink(assignment);
     Object.assign(assignment, vacancy);
     setAutomaticVacancyEvidence(assignment, {
       reason: "daily-flight-count-balance",
@@ -308,11 +314,13 @@ export function enforceDailyFlightCountBalance(
       state.flights.length > 5 && !options.useFullEligibility
         ? quickTransferFlightGroup
         : transferFlightGroup;
-    const transferred = releaseCandidates.some((group) =>
-      lowStaffIds.some((targetStaffId) =>
-        transfer(state, assignments, group, targetStaffId, locked)
-      )
-    );
+    const transferred =
+      options.allowTransfers !== false &&
+      releaseCandidates.some((group) =>
+        lowStaffIds.some((targetStaffId) =>
+          transfer(state, assignments, group, targetStaffId, locked)
+        )
+      );
     const released =
       transferred ||
       releaseCandidates.some((release) =>

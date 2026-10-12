@@ -12,6 +12,7 @@ import {
   visibleScheduleProgressStep,
 } from "./schedule-progress";
 import { ScheduleGuardError } from "./schedule-guard";
+import { guardExplanation } from "../shared/schedule-issue-explanation";
 
 export interface SchedulePipelineContext extends ScheduleMutationContext {
   onProgress?: (stage: ScheduleProgressStage, percent: number) => void;
@@ -70,25 +71,26 @@ export async function runScheduleMutationPlan(
       continue;
     const progress = visibleScheduleProgressStep(item.stage);
     if (progress) context.onProgress?.(progress.stage, progress.percent);
-    const proposal = await item.executor.execute(context);
-    if (proposal.assignments) {
-      try {
+    const before = context.ledger.snapshot().map((row) => structuredClone(row));
+    const locksBefore = new Set(context.lockedAssignmentIds);
+    try {
+      const proposal = await item.executor.execute(context);
+      if (proposal.assignments) {
         context.ledger.commit({
           type: "replace",
           assignments: proposal.assignments,
         });
-      } catch (error) {
-        if (
-          !(error instanceof ScheduleGuardError) ||
-          !error.violations.some(
-            (violation) => violation.ruleId === "daily-primary-position-unique"
-          )
-        )
-          throw error;
-        warnings.push(`后置调整因最终硬约束未满足而回退：${error.message}`);
       }
+      warnings.push(...proposal.warnings);
+    } catch (error) {
+      if (!(error instanceof ScheduleGuardError)) throw error;
+      context.ledger.commit({ type: "replace", assignments: before });
+      context.lockedAssignmentIds.clear();
+      locksBefore.forEach((id) => context.lockedAssignmentIds.add(id));
+      warnings.push(
+        `${item.label}未采用：${error.violations.map(guardExplanation).join("；")}已保留调整前的安排，继续排其他岗位。`
+      );
     }
-    warnings.push(...proposal.warnings);
   }
   return warnings;
 }

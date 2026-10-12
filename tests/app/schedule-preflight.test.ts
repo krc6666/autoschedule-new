@@ -10,6 +10,7 @@ import {
   parseWorkbook,
 } from "../../src/infrastructure/excel";
 import { replaceWeeklyFlightPlan } from "../../src/domain/flights/weekly-flight-plan";
+import { generateSchedule } from "../helpers/generate-schedule";
 import {
   createTestApplicationCoordinator,
   createTestAutoscheduleStore,
@@ -74,6 +75,110 @@ function safeResult(state: AppState, resultDate: string): ScheduleResult {
     }).createCredential(resultDate, []),
   };
 }
+
+describe.each([
+  { open: "generate-schedule", confirm: "confirm-schedule-preflight" },
+  {
+    open: "open-reschedule-flight-picker",
+    confirm: "confirm-reschedule-flight-picker",
+  },
+  {
+    open: "archive-next-duty-day",
+    confirm: "confirm-next-workday-flight-picker",
+  },
+  { open: "toggle-administrative-mode", confirm: null },
+] as const)("黄色空岗提醒：$open", (entry) => {
+  it.each([
+    {
+      vacancies: true,
+      warnings: ["重点岗位频率需要复核", "半休人员没有合适岗位"],
+    },
+    { vacancies: false, warnings: ["重点岗位频率需要复核"] },
+    { vacancies: true, warnings: [] },
+  ])(
+    "只根据最终空岗列清单 $vacancies / $warnings",
+    async ({ vacancies, warnings }) => {
+      const state = fixture();
+      const coordinator = createTestApplicationCoordinator(
+        createTestAutoscheduleStore(state),
+        {
+          preferences,
+          confirm: () => true,
+        }
+      );
+      let result: ScheduleResult | undefined;
+      setTestScheduleRunner(coordinator, {
+        isRunning: () => false,
+        calculate: vi.fn(async (model: AppState, targetDate: string) => {
+          const assignments = vacancies
+            ? [
+                state.assignments[0]!,
+                {
+                  ...state.assignments[0]!,
+                  id: "vacant-h05",
+                  flightNo: "KE166",
+                  position: "H05",
+                  staffId: null,
+                  staffName: "",
+                  status: "unfilled" as const,
+                  systemNotes: ["人员状态不允许安排"],
+                },
+                {
+                  ...state.assignments[0]!,
+                  id: "vacant-h03",
+                  flightNo: "TR121",
+                  position: "H03",
+                  staffId: null,
+                  staffName: "",
+                  status: "unfilled" as const,
+                },
+              ]
+            : [state.assignments[0]!];
+          result = {
+            assignments,
+            warnings,
+            unfilledCount: vacancies ? 2 : 0,
+            safetyCredential: createScheduleSafetySession({
+              phase: "final",
+              state: model,
+              date: targetDate,
+              runFacts: createScheduleRunFacts(model, targetDate),
+            }).createCredential(targetDate, assignments),
+          };
+          return { kind: "completed" as const, result };
+        }),
+      });
+      if (entry.open === "toggle-administrative-mode") {
+        await coordinator.handle({ type: entry.open, enabled: true });
+      } else {
+        await coordinator.handle({ type: entry.open });
+        const dialog = coordinator.view().dialog;
+        if (!dialog || !("selectedIds" in dialog))
+          throw new Error("缺少准备确认窗口");
+        await coordinator.handle({
+          type: entry.confirm,
+          selectedIds: dialog.selectedIds,
+        });
+      }
+      expect(coordinator.model().assignments).toEqual(result!.assignments);
+      expect(result!.warnings).toEqual(warnings);
+      const toast = coordinator.view().toast;
+      if (vacancies) {
+        expect(toast?.tone).toBe("warning");
+        expect(toast?.details?.facts).toEqual([
+          "KE166 / H05：空岗",
+          "TR121 / H03：空岗",
+        ]);
+        expect(toast?.details?.steps).toEqual([]);
+        expect(JSON.stringify(toast)).not.toContain("频率");
+        expect(JSON.stringify(toast)).not.toContain("半休");
+      } else {
+        expect(toast?.tone).toBe("success");
+        expect(toast?.details).toBeUndefined();
+      }
+    }
+  );
+});
 
 const entries = [
   {
@@ -303,7 +408,7 @@ it("空白航班显示模板，勾选确认前不运行排班", async () => {
   expect(calculate).not.toHaveBeenCalled();
 });
 
-it("同日轮值人员状态为休假时报警并阻止生成，原模型保留", async () => {
+it("同日主值班休假时仍生成合法班表，保留计划和诊断事实", async () => {
   const state = fixture();
   const person = state.staff[0]!;
   person.dutyQualified = true;
@@ -319,9 +424,11 @@ it("同日轮值人员状态为休假时报警并阻止生成，原模型保留"
     createTestAutoscheduleStore(state),
     { preferences }
   );
-  const calculate = vi.fn();
+  const calculate = vi.fn(async (model: AppState, targetDate: string) => ({
+    kind: "completed" as const,
+    result: await generateSchedule(model, targetDate),
+  }));
   setTestScheduleRunner(coordinator, { calculate, isRunning: () => false });
-  const before = structuredClone(coordinator.model());
 
   await coordinator.handle({ type: "generate-schedule" });
   const dialog = coordinator.view().dialog;
@@ -339,12 +446,21 @@ it("同日轮值人员状态为休假时报警并阻止生成，原模型保留"
     selectedIds: updated.selectedIds,
   });
 
-  expect(calculate).not.toHaveBeenCalled();
-  expect(coordinator.model()).toEqual(before);
-  expect(coordinator.view().toast?.message).toContain("主值班人员甲当前为休假");
+  expect(calculate).toHaveBeenCalledOnce();
+  expect(
+    coordinator.model().assignments.some((row) => row.staffId === person.id)
+  ).toBe(false);
+  expect(
+    coordinator.model().dutyRosterOverrides.find((row) => row.date === date)
+      ?.dutyStaffId
+  ).toBe(person.id);
+  expect(
+    (await calculate.mock.results[0]!.value).result.warnings.join("；")
+  ).toContain("主值班人员甲当前为休假");
+  expect(coordinator.view().toast?.details?.code).toBe("local-vacancies");
 });
 
-it("重新排班默认读取统计页休假轮值人员并阻止计算", async () => {
+it("重新排班读取休假轮值计划，合法岗位照常生成且事实仍保留", async () => {
   const state = fixture();
   const person = state.staff[0]!;
   person.dutyQualified = true;
@@ -361,9 +477,11 @@ it("重新排班默认读取统计页休假轮值人员并阻止计算", async (
     createTestAutoscheduleStore(state),
     { preferences }
   );
-  const calculate = vi.fn();
+  const calculate = vi.fn(async (model: AppState, targetDate: string) => ({
+    kind: "completed" as const,
+    result: await generateSchedule(model, targetDate),
+  }));
   setTestScheduleRunner(coordinator, { calculate, isRunning: () => false });
-  const before = structuredClone(coordinator.model());
 
   await coordinator.handle({ type: "open-reschedule-flight-picker" });
   const dialog = coordinator.view().dialog;
@@ -375,9 +493,61 @@ it("重新排班默认读取统计页休假轮值人员并阻止计算", async (
     selectedIds: dialog.selectedIds,
   });
 
-  expect(calculate).not.toHaveBeenCalled();
-  expect(coordinator.model()).toEqual(before);
-  expect(coordinator.view().toast?.message).toContain("主值班人员甲当前为休假");
+  expect(calculate).toHaveBeenCalledOnce();
+  expect(
+    coordinator.model().assignments.some((row) => row.staffId === person.id)
+  ).toBe(false);
+  expect(
+    (await calculate.mock.results[0]!.value).result.warnings.join("；")
+  ).toContain("主值班人员甲当前为休假");
+});
+
+it("归档并排后天遇到休假主值班仍采用其他合法岗位，黄色框不重复轮值说明", async () => {
+  const state = fixture();
+  const person = state.staff[0]!;
+  person.dutyQualified = true;
+  state.dutyRosterOverrides = [
+    {
+      date: "2026-08-17",
+      cxPreflightStaffId: null,
+      dutyStaffId: person.id,
+      standbyStaffIds: [null, null],
+    },
+  ];
+  const coordinator = createTestApplicationCoordinator(
+    createTestAutoscheduleStore(state),
+    { preferences, confirm: () => true }
+  );
+  const calculate = vi.fn(async (model: AppState, targetDate: string) => ({
+    kind: "completed" as const,
+    result: await generateSchedule(model, targetDate),
+  }));
+  setTestScheduleRunner(coordinator, { calculate, isRunning: () => false });
+  await coordinator.handle({ type: "archive-next-duty-day" });
+  const dialog = coordinator.view().dialog;
+  if (dialog?.kind !== "next-workday-flight-picker")
+    throw new Error("缺少后天预检");
+  await coordinator.handle({
+    type: "update-next-workday-flight-picker-staff-status",
+    staffId: person.id,
+    status: "休假",
+  });
+  await coordinator.handle({
+    type: "confirm-next-workday-flight-picker",
+    selectedIds: dialog.selectedIds,
+  });
+  expect(calculate).toHaveBeenCalledOnce();
+  expect(coordinator.model().activeScheduleDate).toBe("2026-08-17");
+  expect(coordinator.model().history.some((row) => row.date === date)).toBe(
+    true
+  );
+  expect(
+    coordinator.model().assignments.some((row) => row.staffId === person.id)
+  ).toBe(false);
+  expect(
+    (await calculate.mock.results[0]!.value).result.warnings.join("；")
+  ).toContain("主值班人员甲当前为休假");
+  expect(JSON.stringify(coordinator.view().toast)).not.toContain("主值班人员");
 });
 
 it.each(["generate-schedule", "open-reschedule-flight-picker"] as const)(

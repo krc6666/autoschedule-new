@@ -1,0 +1,39 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/domain/schedule-local-recovery.test.ts (9 tests | 2 failed) 253ms
+     × only clears the 休假 worker's row, preserves other assignments and exports the reason 23ms
+     × only clears the 病假 worker's row, preserves other assignments and exports the reason 3ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/domain/schedule-local-recovery.test.ts > automatic schedule local vacancy recovery > only clears the 休假 worker's row, preserves other assignments and exports the reason
+ FAIL  tests/domain/schedule-local-recovery.test.ts > automatic schedule local vacancy recovery > only clears the 病假 worker's row, preserves other assignments and exports the reason
+AssertionError: expected '2026-10-14 航班保障排班    CX航前人员 未安排 24小时值…' to contain '今天不在岗'
+
+- Expected
++ Received
+
+- 今天不在岗
++ 2026-10-14 航班保障排班    CX航前人员 未安排 24小时值班人员 人员1 次日备勤一（2026-10-15） 未安排 次日备勤二（2026-10-15） 未安排 提前下班 无       2026-10-14
++ 岗位 TEST0
++ 08:00-10:00 2026-10-14
++ 岗位 TEST1
++ 14:00-16:00 柜台 待补位 柜台 人员1         引导人员 未安排 引导人员 未安排 日期 航班号 岗位 姓名 开始时间 结束时间 工作时长(小时) 疲劳点数 备注 状态 航班截载时间 2026-10-14 TEST0 柜台  08:00 10:00 2 1  待补位 10:00 2026-10-14 TEST1 柜台 人员1 14:00 16:00 2 1  已排 16:00 日期 姓名 航班号 岗位 开始时间 结束时间 工作时长(小时) 2026-10-14 人员1 TEST1 柜台 14:00 16:00 2
+
+ ❯ tests/domain/schedule-local-recovery.test.ts:54:18
+     52|     const workbook = buildScheduleWorkbook({ ...state, assignments }, …
+     53|     const text = workbook.SheetNames.flatMap((name) => utils.sheet_to_…
+     54|     expect(text).toContain("今天不在岗");
+       |                  ^
+     55|   });
+     56|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+
+ Test Files  1 failed | 6 passed (7)
+      Tests  2 failed | 167 passed (169)
+   Start at  17:01:46
+   Duration  10.66s (transform 2.32s, setup 0ms, import 4.08s, tests 4.77s, environment 1ms)
+

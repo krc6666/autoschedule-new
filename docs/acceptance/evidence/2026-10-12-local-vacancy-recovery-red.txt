@@ -1,0 +1,61 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/domain/daily-schedule-optimizer.test.ts (63 tests | 2 failed) 2191ms
+     × keeps late-start staff out of morning work when no afternoon flight exists 31ms
+     × keeps early-finish staff out of afternoon work when no morning flight exists 19ms
+ ❯ tests/domain/schedule-pipeline.test.ts (7 tests | 1 failed) 35ms
+     × withdraws an illegal post-stage proposal and keeps the legal schedule 20ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/domain/daily-schedule-optimizer.test.ts > daily schedule module interfaces > keeps late-start staff out of morning work when no afternoon flight exists
+Error: 当天无法生成完整班表。测试人员选择了上午半休，只能安排下午岗位；但当前下午没有测试人员能上的岗位（资质或其他条件不符合），会导致全天没有航班，因此本次重新排班未采用。
+ ❯ optimizeDailySchedule src/domain/kernel/daily-schedule-optimizer.ts:86:11
+     84|     result.termination !== "time-limited-feasible"
+     85|   )
+     86|     throw new Error(
+       |           ^
+     87|       dailyScheduleFailureMessage(
+     88|         result.termination,
+ ❯ generateSchedule src/domain/kernel/scheduling-kernel.ts:181:16
+ ❯ tests/domain/daily-schedule-optimizer.test.ts:451:20
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  tests/domain/daily-schedule-optimizer.test.ts > daily schedule module interfaces > keeps early-finish staff out of afternoon work when no morning flight exists
+Error: 当天无法生成完整班表。测试人员选择了下午半休，只能安排上午岗位；但当前上午没有测试人员能上的岗位（资质或其他条件不符合），会导致全天没有航班，因此本次重新排班未采用。
+ ❯ optimizeDailySchedule src/domain/kernel/daily-schedule-optimizer.ts:86:11
+     84|     result.termination !== "time-limited-feasible"
+     85|   )
+     86|     throw new Error(
+       |           ^
+     87|       dailyScheduleFailureMessage(
+     88|         result.termination,
+ ❯ generateSchedule src/domain/kernel/scheduling-kernel.ts:181:16
+ ❯ tests/domain/daily-schedule-optimizer.test.ts:469:20
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  tests/domain/schedule-pipeline.test.ts > schedule pipeline contract > withdraws an illegal post-stage proposal and keeps the legal schedule
+ScheduleGuardError: 半休时段硬约束：上午半休人员不得安排12点前岗位
+ ❯ assertScheduleAssignmentsSafe src/domain/kernel/schedule-guard.ts:294:11
+    292|   }
+    293|   if (blockingViolations.length)
+    294|     throw new ScheduleGuardError(blockingViolations);
+       |           ^
+    295| }
+    296|
+ ❯ Object.assertAssignmentsSafe src/domain/kernel/schedule-safety-session.ts:112:7
+ ❯ Object.commit src/domain/kernel/schedule-ledger.ts:55:30
+ ❯ runScheduleMutationPlan src/domain/kernel/schedule-pipeline.ts:76:24
+ ❯ tests/domain/schedule-pipeline.test.ts:96:22
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  3 failed | 67 passed (70)
+   Start at  16:47:17
+   Duration  4.36s (transform 1.27s, setup 0ms, import 1.61s, tests 2.23s, environment 0ms)
+

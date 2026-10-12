@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-10-12-local-vacancy-recovery",
+  "title": "自动排班局部问题留空，采用其他合法安排",
+  "startedFrom": "c91562fcc7565344d3fd4f22c47ceadd18783716",
+  "expectation": {
+    "example": "半休人员没有合法岗位，或后置调整使某个柜台不合法，旁边正常航班已有合法安排。",
+    "expected": "生成、重排、归档并排后天均保留其他合法安排；尽量恢复原合法岗位，必要时问题岗位留空并写明原因。",
+    "unchanged": "不得违反人员状态、资格、时间冲突、工时和最终安全检查；人工调班不自动清空。",
+    "fallback": "可定位业务问题局部留空；程序崩溃、输入损坏或未得到可靠结果仍保留原班表。"
+  },
+  "testedVersion": "e75f2e5e35e75afc939e996edfe6a218627667f5cdb1123ed7bb7ef15a8a70d7",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "修改前半休无合法岗位两项、后置非法安排一项稳定失败；修改后真实计算可留空并取得安全凭证。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-local-vacancy-recovery-red.txt",
+          "summary": "修改前半休无合法岗位两项、后置非法安排一项稳定失败；修改后真实计算可留空并取得安全凭证。",
+          "sha256": "3884288439b0c645838ae0d1eb549698cfa49c21cae4fa4ffb1e7943f65e94cf"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-local-vacancy-recovery-verify-final.txt",
+          "summary": "修改前半休无合法岗位两项、后置非法安排一项稳定失败；修改后真实计算可留空并取得安全凭证。",
+          "sha256": "c4c59696507738f4f7664b7408ec4211d1f8bfc897c0fffc0c179d209ea9df15"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "原完整排班及可行半休行为保留；具体上午偏好移至覆盖之后，避免制造额外空岗。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-local-vacancy-recovery-verify-final.txt",
+          "summary": "原完整排班及可行半休行为保留；具体上午偏好移至覆盖之后，避免制造额外空岗。",
+          "sha256": "c4c59696507738f4f7664b7408ec4211d1f8bfc897c0fffc0c179d209ea9df15"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "三个实际 controller 入口、休病假计划值班、真实 Worker/WASM、存储恢复、Excel系统说明已自动覆盖。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-local-vacancy-recovery-boundaries-final.txt",
+          "summary": "三个实际 controller 入口、休病假计划值班、真实 Worker/WASM、存储恢复、Excel系统说明已自动覆盖。",
+          "sha256": "ffcb05253ce88fa6092e8034c0a6ede3758615e821963fd8409491d06db3ec05"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-local-vacancy-recovery-verify-final.txt",
+          "summary": "三个实际 controller 入口、休病假计划值班、真实 Worker/WASM、存储恢复、Excel系统说明已自动覆盖。",
+          "sha256": "c4c59696507738f4f7664b7408ec4211d1f8bfc897c0fffc0c179d209ea9df15"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "后置阶段中途已提交后再失败仍恢复阶段快照及锁定，并继续下一阶段；最终一号重复、资格变化、关联清理和锁定均衡均回归。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-local-vacancy-recovery-verify-final.txt",
+          "summary": "后置阶段中途已提交后再失败仍恢复阶段快照及锁定，并继续下一阶段；最终一号重复、资格变化、关联清理和锁定均衡均回归。",
+          "sha256": "c4c59696507738f4f7664b7408ec4211d1f8bfc897c0fffc0c179d209ea9df15"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "直接检查仍拒绝危险安排；局部恢复后再次通过 guard 和 daily safety，最终空缺数独立重数后与结果一致，并取得安全凭证。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-local-vacancy-recovery-verify-final.txt",
+          "summary": "直接检查仍拒绝危险安排；局部恢复后再次通过 guard 和 daily safety，最终空缺数独立重数后与结果一致，并取得安全凭证。",
+          "sha256": "c4c59696507738f4f7664b7408ec4211d1f8bfc897c0fffc0c179d209ea9df15"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "安全候选、半休时段、人工越权/基础阻断、程序异常及无可靠结果保留原班表的回归继续通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-local-vacancy-recovery-verify-final.txt",
+          "summary": "安全候选、半休时段、人工越权/基础阻断、程序异常及无可靠结果保留原班表的回归继续通过。",
+          "sha256": "c4c59696507738f4f7664b7408ec4211d1f8bfc897c0fffc0c179d209ea9df15"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "已有自动生成最终 assignments、真实 Worker 接收、Store/存储恢复和 Excel 系统说明证据；尚未取得 owner 本机三个入口的页面操作与展开提示现场证据。已请求核对，保持未验收。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-local-vacancy-recovery-boundaries-final.txt",
+          "summary": "已有自动生成最终 assignments、真实 Worker 接收、Store/存储恢复和 Excel 系统说明证据；尚未取得 owner 本机三个入口的页面操作与展开提示现场证据。已请求核对，保持未验收。",
+          "sha256": "ffcb05253ce88fa6092e8034c0a6ede3758615e821963fd8409491d06db3ec05"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-local-vacancy-recovery-verify-final.txt",
+          "summary": "已有自动生成最终 assignments、真实 Worker 接收、Store/存储恢复和 Excel 系统说明证据；尚未取得 owner 本机三个入口的页面操作与展开提示现场证据。已请求核对，保持未验收。",
+          "sha256": "c4c59696507738f4f7664b7408ec4211d1f8bfc897c0fffc0c179d209ea9df15"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "red.txt 的3项稳定失败指出模型必有岗与后置整班拒绝；focused6、priority、boundaries-final 分别证明新留空行为、原可行完整行为及出口链路。",
+    "laterChanges": "补缺/轮岗/恢复/机动督导可能改坏结果；pipeline 阶段中途改坏回退及 finalizer 的一号重复、资格变化、关联清理、锁定均衡反向回归覆盖；最终仍重新检查后才出凭证。",
+    "finalArtifact": "自动产物已独立核对旁边合法岗位保留、问题岗无人员、unfilledCount、关联字段、工时与 Excel系统说明；本机真实页面反馈未取得，不能当现场通过。"
+  },
+  "review": {
+    "missedScope": "曾差点漏掉预检休病假值班阻断、初排和最终两个检查入口、偏好上午柜台造成额外空缺、原因未进Excel。分别通过三入口、真实Worker/存储、原值班回归和最终Excel失败测试补齐；页面布局与真实用户条件仍待验。",
+    "rootCause": "旧合同强制半休和值班至少一岗、严格恢复岗位不能空；模型与最终检查因此可拒整班。后置异常仅特判一号，其他局部问题直接向上抛；没有统一可定位的自动局部恢复。此轮是owner明确改变失败合同，并非关闭安全检查。",
+    "earlyDetection": "修改回退语义前查模型下界、每岗空缺变量、全部入口预检、后置提交和最终检查；先用一处不可排且另一航班合法的反向场景变红，再核对关联工时、存储与导出原因。原完整场景回归可提前发现偏好制造空缺。"
+  }
+}

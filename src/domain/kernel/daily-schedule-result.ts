@@ -26,6 +26,7 @@ import type {
 import type { SolverResult } from "../solver/solver-port";
 import type { SchedulePreparation } from "./schedule-preparation";
 import { assertDailyScheduleSafety } from "./daily-schedule-safety";
+import { recoverLocalScheduleIssues } from "./schedule-local-recovery";
 import {
   HALF_REST_WARNING_PREFIX,
   isHalfRestMorningStart,
@@ -194,6 +195,20 @@ function attachVacancyEvidence(
         .filter((name): name is string => Boolean(name));
       assignment.systemNotes = [
         `${HALF_REST_WARNING_PREFIX}为落实${names.join("、")}半休，后续可用人员不足，岗位保持空缺`,
+      ];
+      continue;
+    }
+    const recoveryExcludedIds =
+      model.strictRecoveryExcludedStaffIdsByTask.get(task.key) ?? [];
+    if (
+      recoveryExcludedIds.length &&
+      !model.staffChoices.some((choice) => choice.task.key === task.key)
+    ) {
+      const names = recoveryExcludedIds
+        .map((id) => state.staff.find((person) => person.id === id)?.name)
+        .filter(Boolean);
+      assignment.systemNotes = [
+        `${names.join("、")}上一班做了需要休息保护的晚班岗位，按“次班重点岗位避让”的严格设置不能做这个岗位；没有其他安全人选，因此留空。请核对该设置和上一班记录，其他合法安排已保留。`,
       ];
       continue;
     }
@@ -451,16 +466,23 @@ export function materializeValidatedDailySchedulePlan(options: {
   optimizationQuality: DailySchedulePlan["optimizationQuality"];
 }): DailySchedulePlan {
   const plan = materializeDailySchedulePlan(options);
-  assertDailyScheduleSafety({
-    state: options.state,
-    date: options.date,
-    assignments: plan.assignments,
-    tasks: options.preparation.tasks.filter(
-      (task) => !isMobileSupervisor(task.flight, task.rule)
-    ),
-    evaluateEligibility: evaluateAutomaticHardConstraints,
-    halfRestFacts: options.preparation.runFacts.halfRest,
-  });
+  plan.warnings.push(
+    ...recoverLocalScheduleIssues(
+      options.state,
+      plan.assignments,
+      (assignments) =>
+        assertDailyScheduleSafety({
+          state: options.state,
+          date: options.date,
+          assignments,
+          tasks: options.preparation.tasks.filter(
+            (task) => !isMobileSupervisor(task.flight, task.rule)
+          ),
+          evaluateEligibility: evaluateAutomaticHardConstraints,
+          halfRestFacts: options.preparation.runFacts.halfRest,
+        })
+    )
+  );
   return { ...plan, optimizationQuality: options.optimizationQuality };
 }
 

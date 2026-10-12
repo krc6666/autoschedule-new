@@ -166,7 +166,7 @@ function isAllowedHalfRestPeriod(
   return mode === "late-start" ? !preNoon : preNoon;
 }
 
-function halfRestAllowedAssignmentCount(
+export function halfRestAllowedAssignmentCount(
   assignments: readonly Assignment[],
   staffId: string,
   mode: HalfRestMode
@@ -190,8 +190,8 @@ export function halfRestMinimumWorkViolation(options: {
       continue;
     violations.push(
       mode === "late-start"
-        ? "半休硬约束：非分队长上午半休人员必须至少安排一个12点后岗位"
-        : "半休硬约束：非分队长下午半休人员必须至少安排一个12点前岗位"
+        ? "半休提醒：有人上午休息，但没能安排到12点后岗位，今天允许无岗"
+        : "半休提醒：有人下午休息，但没能安排到12点前岗位，今天允许无岗"
     );
   }
   return [...new Set(violations)];
@@ -343,13 +343,6 @@ export function buildHalfRestOptimizationModel(
       ],
       upperBound: 0,
     });
-    if (facts.minimumWorkStaffIds.has(staffId)) {
-      constraints.push({
-        id: `half-rest:minimum-work:${staffId}`,
-        terms: [{ variableId: workedId, coefficient: 1 }],
-        lowerBound: 1,
-      });
-    }
     if (mode === "early-finish") {
       for (const choice of staffChoices) {
         const end = operationalEndMinutes(choice.startTime, choice.endTime);
@@ -436,7 +429,6 @@ export function halfRestRegressionReasons(
     )
       reasons.push("调整会使上午半休人员失去最晚结束航班");
   }
-  reasons.push(...halfRestMinimumWorkViolation({ assignments: after, facts }));
   return [...new Set(reasons)];
 }
 

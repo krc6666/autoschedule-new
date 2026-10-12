@@ -15,7 +15,10 @@ import {
   runCoveragePipeline,
   runPostSchedulePipeline,
 } from "./schedule-pipeline";
-import { assignmentRule } from "../flights/schedule-position-rules";
+import {
+  assignmentRule,
+  makeUnfilled,
+} from "../flights/schedule-position-rules";
 import type { ScheduleProgressStage } from "./schedule-progress";
 import type { ScheduleRunFacts } from "../shared/schedule-run-facts";
 import { isPreNoonFlight } from "../flights/schedule-tasks";
@@ -29,10 +32,16 @@ import type { DailySchedulePlan } from "./daily-schedule-result";
 import { assertDailyScheduleSafety } from "./daily-schedule-safety";
 import { evaluateAutomaticHardConstraints } from "../rules/built-in-rule-registry";
 import { scheduleOptimizationWarning } from "../reviews/schedule-warning-message";
-import { isHalfRestWarning } from "../rules/half-rest";
+import {
+  halfRestAllowedAssignmentCount,
+  isHalfRestWarning,
+  HALF_REST_WARNING_PREFIX,
+} from "../rules/half-rest";
 import type { ScheduleSafetySession } from "./schedule-safety-session";
 import { scheduleRuleFingerprint } from "../rules/schedule-rule-fingerprint";
 import { enforceDailyFlightCountBalance } from "../assignments/daily-flight-count-balance";
+import { recoverLocalScheduleIssues } from "./schedule-local-recovery";
+import { dutyRosterStatusIssues } from "../duty-roster/roster";
 
 export interface ScheduleFinalizerOptions {
   solver: SolverPort;
@@ -203,19 +212,88 @@ export async function finalizeSchedule({
   }
 
   const assignments = workingAssignments(ledger);
-  // Recheck after every coverage, rotation, and KE166 mutation. Those stages
-  // can add a valid same-flight reuse or a new flight after the solver plan.
-  // The shared fallback only releases unlocked flight groups and records why.
-  const balance = enforceDailyFlightCountBalance(state, assignments, {
-    dutyStaffId: runFacts.currentDutyStaffId,
-    halfRestStaffIds: runFacts.halfRest.activeStaffIds,
-    lockedAssignmentIds,
-    candidateStaffIds,
-    useFullEligibility: true,
-  });
-  if (balance.spread > 1) {
-    throw new Error(
-      `最终班表航班数差值为 ${balance.spread}，无法在不移动锁定岗位的情况下满足差值不超过 1`
+  for (const task of automaticTasks) {
+    if (
+      assignments.some(
+        (row) =>
+          row.flightId === task.flight.id && row.positionRuleId === task.rule.id
+      )
+    )
+      continue;
+    assignments.push({
+      ...makeUnfilled(task.flight, task.rule.name, task.rule),
+      status: "unfilled",
+      systemNotes: [
+        "这个岗位没有找到合法安排，已留空；其他合法岗位照常保留。请核对该岗位的人员名单和相关设置。",
+      ],
+    });
+  }
+  const assertFinalSafety = (current: readonly Assignment[]): void => {
+    safetySession.assertAssignmentsSafe(current);
+    assertDailyScheduleSafety({
+      state,
+      date,
+      assignments: current,
+      tasks: automaticTasks,
+      evaluateEligibility: evaluateAutomaticHardConstraints,
+      allowFinalizedConcurrency: true,
+      preservedAssignments,
+      halfRestFacts: runFacts.halfRest,
+    });
+  };
+  postReviewWarnings.push(
+    ...recoverLocalScheduleIssues(state, assignments, (current) => {
+      assertFinalSafety(current);
+      // First try the original safe transfers/unlocked releases. Only an
+      // impossible locked balance may release a locked automatic group.
+      const balanceOptions = {
+        dutyStaffId: runFacts.currentDutyStaffId,
+        halfRestStaffIds: runFacts.halfRest.activeStaffIds,
+        candidateStaffIds,
+        useFullEligibility: true,
+      };
+      const balance = enforceDailyFlightCountBalance(state, assignments, {
+        ...balanceOptions,
+        lockedAssignmentIds,
+      });
+      if (balance.spread > 1)
+        enforceDailyFlightCountBalance(state, assignments, {
+          ...balanceOptions,
+          allowTransfers: false,
+        });
+      assertFinalSafety(assignments);
+    })
+  );
+  for (const staffId of runFacts.halfRest.activeStaffIds) {
+    const mode =
+      runFacts.halfRest.modesByStaffId.get(staffId) ?? "early-finish";
+    if (halfRestAllowedAssignmentCount(assignments, staffId, mode)) continue;
+    const name =
+      state.staff.find((person) => person.id === staffId)?.name ?? "所选人员";
+    postReviewWarnings.push(
+      `${HALF_REST_WARNING_PREFIX}${name}今天没有排到符合半休时段的岗位，允许当天无岗；其他合法安排已保留。`
+    );
+  }
+  postReviewWarnings.push(
+    ...dutyRosterStatusIssues(state, date).map(
+      (issue) =>
+        `${issue}。计划选择已保留，本次不给休假或病假人员安排自动岗位；请在准备窗口选择实际在岗人员，或按真实情况修正状态。`
+    )
+  );
+  if (
+    runFacts.currentDutyStaffId &&
+    !assignments.some(
+      (row) =>
+        row.status === "assigned" &&
+        row.staffId === runFacts.currentDutyStaffId &&
+        isPreNoonFlight(row)
+    )
+  ) {
+    const name =
+      state.staff.find((person) => person.id === runFacts.currentDutyStaffId)
+        ?.name ?? "计划主值班人员";
+    postReviewWarnings.push(
+      `${name}没有落实12点前的值班岗位；其他合法岗位已保留。请核对主值班选择、半休时段与岗位名单。`
     );
   }
   applyPreNoonDecisionNotes(state, assignments);

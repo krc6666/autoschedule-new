@@ -1,0 +1,9 @@
+Diagnostic replay evidence; source names and personnel removed.
+[{"source":"owner configuration workbook","sha256":"2a2218aea4226324a6494eea54899d1403b6b6aed20f95115955f79f0b293ef5"},{"source":"owner October 12 schedule workbook","sha256":"a60ffe2366b14fa26a39902c750a36a01aec897fe378dfb8c7dba5b1d83201e6"}]
+Run 1: 8 selected flights, configuration history through October 11. Passed; 215.93s.
+Run 2: two morning flights plus screenshot-confirmed October 12 supervisor record only. Passed; 17.00s; incomplete historical contrast.
+Run 3: 8 selected flights plus all 45 assigned October 12 records. Passed; 215.36s.
+Run 4: also pin confirmed October 14 duty selection. Passed; 227.22s.
+Run 5: also restore three screenshot-confirmed regular personnel to normal. Failed; 230.79s; different symptom: one person assigned to KE166/H02 and CX931/G20 as two primary positions. This is not the owner KE166 capacity error.
+Run 6: restore fourth regular person and include Worker checkpoint behavior. No final verdict returned; manually terminated this diagnostic process. Not a pass or confirmed root cause.
+No original owner capacity error reproduced. Original root cause remains unverified. Temporary probe removed; source workbooks and product rules unchanged by diagnosis.

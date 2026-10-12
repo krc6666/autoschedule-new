@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-10-12-vacancy-toast-only",
+  "title": "黄色排班提醒只列最终空岗",
+  "startedFrom": "c91562fcc7565344d3fd4f22c47ceadd18783716",
+  "expectation": {
+    "example": "owner截图显示右下角黄色框重复列出下方排班反馈中的疲劳、频率、恢复等说明。",
+    "expected": "生成、重排、归档并排后天的黄色框只列最终未排上人的航班与岗位，无空岗不显示黄色排班提醒。",
+    "unchanged": "算法、安全检查、空岗红框原因、排班反馈、系统说明及导出不变；真正计算失败仍显示原失败解释。",
+    "fallback": "只调整成功后的提醒投影，不改计算和原表保留合同。"
+  },
+  "testedVersion": "e2b9265efb512cac858c3b7d0c440728abc7c78913bdf206b2a33d06b8c01d46",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "修改前黄色框把频率、半休等 warnings 当成弹框内容；修改后同一组入口回归只输出最终空岗清单。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-vacancy-toast-only-red.txt",
+          "summary": "修改前 2 个测试文件 10 项失败，稳定复现黄色框混入 warnings 和空岗详情未直接展示。",
+          "sha256": "7b3a7225657d67b202d42c8635985e86456d2097907e4c3b5963847ce9ec76cd"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-vacancy-toast-only-focused.txt",
+          "summary": "修复后定向 5 个测试文件 111 项通过。",
+          "sha256": "1df08ca551ebebdf941f0bf03a9e84ac37752834cce6270aeef71b370cb68f95"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "生成、重新排班、归档并排后天均覆盖有空岗、无空岗和 warnings 组合。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-vacancy-toast-only-functional.txt",
+          "summary": "全量功能测试 133 个文件、1262 项通过。",
+          "sha256": "8603008b5af4a0684ea2b3d96bfc9d1db5021c0abaa9ac31a199187d6528c9ac"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "定向回归覆盖直接生成、预检生成、重新排班和归档后天；空岗无 warnings 仍列空岗，无空岗仅有软提醒不弹空岗框。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-vacancy-toast-only-focused.txt",
+          "summary": "入口组合回归 5 个文件、111 项通过。",
+          "sha256": "1df08ca551ebebdf941f0bf03a9e84ac37752834cce6270aeef71b370cb68f95"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "提醒投影读取计算完成后的最终 assignments；测试同时断言其余 assignments 原样提交，未从 warnings 反推空岗。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-vacancy-toast-only-functional.txt",
+          "summary": "全量功能测试通过，包含最终结果提交与后置路径回归。",
+          "sha256": "8603008b5af4a0684ea2b3d96bfc9d1db5021c0abaa9ac31a199187d6528c9ac"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "类型检查和生产构建通过；真正计算失败仍走原班表保留的失败路径，未由黄色成功提醒吞掉。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-vacancy-toast-only-typecheck.txt",
+          "summary": "npm.cmd run typecheck 退出 0。",
+          "sha256": "f0e27738b34b12050a8cbb339eca3ab588d2bc04dcafa20fbcb7f519d17e79aa"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-vacancy-toast-only-build.txt",
+          "summary": "npm.cmd run build 退出 0，生成 Worker/WASM 产物。",
+          "sha256": "1becbfb5e2e425d0519005942cfccff403141a9ae16d68434e1ac0eea6c265b6"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "UI 测试确认空岗提醒不显示折叠诊断入口；失败诊断仍保持折叠，warnings、空岗原因和导出路径未被删除。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-12-vacancy-toast-only-focused.txt",
+          "summary": "黄色空岗框与失败详情分支均通过。",
+          "sha256": "1df08ca551ebebdf941f0bf03a9e84ac37752834cce6270aeef71b370cb68f95"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "自动测试和构建已通过；真实页面黄色框仍需 owner 刷新页面后确认，不能用组件测试替代现场证据。",
+      "evidence": []
+    }
+  },
+  "answers": {
+    "originalFailure": "修改前失败证据显示黄色框混入频率、半休等 warnings；修复后定向回归只列 KE166/H05、TR121/H03 等最终空岗。",
+    "laterChanges": "三个入口若重新拼接 warnings 或 UI 把 local-vacancies 当普通详情渲染就会复发；入口参数化测试和组件测试已覆盖。",
+    "finalArtifact": "自动最终产物由全量功能、性能、typecheck 和 build 证明；真实页面证据仍待 owner 提供。"
+  },
+  "review": {
+    "missedScope": "现场页面与导出后的真实浏览器显示尚未核对；已静态核对生成、重排、归档和直接生成调用链，并以自动测试覆盖。",
+    "rootCause": "成功提醒直接复用了 warnings 诊断集合，没有以最终 assignments 的 unfilled 行作为唯一展示来源。",
+    "earlyDetection": "改动前先列出所有入口和最终 assignments 消费点，并用‘有 warnings 无空岗’与‘有空岗无 warnings’两组失败回归锁住提醒边界。"
+  }
+}

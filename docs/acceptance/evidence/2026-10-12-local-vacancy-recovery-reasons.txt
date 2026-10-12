@@ -1,0 +1,33 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/domain/daily-schedule-diagnostics.test.ts (5 tests | 1 failed) 66ms
+     × explains when a strict recovery target has no remaining candidate 12ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/domain/daily-schedule-diagnostics.test.ts > daily schedule failure diagnostics > explains when a strict recovery target has no remaining candidate
+AssertionError: expected 'CX937/G18：基础合格的 1 人全部被上一班末班重点岗位避让排除。按…' to match /调整|配置|空缺/
+
+- Expected:
+/调整|配置|空缺/
+
++ Received:
+"CX937/G18：基础合格的 1 人全部被上一班末班重点岗位避让排除。按严格次班恢复设置，这个岗位允许留空；单凭这项不能说明整张班表为什么计算失败，需要检查程序。"
+
+ ❯ tests/domain/daily-schedule-diagnostics.test.ts:194:33
+    192|     expect(diagnosis.join(" ")).toContain("CX937/G18");
+    193|     expect(diagnosis.join(" ")).toMatch(/严格.*恢复|优先避开|次班恢复/);
+    194|     expect(diagnosis.join(" ")).toMatch(/调整|配置|空缺/);
+       |                                 ^
+    195|   });
+    196|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  1 failed | 18 passed (19)
+   Start at  17:20:46
+   Duration  3.19s (transform 1.35s, setup 0ms, import 2.04s, tests 429ms, environment 0ms)
+

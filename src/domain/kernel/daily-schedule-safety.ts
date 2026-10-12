@@ -16,11 +16,25 @@ import {
   previousWorkdayLateProtection,
 } from "../reviews/cross-day-recovery";
 import {
-  halfRestMinimumWorkViolation,
   halfRestPeriodViolation,
   isStrictRecoveryHalfRestBackfill,
   type HalfRestFacts,
 } from "../rules/half-rest";
+import { ScheduleGuardError } from "./schedule-guard";
+import {
+  guideSourceStaff,
+  isGuideAssignment,
+} from "../flights/schedule-position-rules";
+
+function rejectAssignment(
+  ruleId: string,
+  assignment: Assignment,
+  message: string
+): never {
+  throw new ScheduleGuardError([
+    { ruleId, assignmentId: assignment.id, message },
+  ]);
+}
 
 export interface DailyScheduleSafetyOptions {
   state: ScheduleGenerationFacts;
@@ -88,12 +102,18 @@ export function assertDailyScheduleSafety({
     );
     if (
       !current ||
-      current.status !== preserved.status ||
-      current.staffId !== preserved.staffId ||
+      (current.status !== "unfilled" &&
+        (current.status !== preserved.status ||
+          current.staffId !== preserved.staffId)) ||
       current.flightId !== preserved.flightId ||
       current.positionRuleId !== preserved.positionRuleId
     ) {
-      throw new Error("最终安全复核未通过：已锁定岗位在后续排班中发生变化");
+      if (!current) throw new Error("最终安全复核未通过：已锁定岗位缺失");
+      rejectAssignment(
+        "duty-position",
+        current,
+        "最终安全复核未通过：已锁定岗位在后续排班中发生变化"
+      );
     }
   }
   const assignmentsByTask = new Map(
@@ -105,7 +125,9 @@ export function assertDailyScheduleSafety({
     ])
   );
 
-  for (const task of tasks) {
+  // For symmetric conflicts/hours violations keep the earlier planned work
+  // and report the later task first. Rule-specific guards keep their own order.
+  for (const task of [...tasks].reverse()) {
     const matches = assignmentsByTask.get(task.key) ?? [];
     if (matches.length !== 1) {
       throw new Error(
@@ -119,7 +141,9 @@ export function assertDailyScheduleSafety({
     )
       continue;
     if (assignment.status !== "assigned" || !assignment.staffId) {
-      throw new Error(
+      rejectAssignment(
+        "invalid-assignment",
+        assignment,
         `最终安全复核未通过：${task.flight.flightNo}/${task.rule.name}没有形成有效自动排班结果`
       );
     }
@@ -131,11 +155,13 @@ export function assertDailyScheduleSafety({
         })
       : null;
     if (halfRestViolation) {
-      throw new Error(`最终安全复核未通过：${halfRestViolation}`);
+      rejectAssignment("half-rest", assignment, halfRestViolation);
     }
     const person = state.staff.find((item) => item.id === assignment.staffId);
     if (!person) {
-      throw new Error(
+      rejectAssignment(
+        "staff-unavailable",
+        assignment,
         `最终安全复核未通过：${task.flight.flightNo}/${task.rule.name}的人员不存在`
       );
     }
@@ -163,7 +189,9 @@ export function assertDailyScheduleSafety({
         })
       )
     ) {
-      throw new Error(
+      rejectAssignment(
+        "strict-next-workday-recovery",
+        assignment,
         `最终安全复核未通过：${task.flight.flightNo}/${task.rule.name}违反严格跨工作日恢复目标`
       );
     }
@@ -219,18 +247,28 @@ export function assertDailyScheduleSafety({
       workHours: assignment.workHours,
     });
     if (!diagnostic.eligible) {
-      throw new Error(
+      rejectAssignment(
+        diagnostic.violations[0]?.code ?? "invalid-assignment",
+        assignment,
         `最终安全复核未通过：${task.flight.flightNo}/${task.rule.name}${diagnostic.violations[0]?.message ?? "不满足排班要求"}`
       );
     }
   }
-  if (halfRestFacts) {
-    const violations = halfRestMinimumWorkViolation({
-      assignments,
-      facts: halfRestFacts,
-    });
-    if (violations.length) {
-      throw new Error(`最终安全复核未通过：${violations.join("；")}`);
+  for (const guide of assignments) {
+    if (
+      guide.status !== "assigned" ||
+      !guide.staffId ||
+      !isGuideAssignment(state, guide)
+    )
+      continue;
+    if (
+      !assignments.some(
+        (source) =>
+          source.flightId === guide.flightId &&
+          guideSourceStaff(state, source)?.id === guide.staffId
+      )
+    ) {
+      rejectAssignment("guide-source", guide, "引导岗位缺少可复用的常规人员");
     }
   }
 }

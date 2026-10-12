@@ -21,6 +21,7 @@ import type { HalfRestMode } from "../domain/shared/schedule-run-preferences";
 import type { TeamLeaderGapFillPreview } from "../domain/coverage/team-leader-gap-fill";
 import type { HistoryImportSummary } from "./workbook-actions";
 import type { DutyRosterAssignment } from "../domain/duty-roster/roster";
+import type { ScheduleFailureDetails } from "../domain/shared/schedule-failure-details";
 
 export type ApplicationDialog =
   | { kind: "templates" }
@@ -97,6 +98,7 @@ export type ApplicationDialog =
     };
 
 export interface ApplicationToast {
+  details?: ScheduleFailureDetails & { date: string };
   id: number;
   message: string;
   tone: "success" | "danger" | "warning";

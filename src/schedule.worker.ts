@@ -1,4 +1,5 @@
 import { generateSchedule } from "./domain/kernel/scheduling-kernel";
+import { ScheduleGuardError } from "./domain/kernel/schedule-guard";
 import type {
   ScheduleWorkerRequest,
   ScheduleWorkerResponse,
@@ -38,6 +39,9 @@ self.onmessage = async (
     self.postMessage({
       type: "error",
       message: error instanceof Error ? error.message : String(error),
+      ...(error instanceof ScheduleGuardError
+        ? { violations: error.violations }
+        : {}),
     } satisfies ScheduleWorkerResponse);
   }
 };

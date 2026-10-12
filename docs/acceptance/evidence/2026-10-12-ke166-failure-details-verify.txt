@@ -1,0 +1,11 @@
+
+> autoschedule@1.0.0 verify
+> npm run typecheck && npm test && npm run test:performance && npm run build
+
+
+> autoschedule@1.0.0 typecheck
+> tsc -b --pretty false
+
+tests/infrastructure/schedule-worker-failure.test.ts(38,27): error TS2352: Conversion of type '{ data: { state: AppState; date: string; preferences: {}; }; }' to type 'MessageEvent<ScheduleWorkerRequest>' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type '{ data: { state: AppState; date: string; preferences: {}; }; }' is missing the following properties from type 'MessageEvent<ScheduleWorkerRequest>': lastEventId, origin, ports, source, and 23 more.
+EXIT_CODE=1

@@ -19,6 +19,7 @@ import {
 } from "./schedule-progress";
 import type { ScheduleRunPreferences } from "../shared/schedule-run-preferences";
 import { createId } from "../../utils";
+import { recoverLocalScheduleIssues } from "./schedule-local-recovery";
 
 export type { ScheduleProgressStage } from "./schedule-progress";
 
@@ -58,6 +59,11 @@ async function finalizeDailyPlan({
     runFacts: preparation.runFacts,
     warningSink: guardWarnings,
   });
+  warnings.push(
+    ...recoverLocalScheduleIssues(state, plan.assignments, (assignments) =>
+      partialSafetySession.assertAssignmentsSafe(assignments)
+    )
+  );
   const ledger = createScheduleLedger(plan.assignments, {
     safetySession: partialSafetySession,
   });

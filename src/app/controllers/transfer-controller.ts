@@ -4,6 +4,7 @@ import { exportShareHtml, exportSharePng } from "../../infrastructure/share";
 import type { UiCommand } from "../../ui/events/ui-command";
 import { prepareWorkbookImport } from "../workbook-import-controller";
 import { applyLegacyScheduleImport } from "../workbook-actions";
+import { downloadBlob } from "../../utils";
 import type {
   ApplicationContext,
   UiCommandController,
@@ -14,6 +15,31 @@ export class TransferController implements UiCommandController {
 
   async handle(command: UiCommand): Promise<boolean> {
     switch (command.type) {
+      case "export-schedule-failure-details": {
+        const details = this.context.view().toast?.details;
+        if (!details) return true;
+        const title =
+          details.code === "local-vacancies" ? "排班提醒诊断" : "排班失败诊断";
+        const text = [
+          `${title}：${details.date}`,
+          details.reason,
+          "检查发现的情况：",
+          ...details.facts,
+          "处理办法：",
+          ...details.steps,
+          ...(details.diagnosticMessages?.length
+            ? [
+                "开发排查用原始报错（无需自行理解）：",
+                ...details.diagnosticMessages,
+              ]
+            : []),
+        ].join("\n\n");
+        downloadBlob(
+          new Blob([text], { type: "text/plain;charset=utf-8" }),
+          `${title}_${details.date}.txt`
+        );
+        return true;
+      }
       case "import-file":
         if (command.mode === "late-priority-counts") {
           await this.importLatePriorityCounts(

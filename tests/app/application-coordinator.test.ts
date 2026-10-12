@@ -14,6 +14,7 @@ import type { ScheduleResult } from "../../src/model";
 import { createScheduleSafetySession } from "../../src/domain/kernel/schedule-safety-session";
 import { createScheduleRunFacts } from "../../src/domain/shared/schedule-run-facts";
 import { generateSchedule } from "../helpers/generate-schedule";
+import { ScheduleGuardError } from "../../src/domain/kernel/schedule-guard";
 import {
   buildLatePriorityCountsWorkbook,
   parseLatePriorityCountsWorkbook,
@@ -859,6 +860,167 @@ describe("team leader gap fill workflow", () => {
 });
 
 describe("next workday flight picker workflow", () => {
+  it.each(
+    (["generate", "reschedule", "next"] as const).flatMap((entry) => [
+      {
+        entry,
+        error: new Error(
+          "Worker 运行失败：当天排班计算超过允许时间（最长5分钟），请重试"
+        ),
+        code: "calculation-timeout",
+        reason: "计算时间太长",
+      },
+      {
+        entry,
+        error: new Error("Worker 运行失败：RuntimeError: unreachable"),
+        code: "program-error",
+        reason: "程序出了异常",
+      },
+      {
+        entry,
+        error: new Error(
+          "当天无法生成完整班表，请检查人员状态、岗位资质、夜班能力、时间冲突和工时上限"
+        ),
+        code: "no-safe-schedule",
+        reason: "没有找到符合要求的班表",
+      },
+      {
+        entry,
+        error: new Error("排班结果缺少安全凭证，拒绝安装"),
+        code: "schedule-check",
+        reason: "没有通过最后检查",
+      },
+      {
+        entry,
+        error: new ScheduleGuardError([
+          {
+            ruleId: "daily-primary-position-unique",
+            message:
+              "人员甲在TEST100/H01和TEST200/H01重复承担非督导一号岗位，自动排班拒绝提交",
+          },
+        ]),
+        code: "schedule-check",
+        reason: "同一个人被安排了两次一号岗位",
+      },
+    ])
+  )(
+    "explains $code in plain language for $entry without adopting the failed draft",
+    async ({ entry, error, code, reason }) => {
+      const coordinator = createTestApplicationCoordinator(
+        createTestAutoscheduleStore(stateWithCurrentSchedule()),
+        { preferences: nextWorkdayPreferences, confirm: () => true }
+      );
+      if (entry === "generate")
+        coordinator.store
+          .getState()
+          .replaceModel({ ...coordinator.model(), assignments: [] });
+      const original = structuredClone(coordinator.model());
+      setTestScheduleRunner(coordinator, {
+        calculate: vi.fn().mockRejectedValue(error),
+        isRunning: () => false,
+      });
+      await coordinator.handle({
+        type: entry === "next" ? "archive-next-duty-day" : "generate-schedule",
+      });
+      const dialog = coordinator.view().dialog;
+      if (!dialog || !("selectedIds" in dialog))
+        throw new Error("missing preflight");
+      await coordinator.handle({
+        type:
+          dialog.kind === "next-workday-flight-picker"
+            ? "confirm-next-workday-flight-picker"
+            : dialog.kind === "reschedule-flight-picker"
+              ? "confirm-reschedule-flight-picker"
+              : "confirm-schedule-preflight",
+        selectedIds: dialog.selectedIds,
+      });
+      const toast = coordinator.view().toast!;
+      expect(coordinator.model()).toEqual(original);
+      expect(toast.message).toContain("原班表已保留");
+      expect(toast.message).toContain(reason);
+      expect(toast.details).toMatchObject({
+        code,
+        date: dialog.date,
+        diagnosticMessages: [error.message],
+      });
+      const visible = [
+        toast.message,
+        toast.details?.reason,
+        ...(toast.details?.facts ?? []),
+        ...(toast.details?.steps ?? []),
+      ].join(" ");
+      expect(visible).not.toMatch(
+        /Worker|RuntimeError|unreachable|硬约束|守卫/
+      );
+      if (error instanceof ScheduleGuardError)
+        expect(visible).toContain("人员甲");
+      if (code === "program-error") expect(visible).toContain("还不能确定");
+      expect(toast.details?.steps.length).toBeGreaterThan(0);
+    }
+  );
+
+  it.each(["generate", "reschedule", "next"] as const)(
+    "shows KE166 failure details and preserves the model for %s",
+    async (entry) => {
+      const coordinator = createTestApplicationCoordinator(
+        createTestAutoscheduleStore(stateWithCurrentSchedule()),
+        { preferences: nextWorkdayPreferences, confirm: () => true }
+      );
+      const original = structuredClone(coordinator.model());
+      const details = {
+        code: "ke166-distinct-staff-capacity" as const,
+        reason: "人员甲可承担KE166/H05",
+        facts: ["人员甲没有重叠岗位"],
+        steps: ["导出诊断记录交给开发人员"],
+      };
+      setTestScheduleRunner(coordinator, {
+        calculate: vi
+          .fn()
+          .mockRejectedValue(
+            new ScheduleGuardError([
+              { ruleId: "ke166-supervisor", message: "原检查错误", details },
+            ])
+          ),
+        isRunning: () => false,
+      });
+      if (entry === "next")
+        await coordinator.handle({ type: "archive-next-duty-day" });
+      else if (entry === "generate") {
+        coordinator.store
+          .getState()
+          .replaceModel({ ...coordinator.model(), assignments: [] });
+        await coordinator.handle({ type: "generate-schedule" });
+      } else await coordinator.handle({ type: "generate-schedule" });
+      const beforeConfirm = structuredClone(coordinator.model());
+      const dialog = coordinator.view().dialog;
+      if (!dialog || !("selectedIds" in dialog))
+        throw new Error("missing preflight");
+      if (dialog.kind === "next-workday-flight-picker")
+        await coordinator.handle({
+          type: "confirm-next-workday-flight-picker",
+          selectedIds: dialog.selectedIds,
+        });
+      else if (dialog.kind === "reschedule-flight-picker")
+        await coordinator.handle({
+          type: "confirm-reschedule-flight-picker",
+          selectedIds: dialog.selectedIds,
+        });
+      else if (dialog.kind === "schedule-preflight")
+        await coordinator.handle({
+          type: "confirm-schedule-preflight",
+          selectedIds: dialog.selectedIds,
+        });
+      else throw new Error("unexpected preflight");
+      expect(coordinator.model()).toEqual(beforeConfirm);
+      if (entry !== "generate") expect(coordinator.model()).toEqual(original);
+      expect(coordinator.view().toast?.details).toMatchObject({
+        ...details,
+        date: dialog.date,
+      });
+      expect(coordinator.view().toast?.message).toContain("原班表已保留");
+      expect(coordinator.view().toast?.message).not.toContain("Worker");
+    }
+  );
   const nextWorkdayPreferences: ApplicationPreferences = {
     ...preferences,
     loadScheduleDate: () => "2026-08-15",

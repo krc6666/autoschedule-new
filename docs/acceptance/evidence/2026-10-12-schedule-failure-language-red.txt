@@ -1,0 +1,185 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/domain/ke166-initial-reservation.test.ts (10 tests | 1 failed | 9 skipped) 284ms
+     × rejects a post-stage move that sends the reserved KE166 worker to CX937 282ms
+ ❯ tests/app/application-coordinator.test.ts (39 tests | 9 failed | 30 skipped) 96ms
+     × explains 'calculation-timeout' in plain language for 'generate' without adopting the failed draft 35ms
+     × explains 'program-error' in plain language for 'generate' without adopting the failed draft 8ms
+     × explains 'schedule-check' in plain language for 'generate' without adopting the failed draft 8ms
+     × explains 'calculation-timeout' in plain language for 'reschedule' without adopting the failed draft 7ms
+     × explains 'program-error' in plain language for 'reschedule' without adopting the failed draft 7ms
+     × explains 'schedule-check' in plain language for 'reschedule' without adopting the failed draft 7ms
+     × explains 'calculation-timeout' in plain language for 'next' without adopting the failed draft 8ms
+     × explains 'program-error' in plain language for 'next' without adopting the failed draft 7ms
+     × explains 'schedule-check' in plain language for 'next' without adopting the failed draft 6ms
+ ❯ tests/infrastructure/schedule-worker-failure.test.ts (2 tests | 1 failed) 76ms
+   × serializes guard evidence with details=false from the actual worker error boundary 25ms
+npm.cmd : 
+所在位置 行:2 字符: 1
++ npm.cmd exec vitest -- run tests/app/application-coordinator.test.ts  ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+⎯⎯⎯⎯⎯⎯ Failed Tests 11 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/app/application-coordinator.test.ts > next workday flight picker workflow > explains 'calculation-timeout'
+ in plain language for 'generate' without adopting the failed draft
+ FAIL  tests/app/application-coordinator.test.ts > next workday flight picker workflow > explains 'calculation-timeout'
+ in plain language for 'reschedule' without adopting the failed draft
+AssertionError: expected '排班生成失败，原航班、人员状态和班表保持不变：Worker 运行失败：当天…' to contain '原班表已保留'
+
+Expected: "原班表已保留"
+Received: "排班生成失败，原航班、人员状态和班表保持不变：Worker 运行失败：当天排班计算超过允许时间（最长5分钟），请重试"
+
+ ❯ tests/app/application-coordinator.test.ts:886:27
+    884|     const toast = coordinator.view().toast!;
+    885|     expect(coordinator.model()).toEqual(original);
+    886|     expect(toast.message).toContain("原班表已保留");
+       |                           ^
+    887|     expect(toast.message).toContain(reason);
+    888|     expect(toast.details).toMatchObject({ code, date: dialog.date, dia…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/11]⎯
+
+ FAIL  tests/app/application-coordinator.test.ts > next workday flight picker workflow > explains 'program-error' in pl
+ain language for 'generate' without adopting the failed draft
+ FAIL  tests/app/application-coordinator.test.ts > next workday flight picker workflow > explains 'program-error' in pl
+ain language for 'reschedule' without adopting the failed draft
+AssertionError: expected '排班生成失败，原航班、人员状态和班表保持不变：Worker 运行失败：Ru…' to contain '原班表已保留'
+
+Expected: "原班表已保留"
+Received: "排班生成失败，原航班、人员状态和班表保持不变：Worker 运行失败：RuntimeError: unreachable"
+
+ ❯ tests/app/application-coordinator.test.ts:886:27
+    884|     const toast = coordinator.view().toast!;
+    885|     expect(coordinator.model()).toEqual(original);
+    886|     expect(toast.message).toContain("原班表已保留");
+       |                           ^
+    887|     expect(toast.message).toContain(reason);
+    888|     expect(toast.details).toMatchObject({ code, date: dialog.date, dia…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/11]⎯
+
+ FAIL  tests/app/application-coordinator.test.ts > next workday flight picker workflow > explains 'schedule-check' in p
+lain language for 'generate' without adopting the failed draft
+ FAIL  tests/app/application-coordinator.test.ts > next workday flight picker workflow > explains 'schedule-check' in p
+lain language for 'reschedule' without adopting the failed draft
+AssertionError: expected '排班生成失败，原航班、人员状态和班表保持不变：人员甲在TEST100/H0…' to contain '原班表已保留'
+
+Expected: "原班表已保留"
+Received: "排班生成失败，原航班、人员状态和班表保持不变：人员甲在TEST100/H01和TEST200/H01重复承担非督导一号岗位，自动排班拒绝提交"
+
+ ❯ tests/app/application-coordinator.test.ts:886:27
+    884|     const toast = coordinator.view().toast!;
+    885|     expect(coordinator.model()).toEqual(original);
+    886|     expect(toast.message).toContain("原班表已保留");
+       |                           ^
+    887|     expect(toast.message).toContain(reason);
+    888|     expect(toast.details).toMatchObject({ code, date: dialog.date, dia…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/11]⎯
+
+ FAIL  tests/app/application-coordinator.test.ts > next workday flight picker workflow > explains 'calculation-timeout'
+ in plain language for 'next' without adopting the failed draft
+AssertionError: expected '后天排班生成失败：Worker 运行失败：当天排班计算超过允许时间（最长5…' to contain '原班表已保留'
+
+Expected: "原班表已保留"
+Received: "后天排班生成失败：Worker 运行失败：当天排班计算超过允许时间（最长5分钟），请重试"
+
+ ❯ tests/app/application-coordinator.test.ts:886:27
+    884|     const toast = coordinator.view().toast!;
+    885|     expect(coordinator.model()).toEqual(original);
+    886|     expect(toast.message).toContain("原班表已保留");
+       |                           ^
+    887|     expect(toast.message).toContain(reason);
+    888|     expect(toast.details).toMatchObject({ code, date: dialog.date, dia…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/11]⎯
+
+ FAIL  tests/app/application-coordinator.test.ts > next workday flight picker workflow > explains 'program-error' in pl
+ain language for 'next' without adopting the failed draft
+AssertionError: expected '后天排班生成失败：Worker 运行失败：RuntimeError: un…' to contain '原班表已保留'
+
+Expected: "原班表已保留"
+Received: "后天排班生成失败：Worker 运行失败：RuntimeError: unreachable"
+
+ ❯ tests/app/application-coordinator.test.ts:886:27
+    884|     const toast = coordinator.view().toast!;
+    885|     expect(coordinator.model()).toEqual(original);
+    886|     expect(toast.message).toContain("原班表已保留");
+       |                           ^
+    887|     expect(toast.message).toContain(reason);
+    888|     expect(toast.details).toMatchObject({ code, date: dialog.date, dia…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/11]⎯
+
+ FAIL  tests/app/application-coordinator.test.ts > next workday flight picker workflow > explains 'schedule-check' in p
+lain language for 'next' without adopting the failed draft
+AssertionError: expected '后天排班生成失败：人员甲在TEST100/H01和TEST200/H01重…' to contain '原班表已保留'
+
+Expected: "原班表已保留"
+Received: "后天排班生成失败：人员甲在TEST100/H01和TEST200/H01重复承担非督导一号岗位，自动排班拒绝提交"
+
+ ❯ tests/app/application-coordinator.test.ts:886:27
+    884|     const toast = coordinator.view().toast!;
+    885|     expect(coordinator.model()).toEqual(original);
+    886|     expect(toast.message).toContain("原班表已保留");
+       |                           ^
+    887|     expect(toast.message).toContain(reason);
+    888|     expect(toast.details).toMatchObject({ code, date: dialog.date, dia…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/11]⎯
+
+ FAIL  tests/domain/ke166-initial-reservation.test.ts > KE166 supervisor capacity in the initial schedule > rejects a p
+ost-stage move that sends the reserved KE166 worker to CX937
+AssertionError: expected '督导兼任柜台：KE166/H03，09:15—11:15，人员人员甲。 可替…' to contain '没有其他工作'
+
+Expected: "没有其他工作"
+Received: "督导兼任柜台：KE166/H03，09:15—11:15，人员人员甲。 可替代人员人员乙在这个柜台的时间段没有重叠的已排岗位。 以上是最后检查发现的安排；尚未确定是排班过程漏安排，还是检查对可用人员判断有误。"
+
+ ❯ tests/domain/ke166-initial-reservation.test.ts:438:59
+    436|         { phase: "final", ke166SnapshotFacts: { state, date: "2026-09-…
+    437|       );
+    438|       expect(idleViolations[0]?.details?.facts.join(" ")).toContain(
+       |                                                           ^
+    439|         "没有其他工作"
+    440|       );
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/11]⎯
+
+ FAIL  tests/infrastructure/schedule-worker-failure.test.ts > serializes guard evidence with details=false from the act
+ual worker error boundary
+AssertionError: expected { type: 'error', message: '原检查错误' } to match object { type: 'error', …(1) }
+(1 matching property omitted from actual)
+
+- Expected
++ Received
+
+  {
+    "type": "error",
+-   "violations": [
+-     {
+-       "message": "原检查错误",
+
+-       "ruleId": "ke166-supervisor",
+-     },
+-   ],
+  }
+
+ ❯ tests/infrastructure/schedule-worker-failure.test.ts:50:19
+     48|     JSON.stringify(worker.postMessage.mock.calls[0]![0])
+     49|   );
+     50|   expect(message).toMatchObject({ type: "error", violations });
+       |                   ^
+     51| });
+     52|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/11]⎯
+
+ Test Files  3 failed (3)
+      Tests  11 failed | 1 passed | 39 skipped (51)
+   Start at  16:06:39
+   Duration  3.59s (transform 1.61s, setup 0ms, import 2.28s, tests 456ms, environment 0ms)
+

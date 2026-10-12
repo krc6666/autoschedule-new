@@ -128,9 +128,7 @@ describe("rotation review safety", () => {
         lateStartStaffIds: new Set(),
       }
     );
-    expect(reasons).toContain(
-      "半休硬约束：非分队长下午半休人员必须至少安排一个12点前岗位"
-    );
+    expect(reasons).toContain("调整会使半休人员失去12点前岗位");
   });
   it("requires an explicit safety policy for every review purpose", () => {
     expect(Object.keys(ROTATION_REVIEW_POLICIES).sort()).toEqual([

@@ -320,7 +320,7 @@ describe("daily schedule final safety review", () => {
     ).toThrow("半休时段");
   });
 
-  it("rejects an all-day-empty non-team-leader half-rest result", () => {
+  it("allows an all-day-empty non-team-leader half-rest result", () => {
     const state = createDefaultState();
     const person = {
       ...state.staff[0]!,
@@ -387,7 +387,7 @@ describe("daily schedule final safety review", () => {
           lateStartStaffIds: new Set([person.id]),
         },
       })
-    ).toThrow("必须至少安排一个");
+    ).not.toThrow();
   });
 
   it("allows an all-day-empty team-leader half-rest result", () => {

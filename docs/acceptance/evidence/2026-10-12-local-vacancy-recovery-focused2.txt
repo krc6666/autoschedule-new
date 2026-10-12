@@ -1,0 +1,46 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/app/application-coordinator.test.ts (45 tests | 1 failed) 847ms
+     × installs only the complete safe result selected by stop-and-adopt 42ms
+ ❯ tests/domain/schedule-local-recovery.test.ts (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/domain/schedule-local-recovery.test.ts [ tests/domain/schedule-local-recovery.test.ts ]
+Error: Cannot find package 'xlsx' imported from D:/autoschedule-migrate/autoschedule/tests/domain/schedule-local-recovery.test.ts
+ ❯ tests/domain/schedule-local-recovery.test.ts:11:1
+      9| import { createScheduleRunFacts } from "../../src/domain/shared/schedu…
+     10| import { buildScheduleWorkbook } from "../../src/infrastructure/excel";
+     11| import { utils } from "xlsx";
+       | ^
+     12| import type { AssignmentTask } from "../../src/domain/flights/schedule…
+     13| import { ScheduleGuardError } from "../../src/domain/kernel/schedule-g…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/app/application-coordinator.test.ts > application scheduling exclusivity > installs only the complete safe result selected by stop-and-adopt
+AssertionError: expected '班表已生成，有需要核对或补人的地方' to contain '完整安全方案'
+
+Expected: "完整安全方案"
+Received: "班表已生成，有需要核对或补人的地方"
+
+ ❯ tests/app/application-coordinator.test.ts:594:47
+    592|       coordinator.view().date
+    593|     );
+    594|     expect(coordinator.view().toast?.message).toContain("完整安全方案");
+       |                                               ^
+    595|   });
+    596|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed | 5 passed (7)
+      Tests  1 failed | 155 passed (156)
+   Start at  16:59:56
+   Duration  8.48s (transform 1.86s, setup 0ms, import 2.95s, tests 3.54s, environment 1ms)
+

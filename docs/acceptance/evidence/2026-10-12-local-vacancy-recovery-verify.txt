@@ -1,0 +1,54 @@
+
+> autoschedule@1.0.0 verify
+> npm run typecheck && npm test && npm run test:performance && npm run build
+
+
+> autoschedule@1.0.0 typecheck
+> tsc -b --pretty false
+
+
+> autoschedule@1.0.0 test
+> vitest run --exclude tests/performance/**
+
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/architecture/acceptance-gate.test.ts (16 tests | 1 failed) 46951ms
+     × keeps completed historical records while requiring current-version evidence 5934ms
+ ❯ tests/domain/scheduling-kernel.test.ts (135 tests | 1 failed) 116242ms
+     × assigns only available and qualified staff without time conflicts 32288ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/architecture/acceptance-gate.test.ts > acceptance release gate > keeps completed historical records while requiring current-version evidence
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ tests/architecture/acceptance-gate.test.ts:253:3
+    251|   });
+    252|
+    253|   it("keeps completed historical records while requiring current-versi…
+       |   ^
+    254|     const root = fixture();
+    255|     save(root, record(root, "previous"));
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/domain/scheduling-kernel.test.ts > scheduler domain > assigns only available and qualified staff without time conflicts
+Error: Test timed out in 30000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ tests/domain/scheduling-kernel.test.ts:656:3
+    654|   });
+    655|
+    656|   it("assigns only available and qualified staff without time conflict…
+       |   ^
+    657|     const state = createOrdinarySchedulingState();
+    658|     const result = await generateSchedule(state, "2026-07-18");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed | 131 passed (133)
+      Tests  2 failed | 1247 passed (1249)
+   Start at  17:22:29
+   Duration  119.74s (transform 26.19s, setup 0ms, import 74.49s, tests 414.69s, environment 22.92s)
+

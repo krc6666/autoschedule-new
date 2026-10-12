@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import "../../src/ui/components/app-toast";
 import { mountElement } from "./lit-test-helpers";
+import { UI_COMMAND_EVENT } from "../../src/ui/events/ui-command";
 
 interface ToastInstance {
   _config: {
@@ -14,6 +15,68 @@ interface ToastInstance {
 }
 
 describe("application toast", () => {
+  it("shows only vacant positions directly in the yellow schedule notification", async () => {
+    const element = await mountElement("autoschedule-app-toast", {
+      toast: {
+        id: 3,
+        message: "班表已生成，以下岗位未排上人：",
+        tone: "warning",
+        details: {
+          code: "local-vacancies",
+          date: "2026-10-14",
+          reason: "以下岗位留空",
+          facts: ["KE166 / H05：空岗", "TR121 / H03：空岗"],
+          steps: [],
+        },
+      },
+    });
+    expect(element.textContent).toContain("KE166 / H05：空岗");
+    expect(element.textContent).toContain("TR121 / H03：空岗");
+    expect(element.querySelector("details")).toBeNull();
+    expect(element.textContent).not.toContain("查看原因和解决办法");
+    expect(element.textContent).not.toContain("导出诊断记录");
+  });
+  it.each(["ke166-distinct-staff-capacity", "program-error"])(
+    "shows %s failure help collapsed and emits a diagnostic export command",
+    async (code) => {
+      const element = await mountElement<
+        HTMLElement & { updateComplete: Promise<unknown> }
+      >("autoschedule-app-toast", {
+        toast: {
+          id: 1,
+          message: "KE166的人手安排未通过检查",
+          tone: "danger",
+          details: {
+            code,
+            date: "2026-10-14",
+            reason: "柜台仍有其他人员可承担",
+            facts: ["人员甲目前没有安排岗位"],
+            steps: ["保留原班表，导出诊断记录交给开发人员检查。"],
+            diagnosticMessages: ["RuntimeError: unreachable"],
+          },
+        },
+      });
+      const details = element.querySelector<HTMLDetailsElement>("details")!;
+      expect(details).not.toBeNull();
+      expect(details.open).toBe(false);
+      expect(details.querySelector("summary")?.textContent).toContain(
+        "查看原因和解决办法"
+      );
+      details.open = true;
+      expect(details.textContent).toContain("人员甲目前没有安排岗位");
+      expect(element.textContent).not.toContain("RuntimeError");
+      const listener = vi.fn();
+      element.addEventListener(UI_COMMAND_EVENT, listener);
+      const button = Array.from(details.querySelectorAll("button")).find(
+        (button) => button.textContent?.includes("导出诊断记录")
+      )!;
+      button.click();
+      expect(listener).toHaveBeenCalled();
+      expect(listener.mock.calls[0]![0].detail).toEqual({
+        type: "export-schedule-failure-details",
+      });
+    }
+  );
   it("replaces a visible notification before its animation ends without crashing", async () => {
     vi.useFakeTimers();
     try {

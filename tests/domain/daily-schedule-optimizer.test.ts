@@ -165,7 +165,7 @@ async function captureProblem(
 }
 
 describe("daily schedule module interfaces", () => {
-  it("requires a non-team-leader half-rest worker to take one allowed-period assignment", async () => {
+  it("prefers allowed-period half-rest work without requiring impossible participation", async () => {
     const state = modelState([
       flight("morning", "AM100", "08:00", "10:00", ["A1"]),
     ]);
@@ -175,14 +175,16 @@ describe("daily schedule module interfaces", () => {
       halfRestModes: { [state.staff[0]!.id]: "late-start" },
     });
 
-    expect(problem.constraints).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          id: `half-rest:minimum-work:${state.staff[0]!.id}`,
-          lowerBound: 1,
-        }),
-      ])
-    );
+    expect(
+      problem.constraints.some((item) =>
+        item.id.startsWith("half-rest:minimum-work:")
+      )
+    ).toBe(false);
+    expect(
+      problem.objectives.some(
+        (item) => item.id === "half-rest-morning:participation"
+      )
+    ).toBe(true);
     expect(problem.constraints).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
@@ -375,7 +377,7 @@ describe("daily schedule module interfaces", () => {
     ).toMatchObject({ staffId: halfRestWorker.id, status: "assigned" });
   });
 
-  it("keeps the minimum one allowed-period assignment for non-team-leaders", async () => {
+  it("keeps half-rest participation as an objective for non-team-leaders", async () => {
     const state = modelState([
       flight("morning", "AM100", "08:00", "10:00", ["A1"]),
       flight("afternoon", "PM200", "12:00", "17:00", ["B1"]),
@@ -385,14 +387,16 @@ describe("daily schedule module interfaces", () => {
       halfRestStaffIds: [state.staff[0]!.id],
       halfRestModes: { [state.staff[0]!.id]: "late-start" },
     });
-    expect(problem.constraints).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          id: `half-rest:minimum-work:${state.staff[0]!.id}`,
-          lowerBound: 1,
-        }),
-      ])
-    );
+    expect(
+      problem.constraints.some((item) =>
+        item.id.startsWith("half-rest:minimum-work:")
+      )
+    ).toBe(false);
+    expect(
+      problem.objectives.some(
+        (item) => item.id === "half-rest-morning:participation"
+      )
+    ).toBe(true);
   });
 
   it("does not add recovery exclusion to late-start afternoon candidates", () => {
@@ -448,14 +452,16 @@ describe("daily schedule module interfaces", () => {
     expect(preparation.runFacts.halfRest.activeStaffIds).toContain(
       state.staff[0]!.id
     );
-    await expect(
-      generateSchedule(state, "2026-08-03", {
-        preferences: {
-          halfRestStaffIds: [state.staff[0]!.id],
-          halfRestModes: { [state.staff[0]!.id]: "late-start" },
-        },
-      })
-    ).rejects.toThrow("当天无法生成完整班表");
+    const result = await generateSchedule(state, "2026-08-03", {
+      preferences: {
+        halfRestStaffIds: [state.staff[0]!.id],
+        halfRestModes: { [state.staff[0]!.id]: "late-start" },
+      },
+    });
+    expect(result.assignments).toHaveLength(1);
+    expect(result.assignments[0]!.status).toBe("unfilled");
+    expect(result.warnings.join("；")).toContain("没有可合法承担的午后岗位");
+    expect(result.safetyCredential).toBeDefined();
   });
 
   it("keeps early-finish staff out of afternoon work when no morning flight exists", async () => {
@@ -464,14 +470,14 @@ describe("daily schedule module interfaces", () => {
     ]);
     state.staff[0]!.teamLeader = false;
     state.staff[0]!.teamLeader = false;
-    await expect(
-      generateSchedule(state, "2026-08-03", {
-        preferences: {
-          halfRestStaffIds: [state.staff[0]!.id],
-          halfRestModes: { [state.staff[0]!.id]: "early-finish" },
-        },
-      })
-    ).rejects.toThrow("当天无法生成完整班表");
+    const result = await generateSchedule(state, "2026-08-03", {
+      preferences: {
+        halfRestStaffIds: [state.staff[0]!.id],
+        halfRestModes: { [state.staff[0]!.id]: "early-finish" },
+      },
+    });
+    expect(result.assignments[0]!.status).toBe("unfilled");
+    expect(result.warnings.join("；")).toContain("没有可合法承担的12点前岗位");
   });
 
   it("gives every feasible half-rest worker morning work and leaves later shortages explicit", async () => {
@@ -855,7 +861,7 @@ describe("daily schedule module interfaces", () => {
     }
   });
 
-  it("keeps strict recovery mandatory when no half-rest backfill is involved", () => {
+  it("keeps strict recovery exclusion but allows the target to remain vacant", () => {
     const date = "2026-08-03";
     const state = modelState(
       [flight("target", "CX937", "06:00", "08:00", ["G18"])],
@@ -913,7 +919,7 @@ describe("daily schedule module interfaces", () => {
       model.problem.constraints.find(
         (constraint) => constraint.id === "assignment:0"
       )?.terms
-    ).toEqual([]);
+    ).toEqual([{ variableId: "vacancy:0", coefficient: 1 }]);
   });
 
   it("does not force a vacancy when protected staff lack the target qualification", () => {

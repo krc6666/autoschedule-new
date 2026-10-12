@@ -19,20 +19,39 @@ import {
   flightNumbersForDate,
   isoWeekdayForDate,
 } from "../../domain/flights/weekly-flight-plan";
-import { isHalfRestWarning } from "../../domain/rules/half-rest";
 import { planTeamLeaderGapFill } from "../../domain/coverage/team-leader-gap-fill";
 import { applyStaffStatusChange } from "../../domain/kernel/schedule-state";
 import {
   getDutyRosterForDate,
-  dutyRosterStatusIssues,
   updateDutyRosterSlot,
   type DutyRosterAssignment,
   type DutyRosterSlot,
 } from "../../domain/duty-roster/roster";
 import type { AppState, ScheduleResult, StaffStatus } from "../../model";
+import { presentScheduleFailure } from "../schedule-failure-presentation";
 
 export class ScheduleController implements UiCommandController {
   constructor(private readonly context: ApplicationContext) {}
+
+  private showScheduleFailure(
+    error: unknown,
+    date: string,
+    action: string
+  ): void {
+    const { summary, details } = presentScheduleFailure(error);
+    this.context.toast(`${action}失败：${summary}，原班表已保留。`, "danger");
+    const toast = this.context.view().toast;
+    if (toast)
+      this.context.updateView({
+        toast: {
+          ...toast,
+          details: {
+            ...details,
+            date,
+          },
+        },
+      });
+  }
 
   async handle(command: UiCommand): Promise<boolean> {
     const schedule = this.context.store.getState().schedule;
@@ -241,11 +260,6 @@ export class ScheduleController implements UiCommandController {
   }
 
   async generate(date: string): Promise<void> {
-    const dutyIssues = dutyRosterStatusIssues(this.context.model(), date);
-    if (dutyIssues.length) {
-      this.context.toast(`不能生成排班：${dutyIssues.join("；")}`, "danger");
-      return;
-    }
     try {
       const outcome = await this.context.scheduleRunner.calculate(
         this.context.model(),
@@ -269,34 +283,38 @@ export class ScheduleController implements UiCommandController {
             ? `排班已生成，${result.unfilledCount} 个常规岗位待补位`
             : "排班已生成"
       );
-      this.reportHalfRestWarnings(result);
+      this.reportScheduleWarnings(result, date);
     } catch (error) {
-      this.context.toast(
-        `排班生成失败：${error instanceof Error ? error.message : String(error)}`,
-        "danger"
-      );
+      this.showScheduleFailure(error, date, "排班生成");
     }
   }
 
-  private reportHalfRestWarnings(result: ScheduleResult): void {
-    const halfRestWarnings = result.warnings.filter(isHalfRestWarning);
-    const halfRestVacancyCount = result.assignments.filter(
-      (assignment) =>
-        assignment.status === "unfilled" &&
-        assignment.systemNotes?.some(isHalfRestWarning)
-    ).length;
-    if (halfRestWarnings.length || halfRestVacancyCount) {
+  private reportScheduleWarnings(result: ScheduleResult, date: string): void {
+    const vacancies = result.assignments.filter(
+      (assignment) => assignment.status === "unfilled"
+    );
+    if (vacancies.length) {
       this.context.toast(
-        [
-          ...(halfRestVacancyCount
-            ? [`半休人员较多，${halfRestVacancyCount} 个后续岗位待补位并已标红`]
-            : []),
-          ...halfRestWarnings.filter(
-            (message) => !message.includes("岗位保持空缺")
-          ),
-        ].join("；"),
+        `班表已生成，以下 ${vacancies.length} 个岗位未排上人：`,
         "warning"
       );
+      const toast = this.context.view().toast;
+      if (toast)
+        this.context.updateView({
+          toast: {
+            ...toast,
+            details: {
+              date,
+              code: "local-vacancies",
+              reason: "以下岗位未排上人",
+              facts: vacancies.map(
+                (assignment) =>
+                  `${assignment.flightNo} / ${assignment.position}：空岗`
+              ),
+              steps: [],
+            },
+          },
+        });
     }
   }
 
@@ -390,28 +408,6 @@ export class ScheduleController implements UiCommandController {
       const status = statuses[person.id];
       if (status) applyStaffStatusChange(state, person.id, status);
     });
-  }
-
-  private preflightDutyRosterIssues(
-    date: string,
-    statuses: Record<string, StaffStatus>,
-    roster: DutyRosterAssignment | undefined
-  ): string[] {
-    if (!roster) return [];
-    const temporaryState = structuredClone(this.context.model());
-    this.applyPreflightStaffStatuses(temporaryState, statuses);
-    temporaryState.dutyRosterOverrides = [
-      ...temporaryState.dutyRosterOverrides.filter(
-        (item) => item.date !== date
-      ),
-      {
-        date,
-        cxPreflightStaffId: roster.cxPreflightStaffId,
-        dutyStaffId: roster.dutyStaffId,
-        standbyStaffIds: [...roster.standbyStaffIds],
-      },
-    ];
-    return dutyRosterStatusIssues(temporaryState, date);
   }
 
   private checkPreflightContext(
@@ -756,15 +752,6 @@ export class ScheduleController implements UiCommandController {
       this.context.toast("请至少选择一个航班", "warning");
       return;
     }
-    const dutyIssues = this.preflightDutyRosterIssues(
-      dialog.date,
-      dialog.staffStatuses,
-      dialog.dutyRoster
-    );
-    if (dutyIssues.length) {
-      this.context.toast(`不能生成排班：${dutyIssues.join("；")}`, "danger");
-      return;
-    }
     const temporaryState = structuredClone(this.context.model());
     this.applyPreflightStaffStatuses(temporaryState, dialog.staffStatuses);
     if (dialog.dutyRoster) {
@@ -806,12 +793,9 @@ export class ScheduleController implements UiCommandController {
           ? `排班已生成，${outcome.result.unfilledCount} 个常规岗位待补位`
           : "排班已生成"
       );
-      this.reportHalfRestWarnings(outcome.result);
+      this.reportScheduleWarnings(outcome.result, dialog.date);
     } catch (error) {
-      this.context.toast(
-        `排班生成失败，原航班、人员状态和班表保持不变：${error instanceof Error ? error.message : String(error)}`,
-        "danger"
-      );
+      this.showScheduleFailure(error, dialog.date, "排班生成");
     }
   }
 
@@ -890,15 +874,6 @@ export class ScheduleController implements UiCommandController {
       return;
     }
     const date = dialog.date;
-    const dutyIssues = this.preflightDutyRosterIssues(
-      date,
-      dialog.staffStatuses ?? this.currentStaffStatuses(),
-      dialog.dutyRoster
-    );
-    if (dutyIssues.length) {
-      this.context.toast(`不能重新排班：${dutyIssues.join("；")}`, "danger");
-      return;
-    }
     const temporaryState = structuredClone(this.context.model());
     this.applyPreflightStaffStatuses(
       temporaryState,
@@ -945,11 +920,9 @@ export class ScheduleController implements UiCommandController {
             ? `重新排班完成，${outcome.result.unfilledCount} 个常规岗位待补位`
             : "重新排班完成"
       );
+      this.reportScheduleWarnings(outcome.result, date);
     } catch (error) {
-      this.context.toast(
-        `重新排班失败，原航班和班表保持不变：${error instanceof Error ? error.message : String(error)}`,
-        "danger"
-      );
+      this.showScheduleFailure(error, date, "重新排班");
     }
   }
 
@@ -1065,18 +1038,6 @@ export class ScheduleController implements UiCommandController {
       return;
     }
     const nextDate = dialog.date;
-    const dutyIssues = this.preflightDutyRosterIssues(
-      nextDate,
-      dialog.staffStatuses,
-      dialog.dutyRoster
-    );
-    if (dutyIssues.length) {
-      this.context.toast(
-        `不能生成后天排班：${dutyIssues.join("；")}`,
-        "danger"
-      );
-      return;
-    }
     if (
       !this.context.confirm(
         `归档 ${currentDate}，并根据已选择的 ${flights.length} 个航班生成后天 ${nextDate} 排班？`
@@ -1139,11 +1100,9 @@ export class ScheduleController implements UiCommandController {
           ? `后天排班已生成，${outcome.result.unfilledCount} 个常规岗位待补位`
           : "后天排班已生成"
       );
+      this.reportScheduleWarnings(outcome.result, nextDate);
     } catch (error) {
-      this.context.toast(
-        `后天排班生成失败：${error instanceof Error ? error.message : String(error)}`,
-        "danger"
-      );
+      this.showScheduleFailure(error, nextDate, "后天排班生成");
     }
   }
 
