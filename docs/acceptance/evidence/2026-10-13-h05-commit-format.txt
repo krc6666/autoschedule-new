@@ -1,0 +1,4 @@
+提交检查格式化后对比lint-staged备份6298d76：仅rule-propagation-matrix.md表格空白排版变动，10行增/10行删。
+业务实现、测试、spec、README和历史内容均未变化；原完整verify证据继续有效。
+本轮git diff --cached --check通过；提交hook首次默认并行运行时1项kernel测试超过30秒，其余1272项通过，提交未产生。
+按已通过完整verify的VITEST_MAX_WORKERS=1方式重新运行提交hook，不调整规则与测试预算。

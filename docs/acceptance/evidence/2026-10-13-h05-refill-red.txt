@@ -1,0 +1,39 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/domain/ke166-fill-capacity.test.ts (6 tests | 1 failed) 271ms
+   × fills vacant H05 with a safe regular worker when an independent supervisor is available 33ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/domain/ke166-fill-capacity.test.ts > fills vacant H05 with a safe regular worker when an independent supervisor is available
+AssertionError: expected { …(14) } to match object { status: 'assigned', …(3) }
+(10 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+    "fatiguePoints": 2,
+-   "staffId": "person-1",
+-   "status": "assigned",
++   "staffId": null,
++   "status": "unfilled",
+    "workHours": 2,
+  }
+
+ ❯ tests/domain/ke166-fill-capacity.test.ts:26:55
+     24|   expect(evaluateAutomaticHardConstraints({state, assignments, flight,…
+     25|   await finalizeMobileSupervisors({solver:defaultHighsSolver,state,dat…
+     26|   expect(assignments.find(row=>row.position==="H05")).toMatchObject({s…
+       |                                                       ^
+     27|   expect(assignments.find(row=>row.position==="督导")).toMatchObject({st…
+     28|   expect(assignments.find(row=>row.flightNo==="OTHER100")).toEqual(ori…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 5 passed (6)
+   Start at  09:07:45
+   Duration  1.80s (transform 1.03s, setup 0ms, import 1.32s, tests 271ms, environment 0ms)

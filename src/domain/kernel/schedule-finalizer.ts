@@ -42,6 +42,8 @@ import { scheduleRuleFingerprint } from "../rules/schedule-rule-fingerprint";
 import { enforceDailyFlightCountBalance } from "../assignments/daily-flight-count-balance";
 import { recoverLocalScheduleIssues } from "./schedule-local-recovery";
 import { dutyRosterStatusIssues } from "../duty-roster/roster";
+import { fillConfiguredSupervisorTargets } from "../assignments/supervisor-fill";
+import { ScheduleGuardError } from "./schedule-guard";
 
 export interface ScheduleFinalizerOptions {
   solver: SolverPort;
@@ -241,29 +243,69 @@ export async function finalizeSchedule({
       halfRestFacts: runFacts.halfRest,
     });
   };
-  postReviewWarnings.push(
-    ...recoverLocalScheduleIssues(state, assignments, (current) => {
-      assertFinalSafety(current);
-      // First try the original safe transfers/unlocked releases. Only an
-      // impossible locked balance may release a locked automatic group.
-      const balanceOptions = {
-        dutyStaffId: runFacts.currentDutyStaffId,
-        halfRestStaffIds: runFacts.halfRest.activeStaffIds,
-        candidateStaffIds,
-        useFullEligibility: true,
-      };
-      const balance = enforceDailyFlightCountBalance(state, assignments, {
+  // Recovery explanations live on the final rows. Rebuilding below must not
+  // keep a stale "left vacant" warning after that vacancy is safely refilled.
+  recoverLocalScheduleIssues(state, assignments, (current) => {
+    assertFinalSafety(current);
+    // First try the original safe transfers/unlocked releases. Only an
+    // impossible locked balance may release a locked automatic group.
+    const balanceOptions = {
+      dutyStaffId: runFacts.currentDutyStaffId,
+      halfRestStaffIds: runFacts.halfRest.activeStaffIds,
+      candidateStaffIds,
+      useFullEligibility: true,
+    };
+    const balance = enforceDailyFlightCountBalance(state, assignments, {
+      ...balanceOptions,
+      lockedAssignmentIds,
+    });
+    if (balance.spread > 1)
+      enforceDailyFlightCountBalance(state, assignments, {
         ...balanceOptions,
-        lockedAssignmentIds,
+        allowTransfers: false,
       });
-      if (balance.spread > 1)
-        enforceDailyFlightCountBalance(state, assignments, {
-          ...balanceOptions,
-          allowTransfers: false,
-        });
-      assertFinalSafety(assignments);
-    })
-  );
+    assertFinalSafety(assignments);
+  });
+  // A final guard may remove a now-invalid supervisor/counter link after
+  // supervisor finalization. Reuse the same configured-fill facts to complete
+  // the empty counter with a regular worker; never bypass final safety.
+  for (const source of [...assignments]) {
+    if (
+      source.status !== "assigned" ||
+      assignmentRule(state, source)?.category !== "机动督导"
+    )
+      continue;
+    fillConfiguredSupervisorTargets(state, assignments, source, "automatic", {
+      regularOnly: true,
+      validateRegularAssignments: (proposed) => {
+        if (
+          proposed.some(
+            (row) =>
+              lockedAssignmentIds.has(row.id) &&
+              row.staffId !==
+                assignments.find((original) => original.id === row.id)?.staffId
+          )
+        )
+          return false;
+        try {
+          assertFinalSafety(proposed);
+          const balanceProbe = structuredClone(proposed);
+          const balance = enforceDailyFlightCountBalance(state, balanceProbe, {
+            dutyStaffId: runFacts.currentDutyStaffId,
+            halfRestStaffIds: runFacts.halfRest.activeStaffIds,
+            candidateStaffIds,
+            useFullEligibility: true,
+            lockedAssignmentIds,
+          });
+          return balance.spread <= 1 && !balance.changed;
+        } catch (error) {
+          if (!(error instanceof ScheduleGuardError)) throw error;
+          return false;
+        }
+      },
+    });
+  }
+  assertFinalSafety(assignments);
   for (const staffId of runFacts.halfRest.activeStaffIds) {
     const mode =
       runFacts.halfRest.modesByStaffId.get(staffId) ?? "early-finish";

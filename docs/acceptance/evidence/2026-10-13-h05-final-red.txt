@@ -1,0 +1,39 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/domain/schedule-finalizer-local-recovery.test.ts (5 tests | 1 failed) 85ms
+   × refills configured H05 after the final guard removes invalid supervisor sharing 17ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/domain/schedule-finalizer-local-recovery.test.ts > refills configured H05 after the final guard removes invalid supervisor sharing
+AssertionError: expected { …(15) } to match object { status: 'assigned', …(3) }
+(11 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+    "fatiguePoints": 2,
+-   "staffId": "worker-1",
+-   "status": "assigned",
++   "staffId": null,
++   "status": "unfilled",
+    "workHours": 2,
+  }
+
+ ❯ tests/domain/schedule-finalizer-local-recovery.test.ts:162:62
+    160|     tasks.push({key:`${flight.id}:${target.id}`,flight,rule:target});
+    161|   });
+    162|   expect(result.assignments.find(row=>row.position==="H05")).toMatchOb…
+       |                                                              ^
+    163|   expect(result.assignments.find(row=>row.position==="H05")?.superviso…
+    164|   expect(result.unfilledCount).toBe(0);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 4 passed (5)
+   Start at  09:26:51
+   Duration  1.23s (transform 795ms, setup 0ms, import 936ms, tests 85ms, environment 0ms)

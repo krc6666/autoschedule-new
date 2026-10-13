@@ -608,7 +608,13 @@ export function fillConfiguredSupervisorTargets(
   assignments: Assignment[],
   source: Assignment,
   mode: "automatic" | "manual",
-  options: { ignoreSafeRegularCandidate?: boolean } = {}
+  options: {
+    ignoreSafeRegularCandidate?: boolean;
+    /** Automatic callers validate all run-specific rules before filling a regular vacancy. */
+    validateRegularAssignments?: (assignments: Assignment[]) => boolean;
+    /** Final vacancy repair must not recreate a supervisor link removed by a guard. */
+    regularOnly?: boolean;
+  } = {}
 ): Assignment[] {
   const filled: Assignment[] = [];
   for (const target of assignments) {
@@ -626,7 +632,34 @@ export function fillConfiguredSupervisorTargets(
       mode,
       options
     );
-    if (!evaluation.allowed) continue;
+    if (!evaluation.allowed) {
+      if (
+        mode === "automatic" &&
+        target.status === "unfilled" &&
+        options.validateRegularAssignments
+      ) {
+        for (const person of evaluation.safeRegularCandidates ?? []) {
+          const proposed = structuredClone(assignments);
+          const proposedTarget = proposed.find((row) => row.id === target.id)!;
+          placeStaffOnAssignment(state, proposedTarget, person);
+          if (!options.validateRegularAssignments(proposed)) continue;
+          clearAutomaticAssignmentEvidence(target);
+          clearSupervisorFillLink(target);
+          Object.assign(target, proposedTarget);
+          target.decisionTrace = [
+            schedulingDecision(
+              "mobile-supervisor",
+              "selected",
+              `${person.name}可安全承担${target.flightNo}/${target.position}，已补上普通柜台，督导保持原安排`
+            ),
+          ];
+          filled.push(target);
+          break;
+        }
+      }
+      continue;
+    }
+    if (options.regularOnly) continue;
     target.staffId = source.staffId;
     target.staffName = source.staffName;
     target.status = "assigned";

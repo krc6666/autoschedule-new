@@ -29,6 +29,9 @@ import {
   prepareConfiguredSupervisorFillUnderShortage,
   prepareConfiguredSupervisorFillUnderShortageByReassignment,
 } from "./supervisor-fill";
+import { createScheduleSafetySession } from "../kernel/schedule-safety-session";
+import { assertDailyScheduleSafety } from "../kernel/daily-schedule-safety";
+import { ScheduleGuardError } from "../kernel/schedule-guard";
 
 export interface FinalizeMobileSupervisorsOptions {
   solver: SolverPort;
@@ -72,6 +75,45 @@ export async function finalizeMobileSupervisors({
     ...preparation.preferredDutyLateTaskCandidates.map((task) => task.key),
   ]);
   const candidateRulePlan = createCandidateRulePlan(state.settings);
+  const fillSafety = createScheduleSafetySession({
+    phase: "partial",
+    state,
+    date,
+    runFacts: preparation.runFacts,
+  });
+  const validateRegularAssignments = (proposed: Assignment[]): boolean => {
+    if (
+      proposed.some(
+        (row) =>
+          lockedAssignmentIds.has(row.id) &&
+          row.staffId !==
+            assignments.find((original) => original.id === row.id)?.staffId
+      )
+    )
+      return false;
+    try {
+      fillSafety.assertAssignmentsSafe(proposed);
+      assertDailyScheduleSafety({
+        state,
+        date,
+        assignments: proposed,
+        tasks: preparation.tasks.filter((task) =>
+          proposed.some(
+            (row) =>
+              row.flightId === task.flight.id &&
+              row.positionRuleId === task.rule.id
+          )
+        ),
+        evaluateEligibility: evaluateAutomaticHardConstraints,
+        allowFinalizedConcurrency: true,
+        halfRestFacts: preparation.runFacts.halfRest,
+      });
+      return true;
+    } catch (error) {
+      if (!(error instanceof ScheduleGuardError)) throw error;
+      return false;
+    }
+  };
 
   for (const task of tasks) {
     const ke166 = isKe166MobileSupervisor(task.flight, task.rule);
@@ -448,7 +490,10 @@ export async function finalizeMobileSupervisors({
       assignments,
       supervisorAssignment,
       "automatic",
-      preferredConfiguredFill ? { ignoreSafeRegularCandidate: true } : undefined
+      {
+        ignoreSafeRegularCandidate: preferredConfiguredFill,
+        validateRegularAssignments,
+      }
     );
     preserveLegalCounters(supervisorAssignment);
     processedTasks.add(task.key);

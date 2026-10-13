@@ -1,0 +1,13 @@
+[H05-browser] view { dialog: 'workbook-import', toast: undefined }
+[H05-browser] import {"staff":24,"flights":["AK151","CX937（早）","FD573","KE166","MF8683","TR121","TW616"],"history":872,"h05":[{"category":"常规","coverageRole":"supervisor-fill","qualified":13}],"date":"2026-10-13"}
+node:fs:2479
+      path = getValidatedPath(path);
+             ^
+
+TypeError [ERR_INVALID_ARG_TYPE]: The "path" argument must be of type string or an instance of Buffer or URL. Received undefined
+    at writeFileSync (node:fs:2479:14)
+    at file:///D:/autoschedule-migrate/autoschedule/tests/h05-browser.probe.mjs:20:2 {
+  code: 'ERR_INVALID_ARG_TYPE'
+}
+
+Node.js v24.21.0

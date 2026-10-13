@@ -1,0 +1,25 @@
+[H05-browser] view { dialog: 'workbook-import', toast: undefined }
+[H05-browser] import {"staff":24,"flights":["AK151","CX937（早）","FD573","KE166","MF8683","TR121","TW616"],"history":872,"h05":[{"category":"常规","coverageRole":"supervisor-fill","qualified":13}],"date":"2026-10-13"}
+[H05-browser] result {"date":"2026-10-14","rows":54,"h05":{"status":"assigned","hasStaff":true,"workHours":2,"linked":false},"toastTone":"success","toastMessage":"已导入 24 人、7 个航班计划、10 个航班模板、每周航班计划、96 条岗位规则、规则配置、末班重点次数修正、7 条值班轮值、872 条历史负荷；请重新排班"}
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+locator.click: Element is not visible
+Call log:
+[2m  - waiting for locator('[data-assignment-id="assignment-mv6053j1-vj7kw8"]').locator('button.schedule-candidate-trigger')[22m
+[2m    - locator resolved to <button type="button" title="查看当前合格空闲人员" aria-label="查看H05当前合格空闲人员" class="schedule-candidate-trigger legacy-hidden-trigger">…</button>[22m
+[2m  - attempting click action[22m
+[2m    - scrolling into view if needed[22m
+
+    at D:\autoschedule-migrate\autoschedule\tests\h05-browser.probe.mjs:66:58 {
+  log: [
+    `  - waiting for locator('[data-assignment-id="assignment-mv6053j1-vj7kw8"]').locator('button.schedule-candidate-trigger')`,
+    '    - locator resolved to <button type="button" title="查看当前合格空闲人员" aria-label="查看H05当前合格空闲人员" class="schedule-candidate-trigger legacy-hidden-trigger">…</button>',
+    '  - attempting click action',
+    '    - scrolling into view if needed'
+  ],
+  name: 'Error'
+}
+
+Node.js v24.21.0

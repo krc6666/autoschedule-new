@@ -1,0 +1,42 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+[H05-probe] input 2026-10-14 24 [
+  [ 'AK151', '21:05', '23:05', 0 ],
+  [ 'CX937（早）', '08:30', '10:30', 0 ],
+  [ 'FD573', '15:25', '17:25', 0 ],
+  [ 'KE166', '09:15', '11:15', 0 ],
+  [ 'MF8683', '13:40', '15:40', 0 ],
+  [ 'TR121', '21:55', '23:55', 0 ],
+  [ 'TW616', '22:10', '00:10', 0 ]
+] 0
+[H05-probe] stage prepare
+[H05-probe] stage optimize
+[H05-probe] stage assign
+[H05-probe] stage late-priority-frequency
+[H05-probe] stage position-frequency
+[H05-probe] stage late-shift-recovery
+[H05-probe] stage late-shift-cutoff
+[H05-probe] stage position-rotation
+[H05-probe] stage post-mobile-supervisor-late-priority-frequency-validation
+[H05-probe] stage post-mobile-supervisor-frequency-validation
+[H05-probe] stage post-mobile-supervisor-rotation-validation
+[H05-probe] stage complete
+[H05-probe] result assigned worker-9 [ 'worker-4' ] 0
+[H05-probe] KE rows [
+  [ '督导', 'assigned', 'worker-9', 2, false ],
+  [ 'H02', 'assigned', 'worker-8', 2, false ],
+  [ 'H03', 'assigned', 'worker-11', 2, false ],
+  [ 'H04', 'assigned', 'worker-2', 2, false ],
+  [ 'H05', 'assigned', 'worker-9', 0, true ],
+  [ 'H06', 'assigned', 'worker-17', 2, false ],
+  [ 'H07', 'assigned', 'worker-1', 2, false ],
+  [ 'H08', 'manual', undefined, 2, false ],
+  [ 'H09', 'manual', undefined, 2, false ],
+  [ '柜台引导', 'assigned', 'worker-1', 0, false ]
+]
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  09:35:07
+   Duration  364.43s (transform 1.07s, setup 0ms, import 1.36s, tests 362.85s, environment 0ms)

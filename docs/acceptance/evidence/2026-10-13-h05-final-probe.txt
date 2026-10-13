@@ -1,0 +1,29 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+[H05-final] vacancy notes ["原安排worker-9。KE166仍有普通人员可以做柜台，不能让督导同时兼做这个柜台。这个岗位已留空，其他合法安排保留。请按实际情况核对人员状态和岗位设置；信息正确时请开发人员检查。"]
+[H05-final] fact false true [ 'worker-2', 'worker-7' ]
+[H05-final] refill passes final safety
+ ❯ tests/h05-final.probe.test.ts (1 test | 1 failed) 8821ms
+   × inspects actual H05 final vacancy and safe refill 8820ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/h05-final.probe.test.ts > inspects actual H05 final vacancy and safe refill
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ tests/h05-final.probe.test.ts:11:1
+      9| import { prepareSchedule } from "../src/domain/kernel/schedule-prepara…
+     10| import type {AppState,ScheduleResult} from '../src/model';
+     11| it('inspects actual H05 final vacancy and safe refill',()=>{
+       | ^
+     12|  const {state,result}=JSON.parse(readFileSync(process.env.H05_REPLAY_R…
+     13|  const assignments=structuredClone(result.assignments);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  09:25:50
+   Duration  9.82s (transform 677ms, setup 0ms, import 793ms, tests 8.82s, environment 0ms)

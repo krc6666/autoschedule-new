@@ -1,0 +1,61 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+[H05-probe] input 2026-10-14 24 [
+  [ 'AK151', '21:05', '23:05', 0 ],
+  [ 'CX937（早）', '08:30', '10:30', 0 ],
+  [ 'FD573', '15:25', '17:25', 0 ],
+  [ 'KE166', '09:15', '11:15', 0 ],
+  [ 'MF8683', '13:40', '15:40', 0 ],
+  [ 'TR121', '21:55', '23:55', 0 ],
+  [ 'TW616', '22:10', '00:10', 0 ]
+] 0
+[H05-probe] stage prepare
+[H05-probe] stage optimize
+[H05-probe] stage assign
+[H05-probe] stage late-priority-frequency
+[H05-probe] stage position-frequency
+[H05-probe] stage late-shift-recovery
+[H05-probe] stage late-shift-cutoff
+[H05-probe] stage position-rotation
+[H05-probe] stage post-mobile-supervisor-late-priority-frequency-validation
+[H05-probe] stage post-mobile-supervisor-frequency-validation
+[H05-probe] stage post-mobile-supervisor-rotation-validation
+[H05-probe] stage complete
+[H05-probe] result unfilled undefined [ 'worker-2', 'worker-7' ] 1
+[H05-probe] KE rows [
+  [ '督导', 'assigned', 'worker-9', 2, false ],
+  [ 'H02', 'assigned', 'worker-8', 2, false ],
+  [ 'H03', 'assigned', 'worker-11', 2, false ],
+  [ 'H04', 'assigned', 'worker-12', 2, false ],
+  [ 'H05', 'unfilled', undefined, 2, false ],
+  [ 'H06', 'assigned', 'worker-17', 2, false ],
+  [ 'H07', 'assigned', 'worker-1', 2, false ],
+  [ 'H08', 'manual', undefined, 2, false ],
+  [ 'H09', 'manual', undefined, 2, false ],
+  [ '柜台引导', 'assigned', 'worker-1', 0, false ]
+]
+ ❯ tests/h05-replay.probe.test.ts (1 test | 1 failed) 334845ms
+   × replays owner input and checks a vacant H05 has no safe idle replacement 334844ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/h05-replay.probe.test.ts > replays owner input and checks a vacant H05 has no safe idle replacement
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/h05-replay.probe.test.ts:42:58
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  09:19:08
+   Duration  336.39s (transform 1.04s, setup 0ms, import 1.33s, tests 334.84s, environment 0ms)

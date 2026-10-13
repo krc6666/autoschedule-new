@@ -11,6 +11,7 @@ import type {
 import { evaluateAutomaticHardConstraints } from "../rules/built-in-rule-registry";
 import { assignmentRule } from "../flights/schedule-position-rules";
 import { isDisplayOnlyGuideReuse } from "../candidates/assignment-eligibility-facts";
+import { durationHours } from "../shared/time";
 
 export type SupervisorFillMode = "automatic" | "manual";
 
@@ -19,6 +20,8 @@ export interface SupervisorFillEvaluation {
   reason: string | null;
   rule: MobileSupervisorFillRule | null;
   hasSafeRegularCandidate: boolean;
+  /** The same candidates that prevent supervisor fill; consumers must not re-search. */
+  safeRegularCandidates?: readonly Staff[];
 }
 
 export interface SupervisorFillConfigurationIssue extends PolicyDiagnostic {
@@ -260,18 +263,18 @@ function assignmentFlight(
   return state.flights.find((flight) => flight.id === assignment.flightId);
 }
 
-function safeRegularCandidate(
+function safeRegularCandidates(
   state: AssignmentEligibilityFacts,
   assignments: readonly Assignment[],
   target: Assignment,
   targetFlight: Flight,
   targetRule: PositionRule,
   sourceStaffId: string
-): Staff | undefined {
+): Staff[] {
   const otherAssignments = assignments.filter(
     (assignment) => assignment.id !== target.id
   );
-  return state.staff.find(
+  return state.staff.filter(
     (person) =>
       person.id !== sourceStaffId &&
       evaluateAutomaticHardConstraints({
@@ -280,7 +283,7 @@ function safeRegularCandidate(
         flight: targetFlight,
         rule: targetRule,
         person,
-        workHours: target.workHours,
+        workHours: durationHours(target.startTime, target.endTime),
         transitionMode: "forbid",
       }).eligible
   );
@@ -361,7 +364,7 @@ export function evaluateSupervisorFillFacts(
       rule,
       hasSafeRegularCandidate: false,
     };
-  const regularCandidate = safeRegularCandidate(
+  const regularCandidates = safeRegularCandidates(
     state,
     assignments,
     target,
@@ -369,12 +372,14 @@ export function evaluateSupervisorFillFacts(
     targetRule,
     person.id
   );
+  const regularCandidate = regularCandidates[0];
   if (regularCandidate && !options.ignoreSafeRegularCandidate)
     return {
       allowed: false,
       reason: `${regularCandidate.name}仍可安全承担${target.flightNo}/${target.position}`,
       rule,
       hasSafeRegularCandidate: true,
+      safeRegularCandidates: regularCandidates,
     };
   const fillRule: PositionRule = {
     ...targetRule,

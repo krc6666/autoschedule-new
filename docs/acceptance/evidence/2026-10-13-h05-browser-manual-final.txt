@@ -1,0 +1,5 @@
+[H05-browser] view { dialog: 'workbook-import', toast: undefined }
+[H05-browser] import {"staff":24,"flights":["AK151","CX937（早）","FD573","KE166","MF8683","TR121","TW616"],"history":872,"h05":[{"category":"常规","coverageRole":"supervisor-fill","qualified":13}],"date":"2026-10-13"}
+[H05-browser] result {"date":"2026-10-14","rows":54,"h05":{"status":"assigned","hasStaff":true,"workHours":2,"linked":false},"toastTone":"success","toastMessage":"已导入 24 人、7 个航班计划、10 个航班模板、每周航班计划、96 条岗位规则、规则配置、末班重点次数修正、7 条值班轮值、872 条历史负荷；请重新排班"}
+[H05-browser] clear and assign regular worker {"hasStaff":true,"workHours":2,"linked":false,"tone":"success"}
+[H05-browser] reload {"hasStaff":true,"status":"assigned","rows":54}

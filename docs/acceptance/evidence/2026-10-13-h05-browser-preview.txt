@@ -1,0 +1,5 @@
+[H05-browser] view { dialog: 'workbook-import', toast: undefined }
+[H05-browser] import {"staff":24,"flights":["AK151","CX937（早）","FD573","KE166","MF8683","TR121","TW616"],"history":872,"h05":[{"category":"常规","coverageRole":"supervisor-fill","qualified":13}],"date":"2026-10-13"}
+[H05-browser] start real generation
+[H05-browser] result {"date":"2026-10-14","rows":54,"h05":{"status":"assigned","hasStaff":true,"workHours":0,"linked":true},"toastTone":"success","toastMessage":"排班已生成"}
+[H05-browser] reload {"hasStaff":true,"status":"assigned","rows":54}

@@ -8,6 +8,7 @@ import { createScheduleRunFacts } from "../../src/domain/shared/schedule-run-fac
 import { assertDailyScheduleSafety } from "../../src/domain/kernel/daily-schedule-safety";
 import { evaluateAutomaticHardConstraints } from "../../src/domain/rules/built-in-rule-registry";
 import type { AssignmentTask } from "../../src/domain/flights/schedule-tasks";
+import { makeUnfilled } from "../../src/domain/flights/schedule-position-rules";
 
 // Isolate the final review: actual post-stage transactional rollback has its
 // own regression in schedule-pipeline.test.ts; kernel tests cover all stages.
@@ -139,6 +140,105 @@ it("adopts a new final schedule with only the now-unqualified row vacant", async
   expect(result.assignments[0]!.status).toBe("unfilled");
   expect(result.assignments[1]!.staffId).toBe("worker-1");
   expect(result.warnings.join("；")).toContain("合格人员名单");
+});
+
+it("refills configured H05 after the final guard removes invalid supervisor sharing", async () => {
+  const { result, state } = await runFinalizer(
+    ({ state, tasks, assignments }) => {
+      const flight = state.flights[0]!;
+      flight.flightNo = "KE166";
+      const source = state.positionRules[0]!;
+      source.flightNo = "KE166";
+      source.name = "督导";
+      source.category = "机动督导";
+      const target = {
+        ...source,
+        id: "h05",
+        name: "H05",
+        category: "常规" as const,
+        coverageRole: "supervisor-fill" as const,
+        qualifiedStaffIds: ["worker-1"],
+        fatiguePoints: 2,
+      };
+      state.positionRules.push(target);
+      state.settings.dailyPrimaryPositionUniqueEnabled = false;
+      state.settings.crossFlightPriorityPolicies = [
+        {
+          id: "ke-first",
+          flightNo: "KE166",
+          staffIds: ["worker-1"],
+          enabled: true,
+        },
+      ];
+      state.settings.mobileSupervisorFillRules = [
+        {
+          id: "ke-fill",
+          sourceFlightNo: "KE166",
+          sourcePositionKeyword: "督导",
+          targetFlightNo: "KE166",
+          targetPositionKeyword: "H05",
+          enabled: true,
+          allowAutomatic: true,
+          allowManual: true,
+        },
+      ];
+      assignments[0] = createAssignedPosition(
+        tasks[0]!,
+        state.staff[0]!,
+        2,
+        [],
+        []
+      );
+      const h05 = makeUnfilled(flight, "H05", target);
+      Object.assign(h05, {
+        status: "assigned",
+        staffId: "worker-0",
+        staffName: state.staff[0]!.name,
+        workHours: 0,
+        fatiguePoints: 0,
+        supervisorSourceAssignmentId: assignments[0].id,
+        supervisorFillRuleId: "ke-fill",
+      });
+      assignments.push(h05);
+      tasks.push({ key: `${flight.id}:${target.id}`, flight, rule: target });
+    }
+  );
+  expect(
+    result.assignments.find((row) => row.position === "H05")
+  ).toMatchObject({
+    status: "assigned",
+    staffId: "worker-1",
+    workHours: 2,
+    fatiguePoints: 2,
+  });
+  expect(
+    result.assignments.find((row) => row.position === "H05")
+      ?.supervisorSourceAssignmentId
+  ).toBeUndefined();
+  expect(result.unfilledCount).toBe(0);
+  expect(result.warnings.join("；")).not.toContain("这个岗位已留空");
+  expect(
+    result.assignments.find((row) => row.position === "H05")?.systemNotes
+  ).toBeUndefined();
+  expect(
+    result.assignments.find((row) => row.position === "督导")?.staffId
+  ).toBe("worker-0");
+  expect(
+    result.assignments.find((row) => row.flightNo === "TEST1")?.staffId
+  ).toBe("worker-1");
+  // A later write cannot bypass the same final guard after a successful refill.
+  const invalid = structuredClone(result.assignments);
+  const h05 = invalid.find((row) => row.position === "H05")!;
+  h05.staffId = "worker-0";
+  h05.staffName = state.staff[0]!.name;
+  expect(() =>
+    createScheduleSafetySession({
+      phase: "final",
+      state,
+      date: "2026-10-14",
+      runFacts: createScheduleRunFacts(state, "2026-10-14"),
+    }).assertAssignmentsSafe(invalid)
+  ).toThrow();
 });
 
 it("keeps the first one-number position when a late change duplicates it", async () => {

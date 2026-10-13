@@ -1,0 +1,162 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-10-13-h05-safe-refill",
+  "title": "H05有安全空闲人员却仍留空的诊断与修复",
+  "startedFrom": "2d7980e62446f427777c519c7ac35ebb8ef1f380",
+  "expectation": {
+    "example": "owner报告H05仍然空岗，即使存在空闲人员；已有10月14日诊断、配置Excel与12日保障明细，最新截图为16日。owner授权全程自行修复和验收。",
+    "expected": "最终有安全合法的人选可承担H05时补上；通过真实收尾、最终检查、Worker及页面验证，确实无合法安排才留空。",
+    "unchanged": "资格、状态、夜班、冲突、衔接、半休、工时、值班锁定、一号限次、KE166规则和人工合同继续执行。",
+    "fallback": "无合法方案仍保留其他正常岗位，问题岗留空写原因；程序失败不采用新表。"
+  },
+  "testedVersion": "c47a98fdf5a1e41bd0a71e9962058dda1660e934029d815bfa310b7d0bbdc1ca",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-13-h05-refill-red.txt",
+          "summary": "收尾有普通候选但H05空岗失败",
+          "sha256": "38c0d1ca03dc1a7f10b24caf3d49ed707d3c0f21ac8dc45ab591f636df146e24"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-13-h05-final-red.txt",
+          "summary": "最终guard清空后漏补稳定失败",
+          "sha256": "d002812d6d9388343bde6530bdd1c5fe8def624284fbaedfb6e46da0b56936e3"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-13-h05-owner-replay.txt",
+          "summary": "原配置14日H05空岗现场重放失败",
+          "sha256": "5947276d53471f71df1bf9aa208c364c5f06ca125a46d78dbc2803deefa13d59"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-13-h05-owner-replay-green.txt",
+          "summary": "仅修收尾后现场仍失败",
+          "sha256": "82db5ac2e34782e8081e399d63cbe8d6bcc8b153b530cc22297cc2fc1b2f5d0d"
+        }
+      ],
+      "reason": "真实收尾最小红灯与最终清空后红灯均已捕获具体空岗；现场原输入红灯复现，第一处修改后现场仍失败，保留所有失败证据。"
+    },
+    "normalPath": {
+      "status": "verified",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-13-h05-focused-final2.txt",
+          "summary": "5文件66项定向回归通过",
+          "sha256": "2ad4f005c595d142c3ebb0ed780dd3fa4aa98e435d37aa4f93806f3decddca5d"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-13-h05-owner-replay-verified.txt",
+          "summary": "完整kernel重放通过，H05有人且0自动空岗",
+          "sha256": "445fd26bf691f438ab16fab818e839d22129c07301401ab7c2a01bdaf1417e2c"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-13-h05-verify.txt",
+          "summary": "npm.cmd run verify退出0；133文件1273功能测试、5文件16性能测试、typecheck及生产构建通过，包含最后补充的后置改坏反向断言",
+          "sha256": "248c55a6ba208d5aee9d2f1fbc617b2b95d67224ffb472cbee81a01ef8c570e5"
+        }
+      ],
+      "reason": "正式回归验证普通H05补入、正常2小时/疲劳、督导和其他航班不变；已提供配置完整重放通过，0自动空岗。"
+    },
+    "alternatePath": {
+      "status": "verified",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-13-h05-focused-final2.txt",
+          "summary": "边界和原兼任/腾挪回归",
+          "sha256": "2ad4f005c595d142c3ebb0ed780dd3fa4aa98e435d37aa4f93806f3decddca5d"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-13-h05-browser-manual-final.txt",
+          "summary": "导入后装载本次kernel普通人结果，实际姓名输入补H05及刷新恢复通过；不冒充浏览器生成",
+          "sha256": "afb3cace2519c2a526f5d38ce7657f6ff44aeacc5883fcb26bcae50230473613"
+        }
+      ],
+      "reason": "测试覆盖半休、休假、冲突、工时、锁定、跳过第一名不合法人选、合法短员补位/连环腾挪及人工补人。"
+    },
+    "postProcessing": {
+      "status": "verified",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-13-h05-focused-final2.txt",
+          "summary": "最终清空后补回及不残留旧空岗说明",
+          "sha256": "2ad4f005c595d142c3ebb0ed780dd3fa4aa98e435d37aa4f93806f3decddca5d"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-13-h05-verify.txt",
+          "summary": "npm.cmd run verify退出0；133文件1273功能测试、5文件16性能测试、typecheck及生产构建通过，包含最后补充的后置改坏反向断言",
+          "sha256": "248c55a6ba208d5aee9d2f1fbc617b2b95d67224ffb472cbee81a01ef8c570e5"
+        }
+      ],
+      "reason": "最终非法兼任清空后通过原完整安全和均衡检查补普通人员，消除旧空岗说明；新增后置再次改坏人员必须被guard拒绝的反向断言。最后版本由完整verify日志确认。"
+    },
+    "finalGuard": {
+      "status": "verified",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-13-h05-artifact-final.txt",
+          "summary": "独立最后guard/daily复核、普通替代候选验证和Excel写读通过",
+          "sha256": "94d0daa422953c41049dbe3ef0d0c8b5db95790937c77031ff6c2949e857d33b"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-13-h05-verify.txt",
+          "summary": "npm.cmd run verify退出0；133文件1273功能测试、5文件16性能测试、typecheck及生产构建通过，包含最后补充的后置改坏反向断言",
+          "sha256": "248c55a6ba208d5aee9d2f1fbc617b2b95d67224ffb472cbee81a01ef8c570e5"
+        }
+      ],
+      "reason": "普通补入调用原guard与daily safety；最后完整真实结果独立复核通过并已有凭证，合法兼任不改人。"
+    },
+    "unchanged": {
+      "status": "verified",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-13-h05-focused-final2.txt",
+          "summary": "状态/半休/锁定/工时/冲突与原柜台保留回归",
+          "sha256": "2ad4f005c595d142c3ebb0ed780dd3fa4aa98e435d37aa4f93806f3decddca5d"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-13-h05-verify.txt",
+          "summary": "npm.cmd run verify退出0；133文件1273功能测试、5文件16性能测试、typecheck及生产构建通过，包含最后补充的后置改坏反向断言",
+          "sha256": "248c55a6ba208d5aee9d2f1fbc617b2b95d67224ffb472cbee81a01ef8c570e5"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-13-h05-commit-format.txt",
+          "summary": "提交hook格式化只改矩阵表格空白，产品文件与原verify版本一致；并行提交检查超时后采用原串行验证方式重跑",
+          "sha256": "a0a5418ee8187aa455c4293b41928ae43c75caf047bcdb5976aebb09f60f8ff5"
+        }
+      ],
+      "reason": "不新增配置、不按姓名特判、不放宽硬约束；已有普通人或合法兼任不替换，无法合法补入仍留空，其他安排保留。"
+    },
+    "finalArtifact": {
+      "status": "verified",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-13-h05-browser-preview.txt",
+          "summary": "实际浏览器Worker生成14日成功：54行、H05已安排、刷新后仍保留",
+          "sha256": "6a10247b5cb85b29a42000cf2fee5d4bb9da3c65d600f84f7647c82763de2833"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-13-h05-browser-manual-final.txt",
+          "summary": "本次普通H05结果2小时无关联，页面人工填人及刷新恢复",
+          "sha256": "afb3cace2519c2a526f5d38ce7657f6ff44aeacc5883fcb26bcae50230473613"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-13-h05-artifact-final.txt",
+          "summary": "现场最终结果Excel实际序列化写读，姓名/工时一致且独立计数0空岗",
+          "sha256": "94d0daa422953c41049dbe3ef0d0c8b5db95790937c77031ff6c2949e857d33b"
+        }
+      ],
+      "reason": "真实浏览器预览版本导入Excel、准备窗口确认并点击生成，54行且H05有人，无黄色空岗提醒；刷新恢复通过。普通H05的页面人工清空补回另验，Excel写读也独立核对。现场范围为已提供配置14日与四人已确认正常状态，未导出的16日完整输入未验证。"
+    }
+  },
+  "answers": {
+    "originalFailure": "两个稳定红灯直接断言H05应有人；原Excel红重放与首次修复仍失败证据防止只验收尾。",
+    "laterChanges": "收尾、局部回退、均衡都可能改坏结果；两个补位消费点调用同一配置事实与原安全判断，最后补缺不移动其他岗位，反向测试验证补回后再改坏仍拒绝。",
+    "finalArtifact": "browser-preview是实际导入与Worker生成结果，browser-manual-final是本次kernel普通人结果的页面人工/恢复验证，artifact-final为最终安全与Excel写读验证；分别记录，不互相冒充。"
+  },
+  "review": {
+    "missedScope": "仅修督导收尾会漏最后清空步骤，已以现场首次修复仍红发现并补最终入口。16日全部现场输入未导出，无法宣称这份未提供数据已重放；基于已提供14日配置完成实际浏览器独立验收。",
+    "rootCause": "有普通候选只拒绝督导补位而未安排普通人；最终检查清掉H05坏兼任时补位阶段已结束，不再尝试安全普通人。原测试从柜台已有人开始，没有覆盖清空后重新补人的完整链。",
+    "earlyDetection": "改回退时立刻在最后结果断言有合法候选的空岗能补回，先建清空后补人红灯，再跑真实配置与Worker，独立核对H05人员、实际工时、无旧空岗证据及存储导出。"
+  }
+}

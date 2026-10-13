@@ -1,0 +1,12 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+[H05-final] original final passes safety {"status":"assigned","worker":"worker-9","hours":0,"linked":true,"unfilled":0}
+[H05-final] basic replacements [ 'worker-4' ]
+[H05-final] replacement passes worker-4
+[H05-final] Excel write/read verified {"workerMatches":true,"hours":0,"rows":54,"unfilled":0}
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  09:48:22
+   Duration  17.42s (transform 764ms, setup 0ms, import 1.01s, tests 16.22s, environment 0ms)

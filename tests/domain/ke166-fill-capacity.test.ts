@@ -10,6 +10,149 @@ import { createKe166SnapshotScheduleGuard } from "../../src/domain/kernel/schedu
 import { buildScheduleWorkbook } from "../../src/infrastructure/excel";
 import * as XLSX from "xlsx-js-style";
 import { generateSchedule } from "../helpers/generate-schedule";
+import { makeUnfilled } from "../../src/domain/flights/schedule-position-rules";
+import { evaluateSupervisorFillFacts } from "../../src/domain/coverage/supervisor-fill-facts";
+
+it("fills vacant H05 with a safe regular worker when an independent supervisor is available", async () => {
+  const { state, date, flight, helper, supervisor, assignments, preparation } =
+    scenario();
+  const h03 = assignments.find((row) => row.position === "H03")!;
+  h03.staffId = state.staff[2]!.id;
+  h03.staffName = state.staff[2]!.name;
+  const h05Index = assignments.findIndex((row) => row.position === "H05");
+  const targetRule = state.positionRules.find((rule) => rule.id === "h05")!;
+  assignments[h05Index] = makeUnfilled(flight, "H05", targetRule);
+  const originalOther = structuredClone(
+    assignments.find((row) => row.flightNo === "OTHER100")
+  );
+  expect(
+    evaluateAutomaticHardConstraints({
+      state,
+      assignments,
+      flight,
+      rule: targetRule,
+      person: helper,
+      workHours: 2,
+      transitionMode: "forbid",
+    }).eligible
+  ).toBe(true);
+  await finalizeMobileSupervisors({
+    solver: defaultHighsSolver,
+    state,
+    date,
+    assignments,
+    preparation,
+    lockedAssignmentIds: new Set(),
+  });
+  const source = assignments.find((row) => row.position === "督导")!;
+  const target = assignments.find((row) => row.position === "H05")!;
+  if (target.status === "unfilled") {
+    expect(
+      evaluateSupervisorFillFacts(
+        state,
+        assignments,
+        source,
+        target,
+        "automatic"
+      )
+    ).toMatchObject({ allowed: false, hasSafeRegularCandidate: true });
+  }
+  expect(assignments.find((row) => row.position === "H05")).toMatchObject({
+    status: "assigned",
+    staffId: helper.id,
+    workHours: 2,
+    fatiguePoints: 2,
+  });
+  expect(assignments.find((row) => row.position === "督导")).toMatchObject({
+    status: "assigned",
+    staffId: supervisor.id,
+  });
+  expect(assignments.find((row) => row.flightNo === "OTHER100")).toEqual(
+    originalOther
+  );
+  expect(assessKe166DistinctStaffCapacityFacts(state, assignments)).toEqual([]);
+});
+
+it.each(["休假", "半休", "冲突", "工时", "锁定"])(
+  "does not fill H05 with an unsafe regular worker: %s",
+  async (reason) => {
+    const { state, date, flight, helper, assignments } = scenario();
+    const h03 = assignments.find((row) => row.position === "H03")!;
+    h03.staffId = state.staff[2]!.id;
+    h03.staffName = state.staff[2]!.name;
+    const h05 = assignments.findIndex((row) => row.position === "H05");
+    const rule = state.positionRules.find((row) => row.id === "h05")!;
+    rule.qualifiedStaffIds = [helper.id];
+    assignments[h05] = makeUnfilled(flight, "H05", rule);
+    if (reason === "休假") helper.status = "休假";
+    if (reason === "冲突") {
+      const other = assignments.find((row) => row.flightNo === "OTHER100")!;
+      other.startTime = "09:15";
+      other.endTime = "11:15";
+      state.flights.find((row) => row.id === other.flightId)!.startTime =
+        "09:15";
+      state.flights.find((row) => row.id === other.flightId)!.endTime = "11:15";
+    }
+    if (reason === "工时") state.settings.maxDailyHours = 3;
+    const preparation = prepareSchedule(
+      state,
+      date,
+      evaluateAutomaticHardConstraints,
+      reason === "半休"
+        ? {
+            halfRestStaffIds: [helper.id],
+            halfRestModes: { [helper.id]: "late-start" },
+          }
+        : undefined
+    );
+    await finalizeMobileSupervisors({
+      solver: defaultHighsSolver,
+      state,
+      date,
+      assignments,
+      preparation,
+      lockedAssignmentIds:
+        reason === "锁定" ? new Set([assignments[h05]!.id]) : new Set(),
+    });
+    expect(assignments.find((row) => row.position === "H05")?.staffId).not.toBe(
+      helper.id
+    );
+  }
+);
+
+it("tries the next regular candidate when the first violates a run-specific hard rule", async () => {
+  const { state, date, flight, helper, assignments } = scenario();
+  const blocked = { ...helper, id: "blocked", name: "测试受限人员" };
+  const h03 = assignments.find((row) => row.position === "H03")!;
+  h03.staffId = state.staff[2]!.id;
+  h03.staffName = state.staff[2]!.name;
+  const rule = state.positionRules.find((row) => row.id === "h05")!;
+  state.staff.unshift(blocked);
+  rule.qualifiedStaffIds = [blocked.id, helper.id];
+  assignments[assignments.findIndex((row) => row.position === "H05")] =
+    makeUnfilled(flight, "H05", rule);
+  const preparation = prepareSchedule(
+    state,
+    date,
+    evaluateAutomaticHardConstraints,
+    {
+      halfRestStaffIds: [blocked.id],
+      halfRestModes: { [blocked.id]: "late-start" },
+    }
+  );
+  await finalizeMobileSupervisors({
+    solver: defaultHighsSolver,
+    state,
+    date,
+    assignments,
+    preparation,
+    lockedAssignmentIds: new Set(),
+  });
+  expect(assignments.find((row) => row.position === "H05")).toMatchObject({
+    status: "assigned",
+    staffId: helper.id,
+  });
+});
 
 function scenario() {
   const state = createDefaultState();
