@@ -1982,27 +1982,30 @@ autoschedule-schedule-grid {
   background: #fff0f0;
   box-shadow: inset 3px 0 0 #d94343;
 }
-.schedule-vacancy-details {
-  color: #a51d26;
-  font-size: 11px;
-  white-space: normal;
-  overflow-wrap: anywhere;
+.toast-vacancy-details {
+  display: inline;
 }
-.schedule-vacancy-details > summary {
+.toast-vacancy-details > summary {
+  display: inline-block;
+  margin-left: 0.5rem;
+  padding: 0 0.35rem;
+  border: 1px solid currentColor;
+  border-radius: 0.25rem;
   cursor: pointer;
 }
-.schedule-vacancy-details[open] {
-  max-height: 16rem;
-  overflow-y: auto;
+.toast-vacancy-details > summary::before {
+  content: "▸ ";
 }
-.schedule-vacancy-details p {
-  margin: 5px 0;
+.toast-vacancy-details[open] > summary::before {
+  content: "▾ ";
+}
+.toast-vacancy-reasons {
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+.toast-vacancy-reasons p {
+  margin: 0.4rem 0;
   line-height: 1.5;
-}
-@media print {
-  .schedule-vacancy-details {
-    display: none !important;
-  }
 }
 .schedule-cell.is-half-rest-unfilled {
   border-color: #d94343;

@@ -317,14 +317,6 @@ export class ScheduleGridElement extends LightDomElement {
               @change=${(event: Event) => this.updateAssignment(assignment.id, "staffName", event)}
             />
           </div>
-          ${
-            assignment.status === "unfilled" && assignment.systemNotes?.length
-              ? html`<details class="schedule-vacancy-details">
-                  <summary>为什么空着</summary>
-                  ${assignment.systemNotes.map((note) => html`<p>${note}</p>`)}
-                </details>`
-              : null
-          }
           <div class="schedule-cell-actions legacy-person-actions">
             <button
               class="btn btn-sm btn-light icon-btn"

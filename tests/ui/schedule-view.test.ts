@@ -17,7 +17,7 @@ import "../../src/ui/components/schedule-page";
 import { mountElement, settleLit } from "./lit-test-helpers";
 
 describe("schedule page", () => {
-  it("keeps vacancy explanations collapsed inside the vacant person cell", async () => {
+  it("keeps vacant person cells free of explanations and usable for manual filling", async () => {
     const state = createDefaultState();
     const flight = state.flights[0]!;
     const rule = state.positionRules.find(
@@ -59,14 +59,23 @@ describe("schedule page", () => {
     const cell = element.querySelector(
       '.schedule-person-cell[data-assignment-id="vacancy-detail"]'
     )!;
-    const detail = cell.querySelector<HTMLDetailsElement>(
-      "details.schedule-vacancy-details"
-    )!;
-    expect(detail.open).toBe(false);
-    expect(detail.querySelector("summary")?.textContent).toBe("为什么空着");
-    expect(detail.textContent).toContain("上一班做了需要休息保护的晚班岗位");
-    detail.open = true;
-    expect(detail.open).toBe(true);
+    expect(cell.querySelector("details")).toBeNull();
+    expect(cell.textContent).not.toContain("上一班做了需要休息保护的晚班岗位");
+    expect(cell.classList.contains("is-unfilled")).toBe(true);
+    const commands: unknown[] = [];
+    element.addEventListener(UI_COMMAND_EVENT, (event) => {
+      commands.push((event as UiCommandEvent).detail);
+    });
+    const input = cell.querySelector<HTMLInputElement>(".schedule-name-input")!;
+    expect(input.value).toBe("");
+    input.value = "人员甲";
+    input.dispatchEvent(new Event("change", { bubbles: true }));
+    expect(commands).toContainEqual({
+      type: "update-assignment",
+      id: "vacancy-detail",
+      field: "staffName",
+      value: "人员甲",
+    });
   });
   it("marks only enabled unfilled positions red across passenger thresholds", async () => {
     const state = createDefaultState();

@@ -1,5 +1,6 @@
 import Toast from "bootstrap/js/dist/toast";
 import { html, type PropertyValues } from "lit";
+import { keyed } from "lit/directives/keyed.js";
 import { createRef, ref, type Ref } from "lit/directives/ref.js";
 
 import type { ApplicationToast } from "../../app/application-view-state";
@@ -27,12 +28,34 @@ export class AppToastElement extends LightDomElement {
             ${this.toast?.message ?? ""}
             ${
               this.toast?.details?.code === "local-vacancies"
-                ? html`<ul
-                    class="mt-2 mb-0 ps-3"
-                    style="max-height: 50vh; overflow-y: auto;"
-                  >
-                    ${this.toast.details.facts.map((fact) => html`<li>${fact}</li>`)}
-                  </ul>`
+                ? keyed(
+                    this.toast.id,
+                    html`<ul
+                      class="mt-2 mb-0 ps-3"
+                      style="max-height: 50vh; overflow-y: auto;"
+                    >
+                      ${this.toast.details.vacancies?.map(
+                        (vacancy) =>
+                          html`<li
+                            data-vacancy-assignment-id=${vacancy.assignmentId}
+                          >
+                            ${vacancy.label}
+                            <details class="toast-vacancy-details">
+                              <summary>原因</summary>
+                              <div class="toast-vacancy-reasons">
+                                ${
+                                vacancy.reasons.length
+                                  ? vacancy.reasons.map(
+                                      (reason) => html`<p>${reason}</p>`
+                                    )
+                                  : html`<p>这次没有记录到具体原因。</p>`
+                              }
+                              </div>
+                            </details>
+                          </li>`
+                      )}
+                    </ul>`
+                  )
                 : this.toast?.details
                   ? html`<details .open=${false} data-schedule-failure-details>
                       <summary>查看原因和解决办法</summary>

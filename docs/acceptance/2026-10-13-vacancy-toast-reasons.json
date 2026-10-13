@@ -1,0 +1,116 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-10-13-vacancy-toast-reasons",
+  "title": "空岗原因移至黄色回显，恢复人员格编辑",
+  "startedFrom": "9a3fa61232d0fe9613784394754a46613db8abe9",
+  "expectation": {
+    "example": "owner截图：黄色框列CX937早G14/G12、TW616督导引导/G15四个空岗；人员格的原因长文撑高表格，影响手动补人。",
+    "expected": "生成、重排、归档并排后天共用最终空岗投影；每条空岗后有默认收起的“原因”，独立展开对应systemNotes。人员格移除原因详情，恢复输入和拖动补人。",
+    "unchanged": "不改变算法、规则、人员、工时、疲劳、原因持久化、Excel和原反馈；黄色框不重复全局软约束提醒；无空岗不显示黄色空岗框；真正失败的诊断交互保持。",
+    "fallback": "原因缺失显示“这次没有记录到具体原因”，不猜测；长原因在黄色框内滚动，不撑大表格。"
+  },
+  "testedVersion": "2593653ce331a7d20b15dcf6aba5d2eb2f1d9b953044c11bc38553c4fdda3ef6",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "修改前10项失败：黄色框无逐岗详情，四入口空岗投影缺原因，人员格仍有详情；修改后转绿。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-13-vacancy-toast-red.txt",
+          "summary": "修改前3文件10项失败，68项通过，精确命中需求缺失。",
+          "sha256": "9cc28bdae89c8c5fe63ae108a3bef19dae334da7355a619d5805d5af8ab14f8a"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-13-vacancy-toast-focused.txt",
+          "summary": "3文件79项通过：四入口投影、独立展开与缺原因、新结果重置、原失败框、人员格输入补人。",
+          "sha256": "e8bc4af1702bb8fa2f984afc0b26597cfea3cf26d47de2682ecb1d009e524d99"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "四入口共用提醒函数，从最终空岗取对应systemNotes；页面逐项展开对应原因，默认收起。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-13-vacancy-toast-focused.txt",
+          "summary": "3文件79项通过：四入口投影、独立展开与缺原因、新结果重置、原失败框、人员格输入补人。",
+          "sha256": "e8bc4af1702bb8fa2f984afc0b26597cfea3cf26d47de2682ecb1d009e524d99"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-13-vacancy-toast-verify.txt",
+          "summary": "最后产品修改后完整verify退出0：138文件1315功能测试、7文件19性能测试、类型检查和构建通过。",
+          "sha256": "5c8b0099a3f37413c2618af0aad4b5e8d290edf6539efe7218f10a91b599d80d"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "无原因明确告知；无空岗不显示黄色框，有软提示不重复；原失败框及导出命令保持；多条原因、新次结果重置和提醒不自动关闭均覆盖。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-13-vacancy-toast-focused.txt",
+          "summary": "3文件79项通过：四入口投影、独立展开与缺原因、新结果重置、原失败框、人员格输入补人。",
+          "sha256": "e8bc4af1702bb8fa2f984afc0b26597cfea3cf26d47de2682ecb1d009e524d99"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-13-vacancy-toast-verify.txt",
+          "summary": "最后产品修改后完整verify退出0：138文件1315功能测试、7文件19性能测试、类型检查和构建通过。",
+          "sha256": "5c8b0099a3f37413c2618af0aad4b5e8d290edf6539efe7218f10a91b599d80d"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "新结果到达时重建详情并收起，旧展开原因不会残留；人员格移除详情后仍发出手动填人命令。提示使用最终结果快照，不修改assignments。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-13-vacancy-toast-focused.txt",
+          "summary": "3文件79项通过：四入口投影、独立展开与缺原因、新结果重置、原失败框、人员格输入补人。",
+          "sha256": "e8bc4af1702bb8fa2f984afc0b26597cfea3cf26d47de2682ecb1d009e524d99"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "not_applicable",
+      "reason": "仅移动最终结果原因的展示位置，无计算、候选、安全检查、凭证或人员写入变化。",
+      "evidence": []
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "四入口原人员和warnings不变；原失败诊断、黄色无空岗分支、人员输入change命令通过。systemNotes、存储、Excel无修改。完整verify退出0：1315功能测试、19性能测试、类型检查和构建通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-13-vacancy-toast-focused.txt",
+          "summary": "3文件79项通过：四入口投影、独立展开与缺原因、新结果重置、原失败框、人员格输入补人。",
+          "sha256": "e8bc4af1702bb8fa2f984afc0b26597cfea3cf26d47de2682ecb1d009e524d99"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-13-vacancy-toast-verify.txt",
+          "summary": "最后产品修改后完整verify退出0：138文件1315功能测试、7文件19性能测试、类型检查和构建通过。",
+          "sha256": "5c8b0099a3f37413c2618af0aad4b5e8d290edf6539efe7218f10a91b599d80d"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "owner提供修改前截图并确认方案；自动DOM已验证黄色框展开及人员格输入，但修改后真实页面的展开、长内容布局和手动补人尚无owner反馈。不以组件测试代替现场验收。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-13-vacancy-toast-focused.txt",
+          "summary": "3文件79项通过：四入口投影、独立展开与缺原因、新结果重置、原失败框、人员格输入补人。",
+          "sha256": "e8bc4af1702bb8fa2f984afc0b26597cfea3cf26d47de2682ecb1d009e524d99"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "red日志证明原黄色框没有“原因”且人员格仍含长文；focused日志证明需求测试转绿。",
+    "laterChanges": "四入口均经reportScheduleWarnings投影；新结果重置详情测试防止旧展开状态残留，人员格手动填人命令测试保护原编辑入口。",
+    "finalArtifact": "focused日志记录Lit DOM的逐项展开、收起与编辑命令；修改后实际浏览器页面仍待owner验证，未声称现场通过。"
+  },
+  "review": {
+    "missedScope": "核对四处reportScheduleWarnings调用、真正失败分支、无空岗、缺原因、新结果、手动输入和删除旧样式。浏览器宽度、长说明滚动和实际拖放未现场验证。提交前检查发现本任务中文记录被Shell管道编码替换成问号，已从确认内容重写，不影响产品代码。",
+    "rootCause": "此前原因控件放进狭窄人员列，长文撑高格子；黄色框只接收航班岗位文字，没有关联岗位原因。测试只验详情可展开，没有保护编辑区域免受长文影响。",
+    "earlyDetection": "展示改动前用用户截图确认原因放置位置；长期断言黄色框逐项原因对应、人员格无详情且能填人；交付区分DOM证据和现场布局。中文文件避免经默认编码的Shell管道写入，提交前检查实际文本可读性。"
+  }
+}

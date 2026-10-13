@@ -98,7 +98,14 @@ export type ApplicationDialog =
     };
 
 export interface ApplicationToast {
-  details?: ScheduleFailureDetails & { date: string };
+  details?: ScheduleFailureDetails & {
+    date: string;
+    vacancies?: readonly {
+      assignmentId: string;
+      label: string;
+      reasons: readonly string[];
+    }[];
+  };
   id: number;
   message: string;
   tone: "success" | "danger" | "warning";

@@ -170,6 +170,18 @@ describe.each([
           "TR121 / H03：空岗",
         ]);
         expect(toast?.details?.steps).toEqual([]);
+        expect(toast?.details?.vacancies).toEqual([
+          {
+            assignmentId: "vacant-h05",
+            label: "KE166 / H05：空岗",
+            reasons: ["人员状态不允许安排"],
+          },
+          {
+            assignmentId: "vacant-h03",
+            label: "TR121 / H03：空岗",
+            reasons: [],
+          },
+        ]);
         expect(JSON.stringify(toast)).not.toContain("频率");
         expect(JSON.stringify(toast)).not.toContain("半休");
       } else {

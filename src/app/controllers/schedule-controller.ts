@@ -294,6 +294,11 @@ export class ScheduleController implements UiCommandController {
       (assignment) => assignment.status === "unfilled"
     );
     if (vacancies.length) {
+      const vacancyDetails = vacancies.map((assignment) => ({
+        assignmentId: assignment.id,
+        label: `${assignment.flightNo} / ${assignment.position}：空岗`,
+        reasons: [...(assignment.systemNotes ?? [])],
+      }));
       this.context.toast(
         `班表已生成，以下 ${vacancies.length} 个岗位未排上人：`,
         "warning"
@@ -307,10 +312,8 @@ export class ScheduleController implements UiCommandController {
               date,
               code: "local-vacancies",
               reason: "以下岗位未排上人",
-              facts: vacancies.map(
-                (assignment) =>
-                  `${assignment.flightNo} / ${assignment.position}：空岗`
-              ),
+              facts: vacancyDetails.map((vacancy) => vacancy.label),
+              vacancies: vacancyDetails,
               steps: [],
             },
           },

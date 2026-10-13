@@ -1,0 +1,138 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+npm.cmd : stderr | tests/ui/app-toast.test.ts
+所在位置 行:2 字符: 1
++ npm.cmd exec vitest -- run tests/ui/app-toast.test.ts tests/ui/schedu ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (stderr | tests/ui/app-toast.test.ts:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+
+ ❯ tests/ui/app-toast.test.ts (6 tests | 1 failed) 52ms
+     × shows each vacant position with its own collapsed reason in the yellow notification 25ms
+ ❯ tests/app/schedule-preflight.test.ts (50 tests | 8 failed) 776ms
+     × 只根据最终空岗列清单 true / [ '重点岗位频率需要复核', '半休人员没有合适岗位' ] 65ms
+     × 只根据最终空岗列清单 true / [] 17ms
+     × 只根据最终空岗列清单 true / [ '重点岗位频率需要复核', '半休人员没有合适岗位' ] 13ms
+     × 只根据最终空岗列清单 true / [] 14ms
+     × 只根据最终空岗列清单 true / [ '重点岗位频率需要复核', '半休人员没有合适岗位' ] 19ms
+     × 只根据最终空岗列清单 true / [] 13ms
+     × 只根据最终空岗列清单 true / [ '重点岗位频率需要复核', '半休人员没有合适岗位' ] 15ms
+     × 只根据最终空岗列清单 true / [] 13ms
+stderr | tests/ui/schedule-view.test.ts
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+
+ ❯ tests/ui/schedule-view.test.ts (22 tests | 1 failed) 21764ms
+     × keeps vacant person cells free of explanations and usable for manual filling 125ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 10 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/app/schedule-preflight.test.ts > 黄色空岗提醒：'generate-schedule' > 只根据最终空岗列清单 true / [ '重点岗位频率需要复核', '半休人员没有合适岗
+位' ]
+ FAIL  tests/app/schedule-preflight.test.ts > 黄色空岗提醒：'generate-schedule' > 只根据最终空岗列清单 true / []
+ FAIL  tests/app/schedule-preflight.test.ts > 黄色空岗提醒：'open-reschedule-flight-picker' > 只根据最终空岗列清单 true / [ '重点岗位频率需要复核'
+, '半休人员没有合适岗位' ]
+ FAIL  tests/app/schedule-preflight.test.ts > 黄色空岗提醒：'open-reschedule-flight-picker' > 只根据最终空岗列清单 true / []
+ FAIL  tests/app/schedule-preflight.test.ts > 黄色空岗提醒：'archive-next-duty-day' > 只根据最终空岗列清单 true / [ '重点岗位频率需要复核', '半休人员没
+有合适岗位' ]
+ FAIL  tests/app/schedule-preflight.test.ts > 黄色空岗提醒：'archive-next-duty-day' > 只根据最终空岗列清单 true / []
+ FAIL  tests/app/schedule-preflight.test.ts > 黄色空岗提醒：'toggle-administrative-mode' > 只根据最终空岗列清单 true / [ '重点岗位频率需要复核', '
+半休人员没有合适岗位' ]
+ FAIL  tests/app/schedule-preflight.test.ts > 黄色空岗提醒：'toggle-administrative-mode' > 只根据最终空岗列清单 true / []
+AssertionError: expected undefined to deeply equal [ { …(3) }, { …(3) } ]
+
+- Expected:
+[
+  {
+    "assignmentId": "vacant-h05",
+    "label": "KE166 / H05：空岗",
+    "reasons": [
+      "人员状态不允许安排",
+    ],
+  },
+  {
+    "assignmentId": "vacant-h03",
+    "label": "TR121 / H03：空岗",
+    "reasons": [],
+  },
+]
+
++ Received:
+undefined
+
+ ❯ tests/app/schedule-preflight.test.ts:173:43
+    171|         ]);
+    172|         expect(toast?.details?.steps).toEqual([]);
+    173|         expect(toast?.details?.vacancies).toEqual([
+       |                                           ^
+    174|           {
+    175|             assignmentId: "vacant-h05",
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/10]⎯
+
+ FAIL  tests/ui/app-toast.test.ts > application toast > shows each vacant position with its own collapsed reason in the
+ yellow notification
+AssertionError: expected [] to have a length of 2 but got +0
+
+- Expected
++ Received
+
+- 2
++ 0
+
+ ❯ tests/ui/app-toast.test.ts:40:21
+     38|     expect(element.textContent).toContain("TR121 / H03：空岗");
+     39|     const details = Array.from(element.querySelectorAll<HTMLDetailsEle…
+     40|     expect(details).toHaveLength(2);
+       |                     ^
+     41|     expect(details.every((detail) => !detail.open)).toBe(true);
+     42|     expect(details.map((detail) => detail.querySelector("summary")?.te…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/10]⎯
+
+ FAIL  tests/ui/schedule-view.test.ts > schedule page > keeps vacant person cells free of explanations and usable for m
+anual filling
+AssertionError: expected <details …(1)>…(2)</details> to be null
+
+- Expected:
+null
+
++ Received:
+<details
+  class="schedule-vacancy-details"
+>
+
+
+  <summary>
+    为什么空着
+  </summary>
+
+
+  <!--?lit$171730468$-->
+  <!---->
+  <p>
+    <!--?lit$171730468$-->
+    上一班做了需要休息保护的晚班岗位，这次换人会让他超过设置规定的下班时间。
+  </p>
+  <!---->
+
+
+</details>
+
+ ❯ tests/ui/schedule-view.test.ts:62:43
+     60|       '.schedule-person-cell[data-assignment-id="vacancy-detail"]'
+     61|     )!;
+     62|     expect(cell.querySelector("details")).toBeNull();
+       |                                           ^
+     63|     expect(cell.textContent).not.toContain("上一班做了需要休息保护的晚班岗位");
+     64|     expect(cell.classList.contains("is-unfilled")).toBe(true);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/10]⎯
+
+
+ Test Files  3 failed (3)
+      Tests  10 failed | 68 passed (78)
+   Start at  19:20:19
+   Duration  24.31s (transform 3.43s, setup 0ms, import 4.20s, tests 22.59s, environment 927ms)

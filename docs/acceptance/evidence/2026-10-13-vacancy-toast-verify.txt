@@ -1,0 +1,83 @@
+
+> autoschedule@1.0.0 verify
+> npm run typecheck && npm test && npm run test:performance && npm run build
+
+
+> autoschedule@1.0.0 typecheck
+> tsc -b --pretty false
+
+
+> autoschedule@1.0.0 test
+> vitest run --exclude tests/performance/**
+
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+
+ Test Files  138 passed (138)
+      Tests  1315 passed (1315)
+   Start at  19:24:26
+   Duration  91.26s (transform 20.27s, setup 0ms, import 56.49s, tests 299.26s, environment 14.42s)
+
+
+> autoschedule@1.0.0 test:performance
+> vitest run tests/performance
+
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+
+ Test Files  7 passed (7)
+      Tests  19 passed (19)
+   Start at  19:25:59
+   Duration  75.92s (transform 5.94s, setup 0ms, import 8.35s, tests 255.71s, environment 639ms)
+
+
+> autoschedule@1.0.0 build
+> tsc -b && vite build
+
+vite v7.3.6 building client environment for production...
+transforming...
+npm.cmd : [plugin vite:resolve] Module "node:module" has been externalized for browser compatibility, imported by "D:/a
+utoschedule-migrate/autoschedule/node_modules/@autoschedule/highs-ts/build/highs.js". See https://vite.dev/guide/troubl
+eshooting.html#module-externalized-for-browser-compatibility for more details.
+所在位置 行:2 字符: 1
++ npm.cmd run verify *> docs/acceptance/evidence/2026-10-13-vacancy-toa ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([plugin vite:re...r more details.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+[plugin vite:resolve] Module "node:module" has been externalized for browser compatibility, imported by "D:/autoschedul
+e-migrate/autoschedule/node_modules/@bubblyworld/highs-ts/build/highs.js". See https://vite.dev/guide/troubleshooting.h
+tml#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "node:module" has been externalized for browser compatibility, imported by "D:/autoschedul
+e-migrate/autoschedule/node_modules/@bubblyworld/highs-ts/build/highs.js". See https://vite.dev/guide/troubleshooting.h
+tml#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "node:module" has been externalized for browser compatibility, imported by "D:/autoschedul
+e-migrate/autoschedule/node_modules/@autoschedule/highs-ts/build/highs.js". See https://vite.dev/guide/troubleshooting.
+html#module-externalized-for-browser-compatibility for more details.
+✓ 301 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                         0.55 kB │ gzip:     0.37 kB
+dist/assets/highs-1RCCDdji.js                          42.30 kB
+dist/assets/highs-DPG1QqSA.js                          42.97 kB
+dist/assets/bootstrap-icons-mSm7cUeB.woff2            134.04 kB
+dist/assets/bootstrap-icons-BeopsB42.woff             180.29 kB
+dist/assets/schedule.worker-BGeAaTUb.js               410.25 kB
+dist/assets/highs-D01W9kFF.wasm                     3,651.47 kB │ gzip: 1,097.46 kB
+dist/assets/highs-DEeTqoGR.wasm                     3,674.43 kB │ gzip: 1,092.08 kB
+dist/assets/style-PpyqXumH.css                        368.56 kB │ gzip:    55.68 kB
+dist/assets/__vite-browser-external-D7Ct-6yo.js         0.19 kB │ gzip:     0.18 kB │ map:     0.21 kB
+dist/assets/excel-worksheet-BoF6S_9x.js                 0.64 kB │ gzip:     0.41 kB │ map:     2.59 kB
+dist/assets/late-priority-counts-excel-Ds5eLRnr.js      2.89 kB │ gzip:     1.59 kB │ map:    11.37 kB
+dist/assets/duty-roster-excel-hvV_Uynm.js               7.13 kB │ gzip:     3.32 kB │ map:    25.69 kB
+dist/assets/highs-solver-C2s44YRX.js                   25.94 kB │ gzip:     6.55 kB │ map:   145.39 kB
+dist/assets/excel-CETjIbMr.js                          34.97 kB │ gzip:    11.48 kB │ map:   137.24 kB
+dist/assets/highs-BPFrVnVB.js                          42.42 kB │ gzip:    15.10 kB │ map:   207.57 kB
+dist/assets/highs-LmbgU9ip.js                          43.09 kB │ gzip:    15.33 kB │ map:   211.54 kB
+dist/assets/html2canvas.esm-DXEQVQnt.js               201.09 kB │ gzip:    47.47 kB │ map:   602.72 kB
+dist/assets/index-CDK9pLHY.js                         857.57 kB │ gzip:   235.45 kB │ map: 3,029.13 kB
+dist/assets/xlsx.min-BN2t0b5u.js                      869.58 kB │ gzip:   322.62 kB │ map: 1,678.38 kB
+✓ built in 6.62s
+Native exit code: 0

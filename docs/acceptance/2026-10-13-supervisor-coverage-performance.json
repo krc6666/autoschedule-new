@@ -154,7 +154,7 @@
     },
     "finalArtifact": {
       "status": "unverified",
-      "reason": "自动最终产物和两轮存储/XLSX已核对；owner现场已确认“确实快了很多”。督导实际安排与默认折叠原因的本轮页面效果尚未具体确认，不把旧文件重建或组件测试代替页面验收。",
+      "reason": "自动最终产物和两轮存储/XLSX已核对；owner现场确认“确实快了很多”，并确认KE166与TR121机动督导“两个都已安排”。格内原因展示随后被owner要求改为黄色框逐项展开，修改后的页面效果由2026-10-13-vacancy-toast-reasons任务跟踪，保持未验收。",
       "evidence": [
         {
           "path": "docs/acceptance/evidence/2026-10-13-supervisor-owner-final-artifact.txt",
@@ -170,6 +170,11 @@
           "path": "docs/acceptance/evidence/2026-10-13-supervisor-evidence-notes.md",
           "summary": "记录用户提速原话与尚未闭合的页面证据",
           "sha256": "2f28305d26604cd35754f371286e5d934a41ba695a3ba26fcf105cda93081c23"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-13-supervisor-owner-page-confirmation.txt",
+          "summary": "owner确认现场提速及KE166/TR121督导均已安排；空岗原因展示迁移至后续任务。",
+          "sha256": "94e0ca80ed80135d0b629d433ffd2ff817856831475b52083f0196b4802f7e9d"
         }
       ]
     }
@@ -177,10 +182,10 @@
   "answers": {
     "originalFailure": "reassignment-red证明原真实重排链重复一号；长期固定/移动一号及完整方案回归修后通过。storage-red证明有效补位字段丢失，storage-green与最终产物恢复通过。",
     "laterChanges": "指定补位/通用督导/恢复/轮岗等共用重排器，六种intent开启一号回归；完整方案再次改坏、阶段回退、checkpoint内容变化及关闭、有效/失效关联恢复均覆盖。原final守卫保留。",
-    "finalArtifact": "owner-full-reconstruction及owner-final-artifact证明重建最终53行、督导关联、空岗原因与两轮存储/实际XLSX一致；真实Worker长期测试证明安全中间结果；owner只确认速度，页面督导与折叠说明仍待具体证据。"
+    "finalArtifact": "owner-full-reconstruction和owner-final-artifact证明重建最终53行、督导关联、空岗原因与两轮存储/实际XLSX一致；真实Worker测试证明安全中间结果；owner-page-confirmation记录现场提速及KE166/TR121督导均已安排，空岗原因展示的修改后现场仍待证据。"
   },
   "review": {
-    "missedScope": "旧性能场景未启用页面安全中间结果完整后置链，旧重排未查组合一号、存储只测普通兼任；本次补全并核对Worker/存储/Excel。真实浏览器完整输入未取得，页面只取得提速反馈，保持未验收。",
+    "missedScope": "旧性能场景未启用页面安全中间结果完整后置链，旧重排未查组合一号、存储只测普通兼任；本次补全并核对Worker/存储/Excel。真实浏览器完整输入未取得；现场已确认提速和KE166/TR121督导安排，空岗说明展示位置由后续任务修正。",
     "rootCause": "重排候选/模型/完整方案漏用全日一号事实，最终守卫拒绝整轮；末班统计对候选重复扫描全部历史，多次收尾放大；空岗原因未保存；恢复解析漏读既有补位规则ID，导致零疲劳失真。",
     "earlyDetection": "改前真实重排器最小反向红灯；模型后置覆盖及最终guard一起验；性能夹具启用页面完整checkpoint链并记录阶段、次数；交付前对生成真实产物做存储/XLSX逐行往返，不能只测普通兼任或单个组件。"
   }
