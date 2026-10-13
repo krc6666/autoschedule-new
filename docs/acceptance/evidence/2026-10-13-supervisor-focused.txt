@@ -1,0 +1,18 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+npm.cmd : stderr | tests/ui/schedule-view.test.ts
+所在位置 行:2 字符: 1
++ npm.cmd exec vitest -- run tests/domain/reassignment-daily-primary.te ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (stderr | tests/ui/schedule-view.test.ts:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+
+·························································································
+
+ Test Files  8 passed (8)
+      Tests  89 passed (89)
+   Start at  14:19:09
+   Duration  25.89s (transform 6.70s, setup 0ms, import 8.67s, tests 32.12s, environment 564ms)

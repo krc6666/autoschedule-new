@@ -985,7 +985,6 @@ export function buildConfigWorkbook(state: AppState): XLSX.WorkBook {
         "历史覆盖范围",
         "分队长补差",
         "航班截载时间",
-        "系统说明",
       ],
       ...state.history.map((record) => [
         record.id,
@@ -1244,6 +1243,7 @@ export function buildScheduleWorkbook(
         "备注",
         "状态",
         "航班截载时间",
+        "系统说明",
       ],
       ...assignments.map((item) => [
         date,

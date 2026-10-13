@@ -1,0 +1,9 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ✓ tests/domain/tmp-owner-supervisor-final-artifact.test.ts > retains generated owner reconstruction across storage and actual Excel bytes 159ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  15:35:34
+   Duration  1.32s (transform 717ms, setup 0ms, import 962ms, tests 160ms, environment 0ms)

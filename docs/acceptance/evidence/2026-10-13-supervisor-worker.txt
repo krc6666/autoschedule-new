@@ -1,0 +1,24 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ✓ tests/infrastructure/schedule-worker-local-vacancy.test.ts > runs real worker/WASM with an impossible half-rest task, then stores the vacant and legal rows 523ms
+ ✓ tests/infrastructure/schedule-runner.test.ts > background schedule runner > preserves guard evidence with details=true across a serialized worker message 8ms
+ ✓ tests/infrastructure/schedule-runner.test.ts > background schedule runner > preserves guard evidence with details=false across a serialized worker message 1ms
+ ✓ tests/infrastructure/schedule-runner.test.ts > background schedule runner > sends only the active group's staff and history to the worker 7ms
+ ✓ tests/infrastructure/schedule-runner.test.ts > background schedule runner > projects application state to schedule-generation facts before posting 2ms
+ ✓ tests/infrastructure/schedule-runner.test.ts > background schedule runner > stops immediately without exposing a calculated result 2ms
+ ✓ tests/infrastructure/schedule-runner.test.ts > background schedule runner > refuses to adopt a result until a complete safe snapshot exists 2ms
+ ✓ tests/infrastructure/schedule-runner.test.ts > background schedule runner > adopts the latest complete safe snapshot and terminates further work 1ms
+ ✓ tests/infrastructure/schedule-runner.test.ts > background schedule runner > terminates every worker across repeated completed calculations 35ms
+ ✓ tests/infrastructure/schedule-runner.test.ts > background schedule runner > rejects with the original reason when posting schedule data fails 2ms
+ ✓ tests/infrastructure/schedule-runner.test.ts > background schedule runner > rejects with a fallback reason when the browser omits worker error details 1ms
+ ✓ tests/infrastructure/schedule-runner.test.ts > background schedule runner > rejects a worker-reported error, clears its safe result, and allows a later run 2ms
+ ✓ tests/infrastructure/schedule-runner.test.ts > background schedule runner > rejects with the original onerror reason 2ms
+ ✓ tests/infrastructure/schedule-runner.test.ts > background schedule runner > rejects with the original reason when worker construction fails 2ms
+ ✓ tests/infrastructure/schedule-worker-late-priority.test.ts > uses real Worker handler and WASM with late history, supervision and safe checkpoints 1626ms
+ ✓ tests/infrastructure/schedule-runner.test.ts > background schedule runner > keeps the main-thread fallback when Worker is unavailable 10204ms
+
+ Test Files  3 passed (3)
+      Tests  16 passed (16)
+   Start at  14:35:29
+   Duration  12.19s (transform 4.04s, setup 0ms, import 4.26s, tests 12.43s, environment 1ms)

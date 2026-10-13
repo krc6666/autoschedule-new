@@ -1,0 +1,12 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+stdout | tests/performance/checkpoint-pipeline.performance.test.ts > complete scheduling with production safe checkpoints > measures all stages, solver calls and safe checkpoint finalization
+[performance] full checkpoint pipeline {"elapsedMs":1064,"mainCalls":1,"checkpointCalls":0,"mainSolverMs":341.701,"checkpointSolverMs":0,"safeResults":1,"phases":{"prepare":107.68679999999995,"optimize":423.4388000000001,"assign":31.002399999999852,"late-priority-frequency":28.11480000000006,"position-frequency":31.878799999999956,"position-rotation":105.7941000000003,"post-mobile-supervisor-late-priority-frequency-validation":30.466499999999996,"post-mobile-supervisor-frequency-validation":152.54669999999987,"post-mobile-supervisor-rotation-validation":152.6509000000001}}
+
+ ✓ tests/performance/checkpoint-pipeline.performance.test.ts > complete scheduling with production safe checkpoints > measures all stages, solver calls and safe checkpoint finalization 1071ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  14:13:54
+   Duration  2.48s (transform 944ms, setup 0ms, import 1.12s, tests 1.07s, environment 0ms)

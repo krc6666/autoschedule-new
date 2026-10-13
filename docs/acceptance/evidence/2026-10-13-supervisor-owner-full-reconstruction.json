@@ -1,0 +1,74 @@
+{
+  "input": "Owner files reconstructed, no current browser snapshot; booked passengers set to 200; old duplicate rules retained",
+  "elapsedMs": 69960,
+  "safeResults": 0,
+  "stages": {
+    "prepare": 148.95910000000003,
+    "optimize": 21764.9482,
+    "assign": 329.9654999999984,
+    "late-priority-frequency": 7022.0144,
+    "position-frequency": 8440.119900000002,
+    "late-shift-recovery": 44.943299999999,
+    "late-shift-cutoff": 5031.035400000001,
+    "position-rotation": 1145.5648,
+    "post-mobile-supervisor-late-priority-frequency-validation": 8381.638599999998,
+    "post-mobile-supervisor-frequency-validation": 541.4109000000026,
+    "post-mobile-supervisor-rotation-validation": 1427.5421999999962
+  },
+  "rows": 53,
+  "unfilled": [
+    {
+      "flight": "CX937（晚）",
+      "position": "G15",
+      "hasReason": true
+    },
+    {
+      "flight": "CX937（晚）",
+      "position": "G14",
+      "hasReason": true
+    },
+    {
+      "flight": "CX937（晚）",
+      "position": "G12",
+      "hasReason": true
+    },
+    {
+      "flight": "CX931",
+      "position": "G20",
+      "hasReason": true
+    },
+    {
+      "flight": "TW616",
+      "position": "督导/引导",
+      "hasReason": true
+    },
+    {
+      "flight": "TW616",
+      "position": "G16",
+      "hasReason": true
+    }
+  ],
+  "supervisors": [
+    {
+      "flight": "KE166",
+      "status": "assigned",
+      "hasFill": true
+    },
+    {
+      "flight": "TR121",
+      "status": "assigned",
+      "hasFill": true
+    },
+    {
+      "flight": "TW616",
+      "status": "unfilled",
+      "hasFill": false
+    }
+  ],
+  "excelRows": 53,
+  "excelSystemNotes": true,
+  "storageRoundTrip": true,
+  "credential": "final",
+  "storageRepeatRoundTrip": true,
+  "excelWorkload": true
+}

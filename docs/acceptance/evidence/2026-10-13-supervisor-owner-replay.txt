@@ -1,0 +1,10 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ↓ tests/domain/tmp-owner-supervisor-vacancy-probe.test.ts > temporary owner vacancy analysis > minimal: rejects a fill chain that gives one worker two first positions
+ ✓ tests/domain/tmp-owner-supervisor-vacancy-probe.test.ts > temporary owner vacancy analysis > reports search rejection reasons on the saved 15th ordinary arrangement 628ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed | 1 skipped (2)
+   Start at  14:13:04
+   Duration  1.98s (transform 893ms, setup 0ms, import 1.16s, tests 630ms, environment 0ms)

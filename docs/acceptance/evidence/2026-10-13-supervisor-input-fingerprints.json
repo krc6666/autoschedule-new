@@ -1,0 +1,17 @@
+[
+  {
+    "purpose": "configuration",
+    "fileName": "最新排班工具配置 (1).xlsx",
+    "sha256": "b7495f752c77ad137a337da3f81812ec1316409cfeea1e9b798fb7bc3fb532c7"
+  },
+  {
+    "purpose": "previous-day",
+    "fileName": "保障明细_2026-10-13.xlsx",
+    "sha256": "ad21b54ffe489e027307685610e04cbfd600106fa8d5deaa159e39855290d79c"
+  },
+  {
+    "purpose": "saved-result",
+    "fileName": "保障明细_2026-10-15.xlsx",
+    "sha256": "5c4ae9d20148f6fd097c6ef2c39d5dab77ebd9a176507252b9d62aad39e5bcd2"
+  }
+]

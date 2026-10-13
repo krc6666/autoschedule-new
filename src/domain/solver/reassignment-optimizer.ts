@@ -57,6 +57,10 @@ function changedAssignmentLimitReasons(
 export async function optimizeReassignment(
   options: ReassignmentOptimizationOptions
 ): Promise<ReassignmentOptimizationResult> {
+  options = {
+    ...options,
+    frequencyFacts: options.frequencyFacts ?? options.facts?.scheduleFrequency,
+  };
   const deadline = Date.now() + (options.timeoutMs ?? 4_000);
   const {
     choices,

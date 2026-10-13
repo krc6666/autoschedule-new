@@ -1,0 +1,7 @@
+
+ RUN  v4.1.10 C:/Users/19598/AppData/Local/Temp/autoschedule-perf-baseline-20261013
+
+ ↓ tests/domain/tmp-owner-supervisor-full-reconstruction.test.ts > temporary owner vacancy analysis > minimal: rejects a fill chain that gives one worker two first positions
+ × tests/domain/tmp-owner-supervisor-full-reconstruction.test.ts > temporary owner vacancy analysis > reports search rejection reasons on the saved 15th ordinary arrangement 582096ms
+   → Test timed out in 420000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".

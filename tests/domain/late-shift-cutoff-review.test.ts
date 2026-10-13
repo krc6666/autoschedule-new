@@ -7,6 +7,8 @@ import { defaultHighsSolver } from "../../src/infrastructure/solver/highs-solver
 
 function cutoffState(): AppState {
   const state = createDefaultState();
+  // Isolate cutoff protection from this one-job-per-flight fixture's repeated first jobs.
+  state.settings.dailyPrimaryPositionUniqueEnabled = false;
   const [protectedWorker, alternate] = state.staff
     .filter((person) => person.status === "正常")
     .slice(0, 2);

@@ -21,7 +21,7 @@ import {
 } from "../flights/schedule-position-rules";
 import type { ScheduleProgressStage } from "./schedule-progress";
 import type { ScheduleRunFacts } from "../shared/schedule-run-facts";
-import { isPreNoonFlight } from "../flights/schedule-tasks";
+import { isPreNoonFlight, isMobileSupervisor } from "../flights/schedule-tasks";
 import type { SolverPort } from "../solver/solver-port";
 import {
   crossWorkdayReservationStatuses,
@@ -44,6 +44,8 @@ import { recoverLocalScheduleIssues } from "./schedule-local-recovery";
 import { dutyRosterStatusIssues } from "../duty-roster/roster";
 import { fillConfiguredSupervisorTargets } from "../assignments/supervisor-fill";
 import { ScheduleGuardError } from "./schedule-guard";
+import type { SchedulePipelineContext } from "./schedule-pipeline";
+import { guardExplanation } from "../shared/schedule-issue-explanation";
 
 export interface ScheduleFinalizerOptions {
   solver: SolverPort;
@@ -192,7 +194,8 @@ export async function finalizeSchedule({
   reportProgress,
   scheduleRunId,
 }: ScheduleFinalizerOptions): Promise<ScheduleResult> {
-  const pipelineContext = {
+  const rejectedSupervisorNotes: string[] = [];
+  const pipelineContext: SchedulePipelineContext = {
     solver,
     state,
     ledger,
@@ -203,6 +206,15 @@ export async function finalizeSchedule({
     displayRulesByFlight,
     finalizeMobileSupervisors,
     onProgress: reportProgress,
+    onMutationRejected: (item, violations) => {
+      if (item.stage !== "mobile-supervisor-finalize") return;
+      rejectedSupervisorNotes.push(
+        ...violations.map(
+          (violation) =>
+            `这一轮督导换人未采用：${guardExplanation(violation)}已恢复换人前的柜台，因此这个督导岗位暂时留空。`
+        )
+      );
+    },
   };
   const postReviewWarnings = await runCoveragePipeline(pipelineContext);
   postReviewWarnings.push(...(await runPostSchedulePipeline(pipelineContext)));
@@ -227,6 +239,9 @@ export async function finalizeSchedule({
       status: "unfilled",
       systemNotes: [
         "这个岗位没有找到合法安排，已留空；其他合法岗位照常保留。请核对该岗位的人员名单和相关设置。",
+        ...(isMobileSupervisor(task.flight, task.rule)
+          ? rejectedSupervisorNotes
+          : []),
       ],
     });
   }

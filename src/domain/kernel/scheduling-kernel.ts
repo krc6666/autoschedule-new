@@ -20,6 +20,7 @@ import {
 import type { ScheduleRunPreferences } from "../shared/schedule-run-preferences";
 import { createId } from "../../utils";
 import { recoverLocalScheduleIssues } from "./schedule-local-recovery";
+import { createScheduleCheckpointQueue } from "./schedule-checkpoint-queue";
 
 export type { ScheduleProgressStage } from "./schedule-progress";
 
@@ -152,57 +153,48 @@ export async function generateSchedule(
   );
   reportProgress("optimize", scheduleProgressPercent("optimize"));
 
-  let pendingCheckpoint: DailySchedulePlan | null = null;
   const scheduleRunId = createId("schedule-run");
-  let checkpointRunning = false;
+  const checkpoints = createScheduleCheckpointQueue(
+    (plan) =>
+      finalizeDailyPlan({
+        state,
+        date,
+        solver: options.checkpointSolver!,
+        preparation,
+        plan,
+        reportProgress: () => undefined,
+        scheduleRunId,
+      }),
+    (result) => options.onSafeResult?.(result)
+  );
   const queueCheckpoint = (checkpointPlan: DailySchedulePlan): void => {
     if (!options.onSafeResult || !options.checkpointSolver) return;
-    pendingCheckpoint = checkpointPlan;
-    if (checkpointRunning) return;
-    checkpointRunning = true;
-    const processLatest = async (): Promise<void> => {
-      while (pendingCheckpoint) {
-        const current = pendingCheckpoint;
-        pendingCheckpoint = null;
-        try {
-          const safeResult = await finalizeDailyPlan({
-            state,
-            date,
-            solver: options.checkpointSolver!,
-            preparation,
-            plan: current,
-            reportProgress: () => undefined,
-            scheduleRunId,
-          });
-          options.onSafeResult?.(safeResult);
-        } catch {
-          // A checkpoint is only published after the full safety review.
-        }
-      }
-      checkpointRunning = false;
-    };
-    void processLatest();
+    checkpoints.enqueue(checkpointPlan);
   };
-
-  const plan = await optimizeDailySchedule({
-    solver: options.solver,
-    state,
-    date,
-    preparation,
-    onRequiredPlan: queueCheckpoint,
-    onImprovedPlan: queueCheckpoint,
-  });
-
-  reportProgress("assign", scheduleProgressPercent("assign"));
-  const result = await finalizeDailyPlan({
-    state,
-    date,
-    solver: options.solver,
-    preparation,
-    plan,
-    reportProgress,
-    scheduleRunId,
-  });
-  reportProgress("complete", scheduleProgressPercent("complete"));
-  return result;
+  try {
+    const plan = await optimizeDailySchedule({
+      solver: options.solver,
+      state,
+      date,
+      preparation,
+      ...(options.onSafeResult && options.checkpointSolver
+        ? { onRequiredPlan: queueCheckpoint, onImprovedPlan: queueCheckpoint }
+        : {}),
+    });
+    checkpoints.discardPending();
+    reportProgress("assign", scheduleProgressPercent("assign"));
+    const result = await finalizeDailyPlan({
+      state,
+      date,
+      solver: options.solver,
+      preparation,
+      plan,
+      reportProgress,
+      scheduleRunId,
+    });
+    reportProgress("complete", scheduleProgressPercent("complete"));
+    return result;
+  } finally {
+    checkpoints.close();
+  }
 }

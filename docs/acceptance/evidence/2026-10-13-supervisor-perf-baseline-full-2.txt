@@ -1,0 +1,35 @@
+
+ RUN  v4.1.10 C:/Users/19598/AppData/Local/Temp/autoschedule-perf-baseline-20261013
+
+stdout | tests/performance/checkpoint-pipeline.performance.test.ts > complete scheduling with production safe checkpoints > measures all stages, solver calls and safe checkpoint finalization
+[performance] full checkpoint pipeline {"elapsedMs":80342,"mainCalls":1,"checkpointCalls":0,"mainSolverMs":11400.034800000001,"checkpointSolverMs":0,"safeResults":1,"phases":{"prepare":44.999300000000176,"optimize":11888.5016,"assign":3399.2297000000017,"late-priority-frequency":5711.062099999999,"position-frequency":5385.267400000001,"position-rotation":10988.636999999999,"post-mobile-supervisor-late-priority-frequency-validation":5574.308899999996,"post-mobile-supervisor-frequency-validation":13819.808600000004,"post-mobile-supervisor-rotation-validation":23526.073099999994}}
+
+ × tests/performance/checkpoint-pipeline.performance.test.ts > complete scheduling with production safe checkpoints > measures all stages, solver calls and safe checkpoint finalization 92776ms
+   → expected 80341.9779 to be less than 15000
+npm.cmd :
+所在位置 行:2 字符: 1
++ npm.cmd exec vitest -- run tests/performance/checkpoint-pipeline.perf ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/performance/checkpoint-pipeline.performance.test.ts > complete scheduling with production safe checkpoints
+ > measures all stages, solver calls and safe checkpoint finalization
+AssertionError: expected 80341.9779 to be less than 15000
+ ❯ tests/performance/checkpoint-pipeline.performance.test.ts:41:21
+     39|     expect(result.safetyCredential?.phase).toBe("final");
+     40|     expect(measurements.safeResults).toBeGreaterThan(0);
+     41|     expect(elapsed).toBeLessThan(15_000);
+       |                     ^
+     42|   },90_000);
+     43| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  14:14:39
+   Duration  104.57s (transform 1.02s, setup 0ms, import 1.20s, tests 103.16s, environment 0ms)

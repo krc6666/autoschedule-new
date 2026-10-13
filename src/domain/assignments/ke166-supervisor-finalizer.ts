@@ -32,6 +32,10 @@ import {
 import { createScheduleSafetySession } from "../kernel/schedule-safety-session";
 import { assertDailyScheduleSafety } from "../kernel/daily-schedule-safety";
 import { ScheduleGuardError } from "../kernel/schedule-guard";
+import {
+  readableSupervisorRejection,
+  supervisorSearchFailureNotes,
+} from "./supervisor-vacancy-explanation";
 
 export interface FinalizeMobileSupervisorsOptions {
   solver: SolverPort;
@@ -117,6 +121,18 @@ export async function finalizeMobileSupervisors({
 
   for (const task of tasks) {
     const ke166 = isKe166MobileSupervisor(task.flight, task.rule);
+    const searchFailureNotes: string[] = [];
+    const recordSearchFailure: Parameters<
+      typeof assignMobileSupervisorByCounterCoverage
+    >[9] = (target, result) => {
+      searchFailureNotes.push(
+        ...supervisorSearchFailureNotes(
+          target,
+          result,
+          task.rule.qualifiedStaffIds
+        )
+      );
+    };
     const originalCounters = ke166 ? structuredClone(assignments) : [];
     const hours = durationHours(task.flight.startTime, task.flight.endTime);
     const preserveLegalCounters = (supervisor: Assignment): void => {
@@ -153,6 +169,9 @@ export async function finalizeMobileSupervisors({
           `${violation.candidate.name}仍可安全承担${violation.counter.flightNo}/${violation.counter.position}，不能采用督导兼任方案；已恢复原柜台安排，KE166机动督导留空，请人工复核`
         ),
       ];
+      unfilled.systemNotes = unfilled.decisionTrace.map(
+        (decision) => decision.message
+      );
       assignments.push(unfilled);
     };
     const selection = selectAssignmentCandidate({
@@ -376,7 +395,8 @@ export async function finalizeMobileSupervisors({
         date,
         preparation.runFacts,
         lockedAssignmentIds,
-        selected!.id
+        selected!.id,
+        recordSearchFailure
       );
       if (reused) {
         addConfiguredFillFallback(reused);
@@ -402,7 +422,9 @@ export async function finalizeMobileSupervisors({
         task.rule,
         date,
         preparation.runFacts,
-        lockedAssignmentIds
+        lockedAssignmentIds,
+        undefined,
+        recordSearchFailure
       );
       if (reused) {
         addConfiguredFillFallback(reused);
@@ -414,6 +436,39 @@ export async function finalizeMobileSupervisors({
     }
     if (!selected) {
       const unfilled = makeUnfilled(task.flight, task.rule.name, task.rule);
+      const independentReasons = state.staff
+        .filter((person) => task.rule.qualifiedStaffIds.includes(person.id))
+        .flatMap((person) => {
+          const reasons = evaluateAutomaticHardConstraints({
+            state,
+            assignments,
+            flight: task.flight,
+            rule: task.rule,
+            person,
+            workHours: hours,
+          }).violations.map((item) =>
+            readableSupervisorRejection(item.message)
+          );
+          const halfRest = halfRestPeriodViolation({
+            facts: preparation.runFacts.halfRest,
+            staffId: person.id,
+            startTime: task.flight.startTime,
+          });
+          if (halfRest) reasons.push(halfRest);
+          return reasons.length
+            ? [`${person.name}不能单独做督导：${reasons.join("；")}。`]
+            : [];
+        });
+      unfilled.systemNotes = [
+        ...new Set([
+          "督导留空：没有找到能采用的独立安排或完整换人方案；其他合法岗位已保留。",
+          ...independentReasons,
+          ...(configuredFillFallbackReason
+            ? [readableSupervisorRejection(configuredFillFallbackReason)]
+            : []),
+          ...searchFailureNotes,
+        ]),
+      ];
       if (configuredFillFallbackReason) {
         unfilled.decisionTrace = [
           schedulingDecision(

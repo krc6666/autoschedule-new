@@ -17,6 +17,57 @@ import "../../src/ui/components/schedule-page";
 import { mountElement, settleLit } from "./lit-test-helpers";
 
 describe("schedule page", () => {
+  it("keeps vacancy explanations collapsed inside the vacant person cell", async () => {
+    const state = createDefaultState();
+    const flight = state.flights[0]!;
+    const rule = state.positionRules.find(
+      (row) => row.flightNo === flight.flightNo
+    )!;
+    state.assignments = [
+      {
+        id: "vacancy-detail",
+        flightId: flight.id,
+        flightNo: flight.flightNo,
+        positionRuleId: rule.id,
+        position: rule.name,
+        staffId: null,
+        staffName: "",
+        startTime: flight.startTime,
+        endTime: flight.endTime,
+        workHours: 2,
+        fatiguePoints: rule.fatiguePoints,
+        remark: rule.remark,
+        manualRemark: "",
+        status: "unfilled",
+        systemNotes: [
+          "上一班做了需要休息保护的晚班岗位，这次换人会让他超过设置规定的下班时间。",
+        ],
+      },
+    ];
+    const element = await mountElement<
+      HTMLElement & { updateComplete: Promise<unknown> }
+    >("autoschedule-schedule-page", {
+      model: state,
+      date: "2026-10-15",
+      zoom: 1,
+      loadSortField: "totalFatigue",
+      loadSortDirection: "desc",
+    });
+    await element.querySelector<
+      HTMLElement & { updateComplete: Promise<unknown> }
+    >("autoschedule-schedule-grid")?.updateComplete;
+    const cell = element.querySelector(
+      '.schedule-person-cell[data-assignment-id="vacancy-detail"]'
+    )!;
+    const detail = cell.querySelector<HTMLDetailsElement>(
+      "details.schedule-vacancy-details"
+    )!;
+    expect(detail.open).toBe(false);
+    expect(detail.querySelector("summary")?.textContent).toBe("为什么空着");
+    expect(detail.textContent).toContain("上一班做了需要休息保护的晚班岗位");
+    detail.open = true;
+    expect(detail.open).toBe(true);
+  });
   it("marks only enabled unfilled positions red across passenger thresholds", async () => {
     const state = createDefaultState();
     const baseFlight = state.flights[0]!;

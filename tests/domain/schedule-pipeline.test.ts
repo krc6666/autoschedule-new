@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { createDefaultScheduleSettings } from "../../src/domain/rules/schedule-settings";
 import {
@@ -78,6 +78,7 @@ describe("schedule pipeline contract", () => {
       }),
     });
     const context = {
+      onMutationRejected: vi.fn(),
       solver: {
         solve: async () => {
           throw new Error("not called");
@@ -134,6 +135,15 @@ describe("schedule pipeline contract", () => {
     expect(warnings).toContain("其他岗位继续处理");
     expect(context.lockedAssignmentIds.size).toBe(0);
     expect(ledger.snapshot()).toEqual([legal]);
+    expect(context.onMutationRejected).toHaveBeenCalledWith(
+      expect.objectContaining({ stage: "test-illegal-proposal" }),
+      [
+        expect.objectContaining({
+          ruleId: "half-rest",
+          assignmentId: illegal.id,
+        }),
+      ]
+    );
   });
 
   it("keeps post-schedule reviews in the documented order", () => {

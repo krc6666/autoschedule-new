@@ -195,18 +195,96 @@ function currentMonthKindCount(
   staffId: string,
   date: string,
   kind: LatePriorityFrequencyKind,
-  facts: ScheduleFrequencyFacts
+  facts: ScheduleFrequencyFacts,
+  cache: LatePriorityHistoryCache
 ): number {
+  return historicalStaffProfile(state, staffId, date, facts, cache).counts[kind]
+    .currentMonthCount;
+}
+
+type HistoricalStaffProfile = Pick<
+  LatePriorityFrequencyProfile,
+  "counts" | "previousWorkdayAssigned" | "supervisorQualified"
+>;
+
+interface LatePriorityHistoryCache {
+  configuration: string;
+  staffProfiles: Map<string, HistoricalStaffProfile>;
+}
+
+// Lifetime is the immutable history snapshot of one run, never the application
+// state. Today's assignments are deliberately NOT cached here.
+const historyCaches = new WeakMap<
+  ScheduleFrequencyFacts,
+  LatePriorityHistoryCache
+>();
+
+function historyCache(
+  state: ScheduleGenerationFacts,
+  facts: ScheduleFrequencyFacts
+): LatePriorityHistoryCache {
+  const configuration = JSON.stringify([
+    state.settings.latePriorityFlightNumbers,
+    state.settings.lateShiftEndTime,
+    state.positionRules.map((rule) => [
+      rule.category,
+      rule.flightNo,
+      rule.name,
+      rule.remark,
+      rule.qualifiedStaffIds,
+    ]),
+    state.latePriorityFrequencyAdjustments,
+  ]);
+  const existing = historyCaches.get(facts);
+  if (existing?.configuration === configuration) return existing;
+  const cache = {
+    configuration,
+    staffProfiles: new Map<string, HistoricalStaffProfile>(),
+  };
+  historyCaches.set(facts, cache);
+  return cache;
+}
+
+function historicalStaffProfile(
+  state: ScheduleGenerationFacts,
+  staffId: string,
+  date: string,
+  facts: ScheduleFrequencyFacts,
+  cache: LatePriorityHistoryCache
+): HistoricalStaffProfile {
+  const existing = cache.staffProfiles.get(staffId);
+  if (existing) return existing;
   const month = date.slice(0, 7);
-  return Math.max(
-    0,
-    countForKind(
-      scopedRecordsForStaff(state, staffId, date, facts).filter((record) =>
-        record.date.startsWith(month)
-      ),
-      kind
-    ) + manualAdjustmentCount(state, staffId, month, undefined, kind)
+  const matching = scopedRecordsForStaff(state, staffId, date, facts);
+  const monthly = matching.filter((record) => record.date.startsWith(month));
+  const recent = matching.filter((record) =>
+    facts.recentEightWorkdayRecordIds.has(record.id)
   );
+  const counts = emptyCounts();
+  for (const kind of LATE_PRIORITY_FREQUENCY_ORDER) {
+    counts[kind] = {
+      currentMonthCount: Math.max(
+        0,
+        countForKind(monthly, kind) +
+          manualAdjustmentCount(state, staffId, month, undefined, kind)
+      ),
+      recentWorkdayCount: countForKind(recent, kind),
+    };
+  }
+  const previousDate = facts.recentConsecutiveWorkdays[0];
+  const profile = {
+    counts,
+    previousWorkdayAssigned: Boolean(
+      previousDate &&
+      matching.some(
+        (record) =>
+          record.date === previousDate && hasCountedLatePriorityKind(record)
+      )
+    ),
+    supervisorQualified: supervisorQualifiedForScope(state, staffId),
+  };
+  cache.staffProfiles.set(staffId, profile);
+  return profile;
 }
 
 function supervisorQualifiedForScope(
@@ -229,7 +307,8 @@ function supervisorRotationDeficit(
   state: ScheduleGenerationFacts,
   staffId: string,
   date: string,
-  facts: ScheduleFrequencyFacts
+  facts: ScheduleFrequencyFacts,
+  cache: LatePriorityHistoryCache
 ): number {
   if (!supervisorQualifiedForScope(state, staffId)) return 0;
   const qualifiedIds = new Set(
@@ -245,12 +324,19 @@ function supervisorRotationDeficit(
     )
   );
   const counts = [...qualifiedIds].map((qualifiedStaffId) =>
-    currentMonthKindCount(state, qualifiedStaffId, date, "supervisor", facts)
+    currentMonthKindCount(
+      state,
+      qualifiedStaffId,
+      date,
+      "supervisor",
+      facts,
+      cache
+    )
   );
   return Math.max(
     0,
     Math.max(0, ...counts) -
-      currentMonthKindCount(state, staffId, date, "supervisor", facts)
+      currentMonthKindCount(state, staffId, date, "supervisor", facts, cache)
   );
 }
 
@@ -259,7 +345,8 @@ function categoryBoundaryExcess(
   staffId: string,
   rule: Pick<PositionRule, "qualifiedStaffIds" | "name" | "remark">,
   date: string,
-  facts: ScheduleFrequencyFacts
+  facts: ScheduleFrequencyFacts,
+  cache: LatePriorityHistoryCache
 ): Record<LatePriorityFrequencyKind, number> {
   const result = emptyBoundaryExcess();
   const eligibleIds = rule.qualifiedStaffIds.filter((qualifiedStaffId) => {
@@ -269,11 +356,11 @@ function categoryBoundaryExcess(
   if (!eligibleIds.length) return result;
   for (const kind of latePriorityFrequencyKinds(rule)) {
     const counts = eligibleIds.map((qualifiedStaffId) =>
-      currentMonthKindCount(state, qualifiedStaffId, date, kind, facts)
+      currentMonthKindCount(state, qualifiedStaffId, date, kind, facts, cache)
     );
     const minimum = counts.length ? Math.min(...counts) : 0;
     const projected =
-      currentMonthKindCount(state, staffId, date, kind, facts) + 1;
+      currentMonthKindCount(state, staffId, date, kind, facts, cache) + 1;
     result[kind] = Math.max(
       0,
       projected - (minimum + LATE_PRIORITY_ALLOWED_DIFFERENCE[kind])
@@ -304,52 +391,34 @@ export function latePriorityFrequencyProfileForRule(
     return EMPTY_LATE_PRIORITY_FREQUENCY;
   const scheduleFacts =
     facts?.date === date ? facts : createScheduleFrequencyFacts(state, date);
-  const currentMonth = date.slice(0, 7);
-  const matching = scopedRecordsForStaff(state, staffId, date, scheduleFacts);
-  const currentMonthRecords = matching.filter((record) =>
-    record.date.startsWith(currentMonth)
+  const cache = historyCache(state, scheduleFacts);
+  const historical = historicalStaffProfile(
+    state,
+    staffId,
+    date,
+    scheduleFacts,
+    cache
   );
-  const recentRecords = matching.filter((record) =>
-    scheduleFacts.recentEightWorkdayRecordIds.has(record.id)
-  );
-  const counts = emptyCounts();
-  for (const kind of LATE_PRIORITY_FREQUENCY_ORDER) {
-    counts[kind] = {
-      currentMonthCount: countForKind(currentMonthRecords, kind),
-      recentWorkdayCount: countForKind(recentRecords, kind),
-    };
-  }
-  for (const kind of LATE_PRIORITY_FREQUENCY_ORDER) {
-    counts[kind].currentMonthCount = Math.max(
-      0,
-      counts[kind].currentMonthCount +
-        manualAdjustmentCount(state, staffId, currentMonth, undefined, kind)
-    );
-  }
-  const previousDate = scheduleFacts.recentConsecutiveWorkdays[0];
+  const counts = historical.counts;
   return {
     applies: true,
     targetKinds: latePriorityFrequencyKinds(rule),
-    previousWorkdayAssigned: Boolean(
-      previousDate &&
-      matching.some(
-        (record) =>
-          record.date === previousDate && hasCountedLatePriorityKind(record)
-      )
-    ),
-    supervisorQualified: supervisorQualifiedForScope(state, staffId),
+    previousWorkdayAssigned: historical.previousWorkdayAssigned,
+    supervisorQualified: historical.supervisorQualified,
     supervisorRotationDeficit: supervisorRotationDeficit(
       state,
       staffId,
       date,
-      scheduleFacts
+      scheduleFacts,
+      cache
     ),
     categoryBoundaryExcess: categoryBoundaryExcess(
       state,
       staffId,
       rule,
       date,
-      scheduleFacts
+      scheduleFacts,
+      cache
     ),
     counts,
     totalCurrentMonthCount: totalCount(counts, "currentMonthCount"),

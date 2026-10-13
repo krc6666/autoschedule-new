@@ -129,6 +129,9 @@ export function createTeamLeaderGapFillChainScenario(
   };
   const state = createDefaultState();
   state.staff = [leader, worker];
+  // These minimal gap-fill fixtures isolate transfer/protection rules; their
+  // sole job on each flight would otherwise be a repeated daily first job.
+  state.settings.dailyPrimaryPositionUniqueEnabled = false;
   state.flights = [sourceFlight, vacancyFlight];
   state.positionRules = [sourceRule, vacancyRule];
   state.assignments = [sourceAssignment, vacancyAssignment];
@@ -231,6 +234,8 @@ function createGapFillAssignment(
 
 export function createTeamLeaderGapFillBatchScenario() {
   const state = createDefaultState();
+  // Batch/assignment-limit tests isolate their own rule from repeated sole jobs.
+  state.settings.dailyPrimaryPositionUniqueEnabled = false;
   const leader = createGapFillStaff("leader", true);
   const workerOne = createGapFillStaff("worker-one");
   const workerTwo = createGapFillStaff("worker-two");
@@ -311,6 +316,7 @@ export function createTeamLeaderGapFillAssignmentLimitScenario({
   includeExtraMovable = false,
 }: TeamLeaderGapFillAssignmentLimitScenarioOptions) {
   const state = createDefaultState();
+  state.settings.dailyPrimaryPositionUniqueEnabled = false;
   const leader = createGapFillStaff("leader", true);
   const workers = Array.from({ length: chainedVacancyCount }, (_, index) =>
     createGapFillStaff(`worker-${index + 1}`)

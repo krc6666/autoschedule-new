@@ -1,0 +1,97 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ↓ tests/infrastructure/storage.test.ts > state persistence > uses the browser's estimated remaining capacity for near-limit warnings
+ ↓ tests/infrastructure/storage.test.ts > state persistence > records which persisted assignment rows were discarded during recovery
+ ↓ tests/infrastructure/storage.test.ts > state persistence > fills the default TR121/H02 cooldown when loading an older state
+ ↓ tests/infrastructure/storage.test.ts > state persistence > defaults missing flight-count exemption switches when restoring older state
+ ↓ tests/infrastructure/storage.test.ts > state persistence > restores same-flight exclusions and defaults older state to none
+ ↓ tests/infrastructure/storage.test.ts > state persistence > round-trips team-leader gap-fill position policies and defaults older state to none
+ ↓ tests/infrastructure/storage.test.ts > state persistence > migrates v6 cross-flight position rows without guessing people
+ ↓ tests/infrastructure/storage.test.ts > state persistence > records a report when persisted JSON cannot be parsed
+ ↓ tests/infrastructure/storage.test.ts > state persistence > restores decision evidence metadata without changing legacy traces
+ ↓ tests/infrastructure/storage.test.ts > state persistence > round-trips manual late-priority frequency corrections
+ ↓ tests/infrastructure/storage.test.ts > state persistence > preserves manual override warnings on the active schedule
+ ↓ tests/infrastructure/storage.test.ts > state persistence > falls back to valid defaults for corrupt persisted data
+ ↓ tests/infrastructure/storage.test.ts > state persistence > initializes the selected late-priority flight scope once and preserves an intentional empty scope
+ ↓ tests/infrastructure/storage.test.ts > state persistence > preserves valid configuration when only persisted assignments are malformed
+ ↓ tests/infrastructure/storage.test.ts > state persistence > marks a persisted schedule stale when it has no rule fingerprint
+ ↓ tests/infrastructure/storage.test.ts > state persistence > marks a persisted schedule stale when the current rule context changed
+ ↓ tests/infrastructure/storage.test.ts > state persistence > restores valid collections while discarding malformed flight and history records
+ ↓ tests/infrastructure/storage.test.ts > state persistence > migrates persisted legacy history into scoped metadata and configured fatigue
+ ↓ tests/infrastructure/storage.test.ts > state persistence > falls back only the missing collection instead of resetting unrelated persisted state
+ ↓ tests/infrastructure/storage.test.ts > state persistence > converts every previously selected mobile supervisor category to regular once
+ ↓ tests/infrastructure/storage.test.ts > state persistence > preserves a mobile supervisor category selected after the one-time migration
+ ↓ tests/infrastructure/storage.test.ts > state persistence > round-trips the domain state
+ ↓ tests/infrastructure/storage.test.ts > state persistence > initializes an empty seven-day flight plan when migrating version 4 state
+ ↓ tests/infrastructure/storage.test.ts > state persistence > warns near the local storage limit without deleting history
+ ↓ tests/infrastructure/storage.test.ts > state persistence > migrates personnel type, administrative mode, and scheduling policy defaults
+ ↓ tests/infrastructure/storage.test.ts > state persistence > keeps administrative support out of standby when old state lacks the field
+ ↓ tests/infrastructure/storage.test.ts > state persistence > removes rules that use the retired support category
+ ↓ tests/infrastructure/storage.test.ts > state persistence > migrates retired supervisor-fill rules to regular positions
+ ↓ tests/infrastructure/storage.test.ts > state persistence > keeps an existing regular supervisor in the regular category
+ ↓ tests/infrastructure/storage.test.ts > state persistence > normalizes the retired supervisor category to regular
+ ↓ tests/infrastructure/storage.test.ts > state persistence > keeps a supervisor-linked target synchronized without duplicate work hours
+ × tests/infrastructure/storage.test.ts > state persistence > restores configured supervisor fill without losing zero workload: valid 38ms
+   → expected { id: 'cover', …(14) } to deeply equal { id: 'cover', …(15) }
+ ✓ tests/infrastructure/storage.test.ts > state persistence > restores configured supervisor fill without losing zero workload: removed 5ms
+ ✓ tests/infrastructure/storage.test.ts > state persistence > restores configured supervisor fill without losing zero workload: wrong-id 4ms
+ ↓ tests/infrastructure/storage.test.ts > state persistence > keeps generated scheduling notes used by feedback
+ ↓ tests/infrastructure/storage.test.ts > state persistence > does not restore an unavailable worker from a stale persisted assignment
+ ↓ tests/infrastructure/storage.test.ts > state persistence > removes obsolete generated cells that have no position rule
+ ↓ tests/infrastructure/storage.test.ts > state persistence > does not restore administrative positions while support mode is disabled
+ ↓ tests/infrastructure/storage.test.ts > state persistence > removes a persisted regular assignment replaced by an administrative position
+ ↓ tests/infrastructure/storage.test.ts > state persistence > removes obsolete guide rows that were copied into flights without a position rule
+ ↓ tests/infrastructure/storage.test.ts > state persistence > drops persisted decisions that do not match the current rule contract
+npm.cmd :
+所在位置 行:87 字符: 1
++ npm.cmd exec vitest -- run tests/infrastructure/storage.test.ts -t 'r ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/infrastructure/storage.test.ts > state persistence > restores configured supervisor fill without losing ze
+ro workload: valid
+AssertionError: expected { id: 'cover', …(14) } to deeply equal { id: 'cover', …(15) }
+
+- Expected
++ Received
+
+@@ -1,8 +1,8 @@
+  {
+    "endTime": "10:30",
+-   "fatiguePoints": 0,
++   "fatiguePoints": 2,
+    "flightId": "flight-cx937",
+    "flightNo": "CX937",
+    "id": "cover",
+    "manualRemark": "",
+    "position": "G12",
+@@ -10,9 +10,8 @@
+    "remark": "",
+    "staffId": "1",
+    "staffName": "匿名人员",
+    "startTime": "08:30",
+    "status": "assigned",
+-   "supervisorFillRuleId": "configured-fill",
+    "supervisorSourceAssignmentId": "supervisor",
+    "workHours": 0,
+  }
+
+ ❯ tests/infrastructure/storage.test.ts:874:24
+    872|       expect(target.supervisorSourceAssignmentId).toBe(source.id);
+    873|       if (scenario === "valid") {
+    874|         expect(target).toEqual(state.assignments[1]);
+       |                        ^
+    875|       } else {
+    876|         // An invalid configured link must still be removed. Legal ord…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 2 passed | 38 skipped (41)
+   Start at  15:32:54
+   Duration  1.02s (transform 643ms, setup 0ms, import 768ms, tests 48ms, environment 0ms)

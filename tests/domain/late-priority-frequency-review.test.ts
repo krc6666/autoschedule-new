@@ -20,6 +20,9 @@ function setup(): {
   assignments: Assignment[];
 } {
   const state = createDefaultState();
+  // Isolate frequency: this fixture repeats the only (therefore first) job
+  // across flights. Daily-primary enforcement has its own cross-intent test.
+  state.settings.dailyPrimaryPositionUniqueEnabled = false;
   const [underused, frequent] = state.staff
     .filter((person) => person.status === "正常")
     .slice(0, 2);

@@ -3,6 +3,7 @@ import { isDutyMorningFlight } from "../assignments/duty-assignment";
 import { applyConfiguredEarlyReleases } from "../assignments/assignment-timing";
 import {
   diagnoseBaseAssignmentEligibility,
+  diagnoseDailyPrimaryPositionEligibility,
   diagnoseSameAirlinePriorityEligibility,
 } from "../candidates/assignment-eligibility";
 import {
@@ -250,6 +251,21 @@ function createChoices(
         (person) => options.candidateAllowed?.(assignment, person) ?? true
       )
       .filter((person) => {
+        const diagnostic = diagnoseDailyPrimaryPositionEligibility({
+          state: options.state,
+          assignments: [...fixed],
+          flight,
+          rule,
+          person,
+          workHours: assignment.workHours,
+        });
+        recordRejection(
+          person,
+          diagnostic.violations.map((item) => item.message)
+        );
+        return diagnostic.eligible;
+      })
+      .filter((person) => {
         if (person.id === assignment.staffId) return true;
         const diagnostic = diagnoseSameAirlinePriorityEligibility(
           {
@@ -394,6 +410,28 @@ export function incompatibleReassignmentChoices(
       ) {
         const right = ownChoices[rightIndex]!;
         if (left.assignment.id === right.assignment.id) continue;
+        const rightFlight = options.state.flights.find(
+          (flight) => flight.id === right.assignment.flightId
+        );
+        const rightRule = assignmentRule(options.state, right.assignment);
+        if (
+          rightFlight &&
+          rightRule &&
+          !diagnoseDailyPrimaryPositionEligibility({
+            state: options.state,
+            assignments: [projectedAssignment(left.assignment, left.person)],
+            flight: rightFlight,
+            rule: rightRule,
+            person: right.person,
+            workHours: right.assignment.workHours,
+          }).eligible
+        ) {
+          conflicts.push({
+            leftChoiceId: left.choice.id,
+            rightChoiceId: right.choice.id,
+          });
+          continue;
+        }
         const projected = [
           ...ownFixedAssignments.map((assignment) => ({ ...assignment })),
           projectedAssignment(left.assignment, left.person),

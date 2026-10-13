@@ -807,6 +807,90 @@ describe("state persistence", () => {
     });
   });
 
+  it.each(["valid", "removed", "wrong-id"] as const)(
+    "restores configured supervisor fill without losing zero workload: %s",
+    (scenario) => {
+      const state = createDefaultState();
+      const flight = state.flights[0]!;
+      const sourceRule = state.positionRules.find(
+        (rule) => rule.flightNo === flight.flightNo && rule.name === "督导"
+      )!;
+      sourceRule.category = "机动督导";
+      const targetRule = state.positionRules.find(
+        (rule) => rule.flightNo === flight.flightNo && rule.category === "常规"
+      )!;
+      targetRule.coverageRole = "supervisor-fill";
+      const person = state.staff.find((item) =>
+        sourceRule.qualifiedStaffIds.includes(item.id)
+      )!;
+      person.status = "正常";
+      state.staff = [person];
+      const fillId = "configured-fill";
+      state.settings.mobileSupervisorFillRules = [
+        {
+          id: fillId,
+          enabled: true,
+          sourceFlightNo: flight.flightNo,
+          sourcePositionKeyword: sourceRule.name,
+          targetFlightNo: flight.flightNo,
+          targetPositionKeyword: targetRule.name,
+          allowAutomatic: true,
+          allowManual: false,
+        },
+      ];
+      const source = {
+        id: "supervisor",
+        flightId: flight.id,
+        flightNo: flight.flightNo,
+        positionRuleId: sourceRule.id,
+        position: sourceRule.name,
+        staffId: person.id,
+        staffName: person.name,
+        startTime: flight.startTime,
+        endTime: flight.endTime,
+        workHours: 2,
+        fatiguePoints: sourceRule.fatiguePoints,
+        remark: sourceRule.remark,
+        manualRemark: "",
+        status: "assigned" as const,
+      };
+      state.assignments = [
+        source,
+        {
+          ...source,
+          id: "cover",
+          positionRuleId: targetRule.id,
+          position: targetRule.name,
+          remark: targetRule.remark,
+          workHours: 0,
+          fatiguePoints: 0,
+          supervisorSourceAssignmentId: source.id,
+          supervisorFillRuleId: scenario === "wrong-id" ? "stale-fill" : fillId,
+        },
+      ];
+      if (scenario === "removed") state.settings.mobileSupervisorFillRules = [];
+      let saved = "";
+      saveState(state, {
+        setItem: (_key, value) => {
+          saved = value;
+        },
+      });
+      const target = loadState({ getItem: () => saved }).assignments.find(
+        (row) => row.id === "cover"
+      )!;
+      expect(target.supervisorSourceAssignmentId).toBe(source.id);
+      if (scenario === "valid") {
+        expect(target).toEqual(state.assignments[1]);
+      } else {
+        // An invalid configured link must still be removed. Legal ordinary
+        // same-flight concurrency keeps its existing fatigue accounting.
+        expect(target.supervisorFillRuleId).toBeUndefined();
+        expect(target.workHours).toBe(0);
+        expect(target.fatiguePoints).toBe(targetRule.fatiguePoints);
+      }
+    }
+  );
+
   it("keeps generated scheduling notes used by feedback", () => {
     const state = createDefaultState();
     const rule = state.positionRules[0]!;

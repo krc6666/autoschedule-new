@@ -92,6 +92,8 @@ describe("team leader concurrent supervision", () => {
   it("can use an idle duty worker for a new ordinary vacancy without moving locked duty positions", async () => {
     const { state, dutyWorker, morningDuty, lateDuty, lockedAssignmentIds } =
       createTeamLeaderConcurrentDutyScenario();
+    // The purpose here is assignment-level duty locking, not repeated first jobs.
+    state.settings.dailyPrimaryPositionUniqueEnabled = false;
 
     await fillVacancyWithTeamLeaderConcurrentSupervision(
       defaultHighsSolver,

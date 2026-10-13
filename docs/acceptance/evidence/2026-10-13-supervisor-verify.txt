@@ -1,0 +1,317 @@
+
+> autoschedule@1.0.0 verify
+> npm run typecheck && npm test && npm run test:performance && npm run build
+
+
+> autoschedule@1.0.0 typecheck
+> tsc -b --pretty false
+
+
+> autoschedule@1.0.0 test
+> vitest run --exclude tests/performance/**
+
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/domain/team-leader-concurrent-supervision.test.ts (4 tests | 1 failed) 451ms
+     × can use an idle duty worker for a new ordinary vacancy without moving locked duty positions 39ms
+ ❯ tests/domain/team-leader-gap-fill.test.ts (25 tests | 7 failed) 450ms
+     × solves multiple selected vacancies as one atomic overall plan 20ms
+     × allows an atomic plan that changes exactly fifteen jobs 11ms
+     × allows a batch over the fifteen-job recommendation with a yellow warning 10ms
+     × confirms a preview expanded beyond the fifteen-job recommendation 12ms
+     × allows high-load fatigue protection to yield only in gap fill with a concrete warning 12ms
+     × allows rolling-load protection to yield only in gap fill with a concrete warning 6ms
+     × keeps a real time conflict as a hard rejection with concrete person and time 8ms
+ ❯ tests/domain/late-priority-frequency-review.test.ts (6 tests | 2 failed) 296ms
+     × safely moves a late declaration role to the lowest-frequency qualified worker 43ms
+     × reviews a combined role as delivery rather than declaration 8ms
+ ❯ tests/domain/late-shift-cutoff-review.test.ts (4 tests | 4 failed) 48ms
+     × directly reassigns a late flight when that makes the protected worker leave earlier without worsening load spread 31ms
+     × gives the earlier safe departure to the protected worker even when ordinary fatigue favors the alternate 5ms
+     × keeps the original complete schedule when the only alternate is locked 4ms
+     × keeps strict next-workday targets ahead of cutoff preference 5ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 14 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/domain/late-priority-frequency-review.test.ts > late priority frequency review > safely moves a late declaration role to the lowest-frequency qualified worker
+AssertionError: expected [ Array(1) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "华嘉慧 上一工作班已承担末班重点岗位，本班再次承担FD573/H04，本次尝试换人但无替代人选（没有可安全接替的人员）。岗位完整性优先，保留原安排，本班形成连续承担。",
++ ]
+
+ ❯ tests/domain/late-priority-frequency-review.test.ts:184:22
+    182|     );
+    183|
+    184|     expect(warnings).toEqual([]);
+       |                      ^
+    185|     expect(
+    186|       assignments.find((item) => item.id === "late-primary")?.staffId
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/14]⎯
+
+ FAIL  tests/domain/late-priority-frequency-review.test.ts > late priority frequency review > reviews a combined role as delivery rather than declaration
+AssertionError: expected [ Array(1) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "华嘉慧 上一工作班已承担末班重点岗位，本班再次承担FD573/H04，本次尝试换人但无替代人选（没有可安全接替的人员）。岗位完整性优先，保留原安排，本班形成连续承担。",
++ ]
+
+ ❯ tests/domain/late-priority-frequency-review.test.ts:219:22
+    217|     );
+    218|
+    219|     expect(warnings).toEqual([]);
+       |                      ^
+    220|     expect(primary.staffId).toBe(underused.id);
+    221|     const message = primary.decisionTrace?.find(
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/14]⎯
+
+ FAIL  tests/domain/late-shift-cutoff-review.test.ts > late-shift next-workday cutoff review > directly reassigns a late flight when that makes the protected worker leave earlier without worsening load spread
+AssertionError: expected [ Array(1) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "匿名人员 上一班较晚结束，本班仍承担NIGHT300/P2，本次尝试换人但无替代人选（没有可安全接替的人员）。岗位完整性优先，保留原安排，未能提前下班。",
++ ]
+
+ ❯ tests/domain/late-shift-cutoff-review.test.ts:127:5
+    125|         new Set()
+    126|       )
+    127|     ).resolves.toEqual([]);
+       |     ^
+    128|     expect(assignments.find((item) => item.id === "evening")?.staffId)…
+    129|       state.staff[1]!.id
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/14]⎯
+
+ FAIL  tests/domain/late-shift-cutoff-review.test.ts > late-shift next-workday cutoff review > gives the earlier safe departure to the protected worker even when ordinary fatigue favors the alternate
+AssertionError: expected [ Array(1) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "匿名人员 上一班较晚结束，本班仍承担NIGHT300/P2，本次尝试换人但无替代人选（没有可安全接替的人员）。岗位完整性优先，保留原安排，未能提前下班。",
++ ]
+
+ ❯ tests/domain/late-shift-cutoff-review.test.ts:159:22
+    157|     );
+    158|
+    159|     expect(warnings).toEqual([]);
+       |                      ^
+    160|     expect(assignments.find((item) => item.id === "evening")?.staffId)…
+    161|       state.staff[1]!.id
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/14]⎯
+
+ FAIL  tests/domain/late-shift-cutoff-review.test.ts > late-shift next-workday cutoff review > keeps the original complete schedule when the only alternate is locked
+AssertionError: expected [ Array(1) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "匿名人员 上一班较晚结束，本班仍承担NIGHT300/P2，本次尝试换人但无替代人选（没有可安全接替的人员）。岗位完整性优先，保留原安排，未能提前下班。",
++ ]
+
+ ❯ tests/domain/late-shift-cutoff-review.test.ts:183:22
+    181|       undefined
+    182|     );
+    183|     expect(warnings).toEqual([]);
+       |                      ^
+    184|   });
+    185|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/14]⎯
+
+ FAIL  tests/domain/late-shift-cutoff-review.test.ts > late-shift next-workday cutoff review > keeps strict next-workday targets ahead of cutoff preference
+AssertionError: expected '1' to be '2' // Object.is equality
+
+Expected: "2"
+Received: "1"
+
+ ❯ tests/domain/late-shift-cutoff-review.test.ts:209:72
+    207|       new Set()
+    208|     );
+    209|     expect(assignments.find((item) => item.id === "evening")?.staffId)…
+       |                                                                        ^
+    210|       state.staff[1]!.id
+    211|     );
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/14]⎯
+
+ FAIL  tests/domain/team-leader-concurrent-supervision.test.ts > team leader concurrent supervision > can use an idle duty worker for a new ordinary vacancy without moving locked duty positions
+AssertionError: expected { …(14) } to match object { staffId: 'duty-worker', …(1) }
+(12 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "staffId": "duty-worker",
+-   "status": "assigned",
++   "staffId": null,
++   "status": "unfilled",
+  }
+
+ ❯ tests/domain/team-leader-concurrent-supervision.test.ts:107:7
+    105|     expect(
+    106|       state.assignments.find((item) => item.positionRuleId === "second…
+    107|     ).toMatchObject({
+       |       ^
+    108|       staffId: dutyWorker.id,
+    109|       status: "assigned",
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/14]⎯
+
+ FAIL  tests/domain/team-leader-gap-fill.test.ts > team leader gap fill > solves multiple selected vacancies as one atomic overall plan
+AssertionError: expected 'unavailable' to be 'ready' // Object.is equality
+
+Expected: "ready"
+Received: "unavailable"
+
+ ❯ ready tests/domain/team-leader-gap-fill.test.ts:153:23
+    151|   result: TeamLeaderGapFillPlanResult
+    152| ): Extract<TeamLeaderGapFillPlanResult, { kind: "ready" }> {
+    153|   expect(result.kind).toBe("ready");
+       |                       ^
+    154|   return result as Extract<TeamLeaderGapFillPlanResult, { kind: "ready…
+    155| }
+ ❯ tests/domain/team-leader-gap-fill.test.ts:235:20
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/14]⎯
+
+ FAIL  tests/domain/team-leader-gap-fill.test.ts > team leader gap fill > allows an atomic plan that changes exactly fifteen jobs
+AssertionError: expected 'unavailable' to be 'ready' // Object.is equality
+
+Expected: "ready"
+Received: "unavailable"
+
+ ❯ ready tests/domain/team-leader-gap-fill.test.ts:153:23
+    151|   result: TeamLeaderGapFillPlanResult
+    152| ): Extract<TeamLeaderGapFillPlanResult, { kind: "ready" }> {
+    153|   expect(result.kind).toBe("ready");
+       |                       ^
+    154|   return result as Extract<TeamLeaderGapFillPlanResult, { kind: "ready…
+    155| }
+ ❯ tests/domain/team-leader-gap-fill.test.ts:288:20
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/14]⎯
+
+ FAIL  tests/domain/team-leader-gap-fill.test.ts > team leader gap fill > allows a batch over the fifteen-job recommendation with a yellow warning
+AssertionError: expected 'unavailable' to be 'ready' // Object.is equality
+
+Expected: "ready"
+Received: "unavailable"
+
+ ❯ ready tests/domain/team-leader-gap-fill.test.ts:153:23
+    151|   result: TeamLeaderGapFillPlanResult
+    152| ): Extract<TeamLeaderGapFillPlanResult, { kind: "ready" }> {
+    153|   expect(result.kind).toBe("ready");
+       |                       ^
+    154|   return result as Extract<TeamLeaderGapFillPlanResult, { kind: "ready…
+    155| }
+ ❯ tests/domain/team-leader-gap-fill.test.ts:310:20
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/14]⎯
+
+ FAIL  tests/domain/team-leader-gap-fill.test.ts > team leader gap fill > confirms a preview expanded beyond the fifteen-job recommendation
+AssertionError: expected 'unavailable' to be 'ready' // Object.is equality
+
+Expected: "ready"
+Received: "unavailable"
+
+ ❯ ready tests/domain/team-leader-gap-fill.test.ts:153:23
+    151|   result: TeamLeaderGapFillPlanResult
+    152| ): Extract<TeamLeaderGapFillPlanResult, { kind: "ready" }> {
+    153|   expect(result.kind).toBe("ready");
+       |                       ^
+    154|   return result as Extract<TeamLeaderGapFillPlanResult, { kind: "ready…
+    155| }
+ ❯ tests/domain/team-leader-gap-fill.test.ts:335:20
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/14]⎯
+
+ FAIL  tests/domain/team-leader-gap-fill.test.ts > team leader gap fill > allows high-load fatigue protection to yield only in gap fill with a concrete warning
+AssertionError: expected { kind: 'unavailable', …(1) } to match object { kind: 'ready' }
+(1 matching property omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "kind": "ready",
++   "kind": "unavailable",
+  }
+
+ ❯ tests/domain/team-leader-gap-fill.test.ts:622:20
+    620|     });
+    621|
+    622|     expect(result).toMatchObject({ kind: "ready" });
+       |                    ^
+    623|     if (result.kind === "ready") {
+    624|       expect(result.preview.warnings.join("；")).toMatch(
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/14]⎯
+
+ FAIL  tests/domain/team-leader-gap-fill.test.ts > team leader gap fill > allows rolling-load protection to yield only in gap fill with a concrete warning
+AssertionError: expected { kind: 'unavailable', …(1) } to match object { kind: 'ready' }
+(1 matching property omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "kind": "ready",
++   "kind": "unavailable",
+  }
+
+ ❯ tests/domain/team-leader-gap-fill.test.ts:649:20
+    647|     });
+    648|
+    649|     expect(result).toMatchObject({ kind: "ready" });
+       |                    ^
+    650|     if (result.kind === "ready") {
+    651|       expect(result.preview.warnings.join("；")).toMatch(
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/14]⎯
+
+ FAIL  tests/domain/team-leader-gap-fill.test.ts > team leader gap fill > keeps a real time conflict as a hard rejection with concrete person and time
+AssertionError: expected '匿名人员尝试接AK151/G01（10:00-12:00）失败：硬拒绝：匿名人员已…' to match /匿名人员.*AK151\/G01.…/G01.*10:00-12:00.*时间冲突
+
+- Expected:
+/匿名人员.*AK151\/G01.*10:00-12:00.*时间冲突/
+
++ Received:
+"匿名人员尝试接AK151/G01（10:00-12:00）失败：硬拒绝：匿名人员已承担CX999/G09的一号岗位，同一班表内不能再次承担非督导一号岗位"
+
+ ❯ tests/domain/team-leader-gap-fill.test.ts:799:33
+    797|     expect(result).toMatchObject({ kind: "unavailable" });
+    798|     if (result.kind === "unavailable") {
+    799|       expect(result.reasons[0]).toMatch(
+       |                                 ^
+    800|         /匿名人员.*AK151\/G01.*10:00-12:00.*时间冲突/
+    801|       );
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/14]⎯
+
+
+ Test Files  4 failed | 133 passed (137)
+      Tests  14 failed | 1291 passed (1305)
+   Start at  14:21:12
+   Duration  91.83s (transform 21.54s, setup 0ms, import 54.31s, tests 293.15s, environment 15.39s)

@@ -1,0 +1,53 @@
+
+ RUN  v4.1.10 C:/Users/19598/AppData/Local/Temp/autoschedule-perf-baseline-20261013
+
+ ↓ tests/domain/reassignment-daily-primary.test.ts > daily primary position in supervisor reassignment > rejects two movable first positions too
+ ↓ tests/domain/reassignment-daily-primary.test.ts > daily primary position in supervisor reassignment > rejects a normalized plan that reintroduces a duplicate after solving
+ ↓ tests/domain/reassignment-daily-primary.test.ts > daily primary position in supervisor reassignment > preserves legal counters and records the actual rejection at supervisor finalization
+ × tests/domain/reassignment-daily-primary.test.ts > daily primary position in supervisor reassignment > rejects a chain that repeats a fixed first position 77ms
+   → a globally illegal chain must not be accepted as a valid fill: expected [ { assignmentId: 'A1', …(1) }, …(2) ] to be null
+ ↓ tests/domain/reassignment-daily-primary.test.ts > daily primary position in supervisor reassignment > finds another legal chain instead of abandoning all supervisors
+ ↓ tests/domain/reassignment-daily-primary.test.ts > daily primary position in supervisor reassignment > honors the disabled setting
+npm.cmd :
+所在位置 行:3 字符: 1
++ npm.cmd exec vitest -- run tests/domain/reassignment-daily-primary.te ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/domain/reassignment-daily-primary.test.ts > daily primary position in supervisor reassignment > rejects a
+chain that repeats a fixed first position
+AssertionError: a globally illegal chain must not be accepted as a valid fill: expected [ { assignmentId: 'A1', …(1) },
+ …(2) ] to be null
+
+- Expected:
+null
+
++ Received:
+[
+  {
+    "assignmentId": "A1",
+    "staffId": "S0",
+  },
+  {
+    "assignmentId": "A0",
+    "staffId": "S2",
+  },
+  {
+    "assignmentId": "A2",
+    "staffId": "S1",
+  },
+]
+
+ ❯ tests/domain/reassignment-daily-primary.test.ts:54:92
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 5 skipped (6)
+   Start at  14:18:14
+   Duration  1.22s (transform 804ms, setup 0ms, import 946ms, tests 78ms, environment 0ms)

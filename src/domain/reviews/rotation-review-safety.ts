@@ -2,7 +2,10 @@ import type { Assignment } from "../../model";
 import { hasDutyMorningAssignment } from "../assignments/duty-assignment";
 import { applyConfiguredEarlyReleases } from "../assignments/assignment-timing";
 import { diversionTransferCount } from "../assignments/diversion-release-usage";
-import { canAssignStaff } from "../candidates/assignment-eligibility";
+import {
+  canAssignStaff,
+  diagnoseDailyPrimaryPositionEligibility,
+} from "../candidates/assignment-eligibility";
 import {
   assignmentRule,
   isGapFillGuidePosition,
@@ -264,6 +267,21 @@ function plannedAssignmentSafetyReasons(
       (person) => person.id === assignment.staffId
     );
     const assignmentRuleForChange = assignmentRule(state, assignment);
+    const flightForChange = state.flights.find(
+      (flight) => flight.id === assignment.flightId
+    );
+    if (assignedPerson && assignmentRuleForChange && flightForChange) {
+      reasons.push(
+        ...diagnoseDailyPrimaryPositionEligibility({
+          state,
+          assignments: planned,
+          flight: flightForChange,
+          rule: assignmentRuleForChange,
+          person: assignedPerson,
+          workHours: assignment.workHours,
+        }).violations.map((item) => item.message)
+      );
+    }
     const directGuideException = Boolean(
       intentPolicy.allowDirectGuideReassignment &&
       assignmentRuleForChange &&

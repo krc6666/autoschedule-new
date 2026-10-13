@@ -11,11 +11,18 @@ import {
   type ScheduleProgressStep,
   visibleScheduleProgressStep,
 } from "./schedule-progress";
-import { ScheduleGuardError } from "./schedule-guard";
+import {
+  ScheduleGuardError,
+  type ScheduleGuardViolation,
+} from "./schedule-guard";
 import { guardExplanation } from "../shared/schedule-issue-explanation";
 
 export interface SchedulePipelineContext extends ScheduleMutationContext {
   onProgress?: (stage: ScheduleProgressStage, percent: number) => void;
+  onMutationRejected?: (
+    item: PlannedScheduleMutation,
+    violations: readonly ScheduleGuardViolation[]
+  ) => void;
 }
 
 export function coverageHookPlan(
@@ -87,6 +94,7 @@ export async function runScheduleMutationPlan(
       context.ledger.commit({ type: "replace", assignments: before });
       context.lockedAssignmentIds.clear();
       locksBefore.forEach((id) => context.lockedAssignmentIds.add(id));
+      context.onMutationRejected?.(item, error.violations);
       warnings.push(
         `${item.label}未采用：${error.violations.map(guardExplanation).join("；")}已保留调整前的安排，继续排其他岗位。`
       );

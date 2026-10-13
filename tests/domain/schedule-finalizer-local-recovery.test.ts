@@ -9,13 +9,37 @@ import { assertDailyScheduleSafety } from "../../src/domain/kernel/daily-schedul
 import { evaluateAutomaticHardConstraints } from "../../src/domain/rules/built-in-rule-registry";
 import type { AssignmentTask } from "../../src/domain/flights/schedule-tasks";
 import { makeUnfilled } from "../../src/domain/flights/schedule-position-rules";
+import type { SchedulePipelineContext } from "../../src/domain/kernel/schedule-pipeline";
+
+const probe = vi.hoisted(() => ({ rejectSupervisor: false }));
 
 // Isolate the final review: actual post-stage transactional rollback has its
 // own regression in schedule-pipeline.test.ts; kernel tests cover all stages.
-vi.mock("../../src/domain/kernel/schedule-pipeline", () => ({
-  runCoveragePipeline: async () => [],
-  runPostSchedulePipeline: async () => [],
-}));
+vi.mock("../../src/domain/kernel/schedule-pipeline", async (original) => {
+  const actual =
+    await original<
+      typeof import("../../src/domain/kernel/schedule-pipeline")
+    >();
+  return {
+    runCoveragePipeline: async () => [],
+    runPostSchedulePipeline: async (context: SchedulePipelineContext) => {
+      if (probe.rejectSupervisor)
+        context.onMutationRejected?.(
+          actual
+            .postScheduleReviewPlan(context.state.settings)
+            .find((item) => item.stage === "mobile-supervisor-finalize")!,
+          [
+            {
+              ruleId: "daily-primary-position-unique",
+              message:
+                "测试人在早班/H02和晚班/G20重复承担非督导一号岗位，自动排班拒绝提交",
+            },
+          ]
+        );
+      return [];
+    },
+  };
+});
 
 async function runFinalizer(
   change: (data: ReturnType<typeof fixture>) => void
@@ -140,6 +164,37 @@ it("adopts a new final schedule with only the now-unqualified row vacant", async
   expect(result.assignments[0]!.status).toBe("unfilled");
   expect(result.assignments[1]!.staffId).toBe("worker-1");
   expect(result.warnings.join("；")).toContain("合格人员名单");
+});
+
+it("retains the exact rejected supervisor-stage reason on the final vacant row", async () => {
+  probe.rejectSupervisor = true;
+  try {
+    const { result } = await runFinalizer(({ state, tasks }) => {
+      const rule = {
+        ...state.positionRules[0]!,
+        id: "missing-mobile",
+        name: "督导",
+        category: "机动督导" as const,
+        qualifiedStaffIds: [],
+      };
+      state.positionRules.push(rule);
+      tasks.push({
+        key: `${state.flights[0]!.id}:${rule.id}`,
+        flight: state.flights[0]!,
+        rule,
+      });
+    });
+    expect(
+      result.assignments
+        .find((row) => row.positionRuleId === "missing-mobile")
+        ?.systemNotes?.join("；")
+    ).toContain("同一张班表中，一个人只能做一次一号岗位");
+    expect(
+      result.assignments.filter((row) => row.status === "assigned")
+    ).toHaveLength(2);
+  } finally {
+    probe.rejectSupervisor = false;
+  }
 });
 
 it("refills configured H05 after the final guard removes invalid supervisor sharing", async () => {

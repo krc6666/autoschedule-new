@@ -24,6 +24,7 @@ import {
   type RotationStaffChange,
 } from "../reviews/rotation-review-safety";
 import { optimizeReassignment } from "../solver/reassignment-optimizer";
+import type { ReassignmentOptimizationResult } from "../solver/reassignment-contract";
 import type { SolverPort } from "../solver/solver-port";
 import { assignmentWarningMessage } from "../reviews/schedule-warning-message";
 import { halfRestPeriodViolation } from "../rules/half-rest";
@@ -302,7 +303,11 @@ async function findSupervisorCounterPlan(
   facts?: ScheduleRunFacts,
   lockedAssignmentIds: ReadonlySet<string> = new Set(),
   requireNonRepeated = false,
-  excludedSupervisorIds: ReadonlySet<string> = new Set()
+  excludedSupervisorIds: ReadonlySet<string> = new Set(),
+  onSearchFailure?: (
+    target: Assignment,
+    result: ReassignmentOptimizationResult
+  ) => void
 ): Promise<CounterPlacementPlan | null> {
   const supervisorIds = eligibleSupervisorOrder(
     state,
@@ -380,7 +385,10 @@ async function findSupervisorCounterPlan(
       maxParticipants: 5,
       acceptTimeLimitedFeasible: true,
     });
-    if (!result.changes) continue;
+    if (!result.changes) {
+      onSearchFailure?.(target, result);
+      continue;
+    }
     const changes = counterPlacementChanges(state, assignments, result.changes);
     const participantIds = new Set(
       changes.flatMap((change) => [change.assignment.staffId!, change.staffId])
@@ -403,7 +411,11 @@ export async function assignMobileSupervisorByCounterCoverage(
   date: string,
   facts?: ScheduleRunFacts,
   lockedAssignmentIds: ReadonlySet<string> = new Set(),
-  rotationReplacementForStaffId?: string
+  rotationReplacementForStaffId?: string,
+  onSearchFailure?: (
+    target: Assignment,
+    result: ReassignmentOptimizationResult
+  ) => void
 ): Promise<Assignment | undefined> {
   if (!isMobileSupervisor(flight, rule)) return undefined;
   const ke166 = isKe166MobileSupervisor(flight, rule);
@@ -511,7 +523,9 @@ export async function assignMobileSupervisorByCounterCoverage(
       date,
       facts,
       lockedAssignmentIds,
-      requireNonRepeated
+      requireNonRepeated,
+      new Set(),
+      onSearchFailure
     );
     if (plan) {
       for (const change of plan.changes) {
@@ -555,7 +569,8 @@ export async function assignMobileSupervisorByCounterCoverage(
       facts,
       lockedAssignmentIds,
       currentRepeated,
-      excludedSupervisorIds
+      excludedSupervisorIds,
+      onSearchFailure
     );
     if (plan) {
       const originalName = regularAssignment.staffName;

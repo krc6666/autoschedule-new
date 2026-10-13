@@ -15,6 +15,48 @@ import { STRUCTURED_POLICY_DEFINITIONS } from "../../src/domain/rules/structured
 import { createTestAutoscheduleStore } from "../helpers/application";
 
 describe("workbook boundary", () => {
+  it("labels the exported vacancy explanation column without inventing a history column", () => {
+    const state = createDefaultState();
+    const flight = state.flights[0]!;
+    const rule = state.positionRules.find(
+      (row) => row.flightNo === flight.flightNo
+    )!;
+    state.assignments = [
+      {
+        id: "vacancy",
+        flightId: flight.id,
+        flightNo: flight.flightNo,
+        positionRuleId: rule.id,
+        position: rule.name,
+        staffId: null,
+        staffName: "",
+        startTime: flight.startTime,
+        endTime: flight.endTime,
+        workHours: 2,
+        fatiguePoints: rule.fatiguePoints,
+        remark: rule.remark,
+        manualRemark: "",
+        status: "unfilled",
+        systemNotes: ["换人计算达到时间上限；其他岗位保留。"],
+      },
+    ];
+    const workbook = buildScheduleWorkbook(state, "2026-10-15");
+    const serialized = XLSX.read(
+      XLSX.write(workbook, { type: "array", bookType: "xlsx" }),
+      { type: "array" }
+    );
+    const rows = XLSX.utils.sheet_to_json<unknown[]>(
+      serialized.Sheets["排班结果"]!,
+      { header: 1, defval: "" }
+    );
+    expect(rows[0]![11]).toBe("系统说明");
+    expect(rows[1]![11]).toBe(state.assignments[0]!.systemNotes!.join("；"));
+    const history = XLSX.utils.sheet_to_json<unknown[]>(
+      buildConfigWorkbook(state).Sheets["历史排班"]!,
+      { header: 1, defval: "" }
+    );
+    expect(history[0]).not.toContain("系统说明");
+  });
   it("round-trips current duty and standby roster overrides", () => {
     const state = createDefaultState();
     state.staff[0]!.cxPreflightQualified = true;
