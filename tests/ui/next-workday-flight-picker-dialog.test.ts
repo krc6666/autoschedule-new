@@ -12,6 +12,74 @@ import {
 } from "../../src/ui/events/ui-command";
 import "../../src/ui/components/app-dialog";
 import { mountElement } from "./lit-test-helpers";
+import {
+  createTestApplicationCoordinator,
+  createTestAutoscheduleStore,
+} from "../helpers/application";
+
+it.each([
+  "generate-schedule",
+  "open-reschedule-flight-picker",
+  "archive-next-duty-day",
+] as const)("%s的实际准备窗口显示已保存的休假和病假状态", async (open) => {
+  const model = createDefaultState();
+  model.staff = model.staff.slice(0, 3).map((person, index) => ({
+    ...person,
+    name: ["甲", "乙", "丙"][index]!,
+    status: index === 0 ? "休假" : index === 1 ? "病假" : "正常",
+  }));
+  model.activeScheduleDate = "2026-08-15";
+  const flight = model.flights[0]!;
+  model.assignments = [
+    {
+      id: "saved-normal-post",
+      flightId: flight.id,
+      flightNo: flight.flightNo,
+      positionRuleId: null,
+      position: "原岗位",
+      staffId: model.staff[2]!.id,
+      staffName: "丙",
+      startTime: flight.startTime,
+      endTime: flight.endTime,
+      workHours: 2,
+      fatiguePoints: 2,
+      remark: "",
+      manualRemark: "",
+      status: "assigned",
+    },
+  ];
+  const coordinator = createTestApplicationCoordinator(
+    createTestAutoscheduleStore(model),
+    {
+      preferences: {
+        loadScheduleDate: () => "2026-08-15",
+        saveScheduleDate: () => undefined,
+        loadScheduleZoom: () => null,
+        saveScheduleZoom: () => undefined,
+      },
+      confirm: () => true,
+    }
+  );
+  await coordinator.handle({ type: open });
+  const element = await mountElement<
+    HTMLElement & { updateComplete: Promise<unknown> }
+  >("autoschedule-app-dialog", {
+    model: coordinator.model(),
+    dialog: coordinator.view().dialog,
+  });
+  expect(
+    element.querySelector<HTMLSelectElement>('select[aria-label="甲 状态"]')
+      ?.value
+  ).toBe("休假");
+  expect(
+    element.querySelector<HTMLSelectElement>('select[aria-label="乙 状态"]')
+      ?.value
+  ).toBe("病假");
+  expect(
+    element.querySelector<HTMLSelectElement>('select[aria-label="丙 状态"]')
+      ?.value
+  ).toBe("正常");
+});
 
 describe("next workday flight picker dialog", () => {
   it("renders current reschedule choices with today's flights selected", async () => {

@@ -1,0 +1,4 @@
+[status-carryover-browser] {"entry":"生成排班","defaults":["休假","病假","正常"],"savedAfterCancel":["休假","病假","正常"]}
+[status-carryover-browser] {"entry":"重新排班","defaults":["休假","病假","正常"],"savedAfterCancel":["休假","病假","正常"]}
+[status-carryover-browser] {"entry":"归档并排后天","defaults":["休假","病假","正常"],"savedAfterCancel":["休假","病假","正常"]}
+[status-carryover-browser] reload {"defaults":["休假","病假","正常"],"verified":true}

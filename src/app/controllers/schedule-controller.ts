@@ -324,12 +324,6 @@ export class ScheduleController implements UiCommandController {
     );
   }
 
-  private normalStaffStatuses(): Record<string, StaffStatus> {
-    return Object.fromEntries(
-      this.context.model().staff.map((person) => [person.id, "正常"])
-    );
-  }
-
   private dutyRosterForDialog(
     date: string,
     staffStatuses: Record<string, StaffStatus>
@@ -939,6 +933,7 @@ export class ScheduleController implements UiCommandController {
     );
     if (!candidates.length)
       return this.context.toast("没有可选择的本地航班", "warning");
+    const staffStatuses = this.currentStaffStatuses();
     this.context.updateView({
       dialog: {
         kind: "next-workday-flight-picker",
@@ -950,11 +945,8 @@ export class ScheduleController implements UiCommandController {
         selectedIds: candidates
           .filter((candidate) => candidate.selectedByDefault)
           .map((candidate) => candidate.id),
-        staffStatuses: this.normalStaffStatuses(),
-        dutyRoster: this.dutyRosterForDialog(
-          nextDate,
-          this.normalStaffStatuses()
-        ),
+        staffStatuses,
+        dutyRoster: this.dutyRosterForDialog(nextDate, staffStatuses),
       },
     });
   }

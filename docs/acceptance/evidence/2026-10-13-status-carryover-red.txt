@@ -1,0 +1,60 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/app/schedule-preflight.test.ts (50 tests | 5 failed) 657ms
+     × 休假和病假默认保留，只改恢复人员，cancel后符合保存合同 10ms
+     × 休假和病假默认保留，只改恢复人员，error后符合保存合同 4ms
+     × 休假和病假默认保留，只改恢复人员，stopped后符合保存合同 3ms
+     × 休假和病假默认保留，只改恢复人员，completed后符合保存合同 3ms
+     × 未选航班不能计算，配置状态重新打开时重新读取 7ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/app/schedule-preflight.test.ts > 沿用已保存的人员状态：'归档并排后天' > 休假和病假默认保留，只改恢复人员，cancel后符合保存合同
+ FAIL  tests/app/schedule-preflight.test.ts > 沿用已保存的人员状态：'归档并排后天' > 休假和病假默认保留，只改恢复人员，error后符合保存合同
+ FAIL  tests/app/schedule-preflight.test.ts > 沿用已保存的人员状态：'归档并排后天' > 休假和病假默认保留，只改恢复人员，stopped后符合保存合同
+ FAIL  tests/app/schedule-preflight.test.ts > 沿用已保存的人员状态：'归档并排后天' > 休假和病假默认保留，只改恢复人员，completed后符合保存合同
+AssertionError: expected { '1': '正常', '2': '正常', …(1) } to deeply equal { '1': '休假', '2': '病假', …(1) }
+
+- Expected
++ Received
+
+  {
+-   "1": "休假",
+-   "2": "病假",
++   "1": "正常",
++   "2": "正常",
+    "normal-worker": "正常",
+  }
+
+ ❯ tests/app/schedule-preflight.test.ts:243:36
+    241|       if (!dialog || !("staffStatuses" in dialog)) throw new Error("缺少…
+    242|       expect(dialog.kind).toBe(entry.kind);
+    243|       expect(dialog.staffStatuses).toEqual(Object.fromEntries(before.s…
+       |                                    ^
+    244|       await coordinator.handle({ type: entry.update, staffId: state.st…
+    245|       expect(coordinator.model()).toEqual(before);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  tests/app/schedule-preflight.test.ts > 排班前确认：'归档并排后天' > 未选航班不能计算，配置状态重新打开时重新读取
+AssertionError: expected '正常' to be '病假' // Object.is equality
+
+Expected: "病假"
+Received: "正常"
+
+ ❯ tests/app/schedule-preflight.test.ts:434:57
+    432|     )
+    433|       throw new Error("缺少重开的预检弹窗");
+    434|     expect(reopened.staffStatuses[before.staff[0]!.id]).toBe("病假");
+       |                                                         ^
+    435|   });
+    436|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  5 failed | 45 passed (50)
+   Start at  12:03:56
+   Duration  2.57s (transform 1.38s, setup 0ms, import 1.72s, tests 657ms, environment 0ms)

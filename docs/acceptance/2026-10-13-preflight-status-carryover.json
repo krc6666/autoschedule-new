@@ -1,0 +1,137 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-10-13-preflight-status-carryover",
+  "title": "下一班准备确认默认沿用已保存的人员状态",
+  "startedFrom": "c293fe5459b43db1e4fd54b5ab0462f24f36836f",
+  "expectation": {
+    "expected": "生成、重排和归档后天的状态草稿均读取当前组已保存状态；本次成功后保存、下一次继续沿用，存储恢复和Excel往返一致。",
+    "unchanged": "人员状态硬约束、轮值计划、其他组数据、排班算法与原失败回退不改，不从历史岗位猜人员状态。",
+    "example": "owner确认：12日甲休假乙病假，14日准备窗口仍默认甲休假乙病假，只调整恢复上班的人。",
+    "fallback": "取消、失败或归档后天停止不保存本次草稿，原状态/班表/历史保持；生成/重排原受控停止采用最近安全结果合同保持。"
+  },
+  "testedVersion": "3e426f10428dcface147037a237537b72f181eaac41906a732ebafae97623685",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-13-status-carryover-red.txt",
+          "summary": "修改前后天休病假默认继承四分支及病假重开回显共5项失败，实际值被重置成正常；其余45项通过",
+          "sha256": "df364495e8a7aeed38918726ca11976584b0debcc94936ae83dd7b04884ed221"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-13-status-carryover-focused.txt",
+          "summary": "修改后4文件129项通过：三入口休病假草稿、取消/失败/停止、成功保存、当前组隔离、恢复/Excel往返、实际下拉选中值和原轮值/排班动作",
+          "sha256": "ea6da0e468c64a59295e7e640a73e473cf26745aad8b5bec8fe2a0f726d7a717"
+        }
+      ],
+      "reason": "精确复现归档后天下一班默认状态被改成正常，先红后绿；这是owner变更此前默认正常合同。"
+    },
+    "normalPath": {
+      "status": "verified",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-13-status-carryover-focused.txt",
+          "summary": "修改后4文件129项通过：三入口休病假草稿、取消/失败/停止、成功保存、当前组隔离、恢复/Excel往返、实际下拉选中值和原轮值/排班动作",
+          "sha256": "ea6da0e468c64a59295e7e640a73e473cf26745aad8b5bec8fe2a0f726d7a717"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-13-status-carryover-browser.txt",
+          "summary": "隔离无头Edge实际三个按钮打开准备窗口：甲休假乙病假，改甲正常后取消不保存；刷新后生成窗口仍显示休假/病假。使用匿名输入状态，没有运行新的真实班表求解",
+          "sha256": "0b190d57e9aad05703bc830124d95793e1b6f64757734810b1a28342f9d76de4"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-13-status-carryover-verify.txt",
+          "summary": "npm.cmd run verify退出0：133文件1288项功能测试、5文件16项性能测试、类型检查及生产构建通过；VITEST_MAX_WORKERS=1",
+          "sha256": "cd19a44189706cfc1805b8f4cb4cff216571634a74236c778474f64ea7211488"
+        }
+      ],
+      "reason": "三个controller入口和实际页面均沿用已保存休假/病假状态，只修改恢复人员；确认计算输入及保存后再次打开一致。"
+    },
+    "alternatePath": {
+      "status": "verified",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-13-status-carryover-focused.txt",
+          "summary": "修改后4文件129项通过：三入口休病假草稿、取消/失败/停止、成功保存、当前组隔离、恢复/Excel往返、实际下拉选中值和原轮值/排班动作",
+          "sha256": "ea6da0e468c64a59295e7e640a73e473cf26745aad8b5bec8fe2a0f726d7a717"
+        }
+      ],
+      "reason": "取消、失败、无结果停止保持原模型与历史，无存储写入；成功后当前组、存储恢复、Excel往返一致，B组不改。"
+    },
+    "postProcessing": {
+      "status": "verified",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-13-status-carryover-focused.txt",
+          "summary": "修改后4文件129项通过：三入口休病假草稿、取消/失败/停止、成功保存、当前组隔离、恢复/Excel往返、实际下拉选中值和原轮值/排班动作",
+          "sha256": "ea6da0e468c64a59295e7e640a73e473cf26745aad8b5bec8fe2a0f726d7a717"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-13-status-carryover-verify.txt",
+          "summary": "npm.cmd run verify退出0：133文件1288项功能测试、5文件16项性能测试、类型检查及生产构建通过；VITEST_MAX_WORKERS=1",
+          "sha256": "cd19a44189706cfc1805b8f4cb4cff216571634a74236c778474f64ea7211488"
+        }
+      ],
+      "reason": "预检确认将选定状态注入临时模型，成功后整表提交，后续重开读取同一保存事实；计算失败输入被修改时仍保留原模型，原存储/Excel/重排流程继续验证。"
+    },
+    "finalGuard": {
+      "status": "verified",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-13-status-carryover-focused.txt",
+          "summary": "修改后4文件129项通过：三入口休病假草稿、取消/失败/停止、成功保存、当前组隔离、恢复/Excel往返、实际下拉选中值和原轮值/排班动作",
+          "sha256": "ea6da0e468c64a59295e7e640a73e473cf26745aad8b5bec8fe2a0f726d7a717"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-13-status-carryover-verify.txt",
+          "summary": "npm.cmd run verify退出0：133文件1288项功能测试、5文件16项性能测试、类型检查及生产构建通过；VITEST_MAX_WORKERS=1",
+          "sha256": "cd19a44189706cfc1805b8f4cb4cff216571634a74236c778474f64ea7211488"
+        }
+      ],
+      "reason": "不改domain硬约束或guard；既有三入口休假轮值测试调用真实kernel，结果不给休假人员自动排岗，状态及轮值诊断保留，确认仍需安全凭证。"
+    },
+    "unchanged": {
+      "status": "verified",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-13-status-carryover-focused.txt",
+          "summary": "修改后4文件129项通过：三入口休病假草稿、取消/失败/停止、成功保存、当前组隔离、恢复/Excel往返、实际下拉选中值和原轮值/排班动作",
+          "sha256": "ea6da0e468c64a59295e7e640a73e473cf26745aad8b5bec8fe2a0f726d7a717"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-13-status-carryover-verify.txt",
+          "summary": "npm.cmd run verify退出0：133文件1288项功能测试、5文件16项性能测试、类型检查及生产构建通过；VITEST_MAX_WORKERS=1",
+          "sha256": "cd19a44189706cfc1805b8f4cb4cff216571634a74236c778474f64ea7211488"
+        }
+      ],
+      "reason": "唯一产品改动为后天草稿初始化，从全正常变成当前已保存状态；轮值仍按统计日期读取、显式计划保留、其他组不变。"
+    },
+    "finalArtifact": {
+      "status": "verified",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-13-status-carryover-browser.txt",
+          "summary": "隔离无头Edge实际三个按钮打开准备窗口：甲休假乙病假，改甲正常后取消不保存；刷新后生成窗口仍显示休假/病假。使用匿名输入状态，没有运行新的真实班表求解",
+          "sha256": "0b190d57e9aad05703bc830124d95793e1b6f64757734810b1a28342f9d76de4"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-13-status-carryover-focused.txt",
+          "summary": "修改后4文件129项通过：三入口休病假草稿、取消/失败/停止、成功保存、当前组隔离、恢复/Excel往返、实际下拉选中值和原轮值/排班动作",
+          "sha256": "ea6da0e468c64a59295e7e640a73e473cf26745aad8b5bec8fe2a0f726d7a717"
+        }
+      ],
+      "reason": "实际浏览器操作三个按钮并核对下拉值、取消与刷新结果；正式完整提交测试验证成功后的持久化及Excel往返。本任务不改求解算法，浏览器未重新求解完整班表；原休病假实际kernel流程由回归测试验证。"
+    }
+  },
+  "answers": {
+    "originalFailure": "red证据五项精确发现后天重置，focused修改后129项通过，browser实际三个入口默认休病假均回显。",
+    "laterChanges": "确认计算、整表提交、分组投影、存储恢复和Excel可能漏接；三入口参数化验证确认输入、失败事务保留、成功当前组同步、往返及下一窗口，原domain守卫继续阻止休病假自动安排。",
+    "finalArtifact": "browser日志为匿名状态下实际按钮/下拉/取消/刷新产物；focused含成功保存/存储恢复/配置Excel往返及三入口实际kernel状态安全回归。"
+  },
+  "review": {
+    "missedScope": "重点防止只改状态下拉而轮值仍使用全正常模型；后天二者现在使用同一草稿；三入口、其他组、Excel/存储和取消均核对。浏览器未执行新完整求解，不冒充新真实航班计算验收。",
+    "rootCause": "后天入口依旧执行此前正常默认合同，主动覆盖所有Staff.status；生成和重排本来沿用当前状态，测试原来用全正常输入并断言未来恢复正常。owner现在明确要求继承两类状态。",
+    "earlyDetection": "调整跨日默认时先用休假、病假、正常三人开真实入口，断言草稿及下拉实际值，再确认计算输入、成功保存后的下一窗口和取消/失败回退；不使用全正常样例验证继承。"
+  }
+}

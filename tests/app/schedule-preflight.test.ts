@@ -197,6 +197,114 @@ const entries = [
   },
 ] as const;
 
+describe.each([
+  ...entries,
+  {
+    name: "重新排班",
+    open: "open-reschedule-flight-picker",
+    kind: "reschedule-flight-picker",
+    update: "update-reschedule-flight-picker-staff-status",
+    confirm: "confirm-reschedule-flight-picker",
+  },
+] as const)("沿用已保存的人员状态：$name", (entry) => {
+  it.each(["cancel", "error", "stopped", "completed"] as const)(
+    "休假和病假默认保留，只改恢复人员，%s后符合保存合同",
+    async (outcome) => {
+      const state = fixture();
+      const normal = { ...state.staff[0]!, id: "normal-worker", name: "丙" };
+      state.staff.push(normal);
+      state.staff[0]!.status = "休假";
+      state.staff[1]!.status = "病假";
+      state.assignments[0]!.staffId = normal.id;
+      state.assignments[0]!.staffName = normal.name;
+      let raw: string | null = null;
+      const persistence = createStatePersistence({
+        getItem: () => raw,
+        setItem: (_key, value) => {
+          raw = value;
+        },
+        removeItem: () => {
+          raw = null;
+        },
+      });
+      const coordinator = createTestApplicationCoordinator(
+        createTestAutoscheduleStore(state, persistence),
+        { preferences, confirm: () => true }
+      );
+      const calculate = vi.fn(async (input: AppState, targetDate: string) => {
+        expect(input.staff[0]!.status).toBe("正常");
+        expect(input.staff[1]!.status).toBe("病假");
+        if (outcome === "error") throw new Error("计算失败");
+        if (outcome === "stopped")
+          return { kind: "stopped-without-result" as const };
+        return {
+          kind: "completed" as const,
+          result: safeResult(input, targetDate),
+        };
+      });
+      setTestScheduleRunner(coordinator, { calculate, isRunning: () => false });
+      const before = structuredClone(coordinator.model());
+      await coordinator.handle({ type: entry.open });
+      const dialog = coordinator.view().dialog;
+      if (!dialog || !("staffStatuses" in dialog))
+        throw new Error("缺少人员状态草稿");
+      expect(dialog.kind).toBe(entry.kind);
+      expect(dialog.staffStatuses).toEqual(
+        Object.fromEntries(before.staff.map((p) => [p.id, p.status]))
+      );
+      await coordinator.handle({
+        type: entry.update,
+        staffId: state.staff[0]!.id,
+        status: "正常",
+      });
+      expect(coordinator.model()).toEqual(before);
+      if (outcome === "cancel")
+        await coordinator.handle({ type: "close-dialog" });
+      else
+        await coordinator.handle({
+          type: entry.confirm,
+          selectedIds: dialog.selectedIds,
+        });
+      if (outcome !== "completed") {
+        expect(coordinator.model()).toEqual(before);
+        expect(raw).toBeNull();
+      } else {
+        expect(coordinator.model().staff.map((p) => p.status)).toEqual([
+          "正常",
+          "病假",
+          "正常",
+        ]);
+        expect(coordinator.model().groups.B).toEqual(before.groups.B);
+        const restored = persistence.load();
+        expect(restored.staff.map((p) => p.status)).toEqual([
+          "正常",
+          "病假",
+          "正常",
+        ]);
+        const imported = parseWorkbook(
+          buildConfigWorkbook(coordinator.model()),
+          coordinator.model().staff
+        );
+        expect(imported.staff?.map((p) => p.status)).toEqual([
+          "正常",
+          "病假",
+          "正常",
+        ]);
+        const reopened = createTestApplicationCoordinator(
+          createTestAutoscheduleStore(restored),
+          { preferences }
+        );
+        await reopened.handle({ type: "generate-schedule" });
+        expect(reopened.view().dialog).toMatchObject({
+          staffStatuses: Object.fromEntries(
+            restored.staff.map((p) => [p.id, p.status])
+          ),
+        });
+      }
+    }
+  );
+});
+
 describe.each(entries)("排班前确认：$name", (entry) => {
   async function setup() {
     const state = fixture();
@@ -365,9 +473,7 @@ describe.each(entries)("排班前确认：$name", (entry) => {
       reopened?.kind !== "next-workday-flight-picker"
     )
       throw new Error("缺少重开的预检弹窗");
-    expect(reopened.staffStatuses[before.staff[0]!.id]).toBe(
-      entry.kind === "next-workday-flight-picker" ? "正常" : "病假"
-    );
+    expect(reopened.staffStatuses[before.staff[0]!.id]).toBe("病假");
   });
 
   it.each(["switch-group", "change-date"] as const)(
