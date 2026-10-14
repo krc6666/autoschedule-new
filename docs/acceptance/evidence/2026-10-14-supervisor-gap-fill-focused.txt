@@ -1,0 +1,195 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ✓ tests/domain/team-leader-gap-fill.test.ts > team leader gap fill > previews a two-step local reassignment without changing the schedule 111ms
+ ✓ tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > directly fills a qualified non-KE166 mobile supervisor and clears old vacancy evidence 117ms
+ ✓ tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > fills the supervisor through a qualification chain when the leader cannot take it 10ms
+ ✓ tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > fills regular and supervisor vacancies in one atomic batch 13ms
+ ✓ tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > keeps 'KE166' outside the target range in planning and confirmation 2ms
+ ✓ tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > keeps 'manual position' outside the target range in planning and confirmation 1ms
+ ✓ tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > keeps 'administrative position' outside the target range in planning and confirmation 2ms
+ ✓ tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > keeps 'ordinary guide target' outside the target range in planning and confirmation 2ms
+ ✓ tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > keeps 'diversion target' outside the target range in planning and confirmation 2ms
+ ✓ tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > does not unlock an occupied mobile supervisor to close a qualification chain 2ms
+ ✓ tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > rejects a real overlap with another protected supervisor instead of enabling parallel supervision 4ms
+ ✓ tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > rejects an unqualified leader without a complete chain and leaves the original schedule 4ms
+ ✓ tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > rejects a previously legal chain after 'supervisor qualification removed' 5ms
+ ✓ tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > rejects a previously legal chain after 'leader loses night capability' 5ms
+ ✓ tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > rejects a previously legal chain after 'supervisor becomes manual' 5ms
+ ✓ tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > rejects a previously legal chain after 'supervisor category changes' 6ms
+ ✓ tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > rejects a previously legal chain after 'source becomes protected' 6ms
+ ✓ tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > rejects a previously legal chain after 'hours limit decreases' 7ms
+ ✓ tests/domain/team-leader-gap-fill.test.ts > team leader gap fill > keeps a non-overlapping source job available for a qualification chain 9ms
+ ✓ tests/domain/team-leader-gap-fill.test.ts > team leader gap fill > solves multiple selected vacancies as one atomic overall plan 7ms
+ ✓ tests/domain/team-leader-gap-fill.test.ts > team leader gap fill > allows an atomic plan that changes exactly fifteen jobs 17ms
+ ✓ tests/domain/team-leader-gap-fill.test.ts > team leader gap fill > allows a batch over the fifteen-job recommendation with a yellow warning 9ms
+ ✓ tests/domain/team-leader-gap-fill.test.ts > team leader gap fill > confirms a preview expanded beyond the fifteen-job recommendation 15ms
+ ✓ tests/domain/team-leader-gap-fill.test.ts > team leader gap fill > does not move an already assigned priority position 4ms
+ ✓ tests/domain/team-leader-gap-fill.test.ts > team leader gap fill > allows an explicitly released ordinary priority position to join the chain 5ms
+ ✓ tests/domain/team-leader-gap-fill.test.ts > team leader gap fill > keeps fixed KE166 protection even when its position is configured movable 4ms
+ ✓ tests/domain/team-leader-gap-fill.test.ts > team leader gap fill > rejects confirmation if a previewed source position becomes protected 6ms
+ ✓ tests/domain/team-leader-gap-fill.test.ts > team leader gap fill > allows a guide assignment to be replaced by the team leader in gap fill 7ms
+ ✓ tests/domain/team-leader-gap-fill.test.ts > team leader gap fill > allows a diversion-category guide assignment to be replaced by the team leader 4ms
+ ✓ tests/domain/team-leader-gap-fill.test.ts > team leader gap fill > allows a current late-priority assignment to move in gap fill 4ms
+ ✓ tests/domain/team-leader-gap-fill.test.ts > team leader gap fill > allows a recovery-protected worker in gap fill with a concrete warning 5ms
+ ✓ tests/domain/team-leader-gap-fill.test.ts > team leader gap fill > allows high-load fatigue protection to yield only in gap fill with a concrete warning 5ms
+ ✓ tests/domain/team-leader-gap-fill.test.ts > team leader gap fill > allows rolling-load protection to yield only in gap fill with a concrete warning 5ms
+ ✓ tests/domain/team-leader-gap-fill.test.ts > team leader gap fill > allows the 9/27 three-step chain to yield cross-workday qualification reservation with a concrete warning 7ms
+ ✓ tests/domain/team-leader-gap-fill.test.ts > team leader gap fill > prefers a strict plan that preserves qualification reservation when one exists 8ms
+ ✓ tests/domain/team-leader-gap-fill.test.ts > team leader gap fill > keeps load protection hard when a caller does not open the gap-fill relief 2ms
+ ✓ tests/domain/team-leader-gap-fill.test.ts > team leader gap fill > keeps a real time conflict as a hard rejection with concrete person and time 6ms
+ ✓ tests/domain/team-leader-gap-fill.test.ts > team leader gap fill > does not bypass a protected position when reservation relief is available 4ms
+ ✓ tests/domain/team-leader-gap-fill.test.ts > team leader gap fill > prefers the lighter current late assignment for the worker with the heavier previous workday 8ms
+ ✓ tests/domain/team-leader-gap-fill.test.ts > team leader gap fill > keeps the only complete plan when relative fatigue cannot improve and explains the yellow light 5ms
+ ✓ tests/domain/team-leader-gap-fill.test.ts > team leader gap fill > does not compare an early source assignment as part of the current late segment 3ms
+ ✓ tests/domain/team-leader-gap-fill.test.ts > team leader gap fill > applies the whole preview and rejects it after the schedule changes 3ms
+ ✓ tests/infrastructure/storage.test.ts > state persistence > uses the browser's estimated remaining capacity for near-limit warnings 10ms
+ ✓ tests/infrastructure/storage.test.ts > state persistence > records which persisted assignment rows were discarded during recovery 8ms
+ ✓ tests/infrastructure/storage.test.ts > state persistence > fills the default TR121/H02 cooldown when loading an older state 5ms
+ ✓ tests/infrastructure/storage.test.ts > state persistence > defaults missing flight-count exemption switches when restoring older state 5ms
+ ✓ tests/infrastructure/storage.test.ts > state persistence > restores same-flight exclusions and defaults older state to none 14ms
+ ✓ tests/infrastructure/storage.test.ts > state persistence > round-trips team-leader gap-fill position policies and defaults older state to none 13ms
+ ✓ tests/infrastructure/storage.test.ts > state persistence > migrates v6 cross-flight position rows without guessing people 6ms
+ ✓ tests/infrastructure/storage.test.ts > state persistence > records a report when persisted JSON cannot be parsed 2ms
+ ✓ tests/infrastructure/storage.test.ts > state persistence > restores decision evidence metadata without changing legacy traces 22ms
+ ✓ tests/infrastructure/storage.test.ts > state persistence > round-trips manual late-priority frequency corrections 5ms
+ ✓ tests/infrastructure/storage.test.ts > state persistence > preserves manual override warnings on the active schedule 9ms
+ ✓ tests/infrastructure/storage.test.ts > state persistence > falls back to valid defaults for corrupt persisted data 2ms
+ ✓ tests/infrastructure/storage.test.ts > state persistence > initializes the selected late-priority flight scope once and preserves an intentional empty scope 10ms
+ ✓ tests/infrastructure/storage.test.ts > state persistence > preserves valid configuration when only persisted assignments are malformed 6ms
+ ✓ tests/infrastructure/storage.test.ts > state persistence > marks a persisted schedule stale when it has no rule fingerprint 7ms
+ ✓ tests/infrastructure/storage.test.ts > state persistence > marks a persisted schedule stale when the current rule context changed 7ms
+ ✓ tests/infrastructure/storage.test.ts > state persistence > restores valid collections while discarding malformed flight and history records 5ms
+ ✓ tests/infrastructure/storage.test.ts > state persistence > migrates persisted legacy history into scoped metadata and configured fatigue 5ms
+ ✓ tests/infrastructure/storage.test.ts > state persistence > falls back only the missing collection instead of resetting unrelated persisted state 4ms
+ ✓ tests/infrastructure/storage.test.ts > state persistence > converts every previously selected mobile supervisor category to regular once 5ms
+ ✓ tests/infrastructure/storage.test.ts > state persistence > preserves a mobile supervisor category selected after the one-time migration 5ms
+ ✓ tests/infrastructure/storage.test.ts > state persistence > round-trips the domain state 25ms
+ ✓ tests/infrastructure/storage.test.ts > state persistence > initializes an empty seven-day flight plan when migrating version 4 state 4ms
+ ✓ tests/infrastructure/storage.test.ts > state persistence > warns near the local storage limit without deleting history 34ms
+ ✓ tests/infrastructure/storage.test.ts > state persistence > migrates personnel type, administrative mode, and scheduling policy defaults 9ms
+ ✓ tests/infrastructure/storage.test.ts > state persistence > keeps administrative support out of standby when old state lacks the field 6ms
+ ✓ tests/infrastructure/storage.test.ts > state persistence > removes rules that use the retired support category 4ms
+ ✓ tests/infrastructure/storage.test.ts > state persistence > migrates retired supervisor-fill rules to regular positions 3ms
+ ✓ tests/infrastructure/storage.test.ts > state persistence > keeps an existing regular supervisor in the regular category 4ms
+ ✓ tests/infrastructure/storage.test.ts > state persistence > normalizes the retired supervisor category to regular 3ms
+ ✓ tests/infrastructure/storage.test.ts > state persistence > keeps a supervisor-linked target synchronized without duplicate work hours 6ms
+ ✓ tests/infrastructure/storage.test.ts > state persistence > restores configured supervisor fill without losing zero workload: valid 12ms
+ ✓ tests/infrastructure/storage.test.ts > state persistence > restores configured supervisor fill without losing zero workload: removed 7ms
+ ✓ tests/infrastructure/storage.test.ts > state persistence > restores configured supervisor fill without losing zero workload: wrong-id 7ms
+ ✓ tests/infrastructure/storage.test.ts > state persistence > keeps generated scheduling notes used by feedback 4ms
+ ✓ tests/infrastructure/storage.test.ts > state persistence > does not restore an unavailable worker from a stale persisted assignment 5ms
+ ✓ tests/infrastructure/storage.test.ts > state persistence > removes obsolete generated cells that have no position rule 6ms
+ ✓ tests/infrastructure/storage.test.ts > state persistence > does not restore administrative positions while support mode is disabled 5ms
+ ✓ tests/infrastructure/storage.test.ts > state persistence > removes a persisted regular assignment replaced by an administrative position 7ms
+ ✓ tests/infrastructure/storage.test.ts > state persistence > removes obsolete guide rows that were copied into flights without a position rule 6ms
+ ✓ tests/infrastructure/storage.test.ts > state persistence > drops persisted decisions that do not match the current rule contract 7ms
+stderr | tests/ui/app-dialog-view.test.ts
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+System.Management.Automation.RemoteException
+stderr | tests/ui/team-leader-supervisor-gap-fill.test.ts
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+System.Management.Automation.RemoteException
+ ✓ tests/ui/app-dialog-view.test.ts > application dialog > shows late-priority count scope and blocks an invalid preview 40ms
+ ✓ tests/ui/app-dialog-view.test.ts > application dialog > shows concrete gap-fill warnings and rejected candidate reasons 21ms
+ ✓ tests/ui/app-dialog-view.test.ts > application dialog > counts every structured rule collection in configuration import preview 15ms
+ ✓ tests/ui/app-dialog-view.test.ts > application dialog > previews history merge counts without claiming that a history-only import clears the active schedule 7ms
+ ✓ tests/ui/app-dialog-view.test.ts > application dialog > gives legacy schedule import content a constrained scrolling host 11ms
+ ✓ tests/ui/app-dialog-view.test.ts > application dialog > gives online flight query content a constrained scrolling host 10ms
+ ✓ tests/infrastructure/excel.test.ts > workbook boundary > labels the exported vacancy explanation column without inventing a history column 52ms
+ ✓ tests/infrastructure/excel.test.ts > workbook boundary > round-trips current duty and standby roster overrides 15ms
+ ✓ tests/infrastructure/excel.test.ts > workbook boundary > rejects invalid duty roster rows without returning partial data 4ms
+ ✓ tests/infrastructure/excel.test.ts > workbook boundary > keeps older configuration workbooks without a duty roster sheet compatible 0ms
+ ✓ tests/infrastructure/excel.test.ts > workbook boundary > exports and parses the active group's complete history sheet 7ms
+ ✓ tests/infrastructure/excel.test.ts > workbook boundary > exports an empty history sheet for a state without history 3ms
+ ✓ tests/infrastructure/excel.test.ts > workbook boundary > exports every registered structured policy sheet 4ms
+ ✓ tests/infrastructure/excel.test.ts > workbook boundary > exports the active group's staff and flights while keeping shared sheets available 11ms
+ ✓ tests/infrastructure/excel.test.ts > workbook boundary > rejects a same-flight exclusion sheet that references missing staff 5ms
+ ✓ tests/ui/app-dialog-view.test.ts > application dialog > shows a compact swap analysis and only enables a valid confirmation 40ms
+ ✓ tests/app/team-leader-supervisor-gap-fill.test.ts > supervisor gap-fill controller workflow > previews and confirms direct=true, then preserves the final result through storage, Excel and archive 203ms
+ ✓ tests/app/team-leader-supervisor-gap-fill.test.ts > supervisor gap-fill controller workflow > previews and confirms direct=false, then preserves the final result through storage, Excel and archive 43ms
+ ✓ tests/app/team-leader-supervisor-gap-fill.test.ts > supervisor gap-fill controller workflow > shows a concrete conflict and keeps the whole schedule when no safe supervisor plan exists 10ms
+ ✓ tests/ui/team-leader-supervisor-gap-fill.test.ts > supervisor vacancy selection > lists the actual mobile supervisor vacancy alongside a regular vacancy and emits its ID 30ms
+ ✓ tests/ui/team-leader-supervisor-gap-fill.test.ts > supervisor vacancy selection > continues to hide KE166, manual, administrative, guide and diversion targets 7ms
+ ✓ tests/app/application-coordinator.test.ts > application persistence feedback > clears the export warning only after configuration export succeeds 32ms
+ ✓ tests/app/application-coordinator.test.ts > application persistence feedback > keeps the export warning when configuration export fails 5ms
+ ✓ tests/app/application-coordinator.test.ts > application persistence feedback > 切换组前提示保存未保存改动，确认后只显示目标组数据 7ms
+ ✓ tests/app/application-coordinator.test.ts > application persistence feedback > 取消切组确认时保留当前组 4ms
+ ✓ tests/app/application-coordinator.test.ts > application persistence feedback > applies a validated late-priority count preview through the records controller 23ms
+ ✓ tests/app/application-coordinator.test.ts > application persistence feedback > confirms monthly late-priority reset before committing the zero baseline 9ms
+ ✓ tests/app/application-coordinator.test.ts > application persistence feedback > shows an important warning when saved data approaches browser capacity 4ms
+ ✓ tests/app/application-coordinator.test.ts > application persistence feedback > keeps in-memory data and reports a failed quota write 3ms
+ ✓ tests/app/application-coordinator.test.ts > historical schedule editing > opens the archived date as an isolated draft and cancels back to the current schedule 6ms
+ ✓ tests/app/application-coordinator.test.ts > historical schedule editing > saves only the target history date and restores the current schedule 12ms
+ ✓ tests/infrastructure/excel.test.ts > workbook boundary > round-trips per-row same-flight exclusion state and defaults old sheets to enabled 5ms
+ ✓ tests/infrastructure/excel.test.ts > workbook boundary > round-trips manual late-priority frequency corrections by flight and category 5ms
+ ✓ tests/infrastructure/excel.test.ts > workbook boundary > maps workbook rows into stable domain models 1ms
+ ✓ tests/app/application-coordinator.test.ts > historical schedule editing > keeps the draft and history unchanged when overwrite confirmation is declined 4ms
+ ✓ tests/app/application-coordinator.test.ts > historical schedule editing > exports the target historical draft while keeping mutating commands blocked 4ms
+ ✓ tests/app/application-coordinator.test.ts > application scheduling exclusivity > keeps the pre-run schedule when calculation is stopped without a result 25ms
+ ✓ tests/app/application-coordinator.test.ts > application scheduling exclusivity > installs only the complete safe result selected by stop-and-adopt 34ms
+ ✓ tests/app/application-coordinator.test.ts > application scheduling exclusivity > reserves a schedule run before asynchronous command routing 59ms
+ ✓ tests/app/application-coordinator.test.ts > application scheduling exclusivity > blocks data-changing commands while a schedule calculation is running 3ms
+ ✓ tests/app/application-coordinator.test.ts > manual swap analysis workflow > rechecks a proposed swap before applying it 20ms
+ ✓ tests/app/application-coordinator.test.ts > team leader gap fill workflow > previews a local chain and applies it only after confirmation 71ms
+ ✓ tests/app/application-coordinator.test.ts > next workday flight picker workflow > explains 'calculation-timeout' in plain language for 'generate' without adopting the failed draft 8ms
+ ✓ tests/app/application-coordinator.test.ts > next workday flight picker workflow > explains 'program-error' in plain language for 'generate' without adopting the failed draft 7ms
+ ✓ tests/app/application-coordinator.test.ts > next workday flight picker workflow > explains 'no-safe-schedule' in plain language for 'generate' without adopting the failed draft 5ms
+ ✓ tests/app/application-coordinator.test.ts > next workday flight picker workflow > explains 'schedule-check' in plain language for 'generate' without adopting the failed draft 6ms
+ ✓ tests/app/application-coordinator.test.ts > next workday flight picker workflow > explains 'schedule-check' in plain language for 'generate' without adopting the failed draft 7ms
+ ✓ tests/app/application-coordinator.test.ts > next workday flight picker workflow > explains 'calculation-timeout' in plain language for 'reschedule' without adopting the failed draft 7ms
+ ✓ tests/app/application-coordinator.test.ts > next workday flight picker workflow > explains 'program-error' in plain language for 'reschedule' without adopting the failed draft 5ms
+ ✓ tests/app/application-coordinator.test.ts > next workday flight picker workflow > explains 'no-safe-schedule' in plain language for 'reschedule' without adopting the failed draft 9ms
+ ✓ tests/app/application-coordinator.test.ts > next workday flight picker workflow > explains 'schedule-check' in plain language for 'reschedule' without adopting the failed draft 5ms
+ ✓ tests/app/application-coordinator.test.ts > next workday flight picker workflow > explains 'schedule-check' in plain language for 'reschedule' without adopting the failed draft 5ms
+ ✓ tests/app/application-coordinator.test.ts > next workday flight picker workflow > explains 'calculation-timeout' in plain language for 'next' without adopting the failed draft 6ms
+ ✓ tests/app/application-coordinator.test.ts > next workday flight picker workflow > explains 'program-error' in plain language for 'next' without adopting the failed draft 9ms
+ ✓ tests/app/application-coordinator.test.ts > next workday flight picker workflow > explains 'no-safe-schedule' in plain language for 'next' without adopting the failed draft 7ms
+ ✓ tests/app/application-coordinator.test.ts > next workday flight picker workflow > explains 'schedule-check' in plain language for 'next' without adopting the failed draft 6ms
+ ✓ tests/app/application-coordinator.test.ts > next workday flight picker workflow > explains 'schedule-check' in plain language for 'next' without adopting the failed draft 5ms
+ ✓ tests/app/application-coordinator.test.ts > next workday flight picker workflow > shows KE166 failure details and preserves the model for generate 9ms
+ ✓ tests/app/application-coordinator.test.ts > next workday flight picker workflow > shows KE166 failure details and preserves the model for reschedule 6ms
+ ✓ tests/app/application-coordinator.test.ts > next workday flight picker workflow > shows KE166 failure details and preserves the model for next 10ms
+ ✓ tests/app/application-coordinator.test.ts > next workday flight picker workflow > keeps manual late-priority balance through repeated archive-and-next-workday runs 260ms
+ ✓ tests/app/application-coordinator.test.ts > next workday flight picker workflow > opens local flight selection before changing history or starting calculation 5ms
+ ✓ tests/app/application-coordinator.test.ts > next workday flight picker workflow > keeps the original model when the selected next schedule fails 8ms
+ ✓ tests/app/application-coordinator.test.ts > next workday flight picker workflow > keeps the original model when the run is stopped, even with a latest result 8ms
+ ✓ tests/app/application-coordinator.test.ts > next workday flight picker workflow > commits archive, selected flights, date, and result only after success 32ms
+ ✓ tests/app/application-coordinator.test.ts > current schedule flight picker workflow > opens every local flight and defaults to the current day's selection without mutating state 6ms
+ ✓ tests/app/application-coordinator.test.ts > current schedule flight picker workflow > commits selected flights, passenger counts, and the new schedule only after success 20ms
+ ✓ tests/app/application-coordinator.test.ts > current schedule flight picker workflow > keeps the original flights and schedule when recalculation fails 6ms
+ ✓ tests/app/application-coordinator.test.ts > current schedule flight picker workflow > atomically adopts selected flights and a safe result when stop-and-adopt is requested 14ms
+ ✓ tests/infrastructure/excel.test.ts > workbook boundary > exports both operational and machine-readable schedule views 7357ms
+ ✓ tests/infrastructure/excel.test.ts > workbook boundary > groups early departures by airline code in the schedule summary 2ms
+ ✓ tests/infrastructure/excel.test.ts > workbook boundary > keeps the flight cutoff in a schedule workbook and excludes late-cutoff dates 2ms
+ ✓ tests/infrastructure/excel.test.ts > workbook boundary > imports a flight configuration sheet as reusable templates 0ms
+ ✓ tests/infrastructure/excel.test.ts > workbook boundary > round-trips flight templates and passenger thresholds in configuration workbooks 3ms
+ ✓ tests/infrastructure/excel.test.ts > workbook boundary > round-trips weekly flight plans and treats an empty sheet as a cleared plan 3ms
+ ✓ tests/infrastructure/excel.test.ts > workbook boundary > round-trips cross-flight priority policies 3ms
+ ✓ tests/infrastructure/excel.test.ts > workbook boundary > rejects a cross-flight priority sheet with unknown staff ids 1ms
+ ✓ tests/infrastructure/excel.test.ts > workbook boundary > round-trips administrative support position categories 2ms
+ ✓ tests/infrastructure/excel.test.ts > workbook boundary > round-trips supervisor position categories 2ms
+ ✓ tests/infrastructure/excel.test.ts > workbook boundary > keeps regular and administrative rules with the same position name 2ms
+ ✓ tests/infrastructure/excel.test.ts > workbook boundary > ignores removed support-category rows 0ms
+ ✓ tests/infrastructure/excel.test.ts > workbook boundary > round-trips administrative support personnel types 3ms
+ ✓ tests/infrastructure/excel.test.ts > workbook boundary > round-trips the team-leader personnel flag 2ms
+ ✓ tests/infrastructure/excel.test.ts > workbook boundary > round-trips CX preflight personnel qualifications 2ms
+ ✓ tests/infrastructure/excel.test.ts > workbook boundary > round-trips duty personnel qualifications 2ms
+ ✓ tests/infrastructure/excel.test.ts > workbook boundary > round-trips standby personnel qualifications 2ms
+ ✓ tests/infrastructure/excel.test.ts > workbook boundary > ships a downloadable configuration template with current qualification and rule fields 13ms
+ ✓ tests/infrastructure/excel.test.ts > workbook boundary > round-trips every editable scheduling setting and rule table 3ms
+ ✓ tests/infrastructure/excel.test.ts > workbook boundary > defaults missing flight-count exemption rows when importing an older rule sheet 2ms
+ ✓ tests/infrastructure/excel.test.ts > workbook boundary > rejects an invalid team-leader gap-fill protection sheet without partial import 2ms
+ ✓ tests/infrastructure/excel.test.ts > workbook boundary > keeps settings absent when importing an older configuration workbook 0ms
+ ✓ tests/infrastructure/excel.test.ts > workbook boundary > treats a present rule sheet with only a header as an explicit clear 0ms
+ ✓ tests/infrastructure/excel.test.ts > workbook boundary > keeps present empty configuration sheets distinguishable from missing sheets 1ms
+ ✓ tests/infrastructure/excel.test.ts > workbook boundary > does not bind imported history to old-device staff after an explicit staff clear 1ms
+ ✓ tests/infrastructure/excel.test.ts > workbook boundary > rejects one invalid rule sheet without blocking another valid sheet 0ms
+ ✓ tests/infrastructure/excel.test.ts > workbook boundary > preserves rule ids and worksheet row order 0ms
+ ✓ tests/infrastructure/excel.test.ts > workbook boundary > exports manually entered names and cell remarks in the horizontal detail 232ms
+
+ Test Files  8 passed (8)
+      Tests  180 passed (180)
+   Start at  11:48:46
+   Duration  10.08s (transform 7.21s, setup 0ms, import 10.15s, tests 9.80s, environment 1.02s)
+

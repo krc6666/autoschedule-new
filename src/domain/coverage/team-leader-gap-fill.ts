@@ -32,7 +32,10 @@ import {
   assignmentConsumesCrossWorkdayReservation,
   crossWorkdayReservationStatuses,
 } from "../reviews/cross-workday-qualification-reservation";
-import { teamLeaderGapFillAssignmentProtectionReasons } from "./team-leader-gap-fill-protection";
+import {
+  isTeamLeaderGapFillVacancy,
+  teamLeaderGapFillAssignmentProtectionReasons,
+} from "./team-leader-gap-fill-protection";
 
 export interface TeamLeaderGapFillChange {
   assignmentId: string;
@@ -513,18 +516,14 @@ export async function planTeamLeaderGapFill({
     const assignment = state.assignments.find(
       (item) => item.id === assignmentId
     );
-    if (!assignment) return [];
-    const rule = assignmentRule(state, assignment);
-    return assignment.status === "unfilled" &&
-      !assignment.staffId &&
-      rule?.category === "常规" &&
-      !rule.manual &&
-      !/^KE\s*166$/i.test(assignment.flightNo.trim())
+    return assignment && isTeamLeaderGapFillVacancy(state, assignment)
       ? [assignment]
       : [];
   });
   if (vacancies.length !== selectedIds.length)
-    return unavailable("所选岗位已不是可补差的普通空缺，请刷新后重选");
+    return unavailable(
+      "所选岗位已不是可补差的自动常规或机动督导空缺，请刷新后重选"
+    );
 
   const dutyStaffId = getDutyRosterForDate(state, date).dutyStaffId;
   const vacancyCandidateStaffIds = new Set(
@@ -807,15 +806,9 @@ export function applyTeamLeaderGapFillPreview(
   )
     return { kind: "rejected", reasons: ["所选空缺已变化，请重新预览"] };
   if (
-    vacancies.some((assignment) => {
-      const rule = assignmentRule(state, assignment);
-      return (
-        !rule ||
-        rule.category !== "常规" ||
-        rule.manual ||
-        /^KE\s*166$/i.test(assignment.flightNo.trim())
-      );
-    })
+    vacancies.some(
+      (assignment) => !isTeamLeaderGapFillVacancy(state, assignment)
+    )
   )
     return { kind: "rejected", reasons: ["所选空缺已不再符合补差范围"] };
   const changesByAssignmentId = new Map(

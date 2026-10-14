@@ -1,0 +1,191 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+stderr | tests/ui/team-leader-supervisor-gap-fill.test.ts
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+System.Management.Automation.RemoteException
+ × tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > directly fills a qualified non-KE166 mobile supervisor and clears old vacancy evidence 12ms
+   → expected 'unavailable' to be 'ready' // Object.is equality
+ × tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > fills the supervisor through a qualification chain when the leader cannot take it 2ms
+   → expected 'unavailable' to be 'ready' // Object.is equality
+ × tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > fills regular and supervisor vacancies in one atomic batch 1ms
+   → expected 'unavailable' to be 'ready' // Object.is equality
+ ✓ tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > keeps 'KE166' outside the target range in planning and confirmation 15ms
+ ✓ tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > keeps 'manual position' outside the target range in planning and confirmation 1ms
+ ✓ tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > keeps 'administrative position' outside the target range in planning and confirmation 1ms
+ ✓ tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > keeps 'ordinary guide target' outside the target range in planning and confirmation 1ms
+ ✓ tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > keeps 'diversion target' outside the target range in planning and confirmation 1ms
+ × tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > does not unlock an occupied mobile supervisor to close a qualification chain 2ms
+   → expected '所选岗位已不是可补差的普通空缺，请刷新后重选' to contain '机动督导岗位默认保护'
+ × tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > rejects a real overlap with another protected supervisor instead of enabling parallel supervision 2ms
+   → expected '所选岗位已不是可补差的普通空缺，请刷新后重选' to match /时间冲突/
+ ✓ tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > rejects an unqualified leader without a complete chain and leaves the original schedule 1ms
+ × tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > rejects a previously legal chain after 'supervisor qualification removed' 1ms
+   → expected 'unavailable' to be 'ready' // Object.is equality
+ × tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > rejects a previously legal chain after 'leader loses night capability' 1ms
+   → expected 'unavailable' to be 'ready' // Object.is equality
+ × tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > rejects a previously legal chain after 'supervisor becomes manual' 2ms
+   → expected 'unavailable' to be 'ready' // Object.is equality
+ × tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > rejects a previously legal chain after 'supervisor category changes' 2ms
+   → expected 'unavailable' to be 'ready' // Object.is equality
+ × tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > rejects a previously legal chain after 'source becomes protected' 1ms
+   → expected 'unavailable' to be 'ready' // Object.is equality
+ × tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > rejects a previously legal chain after 'hours limit decreases' 1ms
+   → expected 'unavailable' to be 'ready' // Object.is equality
+ × tests/ui/team-leader-supervisor-gap-fill.test.ts > supervisor vacancy selection > lists the actual mobile supervisor vacancy alongside a regular vacancy and emits its ID 28ms
+   → expected [ 'TW616 / G12' ] to deeply equal [ 'TW616 / 督导/引导', 'TW616 / G12' ]
+ × tests/ui/team-leader-supervisor-gap-fill.test.ts > supervisor vacancy selection > continues to hide KE166, manual, administrative, guide and diversion targets 6ms
+   → expected  to have a length of 1 but got +0
+System.Management.Automation.RemoteException
+⎯⎯⎯⎯⎯⎯ Failed Tests 13 ⎯⎯⎯⎯⎯⎯⎯
+System.Management.Automation.RemoteException
+ FAIL  tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > directly fills a qualified non-KE166 mobile supervisor and clears old vacancy evidence
+AssertionError: expected 'unavailable' to be 'ready' // Object.is equality
+System.Management.Automation.RemoteException
+Expected: "ready"
+Received: "unavailable"
+System.Management.Automation.RemoteException
+ ❯ tests/domain/team-leader-supervisor-gap-fill.test.ts:31:25
+     29|     const before = structuredClone(scenario.state.assignments);
+     30|     const result = await plan(scenario);
+     31|     expect(result.kind).toBe("ready");
+       |                         ^
+     32|     if (result.kind !== "ready") throw new Error(result.reasons.join("…
+     33|     expect(scenario.state.assignments).toEqual(before);
+System.Management.Automation.RemoteException
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/13]⎯
+System.Management.Automation.RemoteException
+ FAIL  tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > fills the supervisor through a qualification chain when the leader cannot take it
+AssertionError: expected 'unavailable' to be 'ready' // Object.is equality
+System.Management.Automation.RemoteException
+Expected: "ready"
+Received: "unavailable"
+System.Management.Automation.RemoteException
+ ❯ tests/domain/team-leader-supervisor-gap-fill.test.ts:60:25
+     58|     const before = structuredClone(scenario.state.assignments);
+     59|     const result = await plan(scenario);
+     60|     expect(result.kind).toBe("ready");
+       |                         ^
+     61|     if (result.kind !== "ready") throw new Error(result.reasons.join("…
+     62|     expect(scenario.state.assignments).toEqual(before);
+System.Management.Automation.RemoteException
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/13]⎯
+System.Management.Automation.RemoteException
+ FAIL  tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > fills regular and supervisor vacancies in one atomic batch
+AssertionError: expected 'unavailable' to be 'ready' // Object.is equality
+System.Management.Automation.RemoteException
+Expected: "ready"
+Received: "unavailable"
+System.Management.Automation.RemoteException
+ ❯ tests/domain/team-leader-supervisor-gap-fill.test.ts:89:25
+     87|     scenario.state.assignments.push(extraVacancy);
+     88|     const result = await plan(scenario, [scenario.vacancy.id, extraVac…
+     89|     expect(result.kind).toBe("ready");
+       |                         ^
+     90|     if (result.kind !== "ready") throw new Error(result.reasons.join("…
+     91|     const applied = applyTeamLeaderGapFillPreview(scenario.state, resu…
+System.Management.Automation.RemoteException
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/13]⎯
+System.Management.Automation.RemoteException
+ FAIL  tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > does not unlock an occupied mobile supervisor to close a qualification chain
+AssertionError: expected '所选岗位已不是可补差的普通空缺，请刷新后重选' to contain '机动督导岗位默认保护'
+System.Management.Automation.RemoteException
+Expected: "机动督导岗位默认保护"
+Received: "所选岗位已不是可补差的普通空缺，请刷新后重选"
+System.Management.Automation.RemoteException
+ ❯ tests/domain/team-leader-supervisor-gap-fill.test.ts:131:38
+    129|     expect(result.kind).toBe("unavailable");
+    130|     if (result.kind !== "unavailable") throw new Error("protected sour…
+    131|     expect(result.reasons.join("；")).toContain("机动督导岗位默认保护");
+       |                                      ^
+    132|     expect(scenario.state.assignments).toEqual(before);
+    133|   });
+System.Management.Automation.RemoteException
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/13]⎯
+System.Management.Automation.RemoteException
+ FAIL  tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > rejects a real overlap with another protected supervisor instead of enabling parallel supervision
+AssertionError: expected '所选岗位已不是可补差的普通空缺，请刷新后重选' to match /时间冲突/
+System.Management.Automation.RemoteException
+- Expected:
+/时间冲突/
+System.Management.Automation.RemoteException
++ Received:
+"所选岗位已不是可补差的普通空缺，请刷新后重选"
+System.Management.Automation.RemoteException
+ ❯ tests/domain/team-leader-supervisor-gap-fill.test.ts:145:38
+    143|     expect(result.kind).toBe("unavailable");
+    144|     if (result.kind !== "unavailable") throw new Error("parallel super…
+    145|     expect(result.reasons.join("；")).toMatch(/时间冲突/);
+       |                                      ^
+    146|     expect(scenario.state.assignments).toEqual(before);
+    147|   });
+System.Management.Automation.RemoteException
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/13]⎯
+System.Management.Automation.RemoteException
+ FAIL  tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > rejects a previously legal chain after 'supervisor qualification removed'
+ FAIL  tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > rejects a previously legal chain after 'leader loses night capability'
+ FAIL  tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > rejects a previously legal chain after 'supervisor becomes manual'
+ FAIL  tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > rejects a previously legal chain after 'supervisor category changes'
+ FAIL  tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > rejects a previously legal chain after 'source becomes protected'
+ FAIL  tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > rejects a previously legal chain after 'hours limit decreases'
+AssertionError: expected 'unavailable' to be 'ready' // Object.is equality
+System.Management.Automation.RemoteException
+Expected: "ready"
+Received: "unavailable"
+System.Management.Automation.RemoteException
+ ❯ tests/domain/team-leader-supervisor-gap-fill.test.ts:171:25
+    169|     const scenario = createSupervisorGapFillScenario();
+    170|     const result = await plan(scenario);
+    171|     expect(result.kind).toBe("ready");
+       |                         ^
+    172|     if (result.kind !== "ready") throw new Error(result.reasons.join("…
+    173|     change(scenario);
+System.Management.Automation.RemoteException
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/13]⎯
+System.Management.Automation.RemoteException
+ FAIL  tests/ui/team-leader-supervisor-gap-fill.test.ts > supervisor vacancy selection > lists the actual mobile supervisor vacancy alongside a regular vacancy and emits its ID
+AssertionError: expected [ 'TW616 / G12' ] to deeply equal [ 'TW616 / 督导/引导', 'TW616 / G12' ]
+System.Management.Automation.RemoteException
+- Expected
++ Received
+System.Management.Automation.RemoteException
+  [
+-   "TW616 / 督导/引导",
+    "TW616 / G12",
+  ]
+System.Management.Automation.RemoteException
+ ❯ tests/ui/team-leader-supervisor-gap-fill.test.ts:20:82
+     18|     });
+     19|     const labels = [...element.querySelectorAll<HTMLLabelElement>(".li…
+     20|     expect(labels.map((label) => label.textContent.replace(/\s+/g, " "…
+       |                                                                                  ^
+     21|     const checkbox = labels.find((label) => label.textContent.includes…
+     22|     expect(checkbox).toBeTruthy();
+System.Management.Automation.RemoteException
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/13]⎯
+System.Management.Automation.RemoteException
+ FAIL  tests/ui/team-leader-supervisor-gap-fill.test.ts > supervisor vacancy selection > continues to hide KE166, manual, administrative, guide and diversion targets
+AssertionError: expected  to have a length of 1 but got +0
+System.Management.Automation.RemoteException
+- Expected
++ Received
+System.Management.Automation.RemoteException
+- 1
++ 0
+System.Management.Automation.RemoteException
+ ❯ tests/ui/team-leader-supervisor-gap-fill.test.ts:46:58
+     44|       dialog: { kind: "team-leader-gap-fill", selectedTeamLeaderId: le…
+     45|     });
+     46|     expect(element.querySelectorAll(".list-group-item")).toHaveLength(…
+       |                                                          ^
+     47|     expect(element.querySelector(".list-group-item")?.textContent).toC…
+     48|   });
+System.Management.Automation.RemoteException
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/13]⎯
+System.Management.Automation.RemoteException
+
+ Test Files  2 failed (2)
+      Tests  13 failed | 6 passed (19)
+   Start at  11:34:22
+   Duration  1.30s (transform 856ms, setup 0ms, import 1.02s, tests 87ms, environment 615ms)
+

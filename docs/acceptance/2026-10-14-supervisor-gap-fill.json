@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-10-14-supervisor-gap-fill",
+  "title": "非 KE166 自动机动督导空岗进入分队长补差",
+  "startedFrom": "3f50c065b5cdeda040ad6b424f63b3954f9a77a3",
+  "expectation": {
+    "example": "owner 2026-10-13 截图：CX937（晚）/G12 和 TW616/督导/引导为空，分队长补差只列 G12；2026-10-14 owner 明确确认 TW616 岗位分类为机动督导，并授权按建议修复。",
+    "expected": "非 KE166 自动机动督导空岗与原自动常规空岗均能选择、预览和原子确认；有资质分队长可直接接岗，无该资质可通过原安全换人链腾出合格人员。三个环节消费同一范围判断。",
+    "unchanged": "不改航班页、岗位分类、已排岗位移动保护、KE166/人工/行政支援排除、普通引导/分流目标范围、补差黄灯、资质/夜班/真实冲突/衔接/工时、非并行督导、原存储和Excel合同。历史教训核对9/23保护范围唯一事实、9/22资格链与让步、10/13最终空岗投影。",
+    "fallback": "无安全完整方案或确认前输入变化时整批拒绝并说明原因，保留原班表，不制造新空岗；页面真实验收由owner操作，未取得结果保持未验收。"
+  },
+  "testedVersion": "c9fcc19b66684a7d699f631814e5b9e194242ffab96214afa67f2c7d299475c9",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "现场现象由owner证据确认，并由修改前回归测试稳定复现列表过滤和规划拒绝。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-14-supervisor-gap-fill-owner.txt",
+          "summary": "owner提供现象、TW616分类和修复授权。",
+          "sha256": "d510cd9e5f8a456dbfdce0021b86d95479fb1f261e3c7a230c7b7e4f322cf340"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-14-supervisor-gap-fill-red.txt",
+          "summary": "修改前19项定向回归中13项失败，命中目标漏列与规划拒绝。",
+          "sha256": "377afc80b246f6237682f213299b021eddef8b51e4a5c640e3f23f0c2b484657"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "直接补督导、常规+督导混合批次及页面选择命令通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-14-supervisor-gap-fill-focused.txt",
+          "summary": "8个直接消费者测试文件180项通过。",
+          "sha256": "e99f1ba7c7046c6a5cd96530d049ae317d6a7efbfd6cf438fb50352b21e9bd22"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "分队长无目标资质时的原安全换人链、固定排除和无方案回退通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-14-supervisor-gap-fill-focused.txt",
+          "summary": "真实HiGHS链式补差及固定排除回归通过。",
+          "sha256": "e99f1ba7c7046c6a5cd96530d049ae317d6a7efbfd6cf438fb50352b21e9bd22"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "确认后状态恢复、Excel读写、归档和旧空岗说明清理通过；补差标记恢复漏读已补回归。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-14-supervisor-gap-fill-focused.txt",
+          "summary": "Store/localStorage、Excel和归档往返通过。",
+          "sha256": "e99f1ba7c7046c6a5cd96530d049ae317d6a7efbfd6cf438fb50352b21e9bd22"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-14-supervisor-gap-fill-verify-final.txt",
+          "summary": "最终完整验证包含构建和性能阶段。",
+          "sha256": "3d9dd972f70436b03cc3aaa05a109e6af74ec45cb24bc8e14a902e29dea5df6c"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "预览后资质、夜班、分类、人工、源岗位保护和工时变化均被确认拒绝，真实冲突保持原班表。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-14-supervisor-gap-fill-focused.txt",
+          "summary": "后置改坏和冲突原子回退测试通过。",
+          "sha256": "e99f1ba7c7046c6a5cd96530d049ae317d6a7efbfd6cf438fb50352b21e9bd22"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "KE166、人工、行政支援、普通引导/分流、已排督导保护及原补差消费者保持原行为。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-14-supervisor-gap-fill-focused.txt",
+          "summary": "固定排除、源保护及原补差测试通过。",
+          "sha256": "e99f1ba7c7046c6a5cd96530d049ae317d6a7efbfd6cf438fb50352b21e9bd22"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "自动测试和导出/恢复产物已验证；修复版真实浏览器页面尚未由owner按现场步骤确认。",
+      "evidence": []
+    }
+  },
+  "answers": {
+    "originalFailure": "修改前失败证据显示三处只接受常规分类，19项中13项失败；修改后同组19项通过。",
+    "laterChanges": "后置安全检查、确认前输入变化、存储恢复和Excel/归档均用定向集成测试覆盖；真实冲突及不安全链保持整批回退。",
+    "finalArtifact": "自动最终产物已由真实coordinator、localStorage、Excel和归档测试证明；修复版浏览器页面尚未由owner操作验收，因此保持未验证。"
+  },
+  "review": {
+    "missedScope": "首次实现漏了持久化恢复对Assignment.teamLeaderGapFill的读取；通过端到端往返测试发现并补上，页面现场仍待owner验收。",
+    "rootCause": "目标范围在弹窗、planner和apply三处各自硬编码为常规分类，机动督导空岗在资格和安全检查前被过滤；已有岗位保护与目标空岗范围被混为一谈。",
+    "earlyDetection": "以后确认唯一范围判断后，改前同时列出UI、planner、apply和恢复/导出消费者，并先跑真实coordinator端到端往返；出现目标列表与最终结果不一致或标记恢复丢失时立即停止扩大修改。"
+  }
+}

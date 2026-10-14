@@ -597,6 +597,7 @@ function restoredAssignment(value: unknown): Assignment | null {
     assignment.supervisorSourceAssignmentId = supervisorSourceAssignmentId;
   if (typeof value.supervisorFillRuleId === "string")
     assignment.supervisorFillRuleId = value.supervisorFillRuleId;
+  if (value.teamLeaderGapFill === true) assignment.teamLeaderGapFill = true;
   if (value.layoutGroup === "primary" || value.layoutGroup === "bottom")
     assignment.layoutGroup = value.layoutGroup;
   if (

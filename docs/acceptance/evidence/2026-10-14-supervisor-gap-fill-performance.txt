@@ -1,0 +1,13 @@
+
+> autoschedule@1.0.0 test:performance
+> vitest run tests/performance
+
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+
+ Test Files  7 passed (7)
+      Tests  19 passed (19)
+   Start at  11:56:00
+   Duration  70.60s (transform 5.61s, setup 0ms, import 7.88s, tests 235.65s, environment 581ms)
+

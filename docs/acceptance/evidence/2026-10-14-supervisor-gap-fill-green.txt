@@ -1,0 +1,31 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+stderr | tests/ui/team-leader-supervisor-gap-fill.test.ts
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+System.Management.Automation.RemoteException
+ ✓ tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > directly fills a qualified non-KE166 mobile supervisor and clears old vacancy evidence 92ms
+ ✓ tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > fills the supervisor through a qualification chain when the leader cannot take it 10ms
+ ✓ tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > fills regular and supervisor vacancies in one atomic batch 8ms
+ ✓ tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > keeps 'KE166' outside the target range in planning and confirmation 2ms
+ ✓ tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > keeps 'manual position' outside the target range in planning and confirmation 1ms
+ ✓ tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > keeps 'administrative position' outside the target range in planning and confirmation 1ms
+ ✓ tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > keeps 'ordinary guide target' outside the target range in planning and confirmation 2ms
+ ✓ tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > keeps 'diversion target' outside the target range in planning and confirmation 2ms
+ ✓ tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > does not unlock an occupied mobile supervisor to close a qualification chain 3ms
+ ✓ tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > rejects a real overlap with another protected supervisor instead of enabling parallel supervision 3ms
+ ✓ tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > rejects an unqualified leader without a complete chain and leaves the original schedule 2ms
+ ✓ tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > rejects a previously legal chain after 'supervisor qualification removed' 5ms
+ ✓ tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > rejects a previously legal chain after 'leader loses night capability' 4ms
+ ✓ tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > rejects a previously legal chain after 'supervisor becomes manual' 3ms
+ ✓ tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > rejects a previously legal chain after 'supervisor category changes' 3ms
+ ✓ tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > rejects a previously legal chain after 'source becomes protected' 4ms
+ ✓ tests/domain/team-leader-supervisor-gap-fill.test.ts > team leader supervisor gap fill > rejects a previously legal chain after 'hours limit decreases' 3ms
+ ✓ tests/ui/team-leader-supervisor-gap-fill.test.ts > supervisor vacancy selection > lists the actual mobile supervisor vacancy alongside a regular vacancy and emits its ID 23ms
+ ✓ tests/ui/team-leader-supervisor-gap-fill.test.ts > supervisor vacancy selection > continues to hide KE166, manual, administrative, guide and diversion targets 5ms
+
+ Test Files  2 passed (2)
+      Tests  19 passed (19)
+   Start at  11:35:11
+   Duration  1.09s (transform 871ms, setup 0ms, import 1.04s, tests 180ms, environment 399ms)
+

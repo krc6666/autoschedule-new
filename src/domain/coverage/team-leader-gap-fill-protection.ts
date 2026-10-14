@@ -69,6 +69,24 @@ export function fixedTeamLeaderGapFillPositionReason(
   return null;
 }
 
+/** Filling an empty target does not grant permission to move an occupied source. */
+export function isTeamLeaderGapFillVacancy(
+  state: Pick<ScheduleGenerationFacts, "positionRules">,
+  assignment: Assignment
+): boolean {
+  const rule = assignmentRule(state, assignment);
+  return Boolean(
+    assignment.status === "unfilled" &&
+    !assignment.staffId &&
+    rule &&
+    (rule.category === "常规" || rule.category === "机动督导") &&
+    !fixedTeamLeaderGapFillPositionReason({
+      ...rule,
+      flightNo: assignment.flightNo,
+    })
+  );
+}
+
 export function teamLeaderGapFillPositionDisposition(
   state: Pick<ScheduleGenerationFacts, "settings">,
   rule: PositionRule

@@ -115,6 +115,39 @@ describe("state persistence", () => {
     ).toEqual([]);
   });
 
+  it("restores the team-leader gap-fill marker on assignments", () => {
+    const state = createDefaultState();
+    const flight = state.flights.find((item) => item.flightNo === "CX937")!;
+    const rule = state.positionRules.find(
+      (item) => item.flightNo === flight.flightNo && item.name === "G12"
+    )!;
+    state.assignments = [
+      {
+        id: "gap-fill",
+        flightId: flight.id,
+        flightNo: flight.flightNo,
+        positionRuleId: rule.id,
+        position: rule.name,
+        staffId: state.staff[0]!.id,
+        staffName: state.staff[0]!.name,
+        startTime: "22:10",
+        endTime: "00:10",
+        workHours: 2,
+        fatiguePoints: 9,
+        remark: "",
+        manualRemark: "",
+        status: "assigned",
+        teamLeaderGapFill: true,
+      },
+    ];
+    let value = "";
+    saveState(state, { setItem: (_key, next) => (value = next) });
+
+    expect(
+      loadState({ getItem: () => value }).assignments[0]?.teamLeaderGapFill
+    ).toBe(true);
+  });
+
   it("migrates v6 cross-flight position rows without guessing people", () => {
     const legacy = JSON.parse(JSON.stringify(createDefaultState()));
     legacy.version = 6;

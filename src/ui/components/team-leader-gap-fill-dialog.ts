@@ -2,7 +2,7 @@ import { html, nothing } from "lit";
 
 import type { ApplicationDialog } from "../../app/application-view-state";
 import type { AppState } from "../../model";
-import { assignmentRule } from "../../domain/flights/schedule-position-rules";
+import { isTeamLeaderGapFillVacancy } from "../../domain/coverage/team-leader-gap-fill-protection";
 import { dispatchUiCommand } from "../events/ui-command";
 import { LightDomElement } from "./light-dom-element";
 
@@ -27,16 +27,9 @@ export class TeamLeaderGapFillDialogElement extends LightDomElement {
         person.status === "正常" &&
         person.staffType === "常规"
     );
-    const vacancies = this.model.assignments.filter((assignment) => {
-      const rule = assignmentRule(this.model, assignment);
-      return (
-        assignment.status === "unfilled" &&
-        !assignment.staffId &&
-        rule?.category === "常规" &&
-        !rule.manual &&
-        !/^KE\s*166$/i.test(assignment.flightNo.trim())
-      );
-    });
+    const vacancies = this.model.assignments.filter((assignment) =>
+      isTeamLeaderGapFillVacancy(this.model, assignment)
+    );
     const selected = new Set(this.dialog.selectedVacancyAssignmentIds);
     return html`
       <div class="modal-body">
@@ -130,8 +123,8 @@ export class TeamLeaderGapFillDialogElement extends LightDomElement {
                     (change) =>
                       html`<li>
                         ${change.flightNo}/${change.position}：${
-                        change.fromStaffName || "空缺"
-                      }
+                          change.fromStaffName || "空缺"
+                        }
                         → ${change.toStaffName}
                       </li>`
                   )}
@@ -145,8 +138,8 @@ export class TeamLeaderGapFillDialogElement extends LightDomElement {
                         <strong>黄灯提醒</strong>
                         <ul class="mb-0">
                           ${this.dialog.preview.warnings.map(
-                          (warning) => html`<li>${warning}</li>`
-                        )}
+                            (warning) => html`<li>${warning}</li>`
+                          )}
                         </ul>
                       </div>`
                     : nothing
@@ -157,8 +150,8 @@ export class TeamLeaderGapFillDialogElement extends LightDomElement {
                         <summary>未采用的候选方案</summary>
                         <ul class="mb-0 mt-2">
                           ${this.dialog.preview.rejectedCandidates.map(
-                          (reason) => html`<li>${reason}</li>`
-                        )}
+                            (reason) => html`<li>${reason}</li>`
+                          )}
                         </ul>
                       </details>`
                     : nothing

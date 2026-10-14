@@ -1,0 +1,45 @@
+
+> autoschedule@1.0.0 verify
+> npm run typecheck && npm test && npm run test:performance && npm run build
+
+
+> autoschedule@1.0.0 typecheck
+> tsc -b --pretty false
+
+
+> autoschedule@1.0.0 test
+> vitest run --exclude tests/performance/**
+
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/infrastructure/storage.test.ts (42 tests | 1 failed) 824ms
+     × restores the team-leader gap-fill marker on assignments 26ms
+System.Management.Automation.RemoteException
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+System.Management.Automation.RemoteException
+ FAIL  tests/infrastructure/storage.test.ts > state persistence > restores the team-leader gap-fill marker on assignments
+AssertionError: expected undefined to be true // Object.is equality
+System.Management.Automation.RemoteException
+- Expected:
+true
+System.Management.Automation.RemoteException
++ Received:
+undefined
+System.Management.Automation.RemoteException
+ ❯ tests/infrastructure/storage.test.ts:144:7
+    142|     expect(
+    143|       loadState({ getItem: () => value }).assignments[0]?.teamLeaderGa…
+    144|     ).toBe(true);
+       |       ^
+    145|   });
+    146|
+System.Management.Automation.RemoteException
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+System.Management.Automation.RemoteException
+
+ Test Files  1 failed | 140 passed (141)
+      Tests  1 failed | 1337 passed (1338)
+   Start at  11:57:33
+   Duration  89.72s (transform 18.63s, setup 0ms, import 55.05s, tests 298.50s, environment 15.13s)
+
