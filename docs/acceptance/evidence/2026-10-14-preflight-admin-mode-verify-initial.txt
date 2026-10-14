@@ -1,0 +1,9 @@
+
+> autoschedule@1.0.0 verify
+> npm run typecheck && npm test && npm run test:performance && npm run build
+
+
+> autoschedule@1.0.0 typecheck
+> tsc -b --pretty false
+
+tests/app/preflight-admin-mode.test.ts(248,9): error TS2554: Expected 2-3 arguments, but got 1.

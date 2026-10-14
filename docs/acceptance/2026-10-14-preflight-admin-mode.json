@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-10-14-preflight-admin-mode",
+  "title": "三个排班准备窗口前置行政支援模式开关",
+  "startedFrom": "67a99656cc695885c8c382bdf90aae091d729105",
+  "expectation": {
+    "example": "当前行政支援关闭，打开生成、重排或归档后天准备窗口，在选择航班前打开模式并确认。反向覆盖当前开启而本次关闭。",
+    "expected": "三个窗口顶部都有开关，默认沿用当前模式；编辑只更新草稿，确认计算一次且使用所选模式，安全成功后一起提交模式和班表。",
+    "unchanged": "行政支援资格、岗位优先级、人工安排、工时疲劳、安全检查与原工具栏开关不变；不新增存储或Excel字段。参考history三入口预检与轮值回显事故：既测窗口实际checked，也测计算输入及提交。",
+    "fallback": "取消、计算异常或安全安装失败保留原模型、日期、模式和历史。owner明确保留重新排班的停止并采用：通过安全安装后一起采用班表和所选模式；停止不采用回退，生成和归档后天任一种停止均回退。"
+  },
+  "testedVersion": "f282a4d4ba961e4bcb78b0d855152ddb2fda0f77f43758ec1f321ac001f7517f",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "修改前两文件35项中21项失败，指向三个准备草稿未含模式、共用命令缺失和页面无开关；修改后同一行为与扩展回归通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-14-preflight-admin-mode-red.txt",
+          "summary": "修改前18项app及3项UI失败，14项原行为通过。",
+          "sha256": "91e6c1dab632a5642c9f5d39d1fc6671b95917f22a46dd1c93189cb1539c069c"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-14-preflight-admin-mode-verify-commit.txt",
+          "summary": "最终代码包含31项模式app测试与20项准备窗口UI测试，完整功能验证通过。",
+          "sha256": "3790e5c3d5916836c3f9e81d731fa7906384ca1795a3ab5ee56a8dbc44513cc2"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "三入口默认继承、开关双向、只改草稿、确认只计算一次、成功提交模式/班表并回显均通过；UI直接断言实际checked及顶部位置。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-14-preflight-admin-mode-verify-commit.txt",
+          "summary": "最终完整验证142个功能文件/1375项通过，包括真实UI及coordinator的前置模式回归。",
+          "sha256": "3790e5c3d5916836c3f9e81d731fa7906384ca1795a3ab5ee56a8dbc44513cc2"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "三入口取消、计算异常、无凭证和停止不采用均保留原模型；停止并采用仅安全重新排班提交所选模式，另两入口仍回退；运行期间草稿命令及再次计算受阻。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-14-preflight-admin-mode-focused.txt",
+          "summary": "6个文件182项通过，新增停止安全/无凭证结果及并发保护回归。",
+          "sha256": "2577a0670eb324f342376da194d3a3d9aec959da49bcff2d17e6b66b42bf6576"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-14-preflight-admin-mode-verify-commit.txt",
+          "summary": "参数补齐后的最终代码仍完整通过1375项功能测试。",
+          "sha256": "3790e5c3d5916836c3f9e81d731fa7906384ca1795a3ab5ee56a8dbc44513cc2"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "三入口及模式双向通过真实HiGHS kernel与原后置管线；常规岗位工时不变，行政支援岗位仅开启时生成，归档取原来源日期记录，Store保存和真实localStorage恢复一致；未新增业务硬约束。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-14-preflight-admin-mode-verify-commit.txt",
+          "summary": "完整功能测试包含真实kernel、localStorage、Excel、归档、Worker和安全管线，构建生成原Worker/WASM产物。",
+          "sha256": "3790e5c3d5916836c3f9e81d731fa7906384ca1795a3ab5ee56a8dbc44513cc2"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "模式只写临时模型并按原安全安装原子提交；完成结果与停止采用结果缺凭证均拒绝重新排班提交，原模式/班表/日期/历史保留。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-14-preflight-admin-mode-verify-commit.txt",
+          "summary": "无凭证完成和停止结果回退，以及真实kernel安全安装测试通过。",
+          "sha256": "3790e5c3d5916836c3f9e81d731fa7906384ca1795a3ab5ee56a8dbc44513cc2"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "沿用settings唯一事实，不新增字段；真实localStorage往返保持模式和班表，配置Excel不导出模式；原工具栏、资格、人工、疲劳、补差及安全消费者由完整回归验证。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-14-preflight-admin-mode-verify-commit.txt",
+          "summary": "typecheck、1375功能、19性能、build全通过，verify退出0。",
+          "sha256": "3790e5c3d5916836c3f9e81d731fa7906384ca1795a3ab5ee56a8dbc44513cc2"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "verified",
+      "reason": "owner已在修改后的本地页面确认看到开关，并确认先选相反模式再排班只计算一次、工具栏模式和行政支援岗位一致。三入口共用UI与控制器及取消回退有自动测试覆盖；owner未单独列出三入口逐项操作或取消回退的现场结果，现场确认限定于上述核心场景。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-14-preflight-admin-mode-owner.txt",
+          "summary": "owner两次原文反馈：有 这个开关了；符合，只计算一次且模式与岗位一致。",
+          "sha256": "9665620fbf7e4820a26d80d599631c9d8432efb2f70d71ed829fc4d99cee4e59"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "docs/acceptance/evidence/2026-10-14-preflight-admin-mode-red.txt证明三入口及实际开关的21项失败；最终verify日志证明同类回归通过，断言checked、输入模式与一次计算。",
+    "laterChanges": "计算安全安装、停止采用、归档、Store共享设置与localStorage恢复可能改坏模式；最终verify中的三入口真实kernel与回退/往返测试覆盖，Excel仍排除该字段，原工具栏即时计算未修改。",
+    "finalArtifact": "最终verify证明三入口真实kernel的行政支援岗位与所选模式一致、保存恢复一致；owner.txt证明本地页面看到开关，并实际确认先选模式再计算的一次计算、工具栏与岗位一致。三入口逐项现场操作和取消回退未单独反馈，自动测试已覆盖。"
+  },
+  "review": {
+    "missedScope": "核对三入口、公用控件、命令、原工具栏、临时模型、停止采用、安全安装、归档、存储与Excel。停止概述冲突已由owner裁决并澄清；测试parseWorkbook参数缺漏由完整类型检查发现并修正。owner已确认核心页面效果；三入口逐项及取消回退未单独取得现场反馈，保持自动与现场证据覆盖范围区分。",
+    "rootCause": "行政支援模式只在工具栏即时变更入口生效，准备草稿没有该字段，三入口计算前没有应用本次模式选择，所以需要先排班再切模式重算。",
+    "earlyDetection": "今后增加准备字段时，改前列齐所有入口及成功/停止/失败提交点，先用真实控件checked及coordinator计算输入写失败测试；Vitest通过后仍跑类型检查，真实kernel与保存恢复核对完成后再收现场证据。"
+  }
+}

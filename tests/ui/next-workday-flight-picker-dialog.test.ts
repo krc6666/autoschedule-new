@@ -82,6 +82,59 @@ it.each([
 });
 
 describe("next workday flight picker dialog", () => {
+  it.each(
+    (
+      [
+        "schedule-preflight",
+        "reschedule-flight-picker",
+        "next-workday-flight-picker",
+      ] as const
+    ).flatMap((kind) => [false, true].map((enabled) => ({ kind, enabled })))
+  )(
+    "$kind puts the $enabled administrative draft toggle before flight choices",
+    async ({ kind, enabled }) => {
+      const model = createDefaultState();
+      model.settings.adminSupportEnabled = false;
+      const candidates = buildCurrentScheduleFlightCandidates(
+        model.templates,
+        model.flights
+      );
+      const element = await mountElement<
+        HTMLElement & { updateComplete: Promise<unknown> }
+      >("autoschedule-app-dialog", {
+        model,
+        dialog: {
+          kind,
+          date: "2026-08-17",
+          sourceDate: "2026-08-15",
+          weekday: 1,
+          groupId: model.activeGroupId,
+          candidates,
+          selectedIds: [candidates[0]!.id],
+          staffStatuses: {},
+          adminSupportEnabled: enabled,
+        },
+      });
+      const commands: UiCommandEvent["detail"][] = [];
+      element.addEventListener(UI_COMMAND_EVENT, (event) =>
+        commands.push((event as UiCommandEvent).detail)
+      );
+      const input = element.querySelector<HTMLInputElement>(
+        'input[aria-label="是否启用行政支援模式"]'
+      );
+      expect(input).not.toBeNull();
+      expect(input!.checked).toBe(enabled);
+      const body = element.querySelector(".next-workday-flight-picker")!;
+      expect(body.firstElementChild!.contains(input)).toBe(true);
+      input!.checked = !enabled;
+      input!.dispatchEvent(new Event("change", { bubbles: true }));
+      expect(commands).toEqual([
+        { type: "update-preflight-administrative-mode", enabled: !enabled },
+      ]);
+      expect(model.settings.adminSupportEnabled).toBe(false);
+    }
+  );
+
   it("renders current reschedule choices with today's flights selected", async () => {
     const model = createDefaultState();
     const current = [model.flights[0]!];
@@ -111,7 +164,9 @@ describe("next workday flight picker dialog", () => {
     ).not.toBeNull();
     expect(element.textContent).not.toContain("归档并生成后天排班");
     expect(
-      element.querySelectorAll('input[type="checkbox"]:checked').length
+      element.querySelectorAll(
+        '.next-workday-flight-choice input[type="checkbox"]:checked'
+      ).length
     ).toBe(1);
     expect(
       element.querySelector<HTMLInputElement>(
@@ -155,7 +210,7 @@ describe("next workday flight picker dialog", () => {
     });
 
     const unchecked = element.querySelector<HTMLInputElement>(
-      'input[type="checkbox"]:not(:checked)'
+      '.next-workday-flight-choice input[type="checkbox"]:not(:checked)'
     )!;
     unchecked.checked = true;
     unchecked.dispatchEvent(new Event("change", { bubbles: true }));
@@ -201,9 +256,11 @@ describe("next workday flight picker dialog", () => {
     expect(element.textContent).toContain("全选");
     expect(element.textContent).toContain("清空");
     expect(element.textContent).toContain("已选择");
-    expect(element.querySelectorAll('input[type="checkbox"]').length).toBe(
-      candidates.length
-    );
+    expect(
+      element.querySelectorAll(
+        '.next-workday-flight-choice input[type="checkbox"]'
+      ).length
+    ).toBe(candidates.length);
     const passengerInputs = element.querySelectorAll<HTMLInputElement>(
       'input[type="number"][data-next-workday-passengers]'
     );

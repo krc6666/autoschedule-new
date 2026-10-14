@@ -1,0 +1,190 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/app/preflight-admin-mode.test.ts (18 tests | 18 failed) 109ms
+     × 'generate-schedule' inherits false and commits the selected mode after exactly one calculation 29ms
+     × 'generate-schedule' inherits true and commits the selected mode after exactly one calculation 5ms
+     × 'open-reschedule-flight-picker' inherits false and commits the selected mode after exactly one calculation 4ms
+     × 'open-reschedule-flight-picker' inherits true and commits the selected mode after exactly one calculation 4ms
+     × 'archive-next-duty-day' inherits false and commits the selected mode after exactly one calculation 5ms
+     × 'archive-next-duty-day' inherits true and commits the selected mode after exactly one calculation 4ms
+     × 'generate-schedule' preserves the entire original model and mode on 'cancel' 5ms
+     × 'generate-schedule' preserves the entire original model and mode on 'failure' 5ms
+     × 'generate-schedule' preserves the entire original model and mode on 'invalid-result' 4ms
+     × 'generate-schedule' preserves the entire original model and mode on 'stopped-without-result' 4ms
+     × 'open-reschedule-flight-picker' preserves the entire original model and mode on 'cancel' 5ms
+     × 'open-reschedule-flight-picker' preserves the entire original model and mode on 'failure' 5ms
+     × 'open-reschedule-flight-picker' preserves the entire original model and mode on 'invalid-result' 4ms
+     × 'open-reschedule-flight-picker' preserves the entire original model and mode on 'stopped-without-result' 4ms
+     × 'archive-next-duty-day' preserves the entire original model and mode on 'cancel' 5ms
+     × 'archive-next-duty-day' preserves the entire original model and mode on 'failure' 6ms
+     × 'archive-next-duty-day' preserves the entire original model and mode on 'invalid-result' 6ms
+     × 'archive-next-duty-day' preserves the entire original model and mode on 'stopped-without-result' 5ms
+ ❯ tests/ui/next-workday-flight-picker-dialog.test.ts (17 tests | 3 failed) 332ms
+     × schedule-preflight puts the administrative draft toggle before flight choices 15ms
+     × reschedule-flight-picker puts the administrative draft toggle before flight choices 11ms
+     × next-workday-flight-picker puts the administrative draft toggle before flight choices 16ms
+stderr | tests/ui/next-workday-flight-picker-dialog.test.ts
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+System.Management.Automation.RemoteException
+System.Management.Automation.RemoteException
+⎯⎯⎯⎯⎯⎯ Failed Tests 21 ⎯⎯⎯⎯⎯⎯⎯
+System.Management.Automation.RemoteException
+ FAIL  tests/app/preflight-admin-mode.test.ts > preflight administrative mode draft > 'generate-schedule' inherits false and commits the selected mode after exactly one calculation
+AssertionError: expected { kind: 'schedule-preflight', …(6) } to have property "adminSupportEnabled" with value false
+System.Management.Automation.RemoteException
+- Expected:
+false
+System.Management.Automation.RemoteException
++ Received:
+undefined
+System.Management.Automation.RemoteException
+ ❯ tests/app/preflight-admin-mode.test.ts:78:41
+     76|       setTestScheduleRunner(coordinator, { calculate });
+     77|       await coordinator.handle({ type: entry });
+     78|       expect(coordinator.view().dialog).toHaveProperty("adminSupportEn…
+       |                                         ^
+     79|       await coordinator.handle({ type: "update-preflight-administrativ…
+     80|       expect(coordinator.view().dialog).toHaveProperty("adminSupportEn…
+System.Management.Automation.RemoteException
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/21]⎯
+System.Management.Automation.RemoteException
+ FAIL  tests/app/preflight-admin-mode.test.ts > preflight administrative mode draft > 'generate-schedule' inherits true and commits the selected mode after exactly one calculation
+AssertionError: expected { kind: 'schedule-preflight', …(6) } to have property "adminSupportEnabled" with value true
+System.Management.Automation.RemoteException
+- Expected:
+true
+System.Management.Automation.RemoteException
++ Received:
+undefined
+System.Management.Automation.RemoteException
+ ❯ tests/app/preflight-admin-mode.test.ts:78:41
+     76|       setTestScheduleRunner(coordinator, { calculate });
+     77|       await coordinator.handle({ type: entry });
+     78|       expect(coordinator.view().dialog).toHaveProperty("adminSupportEn…
+       |                                         ^
+     79|       await coordinator.handle({ type: "update-preflight-administrativ…
+     80|       expect(coordinator.view().dialog).toHaveProperty("adminSupportEn…
+System.Management.Automation.RemoteException
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/21]⎯
+System.Management.Automation.RemoteException
+ FAIL  tests/app/preflight-admin-mode.test.ts > preflight administrative mode draft > 'open-reschedule-flight-picker' inherits false and commits the selected mode after exactly one calculation
+AssertionError: expected { …(7) } to have property "adminSupportEnabled" with value false
+System.Management.Automation.RemoteException
+- Expected:
+false
+System.Management.Automation.RemoteException
++ Received:
+undefined
+System.Management.Automation.RemoteException
+ ❯ tests/app/preflight-admin-mode.test.ts:78:41
+     76|       setTestScheduleRunner(coordinator, { calculate });
+     77|       await coordinator.handle({ type: entry });
+     78|       expect(coordinator.view().dialog).toHaveProperty("adminSupportEn…
+       |                                         ^
+     79|       await coordinator.handle({ type: "update-preflight-administrativ…
+     80|       expect(coordinator.view().dialog).toHaveProperty("adminSupportEn…
+System.Management.Automation.RemoteException
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/21]⎯
+System.Management.Automation.RemoteException
+ FAIL  tests/app/preflight-admin-mode.test.ts > preflight administrative mode draft > 'open-reschedule-flight-picker' inherits true and commits the selected mode after exactly one calculation
+AssertionError: expected { …(7) } to have property "adminSupportEnabled" with value true
+System.Management.Automation.RemoteException
+- Expected:
+true
+System.Management.Automation.RemoteException
++ Received:
+undefined
+System.Management.Automation.RemoteException
+ ❯ tests/app/preflight-admin-mode.test.ts:78:41
+     76|       setTestScheduleRunner(coordinator, { calculate });
+     77|       await coordinator.handle({ type: entry });
+     78|       expect(coordinator.view().dialog).toHaveProperty("adminSupportEn…
+       |                                         ^
+     79|       await coordinator.handle({ type: "update-preflight-administrativ…
+     80|       expect(coordinator.view().dialog).toHaveProperty("adminSupportEn…
+System.Management.Automation.RemoteException
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/21]⎯
+System.Management.Automation.RemoteException
+ FAIL  tests/app/preflight-admin-mode.test.ts > preflight administrative mode draft > 'archive-next-duty-day' inherits false and commits the selected mode after exactly one calculation
+AssertionError: expected { …(9) } to have property "adminSupportEnabled" with value false
+System.Management.Automation.RemoteException
+- Expected:
+false
+System.Management.Automation.RemoteException
++ Received:
+undefined
+System.Management.Automation.RemoteException
+ ❯ tests/app/preflight-admin-mode.test.ts:78:41
+     76|       setTestScheduleRunner(coordinator, { calculate });
+     77|       await coordinator.handle({ type: entry });
+     78|       expect(coordinator.view().dialog).toHaveProperty("adminSupportEn…
+       |                                         ^
+     79|       await coordinator.handle({ type: "update-preflight-administrativ…
+     80|       expect(coordinator.view().dialog).toHaveProperty("adminSupportEn…
+System.Management.Automation.RemoteException
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/21]⎯
+System.Management.Automation.RemoteException
+ FAIL  tests/app/preflight-admin-mode.test.ts > preflight administrative mode draft > 'archive-next-duty-day' inherits true and commits the selected mode after exactly one calculation
+AssertionError: expected { …(9) } to have property "adminSupportEnabled" with value true
+System.Management.Automation.RemoteException
+- Expected:
+true
+System.Management.Automation.RemoteException
++ Received:
+undefined
+System.Management.Automation.RemoteException
+ ❯ tests/app/preflight-admin-mode.test.ts:78:41
+     76|       setTestScheduleRunner(coordinator, { calculate });
+     77|       await coordinator.handle({ type: entry });
+     78|       expect(coordinator.view().dialog).toHaveProperty("adminSupportEn…
+       |                                         ^
+     79|       await coordinator.handle({ type: "update-preflight-administrativ…
+     80|       expect(coordinator.view().dialog).toHaveProperty("adminSupportEn…
+System.Management.Automation.RemoteException
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/21]⎯
+System.Management.Automation.RemoteException
+ FAIL  tests/app/preflight-admin-mode.test.ts > preflight administrative mode draft > 'generate-schedule' preserves the entire original model and mode on 'cancel'
+ FAIL  tests/app/preflight-admin-mode.test.ts > preflight administrative mode draft > 'generate-schedule' preserves the entire original model and mode on 'failure'
+ FAIL  tests/app/preflight-admin-mode.test.ts > preflight administrative mode draft > 'generate-schedule' preserves the entire original model and mode on 'invalid-result'
+ FAIL  tests/app/preflight-admin-mode.test.ts > preflight administrative mode draft > 'generate-schedule' preserves the entire original model and mode on 'stopped-without-result'
+ FAIL  tests/app/preflight-admin-mode.test.ts > preflight administrative mode draft > 'open-reschedule-flight-picker' preserves the entire original model and mode on 'cancel'
+ FAIL  tests/app/preflight-admin-mode.test.ts > preflight administrative mode draft > 'open-reschedule-flight-picker' preserves the entire original model and mode on 'failure'
+ FAIL  tests/app/preflight-admin-mode.test.ts > preflight administrative mode draft > 'open-reschedule-flight-picker' preserves the entire original model and mode on 'invalid-result'
+ FAIL  tests/app/preflight-admin-mode.test.ts > preflight administrative mode draft > 'open-reschedule-flight-picker' preserves the entire original model and mode on 'stopped-without-result'
+ FAIL  tests/app/preflight-admin-mode.test.ts > preflight administrative mode draft > 'archive-next-duty-day' preserves the entire original model and mode on 'cancel'
+ FAIL  tests/app/preflight-admin-mode.test.ts > preflight administrative mode draft > 'archive-next-duty-day' preserves the entire original model and mode on 'failure'
+
+ Test Files  2 failed (2)
+      Tests  21 failed | 14 passed (35)
+   Start at  12:50:54
+   Duration  2.69s (transform 2.68s, setup 0ms, import 3.19s, tests 441ms, environment 419ms)
+
+ FAIL  tests/app/preflight-admin-mode.test.ts > preflight administrative mode draft > 'archive-next-duty-day' preserves the entire original model and mode on 'invalid-result'
+ FAIL  tests/app/preflight-admin-mode.test.ts > preflight administrative mode draft > 'archive-next-duty-day' preserves the entire original model and mode on 'stopped-without-result'
+Error: 未处理的界面命令：update-preflight-administrative-mode
+ ❯ ApplicationCoordinator.handle src/app/application-coordinator.ts:260:13
+    258|         if (await controller.handle(command)) return;
+    259|       }
+    260|       throw new Error(`未处理的界面命令：${command.type}`);
+       |             ^
+    261|     } finally {
+    262|       if (reservesSchedule) this.scheduleCommandPending = false;
+ ❯ tests/app/preflight-admin-mode.test.ts:109:7
+System.Management.Automation.RemoteException
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/21]⎯
+System.Management.Automation.RemoteException
+ FAIL  tests/ui/next-workday-flight-picker-dialog.test.ts > next workday flight picker dialog > schedule-preflight puts the administrative draft toggle before flight choices
+ FAIL  tests/ui/next-workday-flight-picker-dialog.test.ts > next workday flight picker dialog > reschedule-flight-picker puts the administrative draft toggle before flight choices
+ FAIL  tests/ui/next-workday-flight-picker-dialog.test.ts > next workday flight picker dialog > next-workday-flight-picker puts the administrative draft toggle before flight choices
+AssertionError: expected null not to be null
+ ❯ tests/ui/next-workday-flight-picker-dialog.test.ts:106:23
+    104|     element.addEventListener(UI_COMMAND_EVENT, event => commands.push(…
+    105|     const input = element.querySelector<HTMLInputElement>('input[aria-…
+    106|     expect(input).not.toBeNull();
+       |                       ^
+    107|     expect(input!.checked).toBe(true);
+    108|     const body = element.querySelector(".next-workday-flight-picker")!;
+System.Management.Automation.RemoteException
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/21]⎯
+System.Management.Automation.RemoteException

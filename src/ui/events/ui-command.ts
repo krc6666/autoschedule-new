@@ -60,6 +60,7 @@ export type UiCommand =
   | { type: "export-share-html" }
   | { type: "export-share-png" }
   | { type: "generate-schedule" }
+  | { type: "update-preflight-administrative-mode"; enabled: boolean }
   | {
       type: "update-schedule-preflight-selection";
       selectedIds: string[];

@@ -33,6 +33,24 @@ export class NextWorkdayFlightPickerDialogElement extends LightDomElement {
     const schedulePreflight = this.dialog.kind === "schedule-preflight";
     const hasStaffStatusDraft = true;
     return html`<div class="modal-body next-workday-flight-picker">
+        <section class="mb-3" aria-label="排班模式">
+          <label class="form-check form-switch">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              role="switch"
+              aria-label="是否启用行政支援模式"
+              .checked=${this.dialog.adminSupportEnabled}
+              @change=${(event: Event) =>
+                dispatchUiCommand(this, {
+                  type: "update-preflight-administrative-mode",
+                  enabled: (event.currentTarget as HTMLInputElement).checked,
+                })}
+            />
+            <span class="form-check-label">是否启用行政支援模式</span>
+          </label>
+          <p class="small text-secondary mb-0">确认后按所选模式排班。</p>
+        </section>
         ${hasStaffStatusDraft ? html`<h3 class="h6">选择航班</h3>` : null}
         <div class="d-flex flex-wrap gap-2 mb-3">
           ${this.quickAction(

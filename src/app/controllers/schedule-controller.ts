@@ -59,6 +59,9 @@ export class ScheduleController implements UiCommandController {
       case "generate-schedule":
         this.openSchedulePreflight();
         return true;
+      case "update-preflight-administrative-mode":
+        this.updatePreflightAdministrativeMode(command.enabled);
+        return true;
       case "update-schedule-preflight-selection":
         this.updateSchedulePreflightSelection(command.selectedIds);
         return true;
@@ -325,6 +328,26 @@ export class ScheduleController implements UiCommandController {
     return Object.fromEntries(
       this.context.model().staff.map((person) => [person.id, person.status])
     );
+  }
+
+  private updatePreflightAdministrativeMode(enabled: boolean): void {
+    const dialog = this.context.view().dialog;
+    if (
+      dialog?.kind !== "schedule-preflight" &&
+      dialog?.kind !== "reschedule-flight-picker" &&
+      dialog?.kind !== "next-workday-flight-picker"
+    )
+      return;
+    this.context.updateView({
+      dialog: { ...dialog, adminSupportEnabled: enabled },
+    });
+  }
+
+  private applyPreflightAdministrativeMode(
+    state: AppState,
+    draft: Pick<AppState["settings"], "adminSupportEnabled">
+  ): void {
+    state.settings.adminSupportEnabled = draft.adminSupportEnabled;
   }
 
   private dutyRosterForDialog(
@@ -645,6 +668,7 @@ export class ScheduleController implements UiCommandController {
     this.context.updateView({
       dialog: {
         kind: "schedule-preflight",
+        adminSupportEnabled: model.settings.adminSupportEnabled,
         date: this.context.view().date,
         groupId: model.activeGroupId,
         candidates,
@@ -750,6 +774,7 @@ export class ScheduleController implements UiCommandController {
       return;
     }
     const temporaryState = structuredClone(this.context.model());
+    this.applyPreflightAdministrativeMode(temporaryState, dialog);
     this.applyPreflightStaffStatuses(temporaryState, dialog.staffStatuses);
     if (dialog.dutyRoster) {
       temporaryState.dutyRosterOverrides = [
@@ -807,6 +832,7 @@ export class ScheduleController implements UiCommandController {
     this.context.updateView({
       dialog: {
         kind: "reschedule-flight-picker",
+        adminSupportEnabled: model.settings.adminSupportEnabled,
         date: this.context.view().date,
         groupId: model.activeGroupId,
         candidates,
@@ -872,6 +898,7 @@ export class ScheduleController implements UiCommandController {
     }
     const date = dialog.date;
     const temporaryState = structuredClone(this.context.model());
+    this.applyPreflightAdministrativeMode(temporaryState, dialog);
     this.applyPreflightStaffStatuses(
       temporaryState,
       dialog.staffStatuses ?? this.currentStaffStatuses()
@@ -940,6 +967,7 @@ export class ScheduleController implements UiCommandController {
     this.context.updateView({
       dialog: {
         kind: "next-workday-flight-picker",
+        adminSupportEnabled: model.settings.adminSupportEnabled,
         date: nextDate,
         sourceDate: currentDate,
         groupId: model.activeGroupId,
@@ -1041,6 +1069,7 @@ export class ScheduleController implements UiCommandController {
       return;
 
     const temporaryState = structuredClone(this.context.model());
+    this.applyPreflightAdministrativeMode(temporaryState, dialog);
     this.applyPreflightStaffStatuses(temporaryState, dialog.staffStatuses);
     if (dialog.dutyRoster) {
       temporaryState.dutyRosterOverrides = [

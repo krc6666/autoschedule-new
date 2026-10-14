@@ -27,6 +27,7 @@ export type ApplicationDialog =
   | { kind: "templates" }
   | {
       kind: "schedule-preflight";
+      adminSupportEnabled: boolean;
       date: string;
       groupId: ScheduleGroupId;
       candidates: FlightSelectionCandidate[];
@@ -36,6 +37,7 @@ export type ApplicationDialog =
     }
   | {
       kind: "reschedule-flight-picker";
+      adminSupportEnabled: boolean;
       date: string;
       groupId: ScheduleGroupId;
       candidates: FlightSelectionCandidate[];
@@ -45,6 +47,7 @@ export type ApplicationDialog =
     }
   | {
       kind: "next-workday-flight-picker";
+      adminSupportEnabled: boolean;
       date: string;
       sourceDate: string;
       groupId: ScheduleGroupId;
