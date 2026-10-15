@@ -1,0 +1,7 @@
+Scope and final-artifact evidence, 2026-10-15
+
+The shared statistics predicate is consumed by monthly late-priority statistics, ordinary-priority statistics, and ordinary-priority configuration diagnostics. It admits all existing regular positions and only mobile-supervisor positions whose name or remark identifies the supervisor category.
+
+Automatic late-priority candidate/frequency logic remains category-gated to regular positions. Late-priority flight-scope candidate generation remains unchanged, so this fix does not expand the selected scope or alter cross-day recovery. No persistence field, Excel schema, history matching key, manual-correction formula, or scheduling qualification check changed.
+
+Local final artifact: production build from npm.cmd run verify. Actual workbook replay passed through parseWorkbook and both statistics domain builders. No browser was opened, no page was deployed, and owner page acceptance remains pending.

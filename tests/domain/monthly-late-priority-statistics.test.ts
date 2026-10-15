@@ -72,6 +72,27 @@ function history(
 }
 
 describe("monthly late priority statistics", () => {
+  it("counts a mobile supervisor role in the supervisor category", () => {
+    const state = createDefaultState();
+    const rule = state.positionRules.find(
+      (item) => item.flightNo === "TR121" && item.name === "督导"
+    )!;
+    const staffId = rule.qualifiedStaffIds[0]!;
+    rule.category = "机动督导";
+    state.settings.latePriorityFlightNumbers = ["TR121"];
+    state.history = [
+      history("mobile-supervisor", "TR121", "督导", "", staffId),
+    ];
+
+    const row = buildMonthlyLatePriorityStatistics(state, DATE).rows.find(
+      (item) => item.staff.id === staffId
+    )!;
+
+    expect(row.categories.督导.qualified).toBe(true);
+    expect(row.categories.督导.details).toHaveLength(1);
+    expect(row.categories.督导.effectiveCount).toBe(1);
+  });
+
   it("projects final counts by flight and category", () => {
     const state = createDefaultState();
     state.settings.latePriorityFlightNumbers = ["TR121", "TW616"];

@@ -15,7 +15,11 @@ import {
   matchesNextWorkdayRecoveryTarget,
 } from "../reviews/cross-day-recovery";
 import { normalizedPolicyValue } from "../reviews/schedule-protection";
-import { isOrdinaryPriorityPosition } from "../reviews/position-rotation-policy";
+import {
+  ordinaryPriorityConfigurationKey,
+  ordinaryPriorityPositionKey,
+} from "../reviews/position-rotation-policy";
+import { isPriorityStatisticsPosition } from "../reviews/late-priority-policy";
 import {
   latePriorityFlightInScope,
   latePriorityFlightScopeCandidates,
@@ -474,7 +478,12 @@ export function diagnoseOrdinaryPriorityPosition(
   const item = state.settings.ordinaryPriorityPositions[index];
   if (!item) return [];
   if (
-    state.positionRules.some((rule) => isOrdinaryPriorityPosition(rule, [item]))
+    state.positionRules.some(
+      (rule) =>
+        isPriorityStatisticsPosition(rule) &&
+        ordinaryPriorityPositionKey(rule.flightNo, rule.name, rule.remark) ===
+          ordinaryPriorityConfigurationKey(item.airlineCode, item.position)
+    )
   )
     return [];
   return [

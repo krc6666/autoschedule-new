@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-10-15-mobile-supervisor-statistics",
+  "title": "机动督导纳入督导次数统计",
+  "startedFrom": "268685bc750bf151c1a7f80159ca1d8c565c4e86",
+  "expectation": {
+    "example": "TR121 的督导岗位分类为机动督导，岗位资质包含人员 A；历史中有人员 A 承担 TR121/督导，末班范围包含 TR121，普通重点集合包含 TR/督导。",
+    "expected": "该历史记录同时进入末班重点的督导和普通重点 TR/督导统计；人员 A 的当前资质显示为合格，次数至少为 1。",
+    "unchanged": "自动排班仍按岗位分类和资质硬约束执行；机动督导不改成常规、不进入其他一号/申报/送资料统计，历史名称仍精确匹配，现有人工修正和最低 0 规则不变。",
+    "fallback": "非督导语义的机动督导岗位仍不进入督导统计；规则或历史不完整时沿用现有精确匹配和空结果行为，不猜测岗位别名。"
+  },
+  "testedVersion": "23320a29640b11ebadc754ad672bb6366fad4f244a37dccbf5f5f947bb9979c2",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "最小 TR121 机动督导场景在修改前复现：末班统计不生成人员行，普通重点资质为 false；共享判断加入后原场景通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-15-mobile-supervisor-red.txt",
+          "summary": "改前 2 项失败、13 项通过；修改后 3 个定向测试文件 37 项通过，并重放真实 Excel。",
+          "sha256": "de1f09f94ceb5f8c94e47d658739bae5a0908a5e7855cbe1c864d74d04f77b99"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "末班督导和普通重点 TR/督导均在同一统计语义判断下读取岗位资质与历史记录。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-15-mobile-supervisor-red.txt",
+          "summary": "真实 Excel parseWorkbook 重放通过：TR121 督导记录进入末班督导明细，普通 TR/督导显示合格且最终次数至少为 1。",
+          "sha256": "de1f09f94ceb5f8c94e47d658739bae5a0908a5e7855cbe1c864d74d04f77b99"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-15-mobile-supervisor-verify.txt",
+          "summary": "完整类型、功能、性能测试和生产构建通过。",
+          "sha256": "466d44e1476617ff0c5afce823edae7fbb2857388a4b4e31a53faa45eaed8ee0"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "非督导语义的机动督导岗位仍被排除；配置诊断与普通重点统计保持同一精确航司/岗位匹配。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-15-mobile-supervisor-red.txt",
+          "summary": "普通统计回归断言 H02 等非督导语义机动岗位不被判为合格督导统计。",
+          "sha256": "de1f09f94ceb5f8c94e47d658739bae5a0908a5e7855cbe1c864d74d04f77b99"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "统计只读取既有历史和人工修正事实，没有新增持久化或重复累计路径。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-15-mobile-supervisor-scope.txt",
+          "summary": "传播审查确认历史键、人工修正公式、Excel/localStorage 合同未改；自动范围候选和次班恢复范围保持原行为。",
+          "sha256": "b49d005bba2540157972dd75ebe65ac611ba77c19eeb20a5f4987842691b8333"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "自动排班频率与资格硬约束仍按原岗位分类执行，非督导机动岗位不会因统计判断获得自动资质。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-15-mobile-supervisor-scope.txt",
+          "summary": "源码传播核对确认 late-priority-frequency、自动候选和最终守卫未消费新的统计判断。",
+          "sha256": "b49d005bba2540157972dd75ebe65ac611ba77c19eeb20a5f4987842691b8333"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-15-mobile-supervisor-verify.txt",
+          "summary": "完整回归包含自动排班、安全、Worker/WASM、Excel、存储和 UI 测试。",
+          "sha256": "466d44e1476617ff0c5afce823edae7fbb2857388a4b4e31a53faa45eaed8ee0"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "没有改变岗位分类、自动排班、末班航班范围候选、历史匹配键、Excel/localStorage 字段或人工修正最低 0 合同。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-15-mobile-supervisor-scope.txt",
+          "summary": "最终传播范围审查及边界说明。",
+          "sha256": "b49d005bba2540157972dd75ebe65ac611ba77c19eeb20a5f4987842691b8333"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-15-mobile-supervisor-verify.txt",
+          "summary": "完整回归和构建通过。",
+          "sha256": "466d44e1476617ff0c5afce823edae7fbb2857388a4b4e31a53faa45eaed8ee0"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "本地真实 Excel 重放、自动回归和生产构建已完成；未操作 owner 的浏览器页面，未部署 GitHub Pages，真实入口现场验收保留未验证。",
+      "evidence": []
+    }
+  },
+  "answers": {
+    "originalFailure": "原错误由真实 Excel 重放和最小失败测试发现：历史有 TR121/督导，但末班统计因机动督导分类被过滤，普通统计当前资质为 false；修改后定向 37 项和完整 verify 通过。",
+    "laterChanges": "普通统计、末班统计、配置诊断共用统计语义；自动频率、范围候选、恢复、守卫和存储未接入该判断，完整回归与传播矩阵核对通过。",
+    "finalArtifact": "docs/acceptance/evidence/2026-10-15-mobile-supervisor-red.txt 证明真实 Excel 重放；docs/acceptance/evidence/2026-10-15-mobile-supervisor-verify.txt 证明最终构建和完整测试通过。真实页面尚未验收。"
+  },
+  "review": {
+    "missedScope": "未取得 owner 在修复版页面保存、再次读取和统计表的现场证据；已检查普通/末班统计、配置诊断、自动频率、范围候选、恢复和最终回归。",
+    "rootCause": "统计实现把岗位分类常规当成唯一入口，导致机动督导中的督导规则从末班统计被完全排除，普通统计又无法建立当前合格人员集合；导入历史本身没有丢失。",
+    "earlyDetection": "以后改岗位分类或统计口径时，先用真实 Excel 做历史记录到末班/普通两张表的双入口红灯，再检查范围候选和自动频率是否意外共享该判断，最后跑完整 verify。"
+  }
+}

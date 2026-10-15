@@ -10,6 +10,7 @@ import {
   latePriorityKindForLabel,
   latePriorityKindLabel,
   latePriorityFrequencyKinds,
+  isPriorityStatisticsPosition,
   LATE_PRIORITY_ALLOWED_DIFFERENCE,
   LATE_PRIORITY_FREQUENCY_ORDER,
   normalizeLatePriorityFlightNumber,
@@ -108,7 +109,7 @@ function flightCategories(
 function scopedRules(state: SchedulingFacts): PositionRule[] {
   return state.positionRules.filter(
     (rule) =>
-      rule.category === "常规" &&
+      isPriorityStatisticsPosition(rule) &&
       latePriorityFlightInScope(
         state.settings.latePriorityFlightNumbers,
         rule.flightNo

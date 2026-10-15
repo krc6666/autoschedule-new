@@ -1,0 +1,10 @@
+Final verification evidence, 2026-10-15
+
+Command: npm.cmd run verify
+Exit code: 0.
+TypeScript typecheck: passed.
+Functional tests: 143 files passed, 1391 tests passed.
+Performance tests: 7 files passed, 19 tests passed.
+Production build: passed; 303 modules transformed and Vite reported built in 6.59s.
+
+The full verify completed after the final source, test, spec, history, and propagation-matrix edits. A preceding run caught one unused import introduced in the ordinary-position diagnostic; it was removed before this final successful run.

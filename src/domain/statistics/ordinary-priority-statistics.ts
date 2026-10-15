@@ -8,6 +8,7 @@ import {
   ordinaryPriorityConfigurationKey,
   ordinaryPriorityPositionKey,
 } from "../reviews/position-rotation-policy";
+import { isPriorityStatisticsPosition } from "../reviews/late-priority-policy";
 import type { SchedulingFacts } from "../shared/scheduling-facts";
 
 export interface OrdinaryPriorityStatisticsRow {
@@ -38,7 +39,7 @@ export function buildOrdinaryPriorityStatistics(
       state.positionRules
         .filter(
           (rule) =>
-            rule.category === "常规" &&
+            isPriorityStatisticsPosition(rule) &&
             ordinaryPriorityPositionKey(
               rule.flightNo,
               rule.name,

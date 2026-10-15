@@ -1,0 +1,11 @@
+Reproduction evidence, 2026-10-15
+
+Before implementation:
+Command: npm.cmd exec vitest run tests/domain/monthly-late-priority-statistics.test.ts tests/domain/ordinary-priority-statistics.test.ts --reporter=dot
+Result: 2 failed, 13 passed. The mobile supervisor did not produce a monthly statistics row; the ordinary supervisor row reported qualified=false.
+
+After implementation:
+Command: npm.cmd exec vitest run tests/domain/monthly-late-priority-statistics.test.ts tests/domain/ordinary-priority-statistics.test.ts tests/domain/policy-configuration-diagnostics.test.ts --reporter=dot
+Result: 3 files passed, 37 tests passed.
+
+The original Excel file was parsed locally without modification. The replay used the user's TR121 supervisor row and verified the ordinary category as qualified with effective count >= 1, plus a late-priority detail for 2026-10-13 / TR121 / supervisor. The input file SHA-256 was ECA766E56879CEEDE3AD653D5B0AF07D8AA2D443C35B62F0B11229D74C7E4A56. No personal names or staff IDs are included here.
