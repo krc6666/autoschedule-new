@@ -8,6 +8,7 @@ import {
   makeUnfilled,
 } from "../domain/flights/schedule-position-rules";
 import type { Assignment } from "../model";
+import { isClearedCountRecord } from "../domain/statistics/manual-count-evidence";
 
 export interface HistoricalScheduleDraft {
   flights: AppState["flights"];
@@ -91,11 +92,19 @@ export function buildHistoricalScheduleDraft(
     unmatched.delete(record.id);
     assignment.staffId = record.staffId || null;
     assignment.staffName = record.staffName;
-    assignment.workHours = record.workHours;
-    assignment.fatiguePoints = record.fatiguePoints;
-    assignment.remark = record.remark;
+    if (!isClearedCountRecord(record)) {
+      assignment.workHours = record.workHours;
+      assignment.fatiguePoints = record.fatiguePoints;
+    }
+    assignment.remark = record.assignmentRemarks?.remark ?? record.remark;
+    if (record.countBaseline)
+      assignment.countBaseline = structuredClone(record.countBaseline);
+    if (record.manualOverrideWarnings)
+      assignment.manualOverrideWarnings = structuredClone(
+        record.manualOverrideWarnings
+      );
     if (record.teamLeaderGapFill) assignment.teamLeaderGapFill = true;
-    assignment.manualRemark = "";
+    assignment.manualRemark = record.assignmentRemarks?.manualRemark ?? "";
     assignment.status = assignment.staffId ? "assigned" : assignment.status;
   }
   const warnings = [
@@ -116,7 +125,11 @@ export function currentScheduleHistory(
   options: { includeUnavailableStaff?: boolean } = {}
 ): HistoryRecord[] {
   const records: HistoryRecord[] = state.assignments
-    .filter((item) => item.status === "assigned" && item.staffName)
+    .filter(
+      (item) =>
+        (item.status === "assigned" && item.staffName) ||
+        isClearedCountRecord({ ...item, staffId: item.staffId ?? "" })
+    )
     .filter(
       (item) =>
         options.includeUnavailableStaff ||
@@ -135,14 +148,28 @@ export function currentScheduleHistory(
       flightCutoffTime:
         state.flights.find((flight) => flight.id === item.flightId)?.endTime ??
         item.endTime,
-      workHours: item.workHours,
-      fatiguePoints: item.fatiguePoints,
+      workHours: item.staffId ? item.workHours : 0,
+      fatiguePoints: item.staffId ? item.fatiguePoints : 0,
       remark: assignmentWarningRemark(
         item.remark,
         item.manualRemark,
         item.manualOverrideWarnings
       ),
       ...(item.teamLeaderGapFill ? { teamLeaderGapFill: true as const } : {}),
+      ...(item.countBaseline
+        ? { countBaseline: structuredClone(item.countBaseline) }
+        : {}),
+      ...(item.manualOverrideWarnings
+        ? {
+            manualOverrideWarnings: structuredClone(
+              item.manualOverrideWarnings
+            ),
+          }
+        : {}),
+      assignmentRemarks: {
+        remark: item.remark,
+        manualRemark: item.manualRemark,
+      },
     }));
   const roster = getDutyRosterForDate(state, date);
   const dutyPerson = roster.dutyStaffId

@@ -1,11 +1,10 @@
-import type {
-  Assignment,
-  HistoryRecord,
-  PositionRule,
-  Staff,
-} from "../../model";
+import type { HistoryRecord, PositionRule, Staff } from "../../model";
 import type { SchedulingFacts } from "../shared/scheduling-facts";
-import { assignmentRule } from "../flights/schedule-position-rules";
+import {
+  baselineStaffId,
+  hasQualificationOverride,
+  monthlyCountRecords,
+} from "./manual-count-evidence";
 import {
   endsAfterLateShiftThreshold,
   latePriorityKindForLabel,
@@ -38,11 +37,25 @@ export interface MonthlyLatePriorityCategoryStatistics {
   visibleDetails: LatePriorityStatisticsDetail[];
   manualCorrection: number;
   effectiveCount: number;
+  baseCount: number;
+}
+
+export function canAdjustLatePriorityCategory(
+  value: MonthlyLatePriorityCategoryStatistics
+): boolean {
+  return (
+    value.qualified ||
+    value.details.length > 0 ||
+    value.baseCount > 0 ||
+    value.manualCorrection !== 0
+  );
 }
 
 export interface MonthlyLatePriorityStatisticsRow {
   staff: Staff;
   totalCount: number;
+  qualificationOverrideCount: number;
+  qualificationUnrecordedCount: number;
   categories: Record<
     LatePriorityStatisticsCategory,
     MonthlyLatePriorityCategoryStatistics
@@ -128,6 +141,7 @@ function emptyCategories(): MonthlyLatePriorityStatisticsRow["categories"] {
         visibleDetails: [],
         manualCorrection: 0,
         effectiveCount: 0,
+        baseCount: 0,
       },
     ])
   ) as unknown as MonthlyLatePriorityStatisticsRow["categories"];
@@ -197,48 +211,48 @@ export function buildMonthlyLatePriorityStatistics(
   const month = date.slice(0, 7);
   const flightNumbers = latePriorityStatisticsFlightNumbers(state);
   const rules = scopedRules(state);
+  const countRecords = monthlyCountRecords(state, date);
   const eligibleStaff = state.staff.filter(
     (person) =>
       person.staffType === "常规" &&
-      person.status === "正常" &&
-      rules.some((rule) => rule.qualifiedStaffIds.includes(person.id))
+      ((person.status === "正常" &&
+        rules.some((rule) => rule.qualifiedStaffIds.includes(person.id))) ||
+        countRecords.some(
+          (r) =>
+            (r.staffId === person.id || baselineStaffId(r) === person.id) &&
+            matchingRule(rules, r.flightNo, r.position)
+        ) ||
+        state.latePriorityFrequencyAdjustments.some(
+          (a) =>
+            a.month === month &&
+            a.staffId === person.id &&
+            flightNumbers.includes(
+              normalizeLatePriorityFlightNumber(a.flightNo)
+            )
+        ))
   );
   const rowByStaffId = new Map<string, MonthlyLatePriorityStatisticsRow>(
     eligibleStaff.map((staff) => [
       staff.id,
-      { staff, totalCount: 0, categories: emptyCategories(), flights: {} },
+      {
+        staff,
+        totalCount: 0,
+        qualificationOverrideCount: 0,
+        qualificationUnrecordedCount: 0,
+        categories: emptyCategories(),
+        flights: {},
+      },
     ])
   );
   for (const row of rowByStaffId.values()) {
     for (const category of LATE_PRIORITY_STATISTICS_CATEGORIES) {
-      const kind = latePriorityKindForLabel(category);
-      row.categories[category].manualCorrection = (
-        state.latePriorityFrequencyAdjustments ?? []
-      )
-        .filter((item) => {
-          const itemFlight = normalizeLatePriorityFlightNumber(item.flightNo);
-          return (
-            item.month === month &&
-            item.staffId === row.staff.id &&
-            item.kind === kind &&
-            flightNumbers.includes(itemFlight) &&
-            rules.some(
-              (rule) =>
-                normalizeLatePriorityFlightNumber(rule.flightNo) ===
-                  itemFlight && latePriorityFrequencyKinds(rule).includes(kind)
-            )
-          );
-        })
-        .reduce((sum, item) => sum + item.delta + (item.resetBaseline ?? 0), 0);
-    }
-  }
-  for (const row of rowByStaffId.values()) {
-    for (const category of LATE_PRIORITY_STATISTICS_CATEGORIES) {
-      row.categories[category].qualified = rules.some(
-        (rule) =>
-          categoryKinds(rule).includes(category) &&
-          rule.qualifiedStaffIds.includes(row.staff.id)
-      );
+      row.categories[category].qualified =
+        row.staff.status === "正常" &&
+        rules.some(
+          (rule) =>
+            categoryKinds(rule).includes(category) &&
+            rule.qualifiedStaffIds.includes(row.staff.id)
+        );
     }
   }
   const seen = new Set<string>();
@@ -248,61 +262,74 @@ export function buildMonthlyLatePriorityStatistics(
     detail: LatePriorityStatisticsDetail
   ): void => {
     const row = rowByStaffId.get(staffId);
-    if (!row?.categories[category].qualified) return;
+    if (!row) return;
     const key = detailKey(staffId, category, detail);
     if (seen.has(key)) return;
     seen.add(key);
     row.categories[category].details.push(detail);
   };
-  const activeDate =
-    state.activeScheduleDate === date && state.assignments.length ? date : null;
+  const baselineDetails = new Map<string, Set<string>>();
+  const qualificationEvidence = new Map<
+    string,
+    { staffId: string; override: boolean; unrecorded: boolean }
+  >();
   const addHistoricalRecord = (record: HistoryRecord): void => {
     const rule = matchingRule(rules, record.flightNo, record.position);
     if (
       !rule ||
-      !rule.qualifiedStaffIds.includes(record.staffId) ||
       !endsAfterLateShiftThreshold(record, state.settings.lateShiftEndTime)
     )
       return;
     for (const category of categoryKinds({
       name: record.position,
-      remark: record.remark,
+      remark: record.assignmentRemarks?.remark ?? record.remark,
     })) {
       if (!categoryKinds(rule).includes(category)) continue;
+      const baselineId = baselineStaffId(record);
+      if (baselineId) {
+        const key = [
+          baselineId,
+          normalizeLatePriorityFlightNumber(record.flightNo),
+          category,
+        ].join("\u0000");
+        const details = baselineDetails.get(key) ?? new Set<string>();
+        details.add(
+          detailKey(baselineId, category, {
+            date: record.date,
+            flightNo: record.flightNo,
+            position: record.position,
+          })
+        );
+        baselineDetails.set(key, details);
+      }
       addDetail(record.staffId, category, {
         date: record.date,
         flightNo: record.flightNo,
         position: record.position,
       });
-    }
-  };
-  state.history
-    .filter(
-      (record) => record.date.startsWith(month) && record.date !== activeDate
-    )
-    .forEach(addHistoricalRecord);
-
-  const addCurrentAssignment = (assignment: Assignment): void => {
-    const rule = assignmentRule(state, assignment);
-    if (
-      !activeDate ||
-      !assignment.staffId ||
-      assignment.status !== "assigned" ||
-      !rule ||
-      !rules.some((item) => item.id === rule.id) ||
-      !rule.qualifiedStaffIds.includes(assignment.staffId) ||
-      !endsAfterLateShiftThreshold(assignment, state.settings.lateShiftEndTime)
-    )
-      return;
-    for (const category of categoryKinds(rule)) {
-      addDetail(assignment.staffId, category, {
-        date: activeDate,
-        flightNo: assignment.flightNo,
-        position: assignment.position,
+      const evidenceKey = detailKey(record.staffId, category, {
+        date: record.date,
+        flightNo: record.flightNo,
+        position: record.position,
       });
+      const evidence = qualificationEvidence.get(evidenceKey) ?? {
+        staffId: record.staffId,
+        override: false,
+        unrecorded: false,
+      };
+      evidence.override ||= hasQualificationOverride(record);
+      evidence.unrecorded ||=
+        !record.countBaseline && !record.manualOverrideWarnings;
+      qualificationEvidence.set(evidenceKey, evidence);
     }
   };
-  state.assignments.forEach(addCurrentAssignment);
+  countRecords.forEach(addHistoricalRecord);
+  for (const evidence of qualificationEvidence.values()) {
+    const row = rowByStaffId.get(evidence.staffId);
+    if (!row) continue;
+    if (evidence.override) row.qualificationOverrideCount++;
+    else if (evidence.unrecorded) row.qualificationUnrecordedCount++;
+  }
 
   const staffOrder = new Map(
     state.staff.map((person, index) => [person.id, index])
@@ -344,13 +371,6 @@ export function buildMonthlyLatePriorityStatistics(
           return false;
         });
       }
-      for (const category of LATE_PRIORITY_STATISTICS_CATEGORIES) {
-        row.categories[category].effectiveCount = Math.max(
-          0,
-          row.categories[category].visibleDetails.length +
-            row.categories[category].manualCorrection
-        );
-      }
       row.flights = Object.fromEntries(
         flightNumbers.map((flightNo) => {
           const applicableCategories = flightCategories(rules, flightNo);
@@ -358,13 +378,15 @@ export function buildMonthlyLatePriorityStatistics(
             LATE_PRIORITY_STATISTICS_CATEGORIES.map((category) => {
               const categoryStatistics = row.categories[category];
               const kind = latePriorityKindForLabel(category);
-              const qualified = rules.some(
-                (rule) =>
-                  normalizeLatePriorityFlightNumber(rule.flightNo) ===
-                    flightNo &&
-                  categoryKinds(rule).includes(category) &&
-                  rule.qualifiedStaffIds.includes(row.staff.id)
-              );
+              const qualified =
+                row.staff.status === "正常" &&
+                rules.some(
+                  (rule) =>
+                    normalizeLatePriorityFlightNumber(rule.flightNo) ===
+                      flightNo &&
+                    categoryKinds(rule).includes(category) &&
+                    rule.qualifiedStaffIds.includes(row.staff.id)
+                );
               const details = categoryStatistics.details.filter(
                 (detail) =>
                   normalizeLatePriorityFlightNumber(detail.flightNo) ===
@@ -375,7 +397,7 @@ export function buildMonthlyLatePriorityStatistics(
                   normalizeLatePriorityFlightNumber(detail.flightNo) ===
                   flightNo
               );
-              const manualCorrection = applicableCategories.includes(category)
+              const numericCorrection = applicableCategories.includes(category)
                 ? (state.latePriorityFrequencyAdjustments ?? [])
                     .filter(
                       (item) =>
@@ -391,6 +413,23 @@ export function buildMonthlyLatePriorityStatistics(
                       0
                     )
                 : 0;
+              const resetCount = (state.latePriorityFrequencyAdjustments ?? [])
+                .filter(
+                  (a) =>
+                    a.month === month &&
+                    a.staffId === row.staff.id &&
+                    a.kind === kind &&
+                    normalizeLatePriorityFlightNumber(a.flightNo) === flightNo
+                )
+                .reduce((sum, a) => sum + (a.resetBaseline ?? 0), 0);
+              const baseCount = Math.max(
+                0,
+                (baselineDetails.get(
+                  [row.staff.id, flightNo, category].join("\u0000")
+                )?.size ?? 0) - resetCount
+              );
+              const manualCorrection =
+                visibleDetails.length - baseCount + numericCorrection;
               return [
                 category,
                 {
@@ -398,10 +437,8 @@ export function buildMonthlyLatePriorityStatistics(
                   details,
                   visibleDetails,
                   manualCorrection,
-                  effectiveCount: Math.max(
-                    0,
-                    visibleDetails.length + manualCorrection
-                  ),
+                  baseCount,
+                  effectiveCount: Math.max(0, baseCount + manualCorrection),
                 },
               ];
             })
@@ -420,6 +457,23 @@ export function buildMonthlyLatePriorityStatistics(
           ];
         })
       ) as Record<string, MonthlyLatePriorityFlightStatistics>;
+      for (const category of LATE_PRIORITY_STATISTICS_CATEGORIES) {
+        const cells = Object.values(row.flights).map(
+          (f) => f.categories[category]
+        );
+        row.categories[category].baseCount = cells.reduce(
+          (s, c) => s + c.baseCount,
+          0
+        );
+        row.categories[category].manualCorrection = cells.reduce(
+          (s, c) => s + c.manualCorrection,
+          0
+        );
+        row.categories[category].effectiveCount = cells.reduce(
+          (s, c) => s + c.effectiveCount,
+          0
+        );
+      }
       row.totalCount = LATE_PRIORITY_STATISTICS_CATEGORIES.reduce(
         (sum, category) => sum + row.categories[category].effectiveCount,
         0

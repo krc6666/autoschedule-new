@@ -3,6 +3,7 @@ import * as XLSX from "xlsx-js-style";
 import {
   LATE_PRIORITY_STATISTICS_CATEGORIES,
   buildMonthlyLatePriorityStatistics,
+  canAdjustLatePriorityCategory,
   type LatePriorityStatisticsCategory,
 } from "../domain/statistics/monthly-late-priority-statistics";
 import { normalizeLatePriorityFlightNumber } from "../domain/reviews/late-priority-policy";
@@ -152,16 +153,21 @@ export function parseLatePriorityCountsWorkbook(
       valid = false;
     }
     seen.add(key);
+    const categoryStatistics =
+      rowByStaffId.get(staffId)?.flights[flightNo]?.categories[
+        category as LatePriorityStatisticsCategory
+      ];
     if (
       valid &&
       staff &&
       allowedCategories.has(category) &&
-      !rowByStaffId.get(staffId)?.flights[flightNo]?.categories[
-        category as LatePriorityStatisticsCategory
-      ].qualified &&
+      (!categoryStatistics ||
+        !canAdjustLatePriorityCategory(categoryStatistics)) &&
       finalCount !== 0
     ) {
-      errors.push(`第${excelRow}行人员不具备该航班岗位类别资质，次数只能为 0`);
+      errors.push(
+        `第${excelRow}行人员没有该航班岗位类别资质或已记录次数，次数只能为 0`
+      );
       valid = false;
     }
     if (valid && staff) {

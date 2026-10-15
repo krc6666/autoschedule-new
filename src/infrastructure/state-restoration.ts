@@ -1,4 +1,5 @@
 import { normalizeSupervisorAssignments } from "../domain/assignments/schedule-adjustment";
+import { restoreManualCountEvidence } from "./manual-count-evidence";
 import { normalizeScheduleSettings } from "../domain/rules/schedule-settings";
 import { removeUnavailableStaffAssignments } from "../domain/kernel/schedule-state";
 import type {
@@ -418,6 +419,7 @@ function restoreHistory(value: unknown[]): HistoryRecord[] {
         fatiguePoints: item.fatiguePoints,
         remark: item.remark,
         ...(historyCoverage ? { historyCoverage } : {}),
+        ...restoreManualCountEvidence(item),
       },
     ];
   });
@@ -574,19 +576,7 @@ function restoredAssignment(value: unknown): Assignment | null {
     )
       assignment.decisionEvidence = { scheduleRunId, ruleFingerprint };
   }
-  if (Array.isArray(value.manualOverrideWarnings)) {
-    const warnings = value.manualOverrideWarnings.flatMap((item) => {
-      if (
-        !item ||
-        typeof item !== "object" ||
-        typeof item.code !== "string" ||
-        typeof item.message !== "string"
-      )
-        return [];
-      return [{ code: item.code, message: item.message }];
-    });
-    if (warnings.length) assignment.manualOverrideWarnings = warnings;
-  }
+  Object.assign(assignment, restoreManualCountEvidence(value));
   const supervisorSourceAssignmentId =
     typeof value.supervisorSourceAssignmentId === "string"
       ? value.supervisorSourceAssignmentId

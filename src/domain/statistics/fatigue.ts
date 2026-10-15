@@ -4,6 +4,7 @@ import type {
   ScheduleSettings,
   Staff,
 } from "../../model";
+import { isClearedCountRecord } from "./manual-count-evidence";
 
 function isoDateToTime(value: string): number | null {
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
@@ -37,9 +38,12 @@ export function recentArchivedWorkdays(
 ): HistoryRecord[] {
   const target = isoDateToTime(date);
   if (target === null) return [];
+  const actualRecords = records.filter(
+    (record) => !isClearedCountRecord(record)
+  );
   const dates = [
     ...new Set(
-      records
+      actualRecords
         .map((record) => ({
           date: record.date,
           timestamp: isoDateToTime(record.date),
@@ -53,7 +57,7 @@ export function recentArchivedWorkdays(
     ),
   ].slice(0, Math.max(0, Math.round(workdayCount)));
   const selected = new Set(dates);
-  return records.filter((record) => selected.has(record.date));
+  return actualRecords.filter((record) => selected.has(record.date));
 }
 
 export function consecutiveWorkDays(

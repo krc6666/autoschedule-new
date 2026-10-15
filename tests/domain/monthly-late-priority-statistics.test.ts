@@ -250,7 +250,7 @@ describe("monthly late priority statistics", () => {
     );
   });
 
-  it("uses the four labels and only counts qualified normal regular staff", () => {
+  it("keeps four labels and counts archived facts even without today's qualification", () => {
     const state = createDefaultState();
     const rules = {
       一号: state.positionRules.find(
@@ -316,10 +316,16 @@ describe("monthly late priority statistics", () => {
     ];
 
     const statistics = buildMonthlyLatePriorityStatistics(state, DATE);
-    expect(statistics.rows).toHaveLength(1);
-    expect(statistics.rows[0]?.staff.id).toBe(qualifiedId);
+    expect(statistics.rows).toHaveLength(2);
+    const qualified = statistics.rows.find((r) => r.staff.id === qualifiedId)!;
+    const unqualified = statistics.rows.find(
+      (r) => r.staff.id === unqualifiedId
+    )!;
+    expect(unqualified.categories.一号.effectiveCount).toBe(1);
+    expect(unqualified.qualificationOverrideCount).toBe(0);
+    expect(unqualified.qualificationUnrecordedCount).toBe(1);
     for (const category of ["督导", "一号", "申报", "送资料"] as const)
-      expect(statistics.rows[0]?.categories[category].details).toEqual([
+      expect(qualified.categories[category].details).toEqual([
         expect.objectContaining({ date: "2026-08-10" }),
       ]);
   });

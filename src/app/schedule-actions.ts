@@ -8,6 +8,7 @@ import {
   isDiversionTransfer,
 } from "../domain/assignments/assignment-timing";
 import { clearAutomaticAssignmentEvidence } from "../domain/assignments/assignment-evidence";
+import { captureCountBaseline } from "../domain/statistics/manual-count-evidence";
 import {
   activeFlightRules,
   compareGuideSourceAssignments,
@@ -211,6 +212,7 @@ export function assignStaff(
   if (!assignment || sourceAssignmentId === assignmentId)
     return { changed: false };
   if (!staffId) {
+    captureCountBaseline(assignment);
     const rule = assignment.positionRuleId
       ? state.positionRules.find(
           (item) => item.id === assignment.positionRuleId
@@ -240,8 +242,13 @@ export function assignStaff(
     ? state.assignments.find((item) => item.id === sourceAssignmentId)
     : undefined;
   if (source) {
+    const previousSource = { ...source };
+    const previousTarget = { ...assignment };
     const error = moveSupervisorWithinFlight(state, source.id, assignment.id);
     if (!error) {
+      captureCountBaseline(assignment, previousTarget);
+      if (source.staffId !== previousSource.staffId)
+        captureCountBaseline(source, previousSource);
       refreshSameFlightGuides(state, [assignment.flightId]);
       refreshManualRuleEvidence(state);
       return { changed: true, message: "督导已机动补位至目标岗位" };
@@ -284,6 +291,8 @@ export function assignStaff(
     if (reverseBlocker)
       return { changed: false, error: `无法交换：${reverseBlocker.message}` };
   }
+  captureCountBaseline(assignment);
+  if (source && !copySource) captureCountBaseline(source);
   clearSupervisorLink(state, assignment);
   assignment.staffId = person.id;
   assignment.staffName = person.name;

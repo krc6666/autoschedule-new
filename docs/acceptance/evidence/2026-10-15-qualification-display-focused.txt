@@ -1,0 +1,58 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ✓ tests/domain/ordinary-priority-statistics.test.ts > ordinary priority statistics > counts historical and active assignments for a configured airline and position 8ms
+ ✓ tests/domain/ordinary-priority-statistics.test.ts > ordinary priority statistics > uses the union of matching position-rule qualifications across flights 2ms
+ ✓ tests/domain/monthly-late-priority-statistics.test.ts > monthly late priority statistics > projects final counts by flight and category 13ms
+ ✓ tests/domain/monthly-late-priority-statistics.test.ts > monthly late priority statistics > applies manual correction by staff, flight and category 3ms
+ ✓ tests/domain/monthly-late-priority-statistics.test.ts > monthly late priority statistics > keeps the personnel order stable when only manual corrections change 8ms
+ ✓ tests/domain/monthly-late-priority-statistics.test.ts > monthly late priority statistics > combines selected flights into one staff table and keeps flight details 22ms
+ ✓ tests/domain/monthly-late-priority-statistics.test.ts > monthly late priority statistics > keeps zero-count qualified workers while excluding sick, administrative and unqualified workers 3ms
+ ✓ tests/domain/monthly-late-priority-statistics.test.ts > monthly late priority statistics > keeps four labels and counts archived facts even without today's qualification 3ms
+ ✓ tests/domain/monthly-late-priority-statistics.test.ts > monthly late priority statistics > counts a combined declaration and delivery role once as delivery 4ms
+ ✓ tests/domain/monthly-late-priority-statistics.test.ts > monthly late priority statistics > keeps separate declaration and delivery roles as two counts 2ms
+ ✓ tests/domain/monthly-late-priority-statistics.test.ts > monthly late priority statistics > uses the current final schedule instead of same-day history 4ms
+ ✓ tests/domain/monthly-late-priority-statistics.test.ts > monthly late priority statistics > keeps supervisor-qualified rows visible but excludes their allowed relief from the declaration spread 2ms
+ ✓ tests/domain/monthly-late-priority-statistics.test.ts > monthly late priority statistics > keeps late-priority-only imports in late-priority statistics 2ms
+npm.cmd : stderr | tests/ui/statistics-view.test.ts
+所在位置 行:2 字符: 1
++ npm.cmd exec vitest -- run tests/ui/statistics-view.test.ts tests/app ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (stderr | tests/...cs-view.test.ts:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+
+ ✓ tests/ui/statistics-view.test.ts > statistics page > shows manual qualification overrides as corrections without hiding the unqualified worker or duplicating totals 122ms
+ ✓ tests/ui/statistics-view.test.ts > statistics page > hides an early departure date if any assigned flight cuts off after 23:00 68ms
+ ✓ tests/ui/statistics-view.test.ts > statistics page > summarizes ordinary priority positions by staff with expandable count cells 91ms
+ ✓ tests/ui/statistics-view.test.ts > statistics page > switches ordinary-priority statistics months independently 146ms
+ ✓ tests/ui/statistics-view.test.ts > statistics page > switches duty and standby roster months while preserving workday parity 402ms
+ ✓ tests/app/manual-history-corrections.test.ts > manual qualification override history contract > deduplicates qualification overrides with the same late count dimension 11ms
+ ✓ tests/app/manual-history-corrections.test.ts > manual qualification override history contract > does not turn a cleared count baseline into a worked day for rotation or recovery 2ms
+ ✓ tests/app/manual-history-corrections.test.ts > manual qualification override history contract > keeps swap baselines on both slots and automatic fairness counts only the final workers 5ms
+ ✓ tests/app/manual-history-corrections.test.ts > manual qualification override history contract > does not infer an old qualification breach or manual source from today's configuration 3ms
+ ✓ tests/app/manual-history-corrections.test.ts > manual qualification override history contract > persists actual manual edits through archive and historical save commands, isolates groups and cancels edits 25ms
+ ✓ tests/app/manual-history-corrections.test.ts > manual qualification override history contract > automatically merges a historical qualification override into existing corrections and the current schedule 14ms
+ ✓ tests/app/manual-history-corrections.test.ts > manual qualification override history contract > keeps automatic qualification strict after a successful manual override 2ms
+ ✓ tests/app/manual-history-corrections.test.ts > manual qualification override history contract > preserves late counts import and reset without adding manual differences twice 7ms
+ ✓ tests/app/manual-history-corrections.test.ts > manual qualification override history contract > saves an unqualified manual replacement, reloads evidence, and derives corrections once 4ms
+ ✓ tests/app/manual-history-corrections.test.ts > manual qualification override history contract > preserves cleared baseline without workload and round trips storage and both Excel exports 80ms
+ ✓ tests/app/manual-history-corrections.test.ts > manual qualification override history contract > stops decrementing at zero without hidden debt and does not relax hard blockers 2ms
+ ✓ tests/ui/statistics-view.test.ts > statistics page > keeps monthly roster, relaxed shifts, position counts, and roster actions 295ms
+ ✓ tests/ui/statistics-view.test.ts > statistics page > switches late-priority statistics between natural months 233ms
+ ✓ tests/ui/statistics-view.test.ts > statistics page > switches the summary table display between all categories and one category 219ms
+ ✓ tests/ui/statistics-view.test.ts > statistics page > filters to qualified staff and sorts the selected category by count 122ms
+ ✓ tests/ui/statistics-view.test.ts > statistics page > shows correction, actual, and final as zero after a monthly reset 218ms
+ ✓ tests/ui/statistics-view.test.ts > statistics page > shows the persisted duty-roster person when it is not the first option 294ms
+ ✓ tests/ui/statistics-view.test.ts > statistics page > allows a qualified leave-status person in the selected monthly duty roster 386ms
+ ✓ tests/ui/statistics-view.test.ts > statistics page > keeps the opened adjustment attached to the same person after a count update 279ms
+ ✓ tests/ui/statistics-view.test.ts > statistics page > summarizes all selected late-priority flights in one table 257ms
+ ✓ tests/ui/statistics-view.test.ts > statistics page > shows only delivery for a combined-only flight 152ms
+ ✓ tests/ui/statistics-view.test.ts > statistics page > keeps declaration visible when a combined flight also has a separate declaration role 167ms
+ ✓ tests/ui/statistics-view.test.ts > statistics page > shows explicit missing configuration and monthly rebalancing states 481ms
+
+ Test Files  4 passed (4)
+      Tests  41 passed (41)
+   Start at  15:28:06
+   Duration  5.07s (transform 2.03s, setup 0ms, import 2.55s, tests 4.18s, environment 477ms)

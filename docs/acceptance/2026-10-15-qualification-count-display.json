@@ -1,0 +1,172 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-10-15-qualification-count-display",
+  "title": "去掉突破资质列，历史人工换人自动合入原次数修正",
+  "startedFrom": "d1a658b35d402575cad146c4bef126c7d852983d",
+  "expectation": {
+    "example": "10月9日机器安排甲1次，历史编辑人工换成无资质乙并保存；当前班表为10月11日。",
+    "expected": "普通与末班原表不再有突破资质列或未记录文字；甲实际1修正-1最终0，乙实际0修正+1最终1，重复保存不累加；原加减按钮仍可叠加修正，最终最低0。",
+    "unchanged": "复用首次人工修改前基准和最终人员推导差额，不建立第二套账本；自动资格、人工硬阻断、岗位精确匹配、存储与Excel证据不变。",
+    "fallback": "失败或取消不覆盖历史；只改统计显示并验证已有差额机制，现场证据未取得保持未验收，不部署。"
+  },
+  "testedVersion": "c03bc974be8356c38741cf5e50435cc50b28d7f17e8ccfc3289510aaed19482d",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "先保留6项UI失败：两表多出突破列及基础标签；修改后41项定向通过，包含历史自动修正controller场景。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-15-qualification-display-red.txt",
+          "summary": "Before UI change: 6 UI assertions failed due to the extra column/labels; 22 other tests passed, including the new historical correction flow.",
+          "sha256": "4b7fe07c7a9144bce0174a58d44b65b67569050949b551c1bb1150ca5de929c4"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-15-qualification-display-focused.txt",
+          "summary": "4 files / 41 tests passed: both UI tables, history save/re-read/re-save with current schedule, existing manual adjustments, zero floor, automatic qualification and XLSX/storage round trips.",
+          "sha256": "d4402b1dc0f1190a4173b934b3318d14b46068385718429e53d664dccf1a97b8"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-15-manual-history-precommit-verify-final.txt",
+          "summary": "Final npm.cmd run verify exit 0: 143 functional files / 1387 tests, 7 performance files / 19 tests, typecheck and production build passed.",
+          "sha256": "6cf76cba4b9f0ec08d2b54f38a67421f74fc3cf74958dcbb2959a489e2781adf"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-15-manual-history-precommit-verify.txt",
+          "summary": "First precommit verification: 1386 passed, one acceptance-gate test exceeded its original 5 second timeout.",
+          "sha256": "c2cbd06dfc3407ad33a5959cd83a641ffeb331b0482aa27f012530c8a1de406d"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-15-manual-history-acceptance-retry.txt",
+          "summary": "Acceptance-gate isolated retry: 16 tests passed; timeout configuration unchanged.",
+          "sha256": "ba3287270baab293bac7a979f5d637a1a895db650ccbd58590afba01ed6bdb14"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "普通和末班两表删除额外列，实际/修正详情及最终次数由UI测试核对；历史人工换人保存后自动派生修正。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-15-qualification-display-focused.txt",
+          "summary": "4 files / 41 tests passed: both UI tables, history save/re-read/re-save with current schedule, existing manual adjustments, zero floor, automatic qualification and XLSX/storage round trips.",
+          "sha256": "d4402b1dc0f1190a4173b934b3318d14b46068385718429e53d664dccf1a97b8"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-15-manual-history-precommit-verify-final.txt",
+          "summary": "Final npm.cmd run verify exit 0: 143 functional files / 1387 tests, 7 performance files / 19 tests, typecheck and production build passed.",
+          "sha256": "6cf76cba4b9f0ec08d2b54f38a67421f74fc3cf74958dcbb2959a489e2781adf"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "10月9日历史甲换乙与10月11日当前甲一起计数：甲实际2修正-1最终1，乙实际0修正+1最终1；普通与末班均独立断言。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-15-qualification-display-focused.txt",
+          "summary": "4 files / 41 tests passed: both UI tables, history save/re-read/re-save with current schedule, existing manual adjustments, zero floor, automatic qualification and XLSX/storage round trips.",
+          "sha256": "d4402b1dc0f1190a4173b934b3318d14b46068385718429e53d664dccf1a97b8"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-15-manual-history-precommit-verify-final.txt",
+          "summary": "Final npm.cmd run verify exit 0: 143 functional files / 1387 tests, 7 performance files / 19 tests, typecheck and production build passed.",
+          "sha256": "6cf76cba4b9f0ec08d2b54f38a67421f74fc3cf74958dcbb2959a489e2781adf"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "重新打开保存后乙仍修正+1，原加号后两表修正均为+2；持久化读取核对，不重复写派生差额。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-15-qualification-display-focused.txt",
+          "summary": "4 files / 41 tests passed: both UI tables, history save/re-read/re-save with current schedule, existing manual adjustments, zero floor, automatic qualification and XLSX/storage round trips.",
+          "sha256": "d4402b1dc0f1190a4173b934b3318d14b46068385718429e53d664dccf1a97b8"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-15-manual-history-precommit-verify-final.txt",
+          "summary": "Final npm.cmd run verify exit 0: 143 functional files / 1387 tests, 7 performance files / 19 tests, typecheck and production build passed.",
+          "sha256": "6cf76cba4b9f0ec08d2b54f38a67421f74fc3cf74958dcbb2959a489e2781adf"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "0下限、自动资格仍严格拒绝无资质、人工硬阻断回归通过；本轮没有削弱不完整历史禁止覆盖保护。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-15-qualification-display-focused.txt",
+          "summary": "4 files / 41 tests passed: both UI tables, history save/re-read/re-save with current schedule, existing manual adjustments, zero floor, automatic qualification and XLSX/storage round trips.",
+          "sha256": "d4402b1dc0f1190a4173b934b3318d14b46068385718429e53d664dccf1a97b8"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-15-manual-history-precommit-verify-final.txt",
+          "summary": "Final npm.cmd run verify exit 0: 143 functional files / 1387 tests, 7 performance files / 19 tests, typecheck and production build passed.",
+          "sha256": "6cf76cba4b9f0ec08d2b54f38a67421f74fc3cf74958dcbb2959a489e2781adf"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "本轮实现仅修改statistics-page展示，保留原派生差额和证据。41项回归涵盖存储、Excel、取消、两组及硬阻断；最终提交前完整verify退出0，1387项功能、19项性能、类型检查和生产构建通过；差异和职责审查无阻断问题。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-15-qualification-display-focused.txt",
+          "summary": "4 files / 41 tests passed: both UI tables, history save/re-read/re-save with current schedule, existing manual adjustments, zero floor, automatic qualification and XLSX/storage round trips.",
+          "sha256": "d4402b1dc0f1190a4173b934b3318d14b46068385718429e53d664dccf1a97b8"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-15-qualification-display-typecheck.txt",
+          "summary": "npm.cmd run typecheck exited 0.",
+          "sha256": "4b3f7cf1ed06cba39ee3b0608990fffcf42e1ff315949a5353a62ce478a2683c"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-15-manual-history-precommit-verify-final.txt",
+          "summary": "Final npm.cmd run verify exit 0: 143 functional files / 1387 tests, 7 performance files / 19 tests, typecheck and production build passed.",
+          "sha256": "6cf76cba4b9f0ec08d2b54f38a67421f74fc3cf74958dcbb2959a489e2781adf"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-15-manual-history-precommit-review.txt",
+          "summary": "Source responsibility and propagation review: no blocking coupling found; owner browser acceptance remains pending.",
+          "sha256": "3e6347a188ed0c10efd8ebc480bf3ca9f66ecf6b3bcec40f5ec20d9530b48638"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "自动测试已核对两表结构与历史修正合同；尚无owner对修复版历史保存、再读和统计全流程的现场证据，保持未验收。开发提交与推送按owner授权执行。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-15-qualification-display-focused.txt",
+          "summary": "4 files / 41 tests passed: both UI tables, history save/re-read/re-save with current schedule, existing manual adjustments, zero floor, automatic qualification and XLSX/storage round trips.",
+          "sha256": "d4402b1dc0f1190a4173b934b3318d14b46068385718429e53d664dccf1a97b8"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-15-qualification-display-typecheck.txt",
+          "summary": "npm.cmd run typecheck exited 0.",
+          "sha256": "4b3f7cf1ed06cba39ee3b0608990fffcf42e1ff315949a5353a62ce478a2683c"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-15-manual-history-precommit-verify-final.txt",
+          "summary": "Final npm.cmd run verify exit 0: 143 functional files / 1387 tests, 7 performance files / 19 tests, typecheck and production build passed.",
+          "sha256": "6cf76cba4b9f0ec08d2b54f38a67421f74fc3cf74958dcbb2959a489e2781adf"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-15-manual-history-precommit-build.json",
+          "summary": "Final local production entry plus Excel, Worker and WASM asset SHA-256 fingerprints.",
+          "sha256": "a98c446be8c067a45f345cc04955bf72d5ce0f077d0b19664770061899aa5649"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "6项修改前UI失败固定额外列及标签问题，修改后41项通过；controller测试证明人工突破自动合入原修正，不另建账本。",
+    "laterChanges": "历史再次保存、当前班表合并和手点加减可能重复或漏计；真实controller逐步独立核对两表甲乙的实际、修正和最终；已有取消及往返回归。",
+    "finalArtifact": "本轮定向日志与类型检查输出证明自动结果；owner浏览器保存再读和统计结果尚未取得，不宣称页面验收完成。"
+  },
+  "review": {
+    "missedScope": "核对两表、无资质人员仍显示、实际修正详情、合计、0禁减、历史保存及再读、重复保存、原加减叠加；现场验收仍未完成。",
+    "rootCause": "额外突破列与未记录提示偏离owner最终的原表自动修正要求；差额计算已存在，应删展示而非再加次数。",
+    "earlyDetection": "先用甲换乙确认实际、修正、最终业务例，再用两表DOM表头与真实历史保存命令核对；内部证据完整性不应变成额外列。"
+  }
+}

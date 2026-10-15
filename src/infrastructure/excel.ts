@@ -1,4 +1,8 @@
 import * as XLSX from "xlsx-js-style";
+import {
+  parseManualCountEvidence,
+  serializeManualCountEvidence,
+} from "./manual-count-evidence";
 
 import type {
   AppState,
@@ -602,11 +606,16 @@ function parseHistory(
   const remarkIndex = headerIndex(header, ["备注"], 4);
   const coverageIndex = headerIndex(header, ["历史覆盖范围"], -1);
   const gapFillIndex = headerIndex(header, ["分队长补差"], -1);
+  const evidenceIndex = headerIndex(header, ["人工调整证据"], -1);
   return data.slice(1).flatMap((row) => {
     const date = normalizeText(row[dateIndex]).slice(0, 10);
     const staffName = normalizeText(row[nameIndex]);
     const position = normalizePosition(row[positionIndex]);
-    if (!date || !staffName || !position) return [];
+    const evidence = parseManualCountEvidence(
+      evidenceIndex >= 0 ? normalizeText(row[evidenceIndex]) : ""
+    );
+    if (!date || (!staffName && !evidence.countBaseline?.staffId) || !position)
+      return [];
     const importedStaffId =
       staffIdIndex >= 0 ? normalizeText(row[staffIdIndex]) : "";
     const startTime =
@@ -661,6 +670,7 @@ function parseHistory(
         remark: normalizeText(row[remarkIndex]),
         ...(historyCoverage ? { historyCoverage } : {}),
         ...(teamLeaderGapFill ? { teamLeaderGapFill } : {}),
+        ...evidence,
       },
     ];
   });
@@ -985,6 +995,7 @@ export function buildConfigWorkbook(state: AppState): XLSX.WorkBook {
         "历史覆盖范围",
         "分队长补差",
         "航班截载时间",
+        "人工调整证据",
       ],
       ...state.history.map((record) => [
         record.id,
@@ -1001,9 +1012,10 @@ export function buildConfigWorkbook(state: AppState): XLSX.WorkBook {
         record.historyCoverage ?? "",
         record.teamLeaderGapFill ? "是" : "否",
         record.flightCutoffTime ?? record.endTime,
+        serializeManualCountEvidence(record),
       ]),
     ],
-    [18, 12, 12, 18, 16, 14, 12, 12, 16, 12, 32, 20, 14, 12]
+    [18, 12, 12, 18, 16, 14, 12, 12, 16, 12, 32, 20, 14, 12, 36]
   );
   return workbook;
 }
@@ -1244,6 +1256,8 @@ export function buildScheduleWorkbook(
         "状态",
         "航班截载时间",
         "系统说明",
+        "人员编号",
+        "人工调整证据",
       ],
       ...assignments.map((item) => [
         date,
@@ -1252,8 +1266,8 @@ export function buildScheduleWorkbook(
         item.staffName,
         item.startTime,
         item.endTime,
-        item.workHours,
-        item.fatiguePoints,
+        item.staffId ? item.workHours : 0,
+        item.staffId ? item.fatiguePoints : 0,
         assignmentWarningRemark(item.remark, item.manualRemark, [
           ...(item.manualOverrideWarnings ?? []),
           ...(sameDayWarningsByAssignment.get(item.id) ?? []),
@@ -1266,9 +1280,17 @@ export function buildScheduleWorkbook(
         state.flights.find((flight) => flight.id === item.flightId)?.endTime ??
           item.endTime,
         (item.systemNotes ?? []).join("；"),
+        item.staffId ?? "",
+        serializeManualCountEvidence({
+          ...item,
+          assignmentRemarks: {
+            remark: item.remark,
+            manualRemark: item.manualRemark,
+          },
+        }),
       ]),
     ],
-    [12, 12, 16, 14, 12, 12, 16, 12, 24, 12, 12, 60]
+    [12, 12, 16, 14, 12, 12, 16, 12, 24, 12, 12, 60, 16, 36]
   );
   const people = new Map<string, Assignment[]>();
   assignments

@@ -4,12 +4,16 @@ import {
   latePriorityKindLabel,
   type LatePriorityFrequencyKind,
 } from "../domain/reviews/late-priority-policy";
-import { buildMonthlyLatePriorityStatistics } from "../domain/statistics/monthly-late-priority-statistics";
+import {
+  buildMonthlyLatePriorityStatistics,
+  canAdjustLatePriorityCategory,
+} from "../domain/statistics/monthly-late-priority-statistics";
 import { mergeLatePriorityFrequencyAdjustments } from "../domain/statistics/late-priority-frequency-adjustment";
 import type { AppState } from "../model";
 import { mergeOrdinaryPriorityFrequencyAdjustments } from "../domain/statistics/ordinary-priority-frequency-adjustment";
 import { ordinaryPriorityConfigurationKey } from "../domain/reviews/position-rotation-policy";
 import type { LatePriorityCountsImportPreview } from "../infrastructure/late-priority-counts-excel";
+import { buildOrdinaryPriorityStatistics } from "../domain/statistics/ordinary-priority-statistics";
 
 function normalizedFlightNo(flightNo: string): string {
   return flightNo.trim().toUpperCase().replaceAll(/\s+/g, "");
@@ -108,7 +112,8 @@ export function updateLatePriorityFrequencyAdjustment(
   kind: LatePriorityFrequencyKind,
   delta: number
 ): boolean {
-  const normalizedDelta = Math.trunc(delta);
+  let normalizedDelta = Math.trunc(delta);
+  if (!Number.isFinite(normalizedDelta)) return false;
   if (!normalizedDelta || !/^\d{4}-\d{2}$/.test(month) || !staffId || !flightNo)
     return false;
   const normalizedFlightNo = flightNo
@@ -118,16 +123,22 @@ export function updateLatePriorityFrequencyAdjustment(
   const category = latePriorityKindLabel(kind);
   const row = buildMonthlyLatePriorityStatistics(
     state,
-    `${month}-01`
+    state.activeScheduleDate?.startsWith(month)
+      ? state.activeScheduleDate
+      : `${month}-01`
   ).rows.find((item) => item.staff.id === staffId);
   const flight = row?.flights[normalizedFlightNo];
   if (
     !flight?.applicableCategories.includes(category) ||
-    !flight.categories[category].qualified
+    !canAdjustLatePriorityCategory(flight.categories[category])
   )
     return false;
   if (normalizedDelta < 0) {
-    if (flight.categories[category].effectiveCount <= 0) return false;
+    normalizedDelta = Math.max(
+      normalizedDelta,
+      -flight.categories[category].effectiveCount
+    );
+    if (!normalizedDelta) return false;
   }
   const existing = state.latePriorityFrequencyAdjustments.find(
     (item) =>
@@ -136,6 +147,10 @@ export function updateLatePriorityFrequencyAdjustment(
       item.flightNo === normalizedFlightNo &&
       item.kind === kind
   );
+  normalizedDelta +=
+    flight.categories[category].effectiveCount -
+    (flight.categories[category].baseCount +
+      flight.categories[category].manualCorrection);
   if (existing) existing.delta += normalizedDelta;
   else
     state.latePriorityFrequencyAdjustments.push({
@@ -224,7 +239,8 @@ export function updateOrdinaryPriorityFrequencyAdjustment(
   position: string,
   delta: number
 ): boolean {
-  const normalizedDelta = Math.trunc(delta);
+  let normalizedDelta = Math.trunc(delta);
+  if (!Number.isFinite(normalizedDelta)) return false;
   if (!normalizedDelta || !/^\d{4}-\d{2}$/.test(month)) return false;
   const key = ordinaryPriorityConfigurationKey(airlineCode, position);
   const configured = state.settings.ordinaryPriorityPositions.some(
@@ -233,6 +249,22 @@ export function updateOrdinaryPriorityFrequencyAdjustment(
   );
   if (!configured || !state.staff.some((person) => person.id === staffId))
     return false;
+  const row = buildOrdinaryPriorityStatistics(
+    state,
+    state.activeScheduleDate?.startsWith(month)
+      ? state.activeScheduleDate
+      : `${month}-01`
+  ).find(
+    (r) =>
+      r.staff.id === staffId &&
+      ordinaryPriorityConfigurationKey(r.airlineCode, r.position) === key
+  );
+  const count = row?.effectiveCount ?? 0;
+  normalizedDelta = Math.max(normalizedDelta, -count);
+  if (!normalizedDelta) return false;
+  if (row)
+    normalizedDelta +=
+      row.effectiveCount - (row.actualCount + row.manualCorrection);
   const existing = state.ordinaryPriorityFrequencyAdjustments.find(
     (item) =>
       item.month === month &&

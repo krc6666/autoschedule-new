@@ -2,6 +2,7 @@ import { html } from "lit";
 
 import {
   buildMonthlyLatePriorityStatistics,
+  canAdjustLatePriorityCategory,
   LATE_PRIORITY_STATISTICS_CATEGORIES,
   latePriorityStatisticsFlightNumbers,
   type LatePriorityStatisticsCategory,
@@ -369,7 +370,10 @@ export class StatisticsPageElement extends LightDomElement {
                           const label = `${column.airlineCode} / ${column.position}`;
                           return html`<td data-label=${label}>
                             ${
-                              cell.qualified
+                              cell.qualified ||
+                              cell.actualCount ||
+                              cell.manualCorrection ||
+                              cell.effectiveCount
                                 ? this.ordinaryPriorityCountCell(cell, month)
                                 : html`<span class="text-body-secondary"
                                     >-</span
@@ -427,7 +431,7 @@ export class StatisticsPageElement extends LightDomElement {
         totalCount: 0,
         cells: new Map<string, OrdinaryPriorityStatisticsRow>(),
       };
-      if (row.qualified) current.totalCount += row.effectiveCount;
+      current.totalCount += row.effectiveCount;
       current.cells.set(
         this.ordinaryPriorityCellKey(row.airlineCode, row.position),
         row
@@ -436,8 +440,19 @@ export class StatisticsPageElement extends LightDomElement {
     }
     return [...displayRows.values()].filter((row) =>
       selectedKey === "全部"
-        ? [...row.cells.values()].some((cell) => cell.qualified)
-        : row.cells.get(selectedKey)?.qualified === true
+        ? [...row.cells.values()].some(
+            (cell) =>
+              cell.qualified ||
+              cell.actualCount ||
+              cell.manualCorrection ||
+              cell.effectiveCount
+          )
+        : Boolean(
+            row.cells.get(selectedKey)?.qualified ||
+            row.cells.get(selectedKey)?.actualCount ||
+            row.cells.get(selectedKey)?.manualCorrection ||
+            row.cells.get(selectedKey)?.effectiveCount
+          )
     );
   }
 
@@ -470,6 +485,7 @@ export class StatisticsPageElement extends LightDomElement {
               class="btn btn-sm btn-outline-secondary"
               type="button"
               aria-label=${`${row.airlineCode}/${row.position}减少一次`}
+              ?disabled=${row.effectiveCount <= 0}
               @click=${() =>
                 dispatchUiCommand(this, {
                   type: "adjust-ordinary-priority-frequency",
@@ -564,7 +580,7 @@ export class StatisticsPageElement extends LightDomElement {
           >
             <strong>${category}</strong>
             ${
-              own.qualified
+              canAdjustLatePriorityCategory(own)
                 ? html`${this.adjustmentButtons(
                       staffId,
                       month,
@@ -572,7 +588,7 @@ export class StatisticsPageElement extends LightDomElement {
                       category,
                       own.effectiveCount
                     )}<small
-                      >实际 ${own.visibleDetails.length} · 修正
+                      >实际 ${own.baseCount} · 修正
                       ${
                         own.manualCorrection >= 0 ? "+" : ""
                       }${own.manualCorrection}</small
@@ -603,7 +619,9 @@ export class StatisticsPageElement extends LightDomElement {
     const category = this.selectedLatePriorityCategory;
     return rows
       .map((row, index) => ({ row, index }))
-      .filter(({ row }) => row.categories[category].qualified)
+      .filter(({ row }) =>
+        canAdjustLatePriorityCategory(row.categories[category])
+      )
       .sort(
         (left, right) =>
           this.latePriorityRowCount(right.row) -
@@ -699,6 +717,7 @@ export class StatisticsPageElement extends LightDomElement {
         type="button"
         class="btn btn-sm btn-outline-secondary"
         aria-label="${flightNo}${category}减少一次"
+        ?disabled=${count <= 0}
         @click=${() => dispatchUiCommand(this, { type: "adjust-late-priority-frequency", month, staffId, flightNo, kind, delta: -1 })}
       >
         −

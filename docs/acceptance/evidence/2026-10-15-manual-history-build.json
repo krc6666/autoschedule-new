@@ -1,0 +1,56 @@
+{
+  "entry": {
+    "path": "dist/index.html",
+    "sha256": "b3f22f1be26349bca8facc7b30986f49d8069acaab4f0ea2a29bcc60cb15db0e"
+  },
+  "assets": [
+    {
+      "path": "dist/assets/excel-DTOO-7AZ.js",
+      "sha256": "cc49c4a15d985fb7af5f3545207d27f6ec2382924ba500eab9c105f372dbf266"
+    },
+    {
+      "path": "dist/assets/excel-worksheet-CjSdF5tR.js",
+      "sha256": "d57063c8887aed40133fb261f11b24488642ac472e95dd428643dc211e2c31cf"
+    },
+    {
+      "path": "dist/assets/highs-B7rmYqTp.js",
+      "sha256": "1fb0e14d56914bad3f02f249ad735f79a1e6ef2b72885daa2fa3d070ecfe942c"
+    },
+    {
+      "path": "dist/assets/highs-BjOZIft-.js",
+      "sha256": "a88e05011844ffb27c1e6c62be333c0f695890733140314bfd00d67795c19dfe"
+    },
+    {
+      "path": "dist/assets/highs-D01W9kFF.wasm",
+      "sha256": "2a95cbf93774622cf4b9ba7650017159aedcec83223f9f1ae5f486818f53a08a"
+    },
+    {
+      "path": "dist/assets/highs-DEeTqoGR.wasm",
+      "sha256": "36e68fe5cdd886bedb12c39ab498b6f316bc38936bc11a94ea956face8b85fe2"
+    },
+    {
+      "path": "dist/assets/highs-DMPgPnuK.js",
+      "sha256": "a38869ca2d19443e54f2fbaac262c8d750271ced8cdfa8403b424f87ad9f610f"
+    },
+    {
+      "path": "dist/assets/highs-solver-DJ9lmGnc.js",
+      "sha256": "bce244a02329fc36640c59093647fc4536dfb3b0f6c1bb8c4bd38037c74c3cbe"
+    },
+    {
+      "path": "dist/assets/highs-SUWNJWf5.js",
+      "sha256": "2e5751eb770e21f2504e57d774633404e0311f4a9cc18febd2a81e78de56ca58"
+    },
+    {
+      "path": "dist/assets/index-CBLcr16f.js",
+      "sha256": "a9117ac23918ddb95eb20c1a1778f53b20267875494d9f2cd6dba6d810050cee"
+    },
+    {
+      "path": "dist/assets/late-priority-counts-excel-CBAsko96.js",
+      "sha256": "d1d03f45961c32a06e9dffaf3af7c27ee549b87a9784fb44ae8094ea6130cae3"
+    },
+    {
+      "path": "dist/assets/schedule.worker-uorFX3Q3.js",
+      "sha256": "5cc817de4bab5c50127aa1724f434ca967b9c5121b2e3a4faa477f9ea704f9c2"
+    }
+  ]
+}

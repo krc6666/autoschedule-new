@@ -68,7 +68,15 @@ export interface PositionRule {
   earlyReleaseMinutes: number;
 }
 
-export interface HistoryRecord {
+export interface ManualCountEvidence {
+  /** First occupant before a successful manual edit; display only, never workload. */
+  countBaseline?: { staffId: string | null; staffName: string };
+  manualOverrideWarnings?: Array<{ code: string; message: string }>;
+  /** Uncombined remarks allow archive editing without duplicating old warnings. */
+  assignmentRemarks?: { remark: string; manualRemark: string };
+}
+
+export interface HistoryRecord extends ManualCountEvidence {
   id: string;
   date: string;
   flightNo: string;
@@ -88,7 +96,7 @@ export interface HistoryRecord {
   teamLeaderGapFill?: true;
 }
 
-export interface Assignment {
+export interface Assignment extends ManualCountEvidence {
   id: string;
   flightId: string;
   flightNo: string;
@@ -114,7 +122,6 @@ export interface Assignment {
     scheduleRunId: string;
     ruleFingerprint: string;
   };
-  manualOverrideWarnings?: Array<{ code: string; message: string }>;
   supervisorSourceAssignmentId?: string;
   /** Structured relation used when a supervisor fills a configured target. */
   supervisorFillRuleId?: string;

@@ -445,7 +445,15 @@ describe("historical schedule editing", () => {
     expect(coordinator.model().activeScheduleDate).toBe("2026-08-22");
     expect(
       coordinator.model().history.filter((item) => item.date === "2026-08-20")
-    ).toEqual([]);
+    ).toMatchObject([
+      {
+        staffId: "",
+        staffName: "",
+        workHours: 0,
+        fatiguePoints: 0,
+        countBaseline: { staffId: state.history[1]!.staffId },
+      },
+    ]);
     expect(
       coordinator.model().history.filter((item) => item.date === "2026-08-18")
     ).toEqual([state.history[0]]);

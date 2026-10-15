@@ -1,0 +1,84 @@
+README.md
+history.md
+rule-propagation-matrix.md
+spec.md
+src/app/history-actions.ts
+src/app/schedule-actions.ts
+src/app/statistics-actions.ts
+src/domain/statistics/fatigue.ts
+src/domain/statistics/monthly-late-priority-statistics.ts
+src/domain/statistics/ordinary-priority-statistics.ts
+src/infrastructure/excel.ts
+src/infrastructure/late-priority-counts-excel.ts
+src/infrastructure/state-restoration.ts
+src/model.ts
+src/ui/components/statistics-page.ts
+tests/app/application-coordinator.test.ts
+tests/domain/monthly-late-priority-statistics.test.ts
+tests/ui/statistics-view.test.ts
+src\model.ts:73:  countBaseline?: { staffId: string | null; staffName: string };
+src\model.ts:76:  assignmentRemarks?: { remark: string; manualRemark: string };
+src\infrastructure\excel.ts:617:    if (!date || (!staffName && !evidence.countBaseline?.staffId) || !position)
+src\infrastructure\excel.ts:1286:          assignmentRemarks: {
+src\infrastructure\manual-count-evidence.ts:4:export function restoreManualCountEvidence(
+src\infrastructure\manual-count-evidence.ts:10:  const remarks = source.assignmentRemarks;
+src\infrastructure\manual-count-evidence.ts:14:      result.assignmentRemarks = {
+src\infrastructure\manual-count-evidence.ts:19:  const baseline = source.countBaseline;
+src\infrastructure\manual-count-evidence.ts:26:      result.countBaseline = { staffId: row.staffId, staffName: row.staffName };
+src\infrastructure\manual-count-evidence.ts:44:    return restoreManualCountEvidence(JSON.parse(value));
+src\infrastructure\manual-count-evidence.ts:54:    !value.countBaseline &&
+src\infrastructure\manual-count-evidence.ts:56:    !value.assignmentRemarks
+src\infrastructure\manual-count-evidence.ts:59:  return JSON.stringify(restoreManualCountEvidence(value));
+src\infrastructure\state-restoration.ts:2:import { restoreManualCountEvidence } from "./manual-count-evidence";
+src\infrastructure\state-restoration.ts:422:        ...restoreManualCountEvidence(item),
+src\infrastructure\state-restoration.ts:579:  Object.assign(assignment, restoreManualCountEvidence(value));
+src\app\history-actions.ts:99:    assignment.remark = record.assignmentRemarks?.remark ?? record.remark;
+src\app\history-actions.ts:100:    if (record.countBaseline)
+src\app\history-actions.ts:101:      assignment.countBaseline = structuredClone(record.countBaseline);
+src\app\history-actions.ts:107:    assignment.manualRemark = record.assignmentRemarks?.manualRemark ?? "";
+src\app\history-actions.ts:159:      ...(item.countBaseline
+src\app\history-actions.ts:160:        ? { countBaseline: structuredClone(item.countBaseline) }
+src\app\history-actions.ts:169:      assignmentRemarks: {
+src\domain\statistics\ordinary-priority-statistics.ts:55:          record.assignmentRemarks?.remark ?? record.remark
+src\domain\statistics\ordinary-priority-statistics.ts:95:          (r) => !r.countBaseline && !r.manualOverrideWarnings
+src\domain\statistics\manual-count-evidence.ts:13:  assignment.countBaseline ??= {
+src\domain\statistics\manual-count-evidence.ts:22:  return record.countBaseline ? record.countBaseline.staffId : record.staffId;
+src\domain\statistics\manual-count-evidence.ts:34:  record: Pick<HistoryRecord, "staffId" | "staffName" | "countBaseline">
+src\domain\statistics\manual-count-evidence.ts:39:    Boolean(record.countBaseline?.staffId)
+src\domain\statistics\manual-count-evidence.ts:60:                a.countBaseline?.staffId)
+src\domain\statistics\monthly-late-priority-statistics.ts:285:      remark: record.assignmentRemarks?.remark ?? record.remark,
+src\domain\statistics\monthly-late-priority-statistics.ts:322:        !record.countBaseline && !record.manualOverrideWarnings;
+git : warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it
+所在位置 行:4 字符: 1
++ git diff --check 2>&1 | Out-File -Append -Encoding UTF8 docs/acceptan ...
++ ~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (warning: in the... Git touches it:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+warning: in the working copy of 'history.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'rule-propagation-matrix.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'spec.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/history-actions.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/schedule-actions.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/statistics-actions.ts', LF will be replaced by CRLF the next time Git touches
+it
+warning: in the working copy of 'src/domain/statistics/fatigue.ts', LF will be replaced by CRLF the next time Git touch
+es it
+warning: in the working copy of 'src/domain/statistics/monthly-late-priority-statistics.ts', LF will be replaced by CRL
+F the next time Git touches it
+warning: in the working copy of 'src/domain/statistics/ordinary-priority-statistics.ts', LF will be replaced by CRLF th
+e next time Git touches it
+warning: in the working copy of 'src/infrastructure/excel.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/infrastructure/late-priority-counts-excel.ts', LF will be replaced by CRLF the nex
+t time Git touches it
+warning: in the working copy of 'src/infrastructure/state-restoration.ts', LF will be replaced by CRLF the next time Gi
+t touches it
+warning: in the working copy of 'src/model.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/ui/components/statistics-page.ts', LF will be replaced by CRLF the next time Git t
+ouches it
+warning: in the working copy of 'tests/app/application-coordinator.test.ts', LF will be replaced by CRLF the next time
+Git touches it
+warning: in the working copy of 'tests/domain/monthly-late-priority-statistics.test.ts', LF will be replaced by CRLF th
+e next time Git touches it
+warning: in the working copy of 'tests/ui/statistics-view.test.ts', LF will be replaced by CRLF the next time Git touch
+es it

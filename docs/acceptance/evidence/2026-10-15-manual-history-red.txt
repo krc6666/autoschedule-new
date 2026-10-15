@@ -1,0 +1,91 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/app/manual-history-corrections.test.ts (3 tests | 3 failed) 31ms
+     × saves an unqualified manual replacement, reloads evidence, and derives corrections once 17ms
+     × preserves cleared baseline without workload and round trips storage and both Excel exports 10ms
+     × stops decrementing at zero without hidden debt and does not relax hard blockers 2ms
+npm.cmd :
+所在位置 行:2 字符: 1
++ npm.cmd exec vitest -- run tests/app/manual-history-corrections.test. ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/app/manual-history-corrections.test.ts > manual qualification override history contract > saves an unquali
+fied manual replacement, reloads evidence, and derives corrections once
+AssertionError: expected { Object (id, date, ...) } to match object { staffId: '2', …(2) }
+(11 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "countBaseline": {
+-     "staffId": "1",
+-   },
+-   "manualOverrideWarnings": ArrayContaining [
+-     ObjectContaining {
+-       "code": "position-qualification",
+-     },
+-   ],
+    "staffId": "2",
+  }
+
+ ❯ tests/app/manual-history-corrections.test.ts:35:24
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  tests/app/manual-history-corrections.test.ts > manual qualification override history contract > preserves cleare
+d baseline without workload and round trips storage and both Excel exports
+AssertionError: expected { Object (id, date, ...) } to match object { staffId: '2', …(2) }
+(11 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "countBaseline": {
+-     "staffId": "1",
+-   },
+-   "manualOverrideWarnings": ArrayContaining [
+-     ObjectContaining {
+-       "code": "position-qualification",
+-     },
+-   ],
+    "staffId": "2",
+  }
+
+ ❯ tests/app/manual-history-corrections.test.ts:60:64
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  tests/app/manual-history-corrections.test.ts > manual qualification override history contract > stops decrementi
+ng at zero without hidden debt and does not relax hard blockers
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ tests/app/manual-history-corrections.test.ts:76:24
+     74|     const {state,people}=scenario();
+     75|     const adjust=(n:number)=>updateOrdinaryPriorityFrequencyAdjustment…
+     76|     expect(adjust(-1)).toBe(false);
+       |                        ^
+     77|     expect(adjust(1)).toBe(true);
+     78|     expect(adjust(-100)).toBe(true);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  3 failed (3)
+   Start at  14:46:10
+   Duration  1.38s (transform 858ms, setup 0ms, import 1.12s, tests 31ms, environment 0ms)

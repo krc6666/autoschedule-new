@@ -1,0 +1,23 @@
+Precommit review: manual history corrections, based on HEAD d1a658b.
+
+Reviewed responsibilities and propagation:
+- app/schedule-actions captures the first successful manual-change baseline.
+- app/history-actions preserves final occupant, baseline, structured warnings and separate remarks.
+- domain/statistics/manual-count-evidence owns baseline projection and current-date/history deduplication.
+- ordinary and late statistics derive final-minus-baseline corrections and add the existing numeric adjustments.
+- infrastructure/manual-count-evidence is the shared decoder for local storage and both Excel exports.
+- UI renders the existing actual/correction table; no qualification-breach column or unknown-evidence text remains.
+
+Preserved boundaries:
+- No DOM/storage access was introduced into domain calculations.
+- No UI event orchestration was moved into infrastructure.
+- No second adjustment ledger or repeated persistence of derived deltas was introduced.
+- Automatic candidate selection and solver implementations were not modified.
+- Automatic qualification still rejects an unqualified manual replacement in the regression test.
+- History exact-name matching and refusal to overwrite an incomplete history draft remain intact.
+- Empty baseline-only records carry zero workload and do not advance actual-workday recovery/rotation windows.
+- Cancellation, repeated saves, group isolation, storage and XLSX round trips are covered by the regression tests.
+
+Review result: no blocking responsibility coupling identified in this change set.
+Limits: this is a source review plus automated evidence; owner browser save/re-read acceptance remains pending.
+Commit and push authorized by owner; deployment was not requested.
