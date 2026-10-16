@@ -1,0 +1,42 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+npm.cmd : stderr | tests/ui/actionable-warning-reasons.test.ts
+所在位置 行:2 字符: 1
++ npm.cmd exec vitest -- run tests/ui/actionable-warning-reasons.test.t ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (stderr | tests/...reasons.test.ts:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+
+ ❯ tests/ui/actionable-warning-reasons.test.ts (2 tests | 1 failed) 34ms
+   × shows the manual result first and keeps full reasons in the yellow notification 11ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/ui/actionable-warning-reasons.test.ts > shows the manual result first and keeps full reasons in the yellow
+ notification
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ tests/ui/actionable-warning-reasons.test.ts:47:37
+     45|   expect(element.textContent).toContain("人工调整已保留");
+     46|   const instance = Toast.getInstance(element.querySelector<HTMLElement…
+     47|   expect(instance._config.autohide).toBe(false);
+       |                                     ^
+     48|   detail.querySelector("summary")!.click();
+     49|   expect(detail.open).toBe(true);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 1 passed (2)
+   Start at  11:06:57
+   Duration  908ms (transform 241ms, setup 0ms, import 308ms, tests 34ms, environment 362ms)

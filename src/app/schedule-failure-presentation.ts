@@ -1,3 +1,4 @@
+import { conciseAssignmentWarningReason } from "../domain/reviews/schedule-warning-message";
 import { guardExplanation } from "../domain/shared/schedule-issue-explanation";
 import { ScheduleGuardError } from "../domain/kernel/schedule-guard";
 import type { ScheduleFailureDetails } from "../domain/shared/schedule-failure-details";
@@ -28,46 +29,9 @@ function guardSummary(ruleId: string): string {
 }
 
 function calculationFacts(message: string): string[] {
-  const diagnostics = message.slice("当天无法生成完整班表。".length);
-  const facts: string[] = [];
-  // These patterns describe existing diagnostic messages, not eligibility rules.
-  const rest = diagnostics.match(/[^。；]*选择了[上下]午半休[^。]*。/g);
-  if (rest) facts.push(...rest);
-  const halfDay =
-    /([^。]+)在可上班的半天都有候选岗位，但整批安排与其他航班发生冲突，无法保证每人至少上一班/.exec(
-      diagnostics
-    );
-  if (halfDay)
-    facts.push(
-      `${halfDay[1]}各自有能做的岗位，但同时安排时会和其他工作冲突，无法让每个人都在上班的半天做至少一个岗位。`
-    );
-  const emptyTargets = diagnostics.matchAll(
-    /([^。]+?)：严格次班恢复禁止空缺，([^。]+)。/g
-  );
-  for (const match of emptyTargets) {
-    const reason = /^基础合格的 (\d+) 人全部被上一班末班重点岗位避让排除$/.exec(
-      match[2]!
-    );
-    facts.push(
-      `${match[1]}按设置不能留空，但${reason ? `原本符合条件的${reason[1]}人上一班都做了需要休息保护的晚班岗位，这一班必须避开这里` : match[2] === "没有人员同时满足在岗状态、岗位资质和夜班能力" ? "没有人同时满足正常在岗、会做这个岗位和夜班能力的要求" : "经过设置要求的上一班晚班休息保护后，没有可安排的人员"}。`
-    );
-  }
-  const capacity = diagnostics.matchAll(
-    /([^。]+?)：严格恢复候选集中只有(.+?)可用，合计 ([\d.]+) 小时会超过每日 ([\d.]+) 小时上限。/g
-  );
-  for (const match of capacity)
-    facts.push(
-      `${match[1]}按设置都不能留空，但只有${match[2]}能做。全部交给这个人需要${match[3]}小时，超过每天${match[4]}小时的上限。`
-    );
-  if (diagnostics.includes("现有候选无法同时承担"))
-    facts.push(
-      "需要填满的岗位各自有人能做，但这些人无法同时接下所有岗位。记录提示可能是工作时间相撞，或两个航班之间间隔太短，具体是哪一项还需检查。"
-    );
-  return facts.length
-    ? facts
-    : [
-        "系统没有找到一份同时满足全部要求的班表。普通岗位缺人通常可以留空；这次没有确定是哪一项要求挡住了整班生成。",
-      ];
+  const separator = message.indexOf("\u3002");
+  const diagnostics = separator >= 0 ? message.slice(separator + 1) : "";
+  return [conciseAssignmentWarningReason(diagnostics ? [diagnostics] : [])];
 }
 
 export function presentScheduleFailure(error: unknown): {
@@ -167,7 +131,7 @@ export function presentScheduleFailure(error: unknown): {
           checkInputs,
           ...(message.includes("严格")
             ? [
-                "核对规则页“次班重点岗位避让”中的航班和岗位，以及上一班晚班记录是否符合实际。相关岗位按设置不能留空；请按实际情况修正记录，不要仅为了生成而关闭规则。",
+                "核对规则页“次班重点岗位避让”中的航班、岗位和模式，以及上一班晚班记录。局部缺人允许留空，不能仅凭局部限制断言整班无解；请保留诊断记录检查。",
               ]
             : []),
           report,
@@ -262,5 +226,10 @@ function safetyExplanation(message: string): string {
         )[eligibility[2]!];
     return `检查发现：${eligibility[1]}，${reason}。`;
   }
+  if (
+    message.startsWith("最终安全复核未通过：") &&
+    /岗位资质|时间冲突|每日工时上限|衔接|当前状态|夜班/.test(message)
+  )
+    return `检查发现：${message.slice("最终安全复核未通过：".length)}`;
   return "最后检查发现班表中仍有不符合要求的安排，或缺少完成检查的记录。当前信息不足以确定具体人员或岗位；原始报错已保留在诊断文件中。";
 }

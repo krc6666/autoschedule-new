@@ -1,0 +1,3 @@
+验收材料检查失败：
+2026-10-16-actionable-warning-reasons / finalArtifact：尚未验收通过（unverified）
+NATIVE_EXIT_CODE=1

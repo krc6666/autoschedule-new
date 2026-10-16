@@ -166,19 +166,19 @@ describe.each([
       if (vacancies) {
         expect(toast?.tone).toBe("warning");
         expect(toast?.details?.facts).toEqual([
-          "KE166 / H05：空岗",
-          "TR121 / H03：空岗",
+          "KE166 / H05：人员状态不允许安排",
+          "TR121 / H03：空岗，具体原因未记录",
         ]);
         expect(toast?.details?.steps).toEqual([]);
         expect(toast?.details?.vacancies).toEqual([
           {
             assignmentId: "vacant-h05",
-            label: "KE166 / H05：空岗",
+            label: "KE166 / H05：人员状态不允许安排",
             reasons: ["人员状态不允许安排"],
           },
           {
             assignmentId: "vacant-h03",
-            label: "TR121 / H03：空岗",
+            label: "TR121 / H03：空岗，具体原因未记录",
             reasons: [],
           },
         ]);

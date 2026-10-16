@@ -801,7 +801,7 @@ export function createStrictPositionTransitionScheduleGuard(): ScheduleGuard {
         return violations.map((policy) => ({
           ruleId: "position-transition",
           assignmentId: assignment.id,
-          message: `${assignment.staffName || assignment.staffId}安排${assignment.flightNo}/${assignment.position}违反严格岗位衔接规则${policy.id}`,
+          message: `${assignment.staffName || assignment.staffId}安排${assignment.flightNo}/${assignment.position}违反严格岗位衔接规则“${policy.name}”（${policy.sourceFlightNo || "任意航班"}/${policy.sourcePositions.join("、") || "任意岗位"}→${policy.targetFlightNo}/${policy.targetPosition}，要求 ${policy.minimumGapMinutes} 分钟）；目标时段 ${assignment.startTime}–${assignment.endTime}`,
         }));
       });
     },

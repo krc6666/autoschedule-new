@@ -519,7 +519,7 @@ describe("history actions", () => {
     )!;
     expect(feedback.status).toBe("需复核");
     expect(feedback.text).toContain(`${onlyQualified.name} 未落实（TR 一号`);
-    expect(feedback.text).toContain("唯一合格人员");
+    expect(feedback.evidence).toContain("唯一合格");
   });
 
   it("reassigns an occupied qualified worker before breaking late-shift recovery protection", async () => {

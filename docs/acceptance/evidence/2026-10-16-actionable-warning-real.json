@@ -1,0 +1,20 @@
+{
+  "configurationSha256": "eca766e56879ceede3ad653d5b0af07d8aa2d443c35b62f0b11229d74c7e4a56",
+  "scheduleSha256": "231e658e63d850310fb78761eceea2ca94d3374064f12b391f8efb281ff48ac4",
+  "inputsUnchangedAfterReplay": true,
+  "date": "2026-10-17",
+  "importWarnings": 0,
+  "target": {
+    "flight": "CX937（早）",
+    "position": "G18",
+    "status": "unfilled",
+    "explanation": "空岗：跨航班优先 1 人；严格跨工作日恢复 3 人\n人员1：跨航班优先规则先保留给KE166；当前承担KE166/H07 09:15–11:15、当前承担KE166/柜台引导 09:15–11:15\n人员15：严格跨工作日恢复（禁止模式）；2026-10-15 TR121/H04 21:55–23:55，本次不能接CX937（早）/G18\n人员5：严格跨工作日恢复（禁止模式）；2026-10-15 TR121/H02 21:55–23:55，本次不能接CX937（早）/G18\n人员6：严格跨工作日恢复（禁止模式）；2026-10-15 TR121/H05 21:55–23:55，本次不能接CX937（早）/G18\n以上为本次候选限制与当前直接检查；不代表多岗换人一定无解。"
+  },
+  "assignmentCount": 53,
+  "vacancyCount": 3,
+  "finalSafetyCredential": true,
+  "storagePreserved": true,
+  "excelPreserved": true,
+  "feedbackPreserved": true,
+  "browserVerified": false
+}

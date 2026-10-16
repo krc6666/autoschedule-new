@@ -114,6 +114,7 @@ async function finalizeDailyPlan({
       .filter((assignment) => plan.lockedAssignmentIds.has(assignment.id))
       .map((assignment) => structuredClone(assignment)),
     optimizationQuality: plan.optimizationQuality,
+    vacancyDiagnosticFacts: plan.vacancyDiagnosticFacts,
     finalizeMobileSupervisors: async () => {
       if (mobileSupervisorsFinalized) return;
       const assignments = ledger

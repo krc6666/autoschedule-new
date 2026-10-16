@@ -585,7 +585,7 @@ describe("high-fatigue ordinary-position rotation", () => {
     );
 
     expect(warnings.join("\n")).toContain("已连续1次承担TEST100/H03");
-    expect(warnings.join("\n")).toContain("需要调整的人员过多");
+    expect(warnings.join("\n")).toContain("整体重排最多允许五人参与");
     expect(
       assignments.find((item) => item.positionRuleId === target.id)?.staffId
     ).toBe(repeatedWorker!.id);

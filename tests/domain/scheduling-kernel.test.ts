@@ -3036,7 +3036,7 @@ describe("scheduler domain", { timeout: 15_000 }, () => {
       (item) => item.key === "previous-late"
     )!;
     expect(feedback.status).toBe("需复核");
-    expect(feedback.text).toContain("值班上午上岗要求优先");
+    expect(feedback.evidence).toContain("值班上午上岗要求优先");
   });
 
   it("keeps the only qualified worker on a protected next-workday position and explains the coverage override", async () => {
@@ -3095,7 +3095,7 @@ describe("scheduler domain", { timeout: 15_000 }, () => {
       (item) => item.key === "previous-late"
     )!;
     expect(feedback.status).toBe("需复核");
-    expect(feedback.text).toContain("唯一合格人员");
+    expect(feedback.evidence).toContain("唯一合格人员");
   });
 
   it("keeps the KE166 mobile supervisor independent and lets another worker satisfy next-workday recovery", async () => {
@@ -3301,7 +3301,7 @@ describe("scheduler domain", { timeout: 15_000 }, () => {
         .map((other) => ({ first, other }))
     )[0]!;
     expect(canAssignStaff(state, pair.other.id, pair.first.staffId!)).toMatch(
-      /时段/
+      /时间冲突/
     );
   }, 30_000);
 
@@ -7469,7 +7469,7 @@ describe("scheduler domain", { timeout: 15_000 }, () => {
     )!;
     expect(target).toMatchObject({ status: "assigned", staffId: person.id });
     expect(source).toMatchObject({ status: "unfilled", staffId: null });
-    expect(source.systemNotes).toContain("因抽调至 TARGET/H01 而空缺");
+    expect(source.systemNotes?.join("；")).toContain("时间冲突：TARGET/H01");
   });
 
   it("records a concrete staffing-shortage reason for an unfilled regular position before noon", async () => {
@@ -7512,7 +7512,7 @@ describe("scheduler domain", { timeout: 15_000 }, () => {
       await generateSchedule(state, "2026-07-18")
     ).assignments.find((item) => item.status === "unfilled")!;
     expect(unfilled.systemNotes?.join("；")).toContain(
-      "因合格人数不足而无法填满"
+      "空岗：当前时段冲突 1 人"
     );
     expect(unfilled.systemNotes?.join("；")).toContain("时段冲突");
   });
@@ -9921,7 +9921,9 @@ describe("scheduler domain", { timeout: 15_000 }, () => {
     ).toMatchObject({
       status: "unfilled",
       staffId: null,
-      systemNotes: [expect.stringContaining("下午严格衔接")],
+      systemNotes: expect.arrayContaining([
+        expect.stringContaining("下午严格衔接"),
+      ]),
     });
 
     const preferredResult = await generateSchedule(
@@ -10108,7 +10110,7 @@ describe("scheduler domain", { timeout: 15_000 }, () => {
         expect.objectContaining({
           ruleId: "position-frequency-review",
           outcome: "fallback",
-          message: expect.stringContaining("值班或KE166固定岗位"),
+          message: expect.stringContaining("值班或KE166特殊锁定"),
         }),
         expect.objectContaining({
           ruleId: "position-rotation",

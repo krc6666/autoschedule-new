@@ -1,0 +1,11 @@
+{
+  "capturedAtUtc": "2026-10-16T03:15:56.860Z",
+  "node": "v24.21.0",
+  "platform": "win32",
+  "architecture": "x64",
+  "cpu": "Intel(R) Core(TM) i5-9300H CPU @ 2.40GHz",
+  "logicalCpuCount": 8,
+  "memoryGiB": 16,
+  "testScope": "functional suite, real Worker/WASM, checkpoint and scheduling performance; no browser automation",
+  "limitations": "Local wall-clock measurements only. Browser acceptance is pending."
+}

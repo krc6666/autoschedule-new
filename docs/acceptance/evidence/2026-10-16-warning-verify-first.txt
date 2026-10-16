@@ -1,0 +1,6 @@
+Observation summary transcribed from this session tool output; NOT a raw log.
+The original failed-run log was lost when a UTF-16 PowerShell log was filtered as UTF-8.
+First npm.cmd run verify: 2 failed files, 144 passed files; 2 failed tests, 1399 passed tests (1401 total).
+Failure 1: schedule-feedback expected generic position-transition wording; actual evidence contained policy name and 180-minute threshold.
+Failure 2: acceptance-gate subprocess test exceeded 5000 ms.
+No timeout threshold was relaxed. Final full verify passed; see warning-verify.txt.

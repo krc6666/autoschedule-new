@@ -529,7 +529,8 @@ describe("daily schedule module interfaces", () => {
       )
     ).toBe(true);
     expect(halfRestVacancy?.systemNotes?.join("；")).toContain("半休");
-    expect(result.warnings.join("；")).toContain("半休甲、半休乙");
+    expect(result.warnings.join("；")).toContain("半休甲：半休时段");
+    expect(result.warnings.join("；")).toContain("半休乙：半休时段");
   });
 
   it("uses a recovery-protected regular worker to backfill a half-rest vacancy", async () => {
@@ -1831,7 +1832,10 @@ describe("daily schedule solver performance model", () => {
       reason: "no-qualified-candidate",
       blockers: ["没有通过人员状态、资质、时段和安全约束的候选人员"],
     });
-    expect(vacancy?.systemNotes?.[0]).toContain("真实无候选人员");
+    expect(vacancy?.systemNotes?.join("；")).toContain("真实无候选人员");
+    expect(vacancy?.systemNotes?.[0]).toContain(
+      "岗位资质名单无当前人员（0人）"
+    );
   });
 
   it("does not use team leaders to satisfy the daily staff coverage objective", async () => {

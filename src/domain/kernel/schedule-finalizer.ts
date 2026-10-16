@@ -46,8 +46,13 @@ import { fillConfiguredSupervisorTargets } from "../assignments/supervisor-fill"
 import { ScheduleGuardError } from "./schedule-guard";
 import type { SchedulePipelineContext } from "./schedule-pipeline";
 import { guardExplanation } from "../shared/schedule-issue-explanation";
+import {
+  refreshVacancyDiagnostics,
+  type VacancyDiagnosticFacts,
+} from "../reviews/vacancy-diagnostics";
 
 export interface ScheduleFinalizerOptions {
+  vacancyDiagnosticFacts?: VacancyDiagnosticFacts;
   solver: SolverPort;
   state: ScheduleGenerationFacts;
   date: string;
@@ -115,10 +120,7 @@ function rebuildWarnings(
 ): string[] {
   const warnings = assignments.flatMap((assignment) => {
     if (assignment.status === "unfilled" && assignment.systemNotes?.length) {
-      const category = assignmentRule(state, assignment)?.category;
-      const baseWarning = `${assignment.flightNo} / ${assignment.position} ${category === "\u5f15\u5bfc" ? "\u6ca1\u6709\u53ef\u590d\u7528\u7684\u5e38\u89c4\u4eba\u5458" : "\u65e0\u53ef\u7528\u4eba\u5458"}`;
       return [
-        baseWarning,
         ...assignment.systemNotes.map(
           (note) => `${assignment.flightNo} / ${assignment.position} ${note}`
         ),
@@ -131,7 +133,7 @@ function rebuildWarnings(
     if (assignment.status !== "unfilled") return [];
     const category = assignmentRule(state, assignment)?.category;
     return [
-      `${assignment.flightNo} / ${assignment.position} ${category === "引导" ? "没有可复用的常规人员" : "无可用人员"}`,
+      `${assignment.flightNo} / ${assignment.position} 空岗：${category === "引导" ? "未找到可复用的常规人员，" : ""}具体原因未记录`,
     ];
   });
   const reservationWarnings = crossWorkdayReservationStatuses(
@@ -176,6 +178,7 @@ function sortAssignments(
 }
 
 export async function finalizeSchedule({
+  vacancyDiagnosticFacts,
   solver,
   state,
   date,
@@ -354,6 +357,13 @@ export async function finalizeSchedule({
     );
   }
   applyPreNoonDecisionNotes(state, assignments);
+  refreshVacancyDiagnostics(
+    state,
+    assignments,
+    automaticTasks,
+    runFacts,
+    vacancyDiagnosticFacts
+  );
   sortAssignments(assignments, flights, displayRulesByFlight);
   ledger.commit({ type: "replace", assignments });
   const resultAssignments = workingAssignments(ledger);

@@ -3,6 +3,7 @@ import type { ScheduleGenerationFacts } from "../shared/scheduling-facts";
 import type { SchedulingDecision } from "../rules/schedule-rule-contract";
 import {
   analyzeAutomaticEligibilityPool,
+  diagnoseAutomaticStaffEligibility,
   eligibleStaffForRule,
 } from "../candidates/assignment-eligibility";
 import { canMobileSupervisorCoverPosition } from "./mobile-supervisor-coverage";
@@ -39,23 +40,21 @@ export function preNoonShortageNote(
     flight,
     rule,
   });
-  const reasons = [
-    pool.configured.length === 0 ? "具备岗位资质 0 人" : "",
-    pool.configured.length > pool.available.length
-      ? `状态非正常 ${pool.configured.length - pool.available.length} 人`
-      : "",
-    pool.available.length > pool.nightCapable.length
-      ? `夜班能力不符 ${pool.available.length - pool.nightCapable.length} 人`
-      : "",
-    pool.nightCapable.length > pool.conflictFree.length
-      ? `时段冲突 ${pool.nightCapable.length - pool.conflictFree.length} 人`
-      : "",
-    pool.conflictFree.length > pool.withinHours.length
-      ? `超过每日工时上限 ${pool.conflictFree.length - pool.withinHours.length} 人`
-      : "",
-    pool.withinHours.length ? "无可继续调配的空闲人员" : "",
-  ].filter(Boolean);
-  return `因合格人数不足而无法填满（缺少 1 人：${reasons.join("，") || "无满足全部硬约束的常规人员"}）`;
+  const reasons = pool.configured.map((person) => {
+    const diagnostic = diagnoseAutomaticStaffEligibility({
+      state,
+      assignments,
+      flight,
+      rule,
+      person,
+      transitionMode: "forbid",
+      ignoreSameFlightReusable: true,
+    });
+    return diagnostic.violations.length
+      ? diagnostic.violations.map((v) => v.message).join("；")
+      : `${person.name}：当前直接检查可通过，完整换人方案的具体原因未记录`;
+  });
+  return `空岗：${reasons.join("；") || "岗位资质名单无当前常规人员（0人）"}；这里只核对当前直接安排，不代表多岗换人无解`;
 }
 
 interface RegularPlacement {

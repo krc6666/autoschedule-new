@@ -2,6 +2,7 @@ import type { Assignment } from "../../model";
 import type { ScheduleGenerationFacts } from "../shared/scheduling-facts";
 import type { RuleFeedbackKey } from "../rules/schedule-rule-contract";
 import { diagnoseAutomaticAssignmentEligibility } from "../candidates/assignment-eligibility";
+import { conciseAssignmentWarningReason } from "../reviews/schedule-warning-message";
 import { groupStaffFlightsByNormalizedNumber } from "../statistics/staff-flight-count";
 import type { ScheduleFeedbackOptions } from "./schedule-feedback";
 import { compileSchedulingPlan } from "../rules/scheduling-execution-plan";
@@ -311,19 +312,7 @@ function concisePriorityRoles(
 }
 
 function conciseProtectionReason(messages: string[]): string {
-  const text = messages.join("；");
-  if (!text) return "人工调整或无自动原因";
-  if (text.includes("唯一合格")) return "唯一合格人员";
-  if (text.includes("值班上午")) return "值班上午上岗要求优先";
-  if (text.includes("值班晚撤")) return "值班晚撤岗位锁定优先";
-  if (text.includes("值班")) return "值班锁定优先";
-  if (text.includes("KE166")) return "KE166机动督导锁定优先";
-  if (text.includes("夜班")) return "夜班能力限制";
-  if (text.includes("时间冲突")) return "其他人员时间冲突";
-  if (text.includes("工时")) return "其他人员工时受限";
-  if (text.includes("岗位空缺") || text.includes("岗位完整"))
-    return "岗位完整性优先";
-  return "无人可安全替代";
+  return conciseAssignmentWarningReason(messages);
 }
 
 function positionRotationFeedback(
@@ -378,7 +367,7 @@ function crossWorkdayLoadFeedback(
       "cross-workday-load",
       "跨工作班动态平衡",
       "attention",
-      unresolved.slice(0, 4).join("；")
+      unresolved.join("\n")
     );
   }
   const fulfilled = assignmentDecisionMessages(state.assignments, {
@@ -761,7 +750,8 @@ function dutyRosterFeedback(
     ruleIds: new Set(["duty-position"]),
     outcomes: new Set(["blocked"]),
   })[0];
-  const reason = blockedDecision?.message ?? "没有满足目标岗位的硬约束";
+  const reason =
+    blockedDecision?.message ?? "具体原因未记录，不能确定哪条限制导致未落位";
   return feedbackItem(
     "rule-execution",
     "duty-roster",
@@ -878,7 +868,7 @@ function dailyFlightCountBalanceFeedback(
       "daily-flight-count-balance",
       "同一工作班航班数均衡",
       "attention",
-      `${date}航班数差值为 ${spread}；航班数均衡回退空岗：${vacancySummary || "无"}；真实无候选人员空岗：${noCandidateSummary || "无"}`
+      `${date}航班数差值为 ${spread}；空岗检查记录：${[vacancySummary, noCandidateSummary].filter(Boolean).join("；")}`
     );
   }
   if (participants.length < 2) {

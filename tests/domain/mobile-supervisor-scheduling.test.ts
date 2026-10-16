@@ -2576,7 +2576,7 @@ describe("all-flight mobile-supervisor scheduling", { timeout: 15_000 }, () => {
 
     expect(target).toMatchObject({ staffId: null, status: "unfilled" });
     expect(target.supervisorSourceAssignmentId).toBeUndefined();
-    expect(result.warnings).toContain("TR121 / H05 无可用人员");
+    expect(result.warnings.join("；")).toContain("TR121 / H05 空岗：");
   });
 
   it("ignores a legal guide display when a cross-flight supervisor fill starts after release", () => {
@@ -2827,7 +2827,9 @@ describe("all-flight mobile-supervisor scheduling", { timeout: 15_000 }, () => {
     expect(counter).toMatchObject({ staffId: worker.id, workHours: 2 });
     expect(counter.supervisorSourceAssignmentId).toBeUndefined();
     expect(supervisor).toMatchObject({ staffId: null, status: "unfilled" });
-    expect(result.warnings).toContain("CX931 / 督导 无可用人员");
+    expect(result.warnings.join("；")).toContain(
+      "CX931 / 督导 空岗：当前时段冲突 1 人"
+    );
   });
 
   it("uses the existing safe reassignment before binding a non-KE166 supervisor", async () => {

@@ -68,7 +68,7 @@ export function manualOverrideWarningMessage(
     ),
   ];
   return messages.length
-    ? `人工调整已完成，请注意：${messages.join("；")}`
+    ? `人工调整已保留，突破以下限制：\n${messages.join("\n")}`
     : undefined;
 }
 

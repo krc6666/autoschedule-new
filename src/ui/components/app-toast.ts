@@ -6,6 +6,7 @@ import { createRef, ref, type Ref } from "lit/directives/ref.js";
 import type { ApplicationToast } from "../../app/application-view-state";
 import { dispatchUiCommand } from "../events/ui-command";
 import { LightDomElement } from "./light-dom-element";
+import { warningSummary } from "../../domain/reviews/warning-presentation";
 
 export class AppToastElement extends LightDomElement {
   static override properties = { toast: { attribute: false } };
@@ -25,7 +26,22 @@ export class AppToastElement extends LightDomElement {
       >
         <div class="d-flex">
           <div class="toast-body">
-            ${this.toast?.message ?? ""}
+            ${
+              this.toast?.tone === "warning" &&
+              !this.toast.details &&
+              warningSummary(this.toast.message) !== this.toast.message
+                ? keyed(
+                    this.toast.id,
+                    html`${warningSummary(this.toast.message)}
+                      <details>
+                        <summary>查看具体原因</summary>
+                        <div style="white-space: pre-line">
+                          ${this.toast.message}
+                        </div>
+                      </details>`
+                  )
+                : (this.toast?.message ?? "")
+            }
             ${
               this.toast?.details?.code === "local-vacancies"
                 ? keyed(
@@ -44,12 +60,12 @@ export class AppToastElement extends LightDomElement {
                               <summary>原因</summary>
                               <div class="toast-vacancy-reasons">
                                 ${
-                                vacancy.reasons.length
-                                  ? vacancy.reasons.map(
-                                      (reason) => html`<p>${reason}</p>`
-                                    )
-                                  : html`<p>这次没有记录到具体原因。</p>`
-                              }
+                                  vacancy.reasons.length
+                                    ? vacancy.reasons.map(
+                                        (reason) => html`<p>${reason}</p>`
+                                      )
+                                    : html`<p>这次没有记录到具体原因。</p>`
+                                }
                               </div>
                             </details>
                           </li>`
@@ -98,7 +114,13 @@ export class AppToastElement extends LightDomElement {
     Toast.getInstance(this.toastRef.value)?.dispose();
     Toast.getOrCreateInstance(this.toastRef.value, {
       animation: false,
-      autohide: this.toast.tone !== "danger" && !this.toast.details,
+      autohide:
+        this.toast.tone !== "danger" &&
+        !this.toast.details &&
+        !(
+          this.toast.tone === "warning" &&
+          warningSummary(this.toast.message) !== this.toast.message
+        ),
       delay: 3600,
     }).show();
   }

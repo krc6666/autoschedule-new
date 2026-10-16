@@ -2,6 +2,15 @@ import type { ScheduleGuardViolation } from "../kernel/schedule-guard";
 
 /** Explains evidence already produced by the checks; never evaluates a rule. */
 export function guardExplanation(violation: ScheduleGuardViolation): string {
+  const summary = plainGuardExplanation(violation);
+  if (/internal|broken|unknown/i.test(violation.message)) return summary;
+  const evidence = violation.message
+    .replace(/，?(?:自动排班)?拒绝提交/g, "")
+    .replaceAll("硬约束", "限制");
+  return `${summary}\n检查记录：${evidence}`;
+}
+
+function plainGuardExplanation(violation: ScheduleGuardViolation): string {
   const message = violation.message;
   switch (violation.ruleId) {
     case "daily-primary-position-unique": {

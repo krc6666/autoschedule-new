@@ -31,13 +31,13 @@ describe("user-facing schedule warnings", () => {
       timedOut: false,
     });
     expect(message).toContain(
-      "人员甲 —— 9/18 做过 TR121 末班岗，下一班不能接 KE166"
+      "人员甲 —— 严格跨工作日恢复限制不允许该人员承担次班目标岗位；上一工作班 2026-09-18 TR121，本次目标KE166"
     );
     expect(message).toContain(
-      "人员乙 —— 9/18 做过 TR121 末班岗，下一班不能接 KE166"
+      "人员乙 —— 严格跨工作日恢复限制不允许该人员承担次班目标岗位；上一工作班 2026-09-18 TR121，本次目标KE166"
     );
     expect(message).toContain("这次自动排班没有找到能完成的换人办法");
-    expect(message).not.toMatch(/跨工作日恢复|候选排除|其他人员处于/);
+    expect(message).not.toMatch(/候选排除|其他人员处于/);
     expect((message.match(/[。！？]/g) ?? []).length).toBeLessThanOrEqual(2);
   });
 
@@ -47,7 +47,7 @@ describe("user-facing schedule warnings", () => {
         "没有具备连续腾挪岗位资质的人员",
         "该岗位的其他资质人员已设置半休，不能重新安排到后续岗位",
       ])
-    ).toBe("其他资质人员已安排半休");
+    ).toContain("该岗位的其他资质人员已设置半休，不能重新安排到后续岗位");
   });
 
   it("turns solver diagnostics into one plain business reason", () => {
@@ -56,7 +56,7 @@ describe("user-facing schedule warnings", () => {
         "求解目标 changed-assignment-count 结束状态：infeasible",
         "没有具备双向岗位资质的完整重排方案",
       ])
-    ).toBe("其他人员资质不匹配");
+    ).toBe("没有具备双方岗位资质的完整换人方案");
   });
 
   it("uses the person-fact-reason-decision-result order in at most two sentences", () => {
@@ -71,7 +71,7 @@ describe("user-facing schedule warnings", () => {
     });
 
     expect(message).toBe(
-      "测试人员 已连续2次承担TEST100/G20，本次尝试换人但无替代人选（其他人员资质不匹配）。岗位完整性优先，保留原安排，当前连续第3次。"
+      "测试人员 已连续2次承担TEST100/G20；岗位完整性优先，保留原安排，当前连续第3次。\n本次未找到完整换人方案：没有具备双方岗位资质的完整换人方案"
     );
     expect(message).not.toMatch(TECHNICAL_TERMS);
     expect((message.match(/[。！？]/g) ?? []).length).toBeLessThanOrEqual(2);

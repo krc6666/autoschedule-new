@@ -1,0 +1,7 @@
+Observation summary transcribed from this session tool output; NOT a raw log.
+The original full-run log was lost when a UTF-16 PowerShell log was filtered as UTF-8. Do not treat this summary as an intact failure transcript.
+Initial npm.cmd test: 8 failed test files, 19 failed tests; exit 1.
+Actual evidence-loss failures: daily flight balance/no-candidate stage notes disappeared; exact rejected supervisor-stage reason disappeared.
+Other failures included assertions for superseded generic text, assertions reading shortened text instead of full evidence, and an acceptance subprocess test exceeding 5000 ms.
+Intact additional red evidence remains in warning-connection-red.txt, warning-upstream-red.txt and warning-toast-red.txt.
+Final verify output is preserved separately in warning-verify.txt.

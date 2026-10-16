@@ -107,15 +107,22 @@ export function buildHistoricalScheduleDraft(
     assignment.manualRemark = record.assignmentRemarks?.manualRemark ?? "";
     assignment.status = assignment.staffId ? "assigned" : assignment.status;
   }
-  const warnings = [
-    ...[...unmatchedFlightNos].map(
-      (flightNo) => `${flightNo} 无法匹配当前航班模板或当天航班，未载入人员`
-    ),
-    ...[...unmatched].map((id) => {
-      const record = assignableRecords.find((item) => item.id === id)!;
-      return `${record.flightNo}/${record.position} 无法匹配当前航班或岗位配置，未载入人员`;
-    }),
-  ];
+  const warnings = [...unmatched].map((id) => {
+    const record = assignableRecords.find((item) => item.id === id)!;
+    const prefix = `${record.flightNo}/${record.position} 未载入人员：`;
+    if (unmatchedFlightNos.has(record.flightNo))
+      return `${prefix}历史航班“${record.flightNo}”在当前航班模板和当天航班中均不存在（按航班原文匹配）`;
+    const configured = state.positionRules.filter(
+      (r) => r.flightNo === record.flightNo
+    );
+    const matching = configured.find((r) => r.name === record.position);
+    if (!matching)
+      return `${prefix}历史岗位“${record.position}”与当前岗位不匹配；当前配置：${configured.map((r) => `“${r.name}”`).join("、") || "无"}（按岗位原文匹配）`;
+    const active = assignments.some(
+      (a) => a.flightNo === record.flightNo && a.position === record.position
+    );
+    return `${prefix}${active ? "同一航班岗位的历史记录多于当前可载入岗位，存在重复记录" : `历史岗位“${record.position}”当前未启用；请核对岗位分类、人工设置和人数门槛 ${matching.minPassengers}`}`;
+  });
   return { flights, assignments, warnings };
 }
 

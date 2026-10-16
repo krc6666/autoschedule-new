@@ -15,12 +15,12 @@ import {
 import { countedWorkloadAssignments } from "../shared/workload-accounting";
 import { evaluateWorkloadBalance } from "../reviews/workload-balance";
 
-function matchesTransitionPolicy(
+function matchingTransitionPolicies(
   state: ScheduleGenerationFacts,
   connection: AssignmentConnection
-): boolean {
+) {
   const normalize = (value: string): string => value.trim().toUpperCase();
-  return state.settings.positionTransitionPolicies.some(
+  return state.settings.positionTransitionPolicies.filter(
     (policy) =>
       policy.enabled &&
       normalize(policy.targetFlightNo) ===
@@ -101,8 +101,16 @@ function coverageFeedback(
   const density = flightDensityEvidence(state);
   if (unworked.length || unfilled || supervisorAssignments.length) {
     const details = [
-      unworked.length ? `${conciseNames(unworked)}为 0 工时` : "",
+      unworked.length
+        ? `${conciseNames(unworked)}为 0 工时；未安排的具体原因未记录`
+        : "",
       unfilled ? `${unfilled} 个常规岗位待补位` : "",
+      ...state.assignments
+        .filter((a) => a.status === "unfilled")
+        .map(
+          (a) =>
+            `${a.flightNo}/${a.position}：${a.systemNotes?.join("\n") || "空岗，具体原因未记录"}`
+        ),
       supervisorAssignments.length
         ? `督导机动补位：${supervisorAssignments.join("、")}`
         : "",
@@ -181,7 +189,7 @@ function fatigueFeedback(
         ? "attention"
         : "ok"
       : "info",
-    evidence
+    `${evidence}${exceeded ? "本次未达到均衡目标；具体换人阻塞原因未记录。" : ""}`
   );
 }
 
@@ -198,8 +206,8 @@ function connectionFeedback(
       "未发生同一人员跨航班连续任务。"
     );
   const overlap = connections.find((connection) => connection.gap < 0);
-  const policyViolation = connections.find((connection) =>
-    matchesTransitionPolicy(state, connection)
+  const policyViolation = connections.find(
+    (connection) => matchingTransitionPolicies(state, connection).length > 0
   );
   const tightest = [...connections].sort(
     (left, right) => left.gap - right.gap
@@ -208,7 +216,14 @@ function connectionFeedback(
     state.staff.find((person) => person.id === connection.next.staffId)?.name ??
     connection.next.staffName;
   const route = (connection: AssignmentConnection): string =>
-    `${connection.previous.flightNo}→${connection.next.flightNo}`;
+    `${connection.previous.flightNo}/${connection.previous.position} ${connection.previous.startTime}–${connection.previous.endTime} → ${connection.next.flightNo}/${connection.next.position} ${connection.next.startTime}–${connection.next.endTime}`;
+  const policyDetails = (connection: AssignmentConnection): string =>
+    matchingTransitionPolicies(state, connection)
+      .map(
+        (policy) =>
+          `岗位衔接“${policy.name}”要求至少 ${policy.minimumGapMinutes} 分钟（${policy.mode === "forbid" ? "严格" : "优先避免"}）`
+      )
+      .join("；");
   if (overlap)
     return feedbackItem(
       "flight-staff",
@@ -232,7 +247,7 @@ function connectionFeedback(
       "connections",
       "航班衔接",
       "attention",
-      `${personName(minimumGapViolation)}的 ${route(minimumGapViolation)} 间隔只有 ${minimumGapViolation.gap} 分钟，少于要求的 ${state.settings.minimumRegularTransitionMinutes} 分钟。${matchesTransitionPolicy(state, minimumGapViolation) ? "同时未达到已配置的岗位衔接要求。" : ""}`
+      `${personName(minimumGapViolation)}的 ${route(minimumGapViolation)} 间隔只有 ${minimumGapViolation.gap} 分钟，少于全局最小衔接要求的 ${state.settings.minimumRegularTransitionMinutes} 分钟。${policyDetails(minimumGapViolation)}`
     );
   if (policyViolation)
     return feedbackItem(
@@ -240,7 +255,7 @@ function connectionFeedback(
       "connections",
       "航班衔接",
       "attention",
-      `${personName(policyViolation)}的 ${route(policyViolation)} 间隔仅 ${policyViolation.gap} 分钟，未达到已配置的岗位衔接要求。`
+      `${personName(policyViolation)}的 ${route(policyViolation)} 间隔仅 ${policyViolation.gap} 分钟；${policyDetails(policyViolation)}。`
     );
   if (tightest.gap < 30)
     return feedbackItem(
@@ -274,7 +289,7 @@ function manualOverrideFeedback(
         "manual-overrides",
         "人工调整提醒",
         "attention",
-        warnings.join("；")
+        `已保留 ${warnings.length} 项人工突破提醒；按最终人员统计。\n${warnings.join("\n")}`
       )
     : feedbackItem(
         "flight-staff",

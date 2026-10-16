@@ -36,8 +36,10 @@ import {
   clearAutomaticVacancyEvidence,
 } from "../assignments/vacancy-evidence";
 import { enforceDailyFlightCountBalance } from "../assignments/daily-flight-count-balance";
+import type { VacancyDiagnosticFacts } from "../reviews/vacancy-diagnostics";
 
 export interface DailySchedulePlan {
+  vacancyDiagnosticFacts?: VacancyDiagnosticFacts;
   assignments: Assignment[];
   lockedAssignmentIds: Set<string>;
   dailyFlightCountBalanceFallback: boolean;
@@ -452,6 +454,11 @@ export function materializeDailySchedulePlan({
     assignments,
     lockedAssignmentIds,
     dailyFlightCountBalanceFallback: !model.dailyFlightCountBalanceEnforced,
+    vacancyDiagnosticFacts: {
+      strictRecoveryExcludedStaffIdsByTask:
+        model.strictRecoveryExcludedStaffIdsByTask,
+      crossFlightPriorityReservations: model.crossFlightPriorityReservations,
+    },
     warnings,
     optimizationQuality: "all-objectives-optimal",
   };

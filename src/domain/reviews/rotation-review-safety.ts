@@ -144,11 +144,11 @@ export function rotationCandidateAssignments(
 }
 
 export function rotationCycleReason(reason: string): string {
-  if (reason.includes("夜班")) return "候选人不具备夜班能力";
-  if (reason.includes("不具备")) return "没有具备双向岗位资质的人员";
-  if (reason.includes("已有排班")) return "交换后会产生时间冲突";
-  if (reason.includes("超过每日")) return "交换后超过每日工时上限";
-  if (reason.includes("衔接")) return "交换后违反严格岗位衔接保护";
+  if (reason.includes("夜班")) return `候选人不具备夜班能力：${reason}`;
+  if (reason.includes("不具备")) return `没有具备双向岗位资质的人员：${reason}`;
+  if (reason.includes("已有排班")) return `交换后会产生时间冲突：${reason}`;
+  if (reason.includes("超过每日")) return `交换后超过每日工时上限：${reason}`;
+  if (reason.includes("衔接")) return `交换后违反严格岗位衔接保护：${reason}`;
   return reason;
 }
 

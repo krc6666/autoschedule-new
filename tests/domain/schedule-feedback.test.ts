@@ -264,7 +264,10 @@ describe("schedule feedback", () => {
     ).toBe(true);
     expect(
       feedback.every(
-        (item) => item.evidence === item.text && item.evidence.length > 0
+        (item) =>
+          item.evidence.length > 0 &&
+          (item.evidence === item.text ||
+            item.evidence.startsWith(item.text.replace(/…$/, "")))
       )
     ).toBe(true);
     expect(feedback.find((item) => item.key === "previous-late")).toMatchObject(
@@ -537,7 +540,9 @@ describe("schedule feedback", () => {
       (item) => item.key === "connections"
     )!;
     expect(connections.level).toBe("attention");
-    expect(connections.text).toContain("未达到已配置的岗位衔接要求");
+    expect(connections.evidence).toContain("TR121 H02 准备保护");
+    expect(connections.evidence).toContain("要求至少 180 分钟");
+    expect(connections.evidence).toContain("CX931/G19 17:00–19:00");
   });
 
   it("marks a previous late-shift worker used on a configured next-workday target as a protection override", () => {
@@ -593,7 +598,7 @@ describe("schedule feedback", () => {
     )!;
     expect(feedback.text).toContain(`${person.name} 未落实（KE 一号`);
     expect(feedback.text).not.toContain("KE166/H02");
-    expect(feedback.text).toContain("人工调整或无自动原因");
+    expect(feedback.evidence).toContain("具体原因未记录");
   });
 
   it("reports a cutoff override with compact flight code and position text without displaying times", () => {
@@ -746,7 +751,7 @@ describe("schedule feedback", () => {
     expect(
       buildScheduleFeedback(automatic, "2026-08-01").find(
         (item) => item.key === "duty-roster"
-      )?.text
+      )?.evidence
     ).toContain("自动值班恢复调整");
 
     const manual = createDefaultState();
@@ -780,7 +785,7 @@ describe("schedule feedback", () => {
     expect(
       buildScheduleFeedback(manual, "2026-08-01").find(
         (item) => item.key === "duty-roster"
-      )?.text
+      )?.evidence
     ).toContain("人工指定值班冲突");
   });
 

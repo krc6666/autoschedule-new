@@ -120,7 +120,7 @@ describe("automatic schedule local vacancy recovery", () => {
       result.assignments
         .find((row) => row.flightId === "flight-0")!
         .systemNotes?.join("；")
-    ).toContain("上一班做了需要休息保护");
+    ).toContain("严格跨工作日恢复");
     expect(result.safetyCredential).toBeDefined();
   });
   it.each(["休假", "病假"] as const)(

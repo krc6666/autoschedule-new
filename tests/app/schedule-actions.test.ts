@@ -455,7 +455,9 @@ describe("人工调整后的规则证据", () => {
       assignStaff(state, state.assignments[0]!.id, person.id)
     ).toMatchObject({
       changed: true,
-      warning: expect.stringContaining("不具备该岗位资质"),
+      warning: expect.stringContaining(
+        "不具备岗位资质：不在“CX937/督导”资质名单"
+      ),
     });
     expect(state.assignments[0]).toMatchObject({
       staffId: person.id,

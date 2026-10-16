@@ -12,6 +12,8 @@ import {
 import {
   positionTransitionCost,
   positionTransitionInsertionCost,
+  violatedPositionTransitionPolicies,
+  violatedPositionTransitionPoliciesForInsertion,
 } from "../reviews/schedule-protection";
 import {
   assignmentConflictFacts,
@@ -101,6 +103,53 @@ function success(): AssignmentEligibilityDiagnostic {
   return { eligible: true, violations: [] };
 }
 
+function conflictMessage(
+  person: Staff,
+  conflicts: readonly Assignment[]
+): string {
+  return `${person.name} 时间冲突：${conflicts.map((a) => `${a.flightNo}/${a.position} ${a.startTime}–${a.endTime}`).join("、")}已有排班`;
+}
+
+function dailyHoursMessage(
+  person: Staff,
+  projectedHours: number,
+  maximum: number
+): string {
+  return `${person.name} 将超过每日工时上限：安排后 ${Number(projectedHours.toFixed(2))} 小时，上限 ${maximum} 小时`;
+}
+
+function positionTransitionMessage(
+  options: AutomaticAssignmentEligibilityOptions,
+  check: PositionTransitionCheck
+): string {
+  const { state, assignments, person, flight, rule, transitionMode } = options;
+  const policies =
+    check === "insertion"
+      ? violatedPositionTransitionPoliciesForInsertion(
+          assignments,
+          person.id,
+          flight.flightNo,
+          rule.name,
+          flight.startTime,
+          flight.endTime,
+          state,
+          transitionMode ?? "forbid"
+        )
+      : violatedPositionTransitionPolicies(
+          assignments,
+          person.id,
+          flight.flightNo,
+          rule.name,
+          flight.startTime,
+          state,
+          transitionMode ?? "forbid"
+        );
+  return `${person.name} 不满足最小衔接间隔：${policies.map((p) => `“${p.name}”（${p.sourceFlightNo || "任意航班"}/${p.sourcePositions.join("、") || "任意岗位"}→${p.targetFlightNo}/${p.targetPosition}，要求 ${p.minimumGapMinutes} 分钟）`).join("；")}；拟接${flight.flightNo}/${rule.name} ${flight.startTime}–${flight.endTime}，已排${assignments
+    .filter((a) => a.status === "assigned" && a.staffId === person.id)
+    .map((a) => `${a.flightNo}/${a.position} ${a.startTime}–${a.endTime}`)
+    .join("、")}`;
+}
+
 function diagnostic(
   violations: AssignmentEligibilityViolation[]
 ): AssignmentEligibilityDiagnostic {
@@ -124,7 +173,7 @@ export function diagnoseBaseAssignmentEligibility(
   if (!facts.positionQualified)
     return violation(
       "position-qualification",
-      `${person.name} 不具备该岗位资质`
+      `${person.name} 不具备岗位资质：不在“${rule.flightNo}/${rule.name}”资质名单`
     );
   if (!facts.nightCapable)
     return violation("night-shift", `${person.name} 不具备夜班能力`);
@@ -177,13 +226,18 @@ function diagnoseAutomaticStaffEligibilityWithTransitionCheck(
       ? ("allow-reusable" as const)
       : ("block" as const),
   };
-  if (assignmentConflictFacts(factOptions).blockingConflicts.length) {
-    return violation("time-conflict", `${person.name} 在该时段已有排班`);
+  const conflicts = assignmentConflictFacts(factOptions).blockingConflicts;
+  if (conflicts.length) {
+    return violation("time-conflict", conflictMessage(person, conflicts));
   }
   if (!assignmentHoursFacts(factOptions).withinDailyHours) {
     return violation(
       "daily-hours",
-      `${person.name} 将超过每日 ${state.settings.maxDailyHours} 小时上限`
+      dailyHoursMessage(
+        person,
+        assignmentHoursFacts(factOptions).projectedHours,
+        state.settings.maxDailyHours
+      )
     );
   }
   if (
@@ -192,7 +246,7 @@ function diagnoseAutomaticStaffEligibilityWithTransitionCheck(
   ) {
     return violation(
       "position-transition",
-      `${person.name} 不满足该岗位的最小衔接间隔`
+      positionTransitionMessage(options, transitionCheck)
     );
   }
   return success();
@@ -476,7 +530,7 @@ export function diagnoseManualAssignmentEligibility(
   if (administrativeStaff && (!rule || !staffFacts.positionQualified)) {
     violations.push({
       code: "position-qualification",
-      message: `${person.name} 不具备该岗位资质`,
+      message: `${person.name} 不具备岗位资质：不在“${assignment.flightNo}/${assignment.position}”资质名单`,
     });
   }
   if (
@@ -487,7 +541,7 @@ export function diagnoseManualAssignmentEligibility(
   ) {
     violations.push({
       code: "position-qualification",
-      message: `${person.name} 不具备该岗位资质`,
+      message: `${person.name} 不具备岗位资质：不在“${assignment.flightNo}/${assignment.position}”资质名单`,
     });
   }
   if (administrativeStaff && rule) {
@@ -598,16 +652,21 @@ export function diagnoseManualAssignmentEligibility(
       ? ("allow-all" as const)
       : ("allow-reusable" as const),
   };
-  if (assignmentConflictFacts(factOptions).blockingConflicts.length) {
+  const conflicts = assignmentConflictFacts(factOptions).blockingConflicts;
+  if (conflicts.length) {
     violations.push({
       code: "time-conflict",
-      message: `${person.name} 在该时段已有排班`,
+      message: conflictMessage(person, conflicts),
     });
   }
   if (!assignmentHoursFacts(factOptions).withinDailyHours) {
     violations.push({
       code: "daily-hours",
-      message: `${person.name} 将超过每日 ${state.settings.maxDailyHours} 小时上限`,
+      message: dailyHoursMessage(
+        person,
+        assignmentHoursFacts(factOptions).projectedHours,
+        state.settings.maxDailyHours
+      ),
     });
   }
   const minimumTransition = minimumFlightTransitionViolationsForInsertion(
@@ -636,7 +695,17 @@ export function diagnoseManualAssignmentEligibility(
   ) {
     violations.push({
       code: "position-transition",
-      message: `${person.name} 不满足该岗位的最小衔接间隔`,
+      message: positionTransitionMessage(
+        {
+          state,
+          assignments: others,
+          flight,
+          rule: eligibilityRule,
+          person,
+          transitionMode: "forbid",
+        },
+        "target-only"
+      ),
     });
   }
   return diagnostic(violations);

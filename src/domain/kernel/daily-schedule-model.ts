@@ -1,5 +1,6 @@
 import type { Staff } from "../../model";
 import type { ScheduleGenerationFacts } from "../shared/scheduling-facts";
+import type { CrossFlightPriorityReservation } from "../reviews/vacancy-diagnostics";
 import { diagnoseBaseAssignmentEligibility } from "../candidates/assignment-eligibility";
 import { createAssignedPosition } from "../assignments/assignment-factory";
 import { evaluateAutomaticHardConstraints } from "../rules/built-in-rule-registry";
@@ -95,6 +96,7 @@ export interface DailyScheduleVacancyChoice {
 }
 
 export interface DailyScheduleModel {
+  readonly crossFlightPriorityReservations: readonly CrossFlightPriorityReservation[];
   readonly problem: SolverProblem;
   readonly staffChoices: readonly DailyScheduleStaffChoice[];
   readonly vacancyChoices: readonly DailyScheduleVacancyChoice[];
@@ -129,6 +131,7 @@ interface CrossWorkdayReservationModel {
 }
 
 interface CrossFlightPriorityModel {
+  reservations: CrossFlightPriorityReservation[];
   variables: Array<SolverProblem["variables"][number]>;
   constraints: LinearConstraint[];
   objectives: LexicographicObjective[];
@@ -141,6 +144,7 @@ function crossFlightPriorityModel(
   const variables: CrossFlightPriorityModel["variables"] = [];
   const constraints: LinearConstraint[] = [];
   const objectives: LexicographicObjective[] = [];
+  const reservations: CrossFlightPriorityReservation[] = [];
 
   enabledCrossFlightPriorityPolicies(state).forEach((policy, policyIndex) => {
     const terms: Array<{ variableId: string; coefficient: number }> = [];
@@ -198,6 +202,13 @@ function crossFlightPriorityModel(
 
         for (const lowerChoice of overlappingLowerPriorityChoices) {
           for (const alternative of priorityAlternatives) {
+            reservations.push({
+              taskKey: lowerChoice.task.key,
+              staffId,
+              priorityFlightNo: protectedChoice.task.flight.flightNo,
+              protectedTaskKey: alternative.task.key,
+              alternativeStaffId: alternative.person.id,
+            });
             constraints.push({
               id: `cross-flight-priority-reserve:${policyIndex}:${staffIndex}:${lowerChoice.id}:${alternative.id}`,
               terms: [
@@ -239,7 +250,7 @@ function crossFlightPriorityModel(
     }
   });
 
-  return { variables, constraints, objectives };
+  return { variables, constraints, objectives, reservations };
 }
 
 function ke166SupervisorAvailabilityModel(
@@ -1901,6 +1912,7 @@ export function buildDailyScheduleModel({
       staffChoiceBuild.halfRestAffectedStaffIdsByTask,
     strictRecoveryExcludedStaffIdsByTask:
       staffChoiceBuild.strictRecoveryExcludedStaffIdsByTask,
+    crossFlightPriorityReservations: crossFlightPriority.reservations,
     problem: {
       variables: [
         ...staffChoices.map(({ id }) => ({ id })),

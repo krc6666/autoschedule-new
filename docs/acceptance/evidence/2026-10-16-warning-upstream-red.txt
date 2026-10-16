@@ -1,0 +1,64 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/domain/actionable-warning-reasons.test.ts (8 tests | 2 failed) 664ms
+     × keeps recorded vacancy stage evidence and unrelated notes when refreshing 110ms
+     × retains the detailed rotation safety reason and the existing manual override classification 3ms
+npm.cmd :
+所在位置 行:2 字符: 1
++ npm.cmd exec vitest -- run tests/domain/actionable-warning-reasons.te ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/domain/actionable-warning-reasons.test.ts > actionable warning evidence > keeps recorded vacancy stage evi
+dence and unrelated notes when refreshing
+AssertionError: expected '空岗：当前时段冲突 1 人；未记录的组合限制 3 人\n人员1 时间冲突：…' to contain 'TR121/H02 21:55–23:55与该岗位冲突，换人计算达到时间上限'
+
+- Expected
++ Received
+
+- TR121/H02 21:55–23:55与该岗位冲突，换人计算达到时间上限
++ 空岗：当前时段冲突 1 人；未记录的组合限制 3 人
++ 人员1 时间冲突：KE166/H03 09:15–11:15已有排班
++ 人员2：当前直接检查可通过，但本次未采用；完整换人方案的具体原因未记录
++ 人员3：当前直接检查可通过，但本次未采用；完整换人方案的具体原因未记录
++ 人员4：当前直接检查可通过，但本次未采用；完整换人方案的具体原因未记录
++ 求解阶段记录：航班数均衡回退；候选人员航班数差值超过1
++ 这一轮督导换人未采用：另一固定一号岗位不能移动
++ 以上为本次候选限制与当前直接检查；不代表多岗换人一定无解。
+
+ ❯ tests/domain/actionable-warning-reasons.test.ts:143:40
+    141|     );
+    142|     expect(cx.systemNotes?.join("\n")).toContain("另一固定一号岗位不能移动");
+    143|     expect(cx.systemNotes?.join("\n")).toContain("TR121/H02 21:55–23:5…
+       |                                        ^
+    144|     cx.systemNotes!.push("其他仍有效的系统说明");
+    145|     Object.assign(cx, {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/domain/actionable-warning-reasons.test.ts > actionable warning evidence > retains the detailed rotation sa
+fety reason and the existing manual override classification
+AssertionError: expected '交换后会产生时间冲突' to contain '人员1 时间冲突：KE166/H03 09:15–11:15已有排班'
+
+Expected: "人员1 时间冲突：KE166/H03 09:15–11:15已有排班"
+Received: "交换后会产生时间冲突"
+
+ ❯ tests/domain/actionable-warning-reasons.test.ts:162:20
+    160|     const detail = "人员1 时间冲突：KE166/H03 09:15–11:15已有排班";
+    161|     const reason = rotationCycleReason(detail);
+    162|     expect(reason).toContain(detail);
+       |                    ^
+    163|     expect(isManualOverrideSafetyReason(reason)).toBe(true);
+    164|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 6 passed (8)
+   Start at  11:12:03
+   Duration  3.19s (transform 1.87s, setup 0ms, import 2.18s, tests 664ms, environment 0ms)

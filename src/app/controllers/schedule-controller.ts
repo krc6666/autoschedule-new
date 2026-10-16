@@ -299,7 +299,7 @@ export class ScheduleController implements UiCommandController {
     if (vacancies.length) {
       const vacancyDetails = vacancies.map((assignment) => ({
         assignmentId: assignment.id,
-        label: `${assignment.flightNo} / ${assignment.position}：空岗`,
+        label: `${assignment.flightNo} / ${assignment.position}：${assignment.systemNotes?.[0] ?? "空岗，具体原因未记录"}`,
         reasons: [...(assignment.systemNotes ?? [])],
       }));
       this.context.toast(

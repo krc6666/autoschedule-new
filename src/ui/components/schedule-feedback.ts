@@ -69,7 +69,16 @@ export class ScheduleFeedbackElement extends LightDomElement {
           >${item.status}</em
         ></strong
       >
-      <span>${item.text}</span>
+      <span
+        >${item.text}${
+          item.level === "attention"
+            ? html`<details>
+                <summary>查看具体原因</summary>
+                <div style="white-space: pre-line">${item.evidence}</div>
+              </details>`
+            : null
+        }</span
+      >
     </div>`;
   }
 }

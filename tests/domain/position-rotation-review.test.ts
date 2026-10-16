@@ -257,10 +257,10 @@ describe("consecutive priority-position rotation review", () => {
     );
     expect(primary.staffId).toBe(current!.id);
     expect(warnings[0]).toContain(
-      `${first!.name} —— 9/18 做过 TR121 末班岗，下一班不能接 KE166`
+      `${first!.name} —— 严格跨工作日恢复限制不允许该人员承担次班目标岗位；上一工作班 2026-09-18 TR121/H04 21:00–23:55，本次目标KE166`
     );
     expect(warnings[0]).toContain(
-      `${second!.name} —— 9/18 做过 TR121 末班岗，下一班不能接 KE166`
+      `${second!.name} —— 严格跨工作日恢复限制不允许该人员承担次班目标岗位；上一工作班 2026-09-18 TR121/H04 21:00–23:55，本次目标KE166`
     );
     expect(
       primary.decisionTrace?.find((item) => item.ruleId === "position-rotation")
@@ -1622,7 +1622,9 @@ describe("consecutive priority-position rotation review", () => {
     expect(supervisor.staffId).toBe(repeatedSupervisor!.id);
     expect(boundCounter.staffId).toBe(repeatedSupervisor!.id);
     expect(priorityCounter.staffId).toBe(candidate!.id);
-    expect(warnings.join("\n")).toContain("其他人员资质不匹配");
+    expect(warnings.join("\n")).toContain(
+      "候选人不具备机动督导或兼任柜台的完整资质"
+    );
   });
 
   it("rotates a repeated KE166 priority position through the mobile-supervisor group and a third role", async () => {

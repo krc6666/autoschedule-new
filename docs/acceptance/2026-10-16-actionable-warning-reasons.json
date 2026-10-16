@@ -1,0 +1,147 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-10-16-actionable-warning-reasons",
+  "title": "异常提醒保留实际规则与人岗事实，统一简短摘要和详细原因",
+  "startedFrom": "c3ee6d206b55b811e5ad30026ffa1f6815fdd514",
+  "expectation": {
+    "example": "owner提供17日保障明细与配置：CX937（早）/G18有4名基础资质人员，3人受15日末班严格恢复限制，另1人受KE166跨航班优先模型限制；旧提示仅报时段冲突4人。",
+    "expected": "异常提醒写清处理结果、实际规则和关键事实；摘要简短、展开查具体人岗/时间/阈值；页面、人工调整、历史、统计和导出同源，不把占岗冒充不可换人的根因。",
+    "unchanged": "本次不修跨航班优先模型、不改变排班候选/约束/目标顺序、岗位匹配、人工越权与保存阻断、统计计算和数据布局；不打开浏览器、不commit/push/部署。",
+    "fallback": "没有检查证据则明确原因未记录；超时/未找到方案不声称确定无解；原程序异常与保存回退不变，旧历史不推测补写原因。"
+  },
+  "testedVersion": "1846e5ca92b69fe2cffe16f0afea6a708d215b91736bb46fe33416bad304b0b5",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "真实文件重放得到G18严格恢复3人及跨航班优先1人；保留岗位衔接规则名缺失及上游轮岗/督导证据丢失的实际失败输出。最初四项失败仅在交接摘要中记载；首次全量失败及首次verify失败日志曾因UTF-16读取过滤错误丢失，现仅保留本会话工具输出的观察摘要，不冒充完整日志。最终verify完整输出已转换UTF-8保留。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-16-warning-functional.txt",
+          "summary": "首次全量失败的工具输出观察摘要；原日志因编码过滤错误丢失，明确不是原始日志",
+          "sha256": "97549c074d62ae60e681092ec4854446bf2c3330423822e0c3a7603ea21586d0"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-16-warning-connection-red.txt",
+          "summary": "岗位衔接提示未列实际政策名称的失败证据",
+          "sha256": "fd0fb757ec686b985d93a14478fcc238db9ace51ee1c766feff58de7257f63de"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-16-warning-upstream-red.txt",
+          "summary": "督导搜索事实和轮岗冲突时段被丢弃，两项失败",
+          "sha256": "3333ae39717b71d38e9884207baab112bb04b69b3c5846bdcd679babb9616574"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-16-actionable-warning-real.json",
+          "summary": "实际配置与17日明细重放，脱敏系统说明及输入前后哈希相同",
+          "sha256": "c7448dd3de259824d7f744275a5b2f7c45ebed21fbcbfbc0f4cf93784348f9da"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-16-warning-toast-red.txt",
+          "summary": "Observed failure: expandable warning disappeared automatically before reading; final UI regression also checks reset for each notification.",
+          "sha256": "48d8dc54ccabfedc2a6e406a77b0373382e3282fec03144d52cf55f87a203eb1"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "普通资格/冲突/工时提示、人工保留、历史匹配、摘要与折叠详情的长期回归覆盖；最终完整verify输出另核对原生命令退出码。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-16-warning-verify.txt",
+          "summary": "最终版本类型、完整功能、性能及生产构建结果",
+          "sha256": "c57939a37de877e81ba4ee9182b90a66f164d5afac6fa6bdc6d7c73fa76bbb4f"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "真实大配置、两组/历史/人工保存回退及真实Worker/WASM原测试纳入完整功能验证；配置和17日保障明细只读。无证据、超时、原始程序错误保留明确未知边界。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-16-warning-real-replay.txt",
+          "summary": "真实输入完整generate、恢复、反馈与Excel往返断言通过",
+          "sha256": "42ee28a61e392af2ac92b13f3867d491730014db33ce2d899c2e26d0cbd9aeb3"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-16-warning-verify.txt",
+          "summary": "包含Worker/WASM、历史、人工、Excel/localStorage及错误展示回归",
+          "sha256": "c57939a37de877e81ba4ee9182b90a66f164d5afac6fa6bdc6d7c73fa76bbb4f"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-16-warning-environment.json",
+          "summary": "Actual Windows/Node/CPU environment; performance timing is local and does not substitute for browser acceptance.",
+          "sha256": "abd47befe1944ce7fc010a531466f836cd1542e4793a4d2fa3f4d18ce7407dd8"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "最终诊断在后置结束后生成，填齐清旧说明但保留其他有效说明；阶段回退、均衡与督导搜索证据均保留；轮岗文案附具体事实但保留既有人工越权分类标记。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-16-warning-upstream-green.txt",
+          "summary": "5文件70项，覆盖后置回退、督导/轮岗证据和原人工分类",
+          "sha256": "3d54c2c4eabacd694fc9eb01ad55e6701755bff1bd80fb01d27eb198792f0e19"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-16-warning-verify.txt",
+          "summary": "最终版本所有后置与安全回归结果",
+          "sha256": "c57939a37de877e81ba4ee9182b90a66f164d5afac6fa6bdc6d7c73fa76bbb4f"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "本次只附检查事实，不修改守卫判定；真实输出具备最终安全凭证，原有后置改坏反向测试及checkpoint/Worker安全回归继续运行。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-16-actionable-warning-real.json",
+          "summary": "实际53行结果，3处空岗，最终安全凭证成立",
+          "sha256": "c7448dd3de259824d7f744275a5b2f7c45ebed21fbcbfbc0f4cf93784348f9da"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-16-warning-verify.txt",
+          "summary": "最终安全、阶段回退与checkpoint性能回归",
+          "sha256": "c57939a37de877e81ba4ee9182b90a66f164d5afac6fa6bdc6d7c73fa76bbb4f"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "逐项审查模型diff，原constraints/objectives/比较顺序不变；新增运行事实不进入ScheduleResult/存储。原排班、人工作业、历史覆盖保护与统计计算回归保留，Excel布局和打印不改；未跟踪.cursor/保留，未commit/push/部署。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-16-warning-verify.txt",
+          "summary": "原排班/统计/持久化和架构合同测试及性能结果",
+          "sha256": "c57939a37de877e81ba4ee9182b90a66f164d5afac6fa6bdc6d7c73fa76bbb4f"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-16-actionable-warning-real.json",
+          "summary": "真实输入校验值未变、原G18空缺未改、说明往返一致",
+          "sha256": "c7448dd3de259824d7f744275a5b2f7c45ebed21fbcbfbc0f4cf93784348f9da"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "已有最终领域结果、DOM折叠交互测试和导出读取证据，但owner尚未操作修复版页面。需要核对黄色G18摘要及展开内容，不能用测试冒充真实页面验收。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-16-actionable-warning-real.json",
+          "summary": "真实文件生成的最终脱敏说明；browserVerified明确false",
+          "sha256": "c7448dd3de259824d7f744275a5b2f7c45ebed21fbcbfbc0f4cf93784348f9da"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "warning-functional、connection-red、upstream-red和toast-red保存实际失败；真实重放与最终verify证明对应计算/展示测试通过。原始问题是原因未沿管线传递和展示层压缩丢事实。",
+    "laterChanges": "补缺、恢复、督导收尾、局部清空、轮岗、存储恢复和导出均可能使原因失效或丢失；最终刷新、阶段记录保留、填齐清旧说明、克隆与往返回归覆盖这些路径。上游轮岗仍保留原越权分类标记，避免文案影响人工判定。",
+    "finalArtifact": "actionable-warning-real.json为实际输入的最终脱敏系统说明，真实Excel写再读断言通过；页面摘要与展开仅有DOM自动证据，真实页面证据尚缺，不宣称业务验收完成。"
+  },
+  "review": {
+    "missedScope": "最初实现遗漏均衡/督导阶段记录和上游轮岗的再次压缩；已通过全量失败和定向回归补齐。真实浏览器页面、所有弹窗逐项人工观察尚未完成；旧记录无证据不回填。运行事实克隆及额外诊断成本纳入checkpoint/大场景性能检查。",
+    "rootCause": "旧说明从已排现象猜原因，模型严格恢复/实际优先限制未完整传出，多处文案映射再次压掉人岗时段阈值；初稿最终刷新还盖掉先前阶段事实。算法优先顺序是owner明确保留的另一事项。",
+    "earlyDetection": "在修改提示前对照真实输入列完整生产/消费链，先断言真实混合限制、完整换人证据、后置撤回和均衡阶段同时保留；交付前同时核对简短摘要、展开全文及存储/导出。人工分类依赖原因标签时保留标签并测试分类不变，避免文案改动产生耦合。"
+  }
+}

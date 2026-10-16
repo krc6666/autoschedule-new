@@ -461,7 +461,7 @@ describe("assignment eligibility diagnostics", () => {
       }).violations[0]
     ).toMatchObject({
       code: "minimum-flight-transition",
-      message: "测试人员与上一航班间隔只有 89 分钟，少于要求的 90 分钟。",
+      message: `测试人员与上一航班间隔只有 89 分钟，少于要求的 90 分钟。涉及航班：${sourceFlight.flightNo}→${targetFlight.flightNo}`,
     });
     expect(
       diagnoseManualAssignmentEligibility(state, targetAssignment.id, person.id)

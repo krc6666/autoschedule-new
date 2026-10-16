@@ -1,0 +1,31 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/domain/actionable-warning-reasons.test.ts (7 tests | 1 failed) 408ms
+     × names the configured transition policy and actual assignments in feedback 60ms
+npm.cmd :
+所在位置 行:2 字符: 1
++ npm.cmd exec vitest -- run tests/domain/actionable-warning-reasons.te ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/domain/actionable-warning-reasons.test.ts > actionable warning evidence > names the configured transition
+policy and actual assignments in feedback
+AssertionError: expected '人员1的 CX937（早）→KE166 间隔仅 0 分钟，未达到已配置的岗…' to contain '控制后接KE柜台'
+
+Expected: "控制后接KE柜台"
+Received: "人员1的 CX937（早）→KE166 间隔仅 0 分钟，未达到已配置的岗位衔接要求。"
+
+ ❯ tests/domain/actionable-warning-reasons.test.ts:93:31
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 6 passed (7)
+   Start at  11:01:28
+   Duration  1.91s (transform 1.10s, setup 0ms, import 1.30s, tests 408ms, environment 0ms)

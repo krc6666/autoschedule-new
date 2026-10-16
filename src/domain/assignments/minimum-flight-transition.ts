@@ -169,5 +169,5 @@ export function minimumFlightTransitionMessage(
 ): string {
   const adjacent =
     violation.relationToCandidate === "previous" ? "上一航班" : "下一航班";
-  return `${personName}与${adjacent}间隔只有 ${violation.gapMinutes} 分钟，少于要求的 ${violation.requiredMinutes} 分钟。`;
+  return `${personName}与${adjacent}间隔只有 ${violation.gapMinutes} 分钟，少于要求的 ${violation.requiredMinutes} 分钟。涉及航班：${violation.previousFlightNo}→${violation.nextFlightNo}`;
 }
