@@ -1,0 +1,49 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+············xxxx
+npm.cmd :
+所在位置 行:2 字符: 1
++ npm.cmd exec vitest -- run tests/infrastructure/legacy-schedule-excel ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/infrastructure/legacy-schedule-excel.test.ts > legacy horizontal schedule workbook adapter > feeds importe
+d H02 into existing statistics independently of category 机动督导
+ FAIL  tests/infrastructure/legacy-schedule-excel.test.ts > legacy horizontal schedule workbook adapter > feeds importe
+d H02 into existing statistics independently of category 分流
+ FAIL  tests/infrastructure/legacy-schedule-excel.test.ts > legacy horizontal schedule workbook adapter > feeds importe
+d H02 into existing statistics independently of category 引导
+ FAIL  tests/infrastructure/legacy-schedule-excel.test.ts > legacy horizontal schedule workbook adapter > feeds importe
+d H02 into existing statistics independently of category 行政支援
+AssertionError: expected undefined to match object { flightNo: 'TR121', …(3) }
+
+- Expected:
+{
+  "fatiguePoints": 10,
+  "flightNo": "TR121",
+  "position": "H02",
+  "remark": "一号",
+}
+
++ Received:
+undefined
+
+ ❯ tests/infrastructure/legacy-schedule-excel.test.ts:435:32
+    433|     );
+    434|
+    435|     expect(preview.records[0]).toMatchObject({
+       |                                ^
+    436|       flightNo: "TR121",
+    437|       position: "H02",
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed | 12 passed (16)
+   Start at  13:21:55
+   Duration  1.33s (transform 798ms, setup 0ms, import 1.05s, tests 32ms, environment 0ms)

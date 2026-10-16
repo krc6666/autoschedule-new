@@ -1,0 +1,12 @@
+COMMAND: npm.cmd exec vitest -- run tests/architecture/acceptance-gate.test.ts
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+
+ Test Files  1 passed (1)
+      Tests  16 passed (16)
+   Start at  13:30:35
+   Duration  15.35s (transform 43ms, setup 0ms, import 61ms, tests 15.09s, environment 0ms)
+
+
+EXIT_CODE: 0

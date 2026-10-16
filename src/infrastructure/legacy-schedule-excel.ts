@@ -5,7 +5,8 @@ import { durationHours, normalizeTime } from "../domain/shared/time";
 import { createId, normalizeText } from "../utils";
 import { rows, normalizePosition } from "./excel-worksheet";
 import {
-  isLatePriorityPosition,
+  endsAfterLateShiftThreshold,
+  latePriorityFrequencyKinds,
   normalizeLatePriorityFlightNumber,
   normalizeLatePriorityPositionReference,
 } from "../domain/reviews/late-priority-policy";
@@ -168,11 +169,11 @@ function latePriorityRuleFor(
   );
   return options.positionRules.find(
     (rule) =>
-      rule.category === "常规" &&
       normalizeLatePriorityFlightNumber(rule.flightNo) === normalizedFlight &&
       normalizeLatePriorityPositionReference(rule.name) ===
         normalizedPosition &&
-      isLatePriorityPosition(rule, record, options.lateShiftEndTime!)
+      latePriorityFrequencyKinds(rule).length > 0 &&
+      endsAfterLateShiftThreshold(record, options.lateShiftEndTime!)
   );
 }
 

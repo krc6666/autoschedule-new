@@ -408,46 +408,50 @@ describe("legacy horizontal schedule workbook adapter", () => {
     });
   });
 
-  it("feeds imported H02 into the same late-priority statistics path as generated history", () => {
-    const state = createDefaultState();
-    state.staff = staff;
-    const rule = state.positionRules.find(
-      (item) => item.flightNo === "TR121" && item.name === "H02"
-    )!;
-    rule.qualifiedStaffIds = ["a"];
-    state.settings.latePriorityFlightNumbers = ["TR121"];
-    const preview = parseLegacyScheduleWorkbook(
-      workbook([
-        ["宀椾綅", "TR121\n2155-2355"],
-        ["H02", "人员A"],
-      ]),
-      staff,
-      {
-        targetDate: "2026-08-19",
-        latePriorityOnly: true,
-        latePriorityFlightNumbers: state.settings.latePriorityFlightNumbers,
-        positionRules: state.positionRules,
-        lateShiftEndTime: state.settings.lateShiftEndTime,
-      }
-    );
+  it.each(["常规", "机动督导", "分流", "引导", "行政支援"] as const)(
+    "feeds imported H02 into existing statistics independently of category %s",
+    (category) => {
+      const state = createDefaultState();
+      state.staff = staff;
+      const rule = state.positionRules.find(
+        (item) => item.flightNo === "TR121" && item.name === "H02"
+      )!;
+      rule.qualifiedStaffIds = ["a"];
+      rule.category = category;
+      state.settings.latePriorityFlightNumbers = ["TR121"];
+      const preview = parseLegacyScheduleWorkbook(
+        workbook([
+          ["宀椾綅", "TR121\n2155-2355"],
+          ["H02", "人员A"],
+        ]),
+        staff,
+        {
+          targetDate: "2026-08-19",
+          latePriorityOnly: true,
+          latePriorityFlightNumbers: state.settings.latePriorityFlightNumbers,
+          positionRules: state.positionRules,
+          lateShiftEndTime: state.settings.lateShiftEndTime,
+        }
+      );
 
-    expect(preview.records[0]).toMatchObject({
-      flightNo: "TR121",
-      position: "H02",
-      remark: "一号",
-      fatiguePoints: 10,
-    });
-    applyLegacyScheduleImport(state, preview, "2026-08-19");
-    expect(state.history[0]).toMatchObject({
-      staffId: "a",
-      remark: "一号",
-      historyCoverage: "late-priority-only",
-    });
+      expect(preview.records[0]).toMatchObject({
+        flightNo: "TR121",
+        position: "H02",
+        remark: "一号",
+        fatiguePoints: 10,
+      });
+      applyLegacyScheduleImport(state, preview, "2026-08-19");
+      expect(state.history[0]).toMatchObject({
+        staffId: "a",
+        remark: "一号",
+        historyCoverage: "late-priority-only",
+      });
 
-    const row = buildMonthlyLatePriorityStatistics(
-      state,
-      "2026-08-20"
-    ).rows.find((item) => item.staff.id === "a")!;
-    expect(row.totalCount).toBe(1);
-  });
+      const row = buildMonthlyLatePriorityStatistics(
+        state,
+        "2026-08-20"
+      ).rows.find((item) => item.staff.id === "a")!;
+      expect(row.totalCount).toBe(1);
+    }
+  );
 });

@@ -19,7 +19,6 @@ import {
   ordinaryPriorityConfigurationKey,
   ordinaryPriorityPositionKey,
 } from "../reviews/position-rotation-policy";
-import { isPriorityStatisticsPosition } from "../reviews/late-priority-policy";
 import {
   latePriorityFlightInScope,
   latePriorityFlightScopeCandidates,
@@ -480,19 +479,18 @@ export function diagnoseOrdinaryPriorityPosition(
   if (
     state.positionRules.some(
       (rule) =>
-        isPriorityStatisticsPosition(rule) &&
         ordinaryPriorityPositionKey(rule.flightNo, rule.name, rule.remark) ===
-          ordinaryPriorityConfigurationKey(item.airlineCode, item.position)
+        ordinaryPriorityConfigurationKey(item.airlineCode, item.position)
     )
   )
     return [];
   return [
     policyDiagnostic(
       "ordinary-position-missing",
-      `${item.airlineCode} / ${item.position} 没有匹配常规岗位`,
+      `${item.airlineCode} / ${item.position} 没有匹配岗位`,
       "普通重点集合使用航司和完整规范岗位名，不使用岗位备注关键词匹配。",
       [
-        "在配置 → 岗位配置核对常规岗位的航司和完整岗位名称。",
+        "在配置 → 岗位配置核对岗位的航司和完整岗位名称。",
         "在本条普通重点岗位集合修改“航司”或“规范岗位”；不再需要的条目可删除。",
       ]
     ),

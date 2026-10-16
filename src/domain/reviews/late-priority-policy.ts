@@ -149,17 +149,3 @@ export function isSupervisorPosition(
 ): boolean {
   return latePriorityFrequencyKinds(target).includes("supervisor");
 }
-
-/**
- * Positions that contribute to the priority-frequency statistics. Mobile
- * supervisor rules remain mobile for scheduling, but a supervisor position is
- * still a supervisor fact for both statistics views.
- */
-export function isPriorityStatisticsPosition(
-  target: Pick<PositionRule, "category" | "name" | "remark">
-): boolean {
-  return (
-    target.category === "常规" ||
-    (target.category === "机动督导" && isSupervisorPosition(target))
-  );
-}

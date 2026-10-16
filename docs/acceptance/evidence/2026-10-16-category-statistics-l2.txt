@@ -1,0 +1,43 @@
+
+COMMAND: npm.cmd run typecheck
+
+> autoschedule@1.0.0 typecheck
+> tsc -b --pretty false
+
+
+EXIT_CODE: 0
+
+COMMAND: npm.cmd tes
+
+> autoschedule@1.0.0 tes
+> vitest run --exclude tests/performance/**
+
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/architecture/acceptance-gate.test.ts (16 tests | 1 failed) 35005ms
+     × rejects missing evidence and verified checks without evidence 5379ms
+
+ Test Files  1 failed | 145 passed (146)
+      Tests  1 failed | 1443 passed (1444)
+   Start at  13:28:40
+   Duration  92.88s (transform 19.29s, setup 0ms, import 58.01s, tests 313.28s, environment 15.42s)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/architecture/acceptance-gate.test.ts > acceptance release gate > rejects missing evidence and verified checks without evidence
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ tests/architecture/acceptance-gate.test.ts:175:3
+    173|   });
+    174|
+    175|   it("rejects missing evidence and verified checks without evidence", …
+       |   ^
+    176|     const root = fixture();
+    177|     const value = record(root);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+EXIT_CODE: 1

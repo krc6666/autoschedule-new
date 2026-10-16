@@ -13,81 +13,85 @@ import { mountElement } from "./lit-test-helpers";
 import type { UiCommandEvent } from "../../src/ui/events/ui-command";
 
 describe("statistics page", () => {
-  it("shows manual qualification overrides as corrections without hiding the unqualified worker or duplicating totals", async () => {
-    const state = createDefaultState();
-    const people = state.staff
-      .filter((p) => p.staffType === "常规" && p.status === "正常")
-      .slice(0, 2);
-    state.staff = people;
-    const rule = {
-      ...state.positionRules.find(
-        (r) => r.flightNo === "TR121" && r.remark === "一号"
-      )!,
-      qualifiedStaffIds: [people[0]!.id],
-    };
-    state.positionRules = [rule];
-    state.settings.ordinaryPriorityPositions = [
-      { airlineCode: "TR", position: rule.name },
-    ];
-    state.settings.latePriorityFlightNumbers = ["TR121"];
-    state.history = [
-      {
-        id: "manual",
-        date: "2026-10-09",
-        flightNo: "TR121",
-        position: rule.name,
-        staffId: people[1]!.id,
-        staffName: people[1]!.name,
-        startTime: "22:00",
-        endTime: "23:55",
-        workHours: 1.92,
-        fatiguePoints: 5,
-        remark: "一号",
-        countBaseline: { staffId: people[0]!.id, staffName: people[0]!.name },
-        manualOverrideWarnings: [
-          { code: "position-qualification", message: "测试突破" },
-        ],
-      },
-    ];
-    state.assignments = [];
-    const element = await mountElement<
-      HTMLElement & { updateComplete: Promise<unknown> }
-    >("autoschedule-statistics-page", { model: state, date: "2026-10-15" });
-    for (const selector of [
-      ".ordinary-priority-summary-table",
-      ".late-priority-summary-table",
-    ]) {
-      const table = element.querySelector(selector)!;
-      const rows = [...table.querySelectorAll("tbody > tr")];
-      const recipient = rows.find((r) =>
-        r.querySelector("td")?.textContent?.includes(people[1]!.name)
-      )!;
-      expect(table.querySelector('td[data-label="突破资质"]')).toBeNull();
-      expect(
-        [...table.querySelectorAll("th")].map((cell) =>
-          cell.textContent?.trim()
-        )
-      ).not.toContain("突破资质");
-      expect(table.textContent).not.toContain("未记录");
-      expect(
-        recipient.querySelector("details")?.textContent?.replace(/\s+/g, " ")
-      ).toContain("实际 0 · 修正 +1");
-      expect(
-        recipient.querySelector("td:nth-child(2)")?.textContent?.trim()
-      ).toBe("1");
-      const original = rows.find((r) =>
-        r.querySelector("td")?.textContent?.includes(people[0]!.name)
-      )!;
-      expect(
-        original
-          .querySelector("button[aria-label$='减少一次']")
-          ?.hasAttribute("disabled")
-      ).toBe(true);
-      expect(
-        original.querySelector("td:nth-child(2)")?.textContent?.trim()
-      ).toBe("0");
+  it.each(["常规", "机动督导", "分流", "行政支援"] as const)(
+    "shows manual corrections in the existing tables for category %s",
+    async (category) => {
+      const state = createDefaultState();
+      const people = state.staff
+        .filter((p) => p.staffType === "常规" && p.status === "正常")
+        .slice(0, 2);
+      state.staff = people;
+      const rule = {
+        ...state.positionRules.find(
+          (r) => r.flightNo === "TR121" && r.remark === "一号"
+        )!,
+        qualifiedStaffIds: [people[0]!.id],
+        category,
+      };
+      state.positionRules = [rule];
+      state.settings.ordinaryPriorityPositions = [
+        { airlineCode: "TR", position: rule.name },
+      ];
+      state.settings.latePriorityFlightNumbers = ["TR121"];
+      state.history = [
+        {
+          id: "manual",
+          date: "2026-10-09",
+          flightNo: "TR121",
+          position: rule.name,
+          staffId: people[1]!.id,
+          staffName: people[1]!.name,
+          startTime: "22:00",
+          endTime: "23:55",
+          workHours: 1.92,
+          fatiguePoints: 5,
+          remark: "一号",
+          countBaseline: { staffId: people[0]!.id, staffName: people[0]!.name },
+          manualOverrideWarnings: [
+            { code: "position-qualification", message: "测试突破" },
+          ],
+        },
+      ];
+      state.assignments = [];
+      const element = await mountElement<
+        HTMLElement & { updateComplete: Promise<unknown> }
+      >("autoschedule-statistics-page", { model: state, date: "2026-10-15" });
+      for (const selector of [
+        ".ordinary-priority-summary-table",
+        ".late-priority-summary-table",
+      ]) {
+        const table = element.querySelector(selector)!;
+        const rows = [...table.querySelectorAll("tbody > tr")];
+        const recipient = rows.find((r) =>
+          r.querySelector("td")?.textContent?.includes(people[1]!.name)
+        )!;
+        expect(table.querySelector('td[data-label="突破资质"]')).toBeNull();
+        expect(
+          [...table.querySelectorAll("th")].map((cell) =>
+            cell.textContent?.trim()
+          )
+        ).not.toContain("突破资质");
+        expect(table.textContent).not.toContain("未记录");
+        expect(
+          recipient.querySelector("details")?.textContent?.replace(/\s+/g, " ")
+        ).toContain("实际 0 · 修正 +1");
+        expect(
+          recipient.querySelector("td:nth-child(2)")?.textContent?.trim()
+        ).toBe("1");
+        const original = rows.find((r) =>
+          r.querySelector("td")?.textContent?.includes(people[0]!.name)
+        )!;
+        expect(
+          original
+            .querySelector("button[aria-label$='减少一次']")
+            ?.hasAttribute("disabled")
+        ).toBe(true);
+        expect(
+          original.querySelector("td:nth-child(2)")?.textContent?.trim()
+        ).toBe("0");
+      }
     }
-  });
+  );
   it("hides an early departure date if any assigned flight cuts off after 23:00", async () => {
     const state = createDefaultState();
     const person = state.staff.find((item) => item.status === "正常")!;

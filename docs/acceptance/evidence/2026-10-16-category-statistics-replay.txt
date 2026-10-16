@@ -1,0 +1,15 @@
+{
+  "inputSha256": "eca766e56879ceede3ad653d5b0af07d8aa2d443c35b62f0b11229d74c7e4a56",
+  "inputUnchanged": true,
+  "date": "2026-10-17",
+  "recordsInMonth": 355,
+  "ordinaryCellsIndependentlyChecked": 198,
+  "lateCellsIndependentlyChecked": 135,
+  "tr121SupervisorCategory": "机动督导",
+  "october13SupervisorRecords": 1,
+  "october13SupervisorRecordsCounted": 1,
+  "sourceStateUnchanged": true,
+  "browserValidated": false
+}
+
+EXIT_CODE: 0

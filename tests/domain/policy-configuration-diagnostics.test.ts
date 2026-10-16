@@ -477,18 +477,21 @@ describe("configuration diagnostics", () => {
     );
   });
 
-  it("accepts a mobile supervisor role as a configured ordinary supervisor position", () => {
-    const state = createDefaultState();
-    const rule = state.positionRules.find(
-      (item) => item.flightNo === "TR121" && item.name === "督导"
-    )!;
-    rule.category = "机动督导";
-    state.settings.ordinaryPriorityPositions = [
-      { airlineCode: "TR", position: "督导" },
-    ];
+  it.each(["常规", "机动督导", "分流", "引导", "行政支援"] as const)(
+    "accepts a configured ordinary position in category %s",
+    (category) => {
+      const state = createDefaultState();
+      const rule = state.positionRules.find(
+        (item) => item.flightNo === "TR121" && item.name === "督导"
+      )!;
+      rule.category = category;
+      state.settings.ordinaryPriorityPositions = [
+        { airlineCode: "TR", position: "督导" },
+      ];
 
-    expect(diagnoseOrdinaryPriorityPosition(state, 0)).toEqual([]);
-  });
+      expect(diagnoseOrdinaryPriorityPosition(state, 0)).toEqual([]);
+    }
+  );
 
   it("uses the central scalar contract for invalid numbers, times and intentional zeros", () => {
     expect(

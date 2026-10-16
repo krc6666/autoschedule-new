@@ -1,0 +1,199 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+npm.cmd : stderr | tests/ui/statistics-view.test.ts
+所在位置 行:2 字符: 1
++ npm.cmd exec vitest -- run tests/domain/ordinary-priority-statistics. ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (stderr | tests/...cs-view.test.ts:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+
+··xxxx···xxxx·································xxx···xxxx····xxx················
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 18 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/domain/monthly-late-priority-statistics.test.ts > monthly late priority statistics > counts all existing k
+inds independently of category 机动督导
+AssertionError: expected 1 to be 4 // Object.is equality
+
+- Expected
++ Received
+
+- 4
++ 1
+
+ ❯ tests/domain/monthly-late-priority-statistics.test.ts:91:28
+     89|     const row = result.rows[0]!;
+     90|     expect(row).toBeDefined();
+     91|     expect(row.totalCount).toBe(4);
+       |                            ^
+     92|     expect(row.flights.TR121!.applicableCategories).toEqual(["督导", "一号…
+     93|     for (const kind of ["督导", "一号", "申报", "送资料"] as const) {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/18]⎯
+
+ FAIL  tests/domain/monthly-late-priority-statistics.test.ts > monthly late priority statistics > counts all existing k
+inds independently of category 分流
+ FAIL  tests/domain/monthly-late-priority-statistics.test.ts > monthly late priority statistics > counts all existing k
+inds independently of category 引导
+ FAIL  tests/domain/monthly-late-priority-statistics.test.ts > monthly late priority statistics > counts all existing k
+inds independently of category 行政支援
+AssertionError: expected undefined to be defined
+ ❯ tests/domain/monthly-late-priority-statistics.test.ts:90:17
+     88|     const result = buildMonthlyLatePriorityStatistics(state, DATE);
+     89|     const row = result.rows[0]!;
+     90|     expect(row).toBeDefined();
+       |                 ^
+     91|     expect(row.totalCount).toBe(4);
+     92|     expect(row.flights.TR121!.applicableCategories).toEqual(["督导", "一号…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/18]⎯
+
+ FAIL  tests/domain/ordinary-priority-statistics.test.ts > ordinary priority statistics > counts the configured supervi
+sor independently of category 分流
+ FAIL  tests/domain/ordinary-priority-statistics.test.ts > ordinary priority statistics > counts the configured supervi
+sor independently of category 引导
+ FAIL  tests/domain/ordinary-priority-statistics.test.ts > ordinary priority statistics > counts the configured supervi
+sor independently of category 行政支援
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/domain/ordinary-priority-statistics.test.ts:44:27
+     42|     const row = buildOrdinaryPriorityStatistics(state, "2026-07-18")[0…
+     43|
+     44|     expect(row.qualified).toBe(true);
+       |                           ^
+     45|     expect(row.actualCount).toBe(1);
+     46|     expect(row.effectiveCount).toBe(1);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/18]⎯
+
+ FAIL  tests/domain/ordinary-priority-statistics.test.ts > ordinary priority statistics > keeps a mobile H02 in its con
+figured position without turning it into a supervisor
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/domain/ordinary-priority-statistics.test.ts:71:32
+     69|
+     70|     const rows = buildOrdinaryPriorityStatistics(state, "2026-07-18");
+     71|     expect(rows[0]!.qualified).toBe(true);
+       |                                ^
+     72|     expect(rows[1]!.qualified).toBe(false);
+     73|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/18]⎯
+
+ FAIL  tests/domain/policy-configuration-diagnostics.test.ts > configuration diagnostics > accepts a configured ordinar
+y position in category 分流
+ FAIL  tests/domain/policy-configuration-diagnostics.test.ts > configuration diagnostics > accepts a configured ordinar
+y position in category 引导
+ FAIL  tests/domain/policy-configuration-diagnostics.test.ts > configuration diagnostics > accepts a configured ordinar
+y position in category 行政支援
+AssertionError: expected [ { …(5) } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "code": "ordinary-position-missing",
++     "explanation": "普通重点集合使用航司和完整规范岗位名，不使用岗位备注关键词匹配。",
++     "message": "TR / 督导 没有匹配常规岗位",
++     "severity": "warning",
++     "steps": [
++       "在配置 → 岗位配置核对常规岗位的航司和完整岗位名称。",
++       "在本条普通重点岗位集合修改“航司”或“规范岗位”；不再需要的条目可删除。",
++     ],
++   },
++ ]
+
+ ❯ tests/domain/policy-configuration-diagnostics.test.ts:490:56
+    488|     ];
+    489|
+    490|     expect(diagnoseOrdinaryPriorityPosition(state, 0)).toEqual([]);
+       |                                                        ^
+    491|   });
+    492|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/18]⎯
+
+ FAIL  tests/infrastructure/late-priority-counts-excel.test.ts > late-priority counts workbook > round-trips selected f
+inal counts independently of category 机动督导
+AssertionError: expected undefined to be 3 // Object.is equality
+
+- Expected:
+3
+
++ Received:
+undefined
+
+ ❯ tests/infrastructure/late-priority-counts-excel.test.ts:41:143
+     39|     expect(preview.month).toBe("2026-08");
+     40|     expect(preview.flightNumbers).toEqual(["TR121", "TW616"]);
+     41|     expect(preview.targets.find(target => target.staffId === staffId &…
+       |
+                                ^
+     42|     expect(updateLatePriorityFrequencyAdjustment(state, "2026-08", sta…
+     43|     expect(applyLatePriorityCountsImport(state, preview)).toBe(true);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/18]⎯
+
+ FAIL  tests/infrastructure/late-priority-counts-excel.test.ts > late-priority counts workbook > round-trips selected f
+inal counts independently of category 分流
+ FAIL  tests/infrastructure/late-priority-counts-excel.test.ts > late-priority counts workbook > round-trips selected f
+inal counts independently of category 引导
+ FAIL  tests/infrastructure/late-priority-counts-excel.test.ts > late-priority counts workbook > round-trips selected f
+inal counts independently of category 行政支援
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/infrastructure/late-priority-counts-excel.test.ts:38:30
+     36|
+     37|     expect(workbook.SheetNames).toEqual(["末班重点岗位次数"]);
+     38|     expect(preview.canApply).toBe(true);
+       |                              ^
+     39|     expect(preview.month).toBe("2026-08");
+     40|     expect(preview.flightNumbers).toEqual(["TR121", "TW616"]);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/18]⎯
+
+ FAIL  tests/ui/statistics-view.test.ts > statistics page > shows manual corrections in the existing tables for categor
+y 机动督导
+ FAIL  tests/ui/statistics-view.test.ts > statistics page > shows manual corrections in the existing tables for categor
+y 分流
+ FAIL  tests/ui/statistics-view.test.ts > statistics page > shows manual corrections in the existing tables for categor
+y 行政支援
+TypeError: Cannot read properties of null (reading 'querySelectorAll')
+ ❯ tests/ui/statistics-view.test.ts:62:30
+     60|     ]) {
+     61|       const table = element.querySelector(selector)!;
+     62|       const rows = [...table.querySelectorAll("tbody > tr")];
+       |                              ^
+     63|       const recipient = rows.find((r) =>
+     64|         r.querySelector("td")?.textContent?.includes(people[1]!.name)
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/18]⎯
+
+
+ Test Files  5 failed (5)
+      Tests  18 failed | 61 passed (79)
+   Start at  13:19:24
+   Duration  6.07s (transform 2.58s, setup 0ms, import 3.47s, tests 4.97s, environment 629ms)

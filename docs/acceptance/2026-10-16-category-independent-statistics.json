@@ -1,0 +1,172 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-10-16-category-independent-statistics",
+  "title": "现有岗位次数统计不受岗位分类影响",
+  "startedFrom": "be6132e6cf261166c03a30669163a6a7ff3446ce",
+  "expectation": {
+    "example": "owner确认：TR121岗位名仍为督导，分类为常规、机动督导或分流，同一人实际承担一次均在原督导项记1；其他已有统计岗位同理。继续复核后，owner于2026-10-16明确接受引导不计次数。",
+    "expected": "保留现有两张次数表及项目；普通重点按已配置航司/岗位键，末班按已选航班、末班界线及既有四类岗位语义计数。已有统计事实、当前资质或修正和导出适用项不额外按分类筛除。引导例外沿用原处理：当前引导岗位不计次数、不新增负荷历史，不重复计算工时与疲劳，不追溯清理已有历史。",
+    "unchanged": "不新增统计列或岗位集合；自动候选、求解、补缺、恢复、轮岗、末班范围候选和迁移不变；保留人员类型、负荷排除、月份、时间界线、同日去重、二合一、人工差额和最终0下限合同。",
+    "fallback": "统计只读既有事实，不重写历史、配置或人工修正；无效次数导入整表拒绝，保留原数据。名称不匹配保护不变。真实页面证据未取得时保持待验收，不宣称线上更新。"
+  },
+  "testedVersion": "ed87c29e505b83ebe3775ec127d23915a0a376de96db310129f23f25082b915b",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "改前分类交叉回归18项失败；另在旧手工班表仅末班入口保留4项失败。改后定向7文件119项通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-16-category-statistics-red.txt",
+          "summary": "改前分类交叉回归18项失败；另在旧手工班表仅末班入口保留4项失败。改后定向7文件119项通过。",
+          "sha256": "01634571701a47849cab42202340110e3d441697838eae8e751a69ee86e28c03"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-16-category-statistics-legacy-red.txt",
+          "summary": "改前分类交叉回归18项失败；另在旧手工班表仅末班入口保留4项失败。改后定向7文件119项通过。",
+          "sha256": "e9416f27166f996316b8dfaa1abb44e03b83bbf7becfa7bf0aafdd486c29b939"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-16-category-statistics-green.txt",
+          "summary": "改前分类交叉回归18项失败；另在旧手工班表仅末班入口保留4项失败。改后定向7文件119项通过。",
+          "sha256": "c3f457197e6cc9b11ef4e04234da6f9fc51944b08c45857832e71ea1566c724d"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "普通重点与末班重点沿用既有项目，不受岗位分类过滤；历史、当前班表、零次资质及四类语义均覆盖。真实配置独立核对198个普通重点项、135个末班项一致。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-16-category-statistics-green.txt",
+          "summary": "普通重点与末班重点沿用既有项目，不受岗位分类过滤；历史、当前班表、零次资质及四类语义均覆盖。真实配置独立核对198个普通重点项、135个末班项一致。",
+          "sha256": "c3f457197e6cc9b11ef4e04234da6f9fc51944b08c45857832e71ea1566c724d"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-16-category-statistics-replay.txt",
+          "summary": "普通重点与末班重点沿用既有项目，不受岗位分类过滤；历史、当前班表、零次资质及四类语义均覆盖。真实配置独立核对198个普通重点项、135个末班项一致。",
+          "sha256": "a9c3c2bb179248ec6ca90f217c110f98f3e66327c3fd897c8a350b32fecbdfe9"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "旧手工班表仅末班导入、专用次数Excel二进制写读应用及重复导入、配置Excel与localStorage恢复均通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-16-category-statistics-green.txt",
+          "summary": "旧手工班表仅末班导入、专用次数Excel二进制写读应用及重复导入、配置Excel与localStorage恢复均通过。",
+          "sha256": "c3f457197e6cc9b11ef4e04234da6f9fc51944b08c45857832e71ea1566c724d"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-16-category-statistics-replay.txt",
+          "summary": "旧手工班表仅末班导入、专用次数Excel二进制写读应用及重复导入、配置Excel与localStorage恢复均通过。",
+          "sha256": "a9c3c2bb179248ec6ca90f217c110f98f3e66327c3fd897c8a350b32fecbdfe9"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "覆盖人工换人差额、当前班表替代同日历史、分类参数化加减/清零、跨月隔离与重复导入不叠加；未修改排班后置流程。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-16-category-statistics-green.txt",
+          "summary": "覆盖人工换人差额、当前班表替代同日历史、分类参数化加减/清零、跨月隔离与重复导入不叠加；未修改排班后置流程。",
+          "sha256": "c3f457197e6cc9b11ef4e04234da6f9fc51944b08c45857832e71ea1566c724d"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-16-category-statistics-review.md",
+          "summary": "覆盖人工换人差额、当前班表替代同日历史、分类参数化加减/清零、跨月隔离与重复导入不叠加；未修改排班后置流程。",
+          "sha256": "3ad388a4a1c5fbaba0e74a35726e11457a563abda5facf8e6e7fe1520faa7297"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "最终次数最低0、二合一不重复、同人同日同航班同类别去重、范围和严格界线保持；无效或不完整次数导入仍拒绝。真实配置逐单元格独立核对并检查人员行覆盖和源状态不变。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-16-category-statistics-green.txt",
+          "summary": "最终次数最低0、二合一不重复、同人同日同航班同类别去重、范围和严格界线保持；无效或不完整次数导入仍拒绝。真实配置逐单元格独立核对并检查人员行覆盖和源状态不变。",
+          "sha256": "c3f457197e6cc9b11ef4e04234da6f9fc51944b08c45857832e71ea1566c724d"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-16-category-statistics-replay.txt",
+          "summary": "最终次数最低0、二合一不重复、同人同日同航班同类别去重、范围和严格界线保持；无效或不完整次数导入仍拒绝。真实配置逐单元格独立核对并检查人员行覆盖和源状态不变。",
+          "sha256": "a9c3c2bb179248ec6ca90f217c110f98f3e66327c3fd897c8a350b32fecbdfe9"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "反向测试证明非正常自动分类不启用自动重点规则或范围候选；差异复核未修改排班候选、求解、恢复、轮岗或硬约束。没有新增列、统计账本或持久化字段。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-16-category-statistics-green.txt",
+          "summary": "反向测试证明非正常自动分类不启用自动重点规则或范围候选；差异复核未修改排班候选、求解、恢复、轮岗或硬约束。没有新增列、统计账本或持久化字段。",
+          "sha256": "c3f457197e6cc9b11ef4e04234da6f9fc51944b08c45857832e71ea1566c724d"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-16-category-statistics-review.md",
+          "summary": "反向测试证明非正常自动分类不启用自动重点规则或范围候选；差异复核未修改排班候选、求解、恢复、轮岗或硬约束。没有新增列、统计账本或持久化字段。",
+          "sha256": "3ad388a4a1c5fbaba0e74a35726e11457a563abda5facf8e6e7fe1520faa7297"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-16-category-statistics-l2.txt",
+          "summary": "反向测试证明非正常自动分类不启用自动重点规则或范围候选；差异复核未修改排班候选、求解、恢复、轮岗或硬约束。没有新增列、统计账本或持久化字段。",
+          "sha256": "e425ebbc6f67e5c8e8030c7d3fe6b66b9c61a36982f11566cf1f8aeaadcf56f7"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-16-category-statistics-gate-recheck.txt",
+          "summary": "反向测试证明非正常自动分类不启用自动重点规则或范围候选；差异复核未修改排班候选、求解、恢复、轮岗或硬约束。没有新增列、统计账本或持久化字段。",
+          "sha256": "aa4169db4f63f8a74c009af3f75693cd9edafe67473301396398f51b8310ecfa"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-16-category-statistics-l2-recheck.txt",
+          "summary": "反向测试证明非正常自动分类不启用自动重点规则或范围候选；差异复核未修改排班候选、求解、恢复、轮岗或硬约束。没有新增列、统计账本或持久化字段。",
+          "sha256": "689f9048331f941acfdd96231d2f9f620932cb30081c6417156f7e81f9555990"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-16-category-statistics-build.txt",
+          "summary": "反向测试证明非正常自动分类不启用自动重点规则或范围候选；差异复核未修改排班候选、求解、恢复、轮岗或硬约束。没有新增列、统计账本或持久化字段。",
+          "sha256": "1f3613e154eaa328684ef8cdb09a8844dc47d0fd44961f528315c461962bfbb9"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-16-category-statistics-precommit-verify-retry.txt",
+          "summary": "提交前完整 npm.cmd run verify 复跑通过：类型检查、146文件1444项功能测试、19项性能测试及生产构建。",
+          "sha256": "431dcb7df9e0bf4516fdf1e460d13ff69a3e57fdd04394884715414019fca825"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "本地真实Excel解析/导入与独立重算、组件和往返证据已取得；尚未取得owner在本地修复版本页面上的查看/保存再读证据，不能认定页面验收或线上更新完成。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-16-category-statistics-replay.txt",
+          "summary": "本地真实Excel解析/导入与独立重算、组件和往返证据已取得；尚未取得owner在本地修复版本页面上的查看/保存再读证据，不能认定页面验收或线上更新完成。",
+          "sha256": "a9c3c2bb179248ec6ca90f217c110f98f3e66327c3fd897c8a350b32fecbdfe9"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-16-category-statistics-green.txt",
+          "summary": "本地真实Excel解析/导入与独立重算、组件和往返证据已取得；尚未取得owner在本地修复版本页面上的查看/保存再读证据，不能认定页面验收或线上更新完成。",
+          "sha256": "c3f457197e6cc9b11ef4e04234da6f9fc51944b08c45857832e71ea1566c724d"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-16-category-statistics-build.txt",
+          "summary": "本地真实Excel解析/导入与独立重算、组件和往返证据已取得；尚未取得owner在本地修复版本页面上的查看/保存再读证据，不能认定页面验收或线上更新完成。",
+          "sha256": "1f3613e154eaa328684ef8cdb09a8844dc47d0fd44961f528315c461962bfbb9"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "分类参数化改前18失败，以及旧手工班表入口改前4失败，证明不是单一机动督导个案；改后7文件119项通过，分别见red、legacy-red、green证据。",
+    "laterChanges": "人工换人、当前覆盖同日历史、清零和次数导入可能重复或错计，已用分类参数化UI/actions及Excel往返回归验证；自动排班不因统计可见而启用新分类。见green和review证据。",
+    "finalArtifact": "replay.txt记录用户配置355条月度历史的独立核对：198个普通重点项、135个末班项一致，10月13日TR121督导1条计入1条，输入SHA256及源状态保持不变。页面最终产物尚缺owner证据。"
+  },
+  "review": {
+    "missedScope": "第一次只补机动督导的督导，未覆盖其余分类；本次沿历史、资格投影、配置诊断、actions、UI、Excel读写核对，额外发现旧手工班表仅末班入口并先加失败测试。继续复核发现当前引导在统计及新增归档前被过滤，owner已确认保留，不再将其描述为所有分类均计入。该确认仅修正文档范围，未改实现，原测试指纹未刷新；修复版页面仍未现场验证。",
+    "rootCause": "统计事实读取错误沿用了自动排班分类限制；前次将机动督导症状当成全部需求，专用过滤器仍隐藏其余分类，导入端还有独立常规限制。",
+    "earlyDetection": "改统计前以全部岗位分类交叉已有岗位语义、列全导入/资格/修正/导出消费者，先跑失败回归；最终按业务定义独立重算，另用反向测试锁住自动规则边界，不把局部测试当页面验收。"
+  }
+}

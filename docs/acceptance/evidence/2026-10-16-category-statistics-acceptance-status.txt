@@ -1,0 +1,4 @@
+验收材料检查失败：
+2026-10-16-category-independent-statistics / finalArtifact：尚未验收通过（unverified）
+
+EXIT_CODE: 1

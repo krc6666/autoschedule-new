@@ -1,0 +1,38 @@
+
+> autoschedule@1.0.0 verify
+> npm run typecheck && npm test && npm run test:performance && npm run build
+
+
+> autoschedule@1.0.0 typecheck
+> tsc -b --pretty false
+
+
+> autoschedule@1.0.0 tes
+> vitest run --exclude tests/performance/**
+
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/architecture/acceptance-gate.test.ts (16 tests | 1 failed) 38599ms
+     × also catches changed build settings and newly added source files 5040ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/architecture/acceptance-gate.test.ts > acceptance release gate > also catches changed build settings and newly added source files
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ tests/architecture/acceptance-gate.test.ts:155:3
+    153|   });
+    154|
+    155|   it("also catches changed build settings and newly added source files…
+       |   ^
+    156|     const root = fixture();
+    157|     save(root, record(root));
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 145 passed (146)
+      Tests  1 failed | 1443 passed (1444)
+   Start at  14:03:26
+   Duration  100.46s (transform 21.84s, setup 0ms, import 65.05s, tests 343.72s, environment 18.89s)
