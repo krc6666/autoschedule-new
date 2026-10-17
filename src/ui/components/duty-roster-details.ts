@@ -137,11 +137,7 @@ export class DutyRosterDetailsElement extends LightDomElement {
                     </td>
                     <td>
                       ${this.rosterSelect(
-                        view.cxStaff.filter(
-                          (person) =>
-                            person.id === row.cxPreflightStaffId ||
-                            person.id !== row.dutyStaffId
-                        ),
+                        view.cxStaff,
                         row,
                         "cx-preflight",
                         row.cxPreflightStaffId,
@@ -225,9 +221,7 @@ export class DutyRosterDetailsElement extends LightDomElement {
                 const standby = view.standbyStaff.filter(
                   (person) => person.id !== row.dutyStaffId
                 );
-                const duty = view.dutyStaff.filter(
-                  (person) => person.id !== row.cxPreflightStaffId
-                );
+                const duty = view.dutyStaff;
                 return html`<tr
                   class=${row.date === this.date ? "is-current" : ""}
                 >

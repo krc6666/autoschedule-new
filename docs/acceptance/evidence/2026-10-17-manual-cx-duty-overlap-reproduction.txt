@@ -1,0 +1,3 @@
+Command before implementation: npm.cmd exec vitest -- run tests/domain/duty-roster.test.ts tests/app/workbook-actions.test.ts tests/infrastructure/excel.test.ts --exclude tests/performance/**
+Observed before implementation: 3 failed tests.
+Failures: manual duty update returned “值班不能与CX航前由同一人承担”; duty-roster import validation returned canApply=false for a duty person matching preserved CX; configuration workbook parse returned no dutyRosterOverrides for the same CX/duty person.

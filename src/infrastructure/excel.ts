@@ -161,10 +161,7 @@ function parseDutyRosterOverrides(
       invalid = true;
     }
     const dutyAndOther = [ids[1], ids[2], ids[3]].filter(Boolean);
-    if (
-      new Set(dutyAndOther).size !== dutyAndOther.length ||
-      (ids[1] && ids[0] === ids[1])
-    ) {
+    if (new Set(dutyAndOther).size !== dutyAndOther.length) {
       warnings.push(`值班轮值第${excelRow}行：值班和备勤人员不能重复`);
       invalid = true;
     }

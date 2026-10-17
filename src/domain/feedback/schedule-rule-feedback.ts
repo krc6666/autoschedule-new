@@ -628,10 +628,7 @@ function dutyRosterFeedback(
   );
   const rosterConflict =
     Boolean(
-      roster.dutyStaffId &&
-      [roster.cxPreflightStaffId, ...roster.standbyStaffIds].includes(
-        roster.dutyStaffId
-      )
+      roster.dutyStaffId && roster.standbyStaffIds.includes(roster.dutyStaffId)
     ) || new Set(standbyIds).size !== standbyIds.length;
   const standbyQualificationShortage = roster.standbyStaffIds.some(
     (staffId) => !staffId
@@ -642,7 +639,7 @@ function dutyRosterFeedback(
       "duty-roster",
       "值班与轮值",
       "attention",
-      `CX航前${cxName}；${dutyDescription}；备勤${standbyDetails}。${standbyQualificationShortage ? "备勤资质人员不足，空缺席位保持未配置；" : ""}轮值未完整配置，或值班与其他轮值发生冲突，需要调整；CX航前与备勤允许同人兼任。${morningDutyText}规则无法核验。${dutyRecoveryNote}${monthlyDutyNote}${monthlyBalanceNote}${monthlyCapacityNote}`
+      `CX航前${cxName}；${dutyDescription}；备勤${standbyDetails}。${standbyQualificationShortage ? "备勤资质人员不足，空缺席位保持未配置；" : ""}轮值未完整配置，或值班与备勤发生冲突，需要调整；CX航前与值班、备勤均允许人工同人。${morningDutyText}规则无法核验。${dutyRecoveryNote}${monthlyDutyNote}${monthlyBalanceNote}${monthlyCapacityNote}`
     );
   }
   const dutyAssignments = state.assignments.filter(

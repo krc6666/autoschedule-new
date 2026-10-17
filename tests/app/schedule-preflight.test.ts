@@ -763,6 +763,72 @@ it("统计页保存的四个后天轮值槽位在归档后天预检中默认回�
   });
 });
 
+it.each(["generate-schedule", "open-reschedule-flight-picker"] as const)(
+  "三个自动排班入口沿用人工 CX 航前和值班同人覆盖：%s",
+  async (open) => {
+    const state = fixture();
+    const person = state.staff[0]!;
+    person.cxPreflightQualified = true;
+    person.dutyQualified = true;
+    const coordinator = createTestApplicationCoordinator(
+      createTestAutoscheduleStore(state),
+      { preferences }
+    );
+
+    await coordinator.handle({
+      type: "update-duty-roster",
+      date,
+      slot: "cx-preflight",
+      staffId: person.id,
+    });
+    await coordinator.handle({
+      type: "update-duty-roster",
+      date,
+      slot: "duty",
+      staffId: person.id,
+    });
+    await coordinator.handle({ type: open });
+
+    expect(coordinator.view().dialog).toMatchObject({
+      dutyRoster: expect.objectContaining({
+        date,
+        cxPreflightStaffId: person.id,
+        dutyStaffId: person.id,
+      }),
+    });
+  }
+);
+
+it("归档后天预检也沿用人工 CX 航前和值班同人覆盖", async () => {
+  const state = fixture();
+  const person = state.staff[0]!;
+  person.cxPreflightQualified = true;
+  person.dutyQualified = true;
+  const nextDate = "2026-08-17";
+  state.dutyRosterOverrides = [
+    {
+      date: nextDate,
+      cxPreflightStaffId: person.id,
+      dutyStaffId: person.id,
+      standbyStaffIds: [null, null],
+    },
+  ];
+  const coordinator = createTestApplicationCoordinator(
+    createTestAutoscheduleStore(state),
+    { preferences }
+  );
+
+  await coordinator.handle({ type: "archive-next-duty-day" });
+
+  expect(coordinator.view().dialog).toMatchObject({
+    dutyRoster: expect.objectContaining({
+      date: nextDate,
+      cxPreflightStaffId: person.id,
+      dutyStaffId: person.id,
+    }),
+  });
+});
+
 it("统计页轮值保存并恢复后仍在生成预检中回显", async () => {
   const state = fixture();
   const person = state.staff[0]!;

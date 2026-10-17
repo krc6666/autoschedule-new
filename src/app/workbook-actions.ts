@@ -213,19 +213,9 @@ export function applyLegacyScheduleImport(
 }
 
 export function validateDutyRosterImport(
-  state: AppState,
   preview: DutyRosterImportPreview
 ): DutyRosterImportPreview {
-  const conflicts = preview.rows.flatMap((row) => {
-    if (row.dutyIncluded === false) return [];
-    const cxStaffId = getDutyRosterForDate(state, row.date).cxPreflightStaffId;
-    if (!cxStaffId || cxStaffId !== row.dutyStaffId) return [];
-    const name =
-      state.staff.find((person) => person.id === cxStaffId)?.name ??
-      `#${cxStaffId}`;
-    return [`${row.date}的值班人员${name}同时承担CX航前，请先调整其中一个安排`];
-  });
-  const errors = [...new Set([...preview.errors, ...conflicts])];
+  const errors = [...new Set(preview.errors)];
   return {
     ...preview,
     errors,
@@ -237,7 +227,7 @@ export function applyDutyRosterImport(
   state: AppState,
   preview: DutyRosterImportPreview
 ): { importedDays: number; importedAssignments: number } {
-  const validated = validateDutyRosterImport(state, preview);
+  const validated = validateDutyRosterImport(preview);
   if (!validated.canApply) return { importedDays: 0, importedAssignments: 0 };
   const existingByDate = new Map(
     preview.rows.map((row) => [row.date, getDutyRosterForDate(state, row.date)])

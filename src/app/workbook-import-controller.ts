@@ -42,7 +42,7 @@ export async function prepareWorkbookImport(
     );
     return {
       kind: "duty-roster",
-      preview: validateDutyRosterImport(state, parsed),
+      preview: validateDutyRosterImport(parsed),
     };
   }
   const { importWorkbook } = await import("../infrastructure/excel");

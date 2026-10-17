@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-10-17-manual-cx-duty-overlap",
+  "title": "人工轮值允许 CX 航前和值班同人，自动默认轮值仍互斥",
+  "startedFrom": "6d1cda005d064c472b84d805a42ddb3115c52f68",
+  "expectation": {
+    "example": "当前组一名同时具备 CX 航前和值班资质的常规人员，某工作班日期先后被人工选择为 CX 航前和值班；随后打开生成排班、重新排班或归档并排后天预检。",
+    "expected": "人工下拉可选、保存后两槽位同人、日期切换和 localStorage/Excel 往返仍保留；三个自动排班入口沿用这份人工安排。",
+    "unchanged": "系统自动生成默认月度轮值仍让值班优先并排斥同日 CX 航前；值班与备勤互斥、备勤重复防护、资质、人员类型、组隔离和自动恢复安全检查不变。",
+    "fallback": "任何资质、备勤重复、日期或导入校验失败仍拒绝本次修改并保留原覆盖和原班表；不擅自清空或改人。"
+  },
+  "testedVersion": "020d56615e1905dc7d900313dcae5884278b92a3b0fba4bba5a9c23618f3a169",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "修改前定向回归稳定复现人工保存、专用导入和配置 Excel 解析的三处 duty/CX 同人阻断。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-17-manual-cx-duty-overlap-reproduction.txt",
+          "summary": "修改前 3 项定向回归失败及具体阻断点",
+          "sha256": "18f8ac332144da911c11d76b8eac72cbefe0c6ece48c68fde7fd6e850b358528"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "人工双向保存、配置 Excel 往返、专用导入和 UI 两个下拉选项均通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-17-manual-cx-duty-overlap-focused.txt",
+          "summary": "6 个定向文件 145 项及 2 个 UI 文件 41 项通过",
+          "sha256": "b6cbe503fff4b1ef7918a9922bf8808d08073c636032bd7c96a0a01c386532c2"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "生成排班、重新排班和归档后天预检均回显人工同人覆盖；自动默认轮值仍互斥。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-17-manual-cx-duty-overlap-focused.txt",
+          "summary": "schedule-preflight、domain duty-roster 和 UI 回归通过",
+          "sha256": "b6cbe503fff4b1ef7918a9922bf8808d08073c636032bd7c96a0a01c386532c2"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "反馈只把值班与备勤重复作为冲突，自动恢复仍通过原有安全路径；完整功能与性能验证通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-17-manual-cx-duty-overlap-verify.txt",
+          "summary": "完整功能、性能、类型检查和生产构建通过",
+          "sha256": "be73e85e8118ba3546d55f0669d7e913a8b6638e2351cefb3a176679bbe08dd5"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "自动默认轮值、备勤重复、资质、导入整表失败和最终反馈回归均通过；生产构建完成。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-17-manual-cx-duty-overlap-verify.txt",
+          "summary": "完整 verify 输出",
+          "sha256": "be73e85e8118ba3546d55f0669d7e913a8b6638e2351cefb3a176679bbe08dd5"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "原有资质、值班/备勤重复、自动默认互斥和组隔离回归未改变；1450 项功能测试及 19 项性能测试通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-17-manual-cx-duty-overlap-verify.txt",
+          "summary": "完整验证结果",
+          "sha256": "be73e85e8118ba3546d55f0669d7e913a8b6638e2351cefb3a176679bbe08dd5"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "尚未取得 owner 按真实应用入口操作后的页面证据；自动 UI 组件测试已通过，现场验收待 owner 完成。",
+      "evidence": []
+    }
+  },
+  "answers": {
+    "originalFailure": "修改前定向回归显示人工更新、专用导入和配置 Excel 解析均把 CX/值班同人当成冲突；修改后对应回归通过。",
+    "laterChanges": "自动默认轮值和自动恢复可能重新生成或交换人员；保留自动互斥与恢复回归，完整 verify 通过。",
+    "finalArtifact": "代码、测试和生产构建已完成；真实页面最终产物仍待 owner 按步骤验收。"
+  },
+  "review": {
+    "missedScope": "初始实现同时影响统计页和三个排班预检入口；通过传播矩阵补查 UI、保存、恢复、配置 Excel 和专用导入后已覆盖，真实页面仍未取得证据。",
+    "rootCause": "自动默认轮值的 duty/CX 互斥被错误复用于人工覆盖合法性和导入校验，UI 又提前过滤了对方槽位。",
+    "earlyDetection": "改轮值规则前先区分自动生成、人工覆盖、预检消费和 Excel 导入，并先用同人双向保存及三入口回显失败测试检查传播矩阵。"
+  }
+}

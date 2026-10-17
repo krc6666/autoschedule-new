@@ -1,0 +1,7 @@
+Command: npm.cmd exec vitest -- run tests/domain/duty-roster.test.ts tests/domain/schedule-feedback.test.ts tests/app/workbook-actions.test.ts tests/app/schedule-preflight.test.ts tests/infrastructure/excel.test.ts tests/ui/duty-roster-import-view.test.ts --exclude tests/performance/**
+Result: Test Files 6 passed (6); Tests 145 passed (145).
+
+Command: npm.cmd exec vitest -- run tests/ui/statistics-view.test.ts tests/ui/next-workday-flight-picker-dialog.test.ts --exclude tests/performance/**
+Result: Test Files 2 passed (2); Tests 41 passed (41).
+
+Covered: manual CX/duty overlap save, automatic preflight reuse, configuration Excel round trip, dedicated duty-roster import, UI option presence, standby duplicate protection, and automatic default roster exclusivity.

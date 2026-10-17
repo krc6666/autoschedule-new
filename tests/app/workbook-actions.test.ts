@@ -677,7 +677,7 @@ describe("workbook actions", () => {
     ).toBe(true);
   });
 
-  it("blocks an imported duty person who is already the preserved CX preflight person", () => {
+  it("allows an imported duty person who is already the preserved CX preflight person", () => {
     const state = createDefaultState();
     const person = state.staff[0]!;
     person.cxPreflightQualified = true;
@@ -706,14 +706,25 @@ describe("workbook actions", () => {
       ],
     };
 
-    const validated = validateDutyRosterImport(state, preview);
+    const validated = validateDutyRosterImport(preview);
 
-    expect(validated.canApply).toBe(false);
-    expect(validated.errors.join("；")).toContain("同时承担CX航前");
+    expect(validated.canApply).toBe(true);
+    expect(validated.errors).not.toContain(
+      "2026-07-01的值班人员同时承担CX航前，请先调整其中一个安排"
+    );
     expect(applyDutyRosterImport(state, preview)).toEqual({
-      importedDays: 0,
-      importedAssignments: 0,
+      importedDays: 1,
+      importedAssignments: 3,
     });
+    expect(state.dutyRosterOverrides).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          date: "2026-07-01",
+          cxPreflightStaffId: person.id,
+          dutyStaffId: person.id,
+        }),
+      ])
+    );
   });
 
   it("preserves duty when a new month's first-day standby only covers the previous workday", () => {

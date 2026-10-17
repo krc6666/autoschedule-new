@@ -76,6 +76,24 @@ describe("workbook boundary", () => {
     expect(imported.dutyRosterOverrides).toEqual(state.dutyRosterOverrides);
   });
 
+  it("round-trips a manual CX preflight and duty overlap", () => {
+    const state = createDefaultState();
+    const person = state.staff[0]!;
+    person.cxPreflightQualified = true;
+    person.dutyQualified = true;
+    state.dutyRosterOverrides = [
+      {
+        date: "2026-10-01",
+        cxPreflightStaffId: person.id,
+        dutyStaffId: person.id,
+        standbyStaffIds: [state.staff[2]!.id, state.staff[3]!.id],
+      },
+    ];
+
+    const imported = parseWorkbook(buildConfigWorkbook(state), state.staff);
+    expect(imported.dutyRosterOverrides).toEqual(state.dutyRosterOverrides);
+  });
+
   it("rejects invalid duty roster rows without returning partial data", () => {
     const state = createDefaultState();
     const workbook = buildConfigWorkbook(state);

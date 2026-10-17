@@ -852,6 +852,46 @@ describe("statistics page", () => {
     ).toBe(selected.id);
   });
 
+  it("keeps a manually overlapping CX and duty person selectable in both lists", async () => {
+    const state = createDefaultState();
+    const selected = state.staff.find(
+      (person) => person.staffType === "常规" && person.status === "正常"
+    )!;
+    selected.cxPreflightQualified = true;
+    selected.dutyQualified = true;
+    const rosterDate = getMonthlyDutyRoster(state, "2026-07-18")[0]!.date;
+    state.dutyRosterOverrides = [
+      {
+        date: rosterDate,
+        cxPreflightStaffId: selected.id,
+        dutyStaffId: selected.id,
+        standbyStaffIds: [null, null],
+      },
+    ];
+
+    const element = await mountElement<
+      HTMLElement & { updateComplete: Promise<unknown> }
+    >("autoschedule-statistics-page", { model: state, date: "2026-07-18" });
+    const cxSelect = element.querySelector<HTMLSelectElement>(
+      `select[aria-label="${rosterDate} CX航前"]`
+    );
+    const dutySelect = element.querySelector<HTMLSelectElement>(
+      `select[aria-label="${rosterDate} 值班人员"]`
+    );
+    expect(cxSelect?.value).toBe(selected.id);
+    expect(dutySelect?.value).toBe(selected.id);
+    expect(
+      [...(cxSelect?.options ?? [])].some(
+        (option) => option.value === selected.id
+      )
+    ).toBe(true);
+    expect(
+      [...(dutySelect?.options ?? [])].some(
+        (option) => option.value === selected.id
+      )
+    ).toBe(true);
+  });
+
   it("allows a qualified leave-status person in the selected monthly duty roster", async () => {
     const state = createDefaultState();
     const selected = state.staff.find(

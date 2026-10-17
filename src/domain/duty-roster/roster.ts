@@ -391,13 +391,6 @@ function validOverride(
   if (override.cxPreflightStaffId && !cxIds.has(override.cxPreflightStaffId))
     return false;
   if (override.dutyStaffId && !dutyIds.has(override.dutyStaffId)) return false;
-  if (
-    override.dutyStaffId &&
-    [override.cxPreflightStaffId, ...override.standbyStaffIds].includes(
-      override.dutyStaffId
-    )
-  )
-    return false;
   const standbyIds = override.standbyStaffIds.filter((id): id is string =>
     Boolean(id)
   );
@@ -474,7 +467,6 @@ export function updateDutyRosterSlot(
   );
   if (slot === "cx-preflight") {
     if (!cxIds.has(staffId)) return "该人员不具备CX航前资质或当前不可用";
-    if (current.dutyStaffId === staffId) return "CX航前不能与值班由同一人承担";
     current.cxPreflightStaffId = staffId;
   } else {
     if (!regularIds.has(staffId)) return "值班和备勤只能选择状态正常的常规人员";
@@ -482,8 +474,6 @@ export function updateDutyRosterSlot(
       return "该人员不具备值班资质或当前不可用";
     if (slot !== "duty" && !standbyIds.has(staffId))
       return "该人员不具备备勤资质或当前不可用";
-    if (slot === "duty" && staffId === current.cxPreflightStaffId)
-      return "值班不能与CX航前由同一人承担";
     const values: [string | null, string | null, string | null] = [
       current.dutyStaffId,
       current.standbyStaffIds[0],

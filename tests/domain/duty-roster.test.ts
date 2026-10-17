@@ -82,7 +82,37 @@ describe("monthly duty roster", () => {
     expect(adjusted.standbyStaffIds).toContain(state.staff[0]!.id);
     expect(
       updateDutyRosterSlot(state, row.date, "duty", state.staff[0]!.id)
-    ).toContain("值班不能与CX航前");
+    ).toBeNull();
+    expect(getDutyRosterForDate(state, row.date)).toMatchObject({
+      cxPreflightStaffId: state.staff[0]!.id,
+      dutyStaffId: state.staff[0]!.id,
+    });
+  });
+
+  it("allows a manual CX preflight and duty overlap while automatic rows stay exclusive", () => {
+    const state = createOrdinarySchedulingState();
+    const person = state.staff[0]!;
+    person.cxPreflightQualified = true;
+    person.dutyQualified = true;
+    const date = "2026-08-03";
+
+    expect(
+      updateDutyRosterSlot(state, date, "cx-preflight", person.id)
+    ).toBeNull();
+    expect(updateDutyRosterSlot(state, date, "duty", person.id)).toBeNull();
+    expect(getDutyRosterForDate(state, date)).toMatchObject({
+      cxPreflightStaffId: person.id,
+      dutyStaffId: person.id,
+      adjusted: true,
+    });
+
+    const automaticState = createOrdinarySchedulingState();
+    automaticState.staff[0]!.cxPreflightQualified = true;
+    automaticState.staff[0]!.dutyQualified = true;
+    const automatic = getMonthlyDutyRoster(automaticState, date);
+    expect(
+      automatic.every((row) => row.dutyStaffId !== row.cxPreflightStaffId)
+    ).toBe(true);
   });
 
   it("limits duty to qualified staff and keeps monthly duty counts balanced", () => {

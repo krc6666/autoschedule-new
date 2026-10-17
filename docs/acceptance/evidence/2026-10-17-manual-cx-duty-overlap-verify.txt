@@ -1,0 +1,7 @@
+Command: npm.cmd run verify
+Result: exit code 0.
+Result: typecheck passed.
+Result: npm test passed; Test Files 146 passed (146); Tests 1450 passed (1450).
+Result: test:performance passed; Test Files 7 passed (7); Tests 19 passed (19).
+Result: production build passed; Vite built 305 modules.
+Note: build emitted the existing node:module browser-externalization notices for HiGHS dependencies.
