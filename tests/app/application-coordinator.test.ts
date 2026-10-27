@@ -8,7 +8,10 @@ import {
 } from "../helpers/application";
 import type { ApplicationPreferences } from "../../src/app/application-preferences";
 import { createDefaultState } from "../../src/defaults";
-import { replaceWeeklyFlightPlan } from "../../src/domain/flights/weekly-flight-plan";
+import {
+  isoWeekdayForDate,
+  replaceWeeklyFlightPlan,
+} from "../../src/domain/flights/weekly-flight-plan";
 import { buildMonthlyLatePriorityStatistics } from "../../src/domain/statistics/monthly-late-priority-statistics";
 import type { ScheduleResult } from "../../src/model";
 import { createScheduleSafetySession } from "../../src/domain/kernel/schedule-safety-session";
@@ -638,9 +641,14 @@ describe("application scheduling exclusivity", () => {
     const dialog = coordinator.view().dialog;
     if (dialog?.kind !== "schedule-preflight")
       throw new Error("missing preflight");
+    const selectedIds = [dialog.candidates[0]!.id];
+    await coordinator.handle({
+      type: "update-schedule-preflight-selection",
+      selectedIds,
+    });
     const generate = coordinator.handle({
       type: "confirm-schedule-preflight",
-      selectedIds: dialog.selectedIds,
+      selectedIds,
     });
     const toggle = coordinator.handle({
       type: "toggle-administrative-mode",
@@ -914,8 +922,9 @@ describe("next workday flight picker workflow", () => {
   )(
     "explains $code in plain language for $entry without adopting the failed draft",
     async ({ entry, error, code, reason }) => {
+      const state = stateWithCurrentSchedule(entry === "generate");
       const coordinator = createTestApplicationCoordinator(
-        createTestAutoscheduleStore(stateWithCurrentSchedule()),
+        createTestAutoscheduleStore(state),
         { preferences: nextWorkdayPreferences, confirm: () => true }
       );
       if (entry === "generate")
@@ -933,6 +942,8 @@ describe("next workday flight picker workflow", () => {
       const dialog = coordinator.view().dialog;
       if (!dialog || !("selectedIds" in dialog))
         throw new Error("missing preflight");
+      if (entry === "generate")
+        expect(dialog.selectedIds.length).toBeGreaterThan(0);
       await coordinator.handle({
         type:
           dialog.kind === "next-workday-flight-picker"
@@ -970,8 +981,9 @@ describe("next workday flight picker workflow", () => {
   it.each(["generate", "reschedule", "next"] as const)(
     "shows KE166 failure details and preserves the model for %s",
     async (entry) => {
+      const state = stateWithCurrentSchedule(entry === "generate");
       const coordinator = createTestApplicationCoordinator(
-        createTestAutoscheduleStore(stateWithCurrentSchedule()),
+        createTestAutoscheduleStore(state),
         { preferences: nextWorkdayPreferences, confirm: () => true }
       );
       const original = structuredClone(coordinator.model());
@@ -1003,6 +1015,8 @@ describe("next workday flight picker workflow", () => {
       const dialog = coordinator.view().dialog;
       if (!dialog || !("selectedIds" in dialog))
         throw new Error("missing preflight");
+      if (entry === "generate")
+        expect(dialog.selectedIds.length).toBeGreaterThan(0);
       if (dialog.kind === "next-workday-flight-picker")
         await coordinator.handle({
           type: "confirm-next-workday-flight-picker",
@@ -1034,13 +1048,22 @@ describe("next workday flight picker workflow", () => {
     loadScheduleDate: () => "2026-08-15",
   };
 
-  function stateWithCurrentSchedule() {
+  function stateWithCurrentSchedule(includeCurrentWeekdayPlan = false) {
     const state = createDefaultState();
     state.weeklyFlightPlans = replaceWeeklyFlightPlan(
       state.weeklyFlightPlans,
       1,
       [state.templates[1]!.flightNo]
     );
+    if (includeCurrentWeekdayPlan) {
+      const currentDate = nextWorkdayPreferences.loadScheduleDate();
+      if (currentDate)
+        state.weeklyFlightPlans = replaceWeeklyFlightPlan(
+          state.weeklyFlightPlans,
+          isoWeekdayForDate(currentDate),
+          [state.templates[0]!.flightNo]
+        );
+    }
     const flight = state.flights[0]!;
     const rule = state.positionRules.find(
       (item) => item.flightNo === flight.flightNo && item.category === "常规"

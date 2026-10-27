@@ -1,0 +1,4 @@
+Task: 2026-10-27-position-rule-flights-to-template
+
+Command: npm.cmd run test:performance
+Result: exit 0. Seven performance test files passed, 19 tests passed.

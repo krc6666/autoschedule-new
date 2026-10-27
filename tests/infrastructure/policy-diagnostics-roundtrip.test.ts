@@ -89,9 +89,11 @@ describe("configuration diagnostics after persistence", () => {
     const parsed = parseWorkbook(workbook, state.staff);
     const imported = createDefaultState();
     imported.flights = [];
-    expect(applyWorkbookImport(imported, parsed, "config").changedConfig).toBe(
-      true
-    );
+    expect(
+      applyWorkbookImport(imported, parsed, "config", {
+        replaceSharedTemplates: true,
+      }).changedConfig
+    ).toBe(true);
     const fill = imported.settings.mobileSupervisorFillRules[0]!;
     expect(
       diagnosePolicyConfiguration(

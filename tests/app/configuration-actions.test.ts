@@ -15,6 +15,7 @@ import {
   updateConfigurationField,
 } from "../../src/app/configuration-actions";
 import { flightNumbersForDate } from "../../src/domain/flights/weekly-flight-plan";
+import { activeFlightPositions } from "../../src/domain/flights/schedule-position-rules";
 import { buildFlightPlanReconciliation } from "../../src/domain/flights/flight-plan-reconciliation";
 import type { OnlineFlightQueryResult } from "../../src/infrastructure/flight-query";
 
@@ -101,6 +102,103 @@ describe("configuration actions", () => {
     );
     expect(state.activeScheduleDate).toBeNull();
     expect(state.schedulePolicyStale).toBe(false);
+  });
+
+  it("adds new template positions to both groups without sharing rule settings", () => {
+    const state = createDefaultState();
+    const template = state.templates[0]!;
+    const staffIdA = state.groups.A.staff[0]!.id;
+    const ruleA = {
+      ...state.positionRules[0]!,
+      id: "a-h1",
+      flightNo: template.flightNo,
+      name: "H1",
+      category: "分流" as const,
+      qualifiedStaffIds: [staffIdA],
+      earlyReleaseMinutes: 60,
+    };
+    const ruleB = {
+      ...state.groups.B.positionRules[0]!,
+      id: "b-h1",
+      flightNo: template.flightNo,
+      name: "H1",
+      category: "常规" as const,
+      qualifiedStaffIds: ["b-only"],
+    };
+    state.groups.A.positionRules = [ruleA];
+    state.groups.B.positionRules = [ruleB];
+    state.positionRules = state.groups.A.positionRules;
+    state.activeScheduleDate = "2026-08-17";
+    state.groups.A.activeScheduleDate = "2026-08-17";
+    state.groups.B.activeScheduleDate = "2026-08-17";
+
+    expect(
+      updateConfigurationField(
+        state,
+        "template",
+        template.id,
+        "positions",
+        "H1, H2"
+      )
+    ).toBe("updated");
+
+    expect(state.groups.A.positionRules).toHaveLength(2);
+    expect(state.groups.B.positionRules).toHaveLength(2);
+    expect(
+      state.groups.A.positionRules.find((rule) => rule.name === "H1")
+    ).toMatchObject({
+      category: "分流",
+      qualifiedStaffIds: [staffIdA],
+    });
+    expect(
+      state.groups.B.positionRules.find((rule) => rule.name === "H1")
+    ).toMatchObject({
+      category: "常规",
+      qualifiedStaffIds: ["b-only"],
+    });
+    expect(
+      state.groups.A.positionRules.find((rule) => rule.name === "H2")
+    ).toMatchObject({
+      flightNo: template.flightNo,
+      category: "常规",
+      qualifiedStaffIds: [],
+    });
+    expect(
+      state.groups.B.positionRules.find((rule) => rule.name === "H2")
+    ).toMatchObject({
+      flightNo: template.flightNo,
+      category: "常规",
+      qualifiedStaffIds: [],
+    });
+    const flight = { ...state.flights[0]!, flightNo: template.flightNo };
+    expect(
+      activeFlightPositions(
+        {
+          positionRules: state.groups.A.positionRules,
+          settings: state.groups.A.settings,
+        },
+        flight
+      )
+    ).toContain("H2");
+    expect(
+      activeFlightPositions(
+        {
+          positionRules: state.groups.B.positionRules,
+          settings: state.groups.B.settings,
+        },
+        flight
+      )
+    ).toContain("H2");
+    expect(state.activeScheduleDate).toBeNull();
+    expect(state.groups.B.activeScheduleDate).toBeNull();
+
+    updateConfigurationField(state, "template", template.id, "positions", "H1");
+    expect(state.groups.A.positionRules.map((rule) => rule.name)).toContain(
+      "H2"
+    );
+    expect(state.groups.B.positionRules.map((rule) => rule.name)).toContain(
+      "H2"
+    );
   });
 
   it("copies a complete position group and qualifications to another flight", () => {
@@ -204,19 +302,23 @@ describe("configuration actions", () => {
     expect(state.staff.at(-1)?.id).toBe("A2");
   });
 
-  it("updates only the active group's qualifications in shared position rules", () => {
+  it("updates qualifications only in the active group's position rules", () => {
     const state = createDefaultState();
     const rule = state.positionRules[0]!;
     const otherGroupId = "B-qualified";
     state.groups.B.staff = [
       { ...state.staff[0]!, id: otherGroupId, name: "B组资质人员" },
     ];
+    state.groups.B.positionRules[0]!.qualifiedStaffIds = [otherGroupId];
     rule.qualifiedStaffIds = [state.staff[0]!.id, otherGroupId];
 
     expect(saveQualified(state, rule.id, false, [state.staff[1]!.id])).toBe(
       true
     );
-    expect(rule.qualifiedStaffIds).toEqual([otherGroupId, state.staff[1]!.id]);
+    expect(rule.qualifiedStaffIds).toEqual([state.staff[1]!.id]);
+    expect(state.groups.B.positionRules[0]!.qualifiedStaffIds).toEqual([
+      otherGroupId,
+    ]);
   });
 
   it("applies a flight template and invalidates the active schedule", () => {
@@ -458,6 +560,10 @@ describe("configuration actions", () => {
         flightNo: template.flightNo,
       },
     ];
+    state.groups.B.settings.sameFlightStaffExclusions = structuredClone(
+      state.settings.sameFlightStaffExclusions
+    );
+    state.groups.B.positionRules[0]!.flightNo = template.flightNo;
 
     expect(
       updateConfigurationField(
@@ -471,6 +577,10 @@ describe("configuration actions", () => {
     expect(state.settings.sameFlightStaffExclusions[0]!.flightNo).toBe(
       "NEW937"
     );
+    expect(state.groups.B.settings.sameFlightStaffExclusions[0]!.flightNo).toBe(
+      "NEW937"
+    );
+    expect(state.groups.B.positionRules[0]!.flightNo).toBe("NEW937");
   });
 
   it("keeps same-flight exclusion people synchronized when a staff id is renamed", () => {

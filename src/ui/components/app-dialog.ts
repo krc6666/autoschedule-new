@@ -78,8 +78,7 @@ export class AppDialogElement extends LightDomElement {
     if (dialog?.kind === "duty-roster-import") return "值班备勤表导入预览";
     if (dialog?.kind === "late-priority-counts-import")
       return "末班重点岗位次数导入预览";
-    if (dialog?.kind === "workbook-import")
-      return dialog.changedConfig ? "配置导入预览" : "历史导入预览";
+    if (dialog?.kind === "workbook-import") return "工作簿导入预览";
     if (dialog?.kind === "legacy-schedule-import")
       return "旧版手工排班导入预览";
     if (dialog?.kind === "swap-analysis") return "调整原因分析";

@@ -1,0 +1,29 @@
+Task: 2026-10-26-group-specific-scheduling-config
+
+Command:
+npm.cmd exec vitest -- run tests/app/configuration-actions.test.ts tests/app/flight-rename-sync.test.ts tests/app/group-workspace-isolation.test.ts tests/app/policy-actions.test.ts tests/app/preflight-admin-mode.test.ts tests/app/workbook-actions.test.ts tests/app/workbook-import-scope.test.ts tests/domain/policy-configuration-diagnostics.test.ts tests/infrastructure/excel.test.ts tests/infrastructure/group-state-migration.test.ts tests/infrastructure/ordinary-priority-storage.test.ts tests/infrastructure/policy-diagnostics-roundtrip.test.ts tests/infrastructure/storage.test.ts tests/ui/app-dialog-view.test.ts
+
+Result:
+Test Files  14 passed (14)
+Tests       243 passed (243)
+Exit code   0
+
+The suite covers group switching and projection, group-local rule editing,
+localStorage v9 round trips, v1-v8 migration, current-group workbook import
+and export, explicit shared-template/weekly-plan import, binary XLSX preview
+and confirmation, and existing group-scoped records.
+
+Command:
+npm.cmd run test:performance
+
+Result:
+Test Files  7 passed (7)
+Tests       19 passed (19)
+Exit code   0
+
+Command:
+npm.cmd run build
+
+Result:
+TypeScript build and Vite production build completed with exit code 0.
+Vite printed the existing node:module externalization warning for HiGHS.

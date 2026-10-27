@@ -659,10 +659,19 @@ export class ScheduleController implements UiCommandController {
 
   private openSchedulePreflight(): void {
     const model = this.context.model();
-    const candidates = buildCurrentScheduleFlightCandidates(
+    let candidates = buildCurrentScheduleFlightCandidates(
       model.templates,
       model.flights
     );
+    if (model.assignments.length === 0) {
+      const plannedFlightNos = new Set(
+        flightNumbersForDate(model.weeklyFlightPlans, this.context.view().date)
+      );
+      candidates = candidates.map((candidate) => ({
+        ...candidate,
+        selectedByDefault: plannedFlightNos.has(candidate.flightNo),
+      }));
+    }
     if (!candidates.length)
       return this.context.toast("没有可选择的本地航班", "warning");
     this.context.updateView({

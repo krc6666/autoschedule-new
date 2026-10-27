@@ -23,6 +23,7 @@ export type UiCommand =
       date?: string;
     }
   | { type: "close-dialog" }
+  | { type: "set-workbook-import-shared-templates"; enabled: boolean }
   | { type: "apply-workbook-import" }
   | { type: "apply-legacy-schedule-import" }
   | { type: "update-legacy-schedule-import-date"; date: string }

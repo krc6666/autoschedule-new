@@ -4,6 +4,10 @@ import { describe, expect, it } from "vitest";
 
 import { createDefaultState } from "../../src/defaults";
 import { analyzeManualSwap } from "../../src/domain/reviews/manual-swap-analysis";
+import {
+  UI_COMMAND_EVENT,
+  type UiCommandEvent,
+} from "../../src/ui/events/ui-command";
 import { schedulingDecision } from "../../src/domain/rules/schedule-rule-contract";
 import "../../src/ui/components/app-dialog";
 import { mountElement } from "./lit-test-helpers";
@@ -116,15 +120,111 @@ describe("application dialog", () => {
       dialog: {
         kind: "workbook-import",
         mode: "config",
-        importedState: model,
+        imported: {
+          templates: model.templates,
+          weeklyFlightPlans: model.weeklyFlightPlans,
+          settings: model.settings,
+          positionRules: model.positionRules,
+          warnings: [],
+        },
         recognized: "规则配置",
         changedConfig: true,
+        sharedTemplatesAvailable: true,
+        replaceSharedTemplates: false,
         warnings: [],
       },
     });
 
     expect(element.textContent).toContain("结构化规则");
     expect(element.textContent).toContain(`${expectedCount} 条`);
+    expect(element.textContent).toContain("配置目标：A 组");
+    expect(element.textContent).toContain("导入配置");
+    expect(element.textContent).toContain("确认导入配置");
+    expect(element.textContent).toContain("当前组未归档的排班结果会清空");
+    expect(element.textContent).not.toContain("重新排班");
+    expect(element.textContent).toContain(
+      "岗位配置中的新航班会自动补入 A、B 共用模板"
+    );
+    expect(element.textContent).toContain(
+      "文件中的每周计划会导入，并同步到 A、B 两组"
+    );
+    expect(element.textContent).toContain("A、B 两组都会更新");
+    const commands: UiCommandEvent["detail"][] = [];
+    element.addEventListener(UI_COMMAND_EVENT, (event) =>
+      commands.push((event as UiCommandEvent).detail)
+    );
+    const checkbox = element.querySelector<HTMLInputElement>(
+      'input[type="checkbox"]'
+    )!;
+    checkbox.checked = true;
+    checkbox.dispatchEvent(new Event("change", { bubbles: true }));
+    expect(commands).toEqual([
+      { type: "set-workbook-import-shared-templates", enabled: true },
+    ]);
+  });
+
+  it("shows the seven effective weekly selections and unavailable flights in import preview", async () => {
+    const model = createDefaultState();
+    const plans = model.weeklyFlightPlans.map((entry, index) => ({
+      ...entry,
+      flightNos: [`WEEK${index + 1}`],
+    }));
+    const element = await mountElement<
+      HTMLElement & { updateComplete: Promise<unknown> }
+    >("autoschedule-app-dialog", {
+      model,
+      dialog: {
+        kind: "workbook-import",
+        mode: "config",
+        imported: {
+          weeklyFlightPlans: plans,
+          weeklyFlightPlanStatus: "valid",
+          warnings: [],
+        },
+        weeklyPlanPreview: {
+          plans,
+          unavailableFlightNos: ["MISSING100"],
+        },
+        recognized: "每周航班计划",
+        changedConfig: true,
+        sharedTemplatesAvailable: false,
+        replaceSharedTemplates: false,
+        warnings: [],
+      },
+    });
+
+    const text = element.textContent.replace(/\s+/g, " ").trim();
+    expect(text).toContain("星期一");
+    expect(text).toContain("WEEK1");
+    expect(text).toContain("星期日");
+    expect(text).toContain("因模板不存在而不会导入：MISSING100");
+    expect(text).toContain("文件中的每周计划会导入，并同步到 A、B 两组");
+  });
+
+  it("distinguishes an invalid weekly plan sheet from a missing sheet", async () => {
+    const element = await mountElement<
+      HTMLElement & { updateComplete: Promise<unknown> }
+    >("autoschedule-app-dialog", {
+      model: createDefaultState(),
+      dialog: {
+        kind: "workbook-import",
+        mode: "config",
+        imported: {
+          weeklyFlightPlanStatus: "invalid",
+          warnings: ["每周航班计划工作表不完整，现有计划保留"],
+        },
+        recognized: "规则配置",
+        changedConfig: true,
+        sharedTemplatesAvailable: false,
+        replaceSharedTemplates: false,
+        warnings: ["每周航班计划工作表不完整，现有计划保留"],
+      },
+    });
+
+    expect(element.textContent).toContain(
+      "每周航班计划工作表有问题，现有计划保留"
+    );
+    expect(element.textContent).not.toContain("文件未包含每周计划");
   });
 
   it("previews history merge counts without claiming that a history-only import clears the active schedule", async () => {
@@ -136,9 +236,11 @@ describe("application dialog", () => {
       dialog: {
         kind: "workbook-import",
         mode: "history",
-        importedState: model,
+        imported: { warnings: [] },
         recognized: "4 条历史负荷",
         changedConfig: false,
+        sharedTemplatesAvailable: false,
+        replaceSharedTemplates: false,
         historySummary: {
           total: 4,
           added: 2,
@@ -150,11 +252,12 @@ describe("application dialog", () => {
     });
 
     const text = element.textContent.replace(/\s+/g, " ").trim();
-    expect(text).toContain("历史导入预览");
+    expect(text).toContain("工作簿导入预览");
     expect(text).toContain(
       "共 4 条；新增 2 条；覆盖 1 条；无法匹配当前人员 1 条"
     );
     expect(text).toContain("当前尚未归档的排班结果保持不变");
+    expect(text).toContain("导入历史");
     expect(text).toContain("确认导入历史");
     expect(text).not.toContain("确认导入并重新排班");
   });

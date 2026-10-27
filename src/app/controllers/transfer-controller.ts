@@ -3,7 +3,10 @@ import { queryInternationalFlights } from "../../infrastructure/flight-query";
 import { exportShareHtml, exportSharePng } from "../../infrastructure/share";
 import type { UiCommand } from "../../ui/events/ui-command";
 import { prepareWorkbookImport } from "../workbook-import-controller";
-import { applyLegacyScheduleImport } from "../workbook-actions";
+import {
+  applyLegacyScheduleImport,
+  applyWorkbookImport,
+} from "../workbook-actions";
 import { downloadBlob } from "../../utils";
 import type {
   ApplicationContext,
@@ -56,6 +59,8 @@ export class TransferController implements UiCommandController {
         return true;
       case "apply-workbook-import":
         return this.applyWorkbookImport();
+      case "set-workbook-import-shared-templates":
+        return this.setWorkbookImportSharedTemplates(command.enabled);
       case "apply-legacy-schedule-import":
         return this.applyLegacyScheduleImport();
       case "update-legacy-schedule-import-date":
@@ -160,9 +165,12 @@ export class TransferController implements UiCommandController {
         dialog: {
           kind: "workbook-import",
           mode: mode === "duty-roster" ? "all" : mode,
-          importedState,
+          imported: prepared.imported,
           recognized: prepared.recognized,
           changedConfig: prepared.changedConfig,
+          sharedTemplatesAvailable: prepared.sharedTemplatesAvailable,
+          replaceSharedTemplates: false,
+          weeklyPlanPreview: prepared.weeklyPlanPreview,
           historySummary: prepared.historySummary,
           warnings: prepared.warnings,
         },
@@ -201,22 +209,56 @@ export class TransferController implements UiCommandController {
   private applyWorkbookImport(): boolean {
     const dialog = this.context.view().dialog;
     if (dialog?.kind !== "workbook-import") return false;
-    if (!dialog.recognized) {
+    const applied = this.context.store
+      .getState()
+      .records.applyWorkbookImport(dialog.imported, dialog.mode, {
+        replaceSharedTemplates: dialog.replaceSharedTemplates,
+      });
+    if (applied.errors?.length) {
+      this.context.toast(applied.errors.join("；"), "warning");
+      return true;
+    }
+    const hasHistory = (applied.historySummary?.total ?? 0) > 0;
+    const hasSharedChange =
+      dialog.replaceSharedTemplates && dialog.sharedTemplatesAvailable;
+    if (!applied.changedConfig && !hasHistory && !hasSharedChange) {
       this.context.toast(
-        dialog.warnings[0] ?? "文件中没有有效数据，未导入任何内容",
+        dialog.warnings[0] ?? "文件中没有选择可导入内容，现有数据未改变",
         "warning"
       );
       return true;
     }
-    this.context.store.getState().replaceModel(dialog.importedState);
     this.context.updateView({ dialog: null });
     this.context.commit(
-      `已导入 ${dialog.recognized}；${
-        dialog.changedConfig === false ? "历史已归档" : "请重新排班"
+      `已导入 ${applied.recognized}；${
+        applied.changedConfig
+          ? "当前组班表已清空，请到排班页重新排班"
+          : "历史已归档"
       }`
     );
     if (dialog.warnings.length)
       this.context.toast(dialog.warnings.join("；"), "warning");
+    return true;
+  }
+
+  private setWorkbookImportSharedTemplates(enabled: boolean): boolean {
+    const dialog = this.context.view().dialog;
+    if (dialog?.kind !== "workbook-import") return false;
+    if (!dialog.sharedTemplatesAvailable) return true;
+    const previewState = structuredClone(this.context.model());
+    const preview = applyWorkbookImport(
+      previewState,
+      dialog.imported,
+      dialog.mode,
+      { replaceSharedTemplates: enabled }
+    );
+    this.context.updateView({
+      dialog: {
+        ...dialog,
+        replaceSharedTemplates: enabled,
+        weeklyPlanPreview: preview.weeklyPlanPreview,
+      },
+    });
     return true;
   }
 

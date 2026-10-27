@@ -43,10 +43,15 @@ import {
 import { airlineCode } from "../domain/rules/airline-rotation";
 import { scheduleRuleFingerprint } from "../domain/rules/schedule-rule-fingerprint";
 import { normalizeTime } from "../domain/shared/time";
+import { clearActiveSchedule } from "../domain/kernel/schedule-lifecycle";
+import {
+  addMissingRuleFlightTemplates,
+  addMissingTemplatePositionRules,
+} from "../domain/flights/template-position-rules";
 
 type PersistedSettings = Partial<ScheduleSettings>;
 type PersistedAppState = Record<string, unknown> & {
-  version: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+  version: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11;
 };
 
 const LATE_PRIORITY_KINDS = new Set([
@@ -141,7 +146,10 @@ function isPersistedState(value: unknown): value is PersistedAppState {
     value.version === 5 ||
     value.version === 6 ||
     value.version === 7 ||
-    value.version === 8
+    value.version === 8 ||
+    value.version === 9 ||
+    value.version === 10 ||
+    value.version === 11
   );
 }
 
@@ -154,18 +162,14 @@ function restoredCollection<T>(
 }
 
 function migrateSettings(
-  parsed: PersistedAppState,
-  fallback: AppState,
+  value: unknown,
+  version: number,
+  fallback: ScheduleSettings,
   positionRules: readonly PositionRule[]
 ): ScheduleSettings {
-  const persistedSettings = isRecord(parsed.settings)
-    ? (parsed.settings as PersistedSettings)
-    : {};
-  const migrated = { ...fallback.settings, ...persistedSettings };
-  if (
-    parsed.version < 7 &&
-    Array.isArray(migrated.crossFlightPriorityPolicies)
-  ) {
+  const persistedSettings = isRecord(value) ? (value as PersistedSettings) : {};
+  const migrated = { ...fallback, ...persistedSettings };
+  if (version < 7 && Array.isArray(migrated.crossFlightPriorityPolicies)) {
     migrated.crossFlightPriorityPolicies =
       migrated.crossFlightPriorityPolicies.map((item) => {
         const record: Record<string, unknown> = isRecord(item) ? item : {};
@@ -181,7 +185,7 @@ function migrateSettings(
   Reflect.deleteProperty(migrated, "rollingLoadMode");
   Reflect.deleteProperty(migrated, "lateShiftRecoveryMode");
   Reflect.deleteProperty(migrated, "nextDayLateMaxFatigue");
-  if (parsed.version < 3 && Array.isArray(migrated.dutyPositionPriorities)) {
+  if (version < 3 && Array.isArray(migrated.dutyPositionPriorities)) {
     migrated.dutyPositionPriorities = migrated.dutyPositionPriorities.map(
       (item) =>
         String(item.flightNo ?? "")
@@ -192,11 +196,11 @@ function migrateSettings(
           : item
     );
   }
-  if (parsed.version < 4) {
+  if (version < 4) {
     migrated.latePriorityFlightNumbers =
       latePriorityFlightScopeCandidates(positionRules);
   }
-  if (parsed.version < 8) {
+  if (version < 8) {
     migrated.ordinaryPriorityPositions = normalizeOrdinaryPriorityPositions(
       positionRules.filter(isPriorityRotationPosition).map((rule) => ({
         airlineCode: airlineCode(rule.flightNo),
@@ -204,7 +208,7 @@ function migrateSettings(
       }))
     );
   }
-  return normalizeScheduleSettings(migrated, fallback.settings);
+  return normalizeScheduleSettings(migrated, fallback);
 }
 
 const STAFF_STATUSES = new Set<Staff["status"]>(["正常", "病假", "休假"]);
@@ -687,10 +691,15 @@ function restoreDutyRosterOverrides(value: unknown[]): DutyRosterOverride[] {
   });
 }
 
-function emptyGroupWorkspace(): GroupWorkspace {
+function emptyGroupWorkspace(
+  positionRules: readonly PositionRule[],
+  settings: ScheduleSettings
+): GroupWorkspace {
   return {
     flights: [],
     staff: [],
+    positionRules: structuredClone([...positionRules]),
+    settings: structuredClone(settings),
     history: [],
     dutyRosterOverrides: [],
     latePriorityFrequencyAdjustments: [],
@@ -705,6 +714,8 @@ function groupWorkspaceFromState(state: AppState): GroupWorkspace {
   return {
     flights: structuredClone(state.flights),
     staff: structuredClone(state.staff),
+    positionRules: structuredClone(state.positionRules),
+    settings: structuredClone(state.settings),
     history: structuredClone(state.history),
     dutyRosterOverrides: structuredClone(state.dutyRosterOverrides),
     latePriorityFrequencyAdjustments: structuredClone(
@@ -724,8 +735,6 @@ function sharedScheduleDataFromState(state: AppState): SharedScheduleData {
   return {
     templates: structuredClone(state.templates),
     weeklyFlightPlans: structuredClone(state.weeklyFlightPlans),
-    positionRules: structuredClone(state.positionRules),
-    settings: structuredClone(state.settings),
   };
 }
 
@@ -733,7 +742,8 @@ function restoreGroupWorkspace(
   value: unknown,
   fallback: GroupWorkspace,
   base: AppState,
-  issues: StateRestorationIssue[]
+  issues: StateRestorationIssue[],
+  persistedVersion: number
 ): GroupWorkspace {
   if (!isRecord(value)) return structuredClone(fallback);
   const staff = restoredCollection(value.staff, fallback.staff, restoreStaff);
@@ -742,7 +752,19 @@ function restoreGroupWorkspace(
     fallback.flights,
     restoreFlights
   );
-  const positionRules = base.positionRules;
+  const positionRules =
+    persistedVersion >= 9 && Array.isArray(value.positionRules)
+      ? restorePositionRules(value.positionRules, false)
+      : structuredClone(fallback.positionRules);
+  const settings =
+    persistedVersion >= 9 && isRecord(value.settings)
+      ? migrateSettings(
+          value.settings,
+          persistedVersion,
+          fallback.settings,
+          positionRules
+        )
+      : structuredClone(fallback.settings);
   const history = migrateLegacyHistoryMetadata(
     restoredCollection(value.history, fallback.history, restoreHistory),
     positionRules
@@ -751,6 +773,8 @@ function restoreGroupWorkspace(
     ...base,
     flights,
     staff,
+    positionRules,
+    settings,
     history,
     assignments: [],
   };
@@ -762,9 +786,33 @@ function restoreGroupWorkspace(
     rawAssignments,
     issues
   );
+  const activeScheduleDate =
+    value.activeScheduleDate === null ||
+    typeof value.activeScheduleDate === "string"
+      ? value.activeScheduleDate
+      : fallback.activeScheduleDate;
+  let schedulePolicyStale =
+    typeof value.schedulePolicyStale === "boolean"
+      ? value.schedulePolicyStale
+      : fallback.schedulePolicyStale;
+  let savedRuleFingerprint =
+    typeof value.scheduleRuleFingerprint === "string"
+      ? value.scheduleRuleFingerprint
+      : undefined;
+  if (assignments.length) {
+    const currentFingerprint = scheduleRuleFingerprint(workspaceState);
+    schedulePolicyStale =
+      schedulePolicyStale ||
+      !savedRuleFingerprint ||
+      savedRuleFingerprint !== currentFingerprint;
+  } else {
+    savedRuleFingerprint = undefined;
+  }
   return {
     flights,
     staff,
+    positionRules,
+    settings,
     history,
     dutyRosterOverrides: restoredCollection(
       value.dutyRosterOverrides,
@@ -779,19 +827,9 @@ function restoreGroupWorkspace(
         value.ordinaryPriorityFrequencyAdjustments
       ),
     assignments,
-    activeScheduleDate:
-      value.activeScheduleDate === null ||
-      typeof value.activeScheduleDate === "string"
-        ? value.activeScheduleDate
-        : fallback.activeScheduleDate,
-    schedulePolicyStale:
-      typeof value.schedulePolicyStale === "boolean"
-        ? value.schedulePolicyStale
-        : fallback.schedulePolicyStale,
-    scheduleRuleFingerprint:
-      typeof value.scheduleRuleFingerprint === "string"
-        ? value.scheduleRuleFingerprint
-        : undefined,
+    activeScheduleDate,
+    schedulePolicyStale,
+    scheduleRuleFingerprint: savedRuleFingerprint,
   };
 }
 
@@ -803,6 +841,8 @@ function projectActiveGroup(next: AppState): void {
   }
   next.flights = active.flights;
   next.staff = active.staff;
+  next.positionRules = active.positionRules;
+  next.settings = active.settings;
   next.history = active.history;
   next.dutyRosterOverrides = active.dutyRosterOverrides;
   next.latePriorityFrequencyAdjustments =
@@ -838,7 +878,7 @@ export function restorePersistedState(
     positionRules
   );
   const next: AppState = {
-    version: 8,
+    version: 11,
     shared: structuredClone(fallback.shared),
     groups: structuredClone(fallback.groups),
     activeGroupId: "A",
@@ -885,7 +925,12 @@ export function restorePersistedState(
       typeof value.scheduleRuleFingerprint === "string"
         ? value.scheduleRuleFingerprint
         : undefined,
-    settings: migrateSettings(value, fallback, positionRules),
+    settings: migrateSettings(
+      value.settings,
+      value.version,
+      fallback.settings,
+      positionRules
+    ),
     updatedAt:
       typeof value.updatedAt === "string"
         ? value.updatedAt
@@ -933,20 +978,26 @@ export function restorePersistedState(
   next.shared = sharedScheduleDataFromState(next);
   if (value.version >= 6 && isRecord(value.groups)) {
     const persistedActiveGroup = value.activeGroupId === "B" ? "B" : "A";
+    const legacyWorkspace = emptyGroupWorkspace(
+      next.positionRules,
+      next.settings
+    );
     const groupA =
       persistedActiveGroup === "A"
         ? groupWorkspaceFromState(next)
         : restoreGroupWorkspace(
             value.groups.A,
-            groupWorkspaceFromState(next),
+            value.version >= 9 ? fallback.groups.A : legacyWorkspace,
             next,
-            issues
+            issues,
+            value.version
           );
     const groupB = restoreGroupWorkspace(
       value.groups.B,
-      emptyGroupWorkspace(),
+      value.version >= 9 ? fallback.groups.B : legacyWorkspace,
       next,
-      issues
+      issues,
+      value.version
     );
     next.groups = { A: groupA, B: groupB };
     next.activeGroupId = persistedActiveGroup;
@@ -954,9 +1005,53 @@ export function restorePersistedState(
   } else {
     next.groups = {
       A: groupWorkspaceFromState(next),
-      B: emptyGroupWorkspace(),
+      B: emptyGroupWorkspace(next.positionRules, next.settings),
     };
     next.activeGroupId = "A";
+  }
+  if (value.version < 10) {
+    let addedPositionRules = false;
+    for (const groupId of ["A", "B"] as const) {
+      const group = next.groups[groupId];
+      const result = addMissingTemplatePositionRules(
+        group.positionRules,
+        next.templates
+      );
+      if (!result.added) continue;
+      group.positionRules = result.rules;
+      clearActiveSchedule(group);
+      addedPositionRules = true;
+    }
+    if (addedPositionRules) projectActiveGroup(next);
+  }
+  if (value.version < 11) {
+    const allPositionRules = [
+      ...next.groups.A.positionRules,
+      ...next.groups.B.positionRules,
+    ];
+    const result = addMissingRuleFlightTemplates(
+      next.templates,
+      allPositionRules,
+      allPositionRules,
+      [...next.flights, ...next.groups.A.flights, ...next.groups.B.flights]
+    );
+    if (result.added.length) {
+      next.templates = result.templates;
+      next.shared.templates = result.templates;
+      let addedPositionRules = false;
+      for (const groupId of ["A", "B"] as const) {
+        const group = next.groups[groupId];
+        const groupResult = addMissingTemplatePositionRules(
+          group.positionRules,
+          result.added
+        );
+        if (!groupResult.added) continue;
+        group.positionRules = orderPositionRules(groupResult.rules);
+        clearActiveSchedule(group);
+        addedPositionRules = true;
+      }
+      if (addedPositionRules) projectActiveGroup(next);
+    }
   }
   return next;
 }

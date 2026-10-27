@@ -1,0 +1,8 @@
+Task: 2026-10-27-position-rule-flights-to-template
+
+Command: npm.cmd run typecheck
+Result: exit 0.
+
+Command: npm.cmd run build
+Result: exit 0. Vite emitted the existing node:module browser externalization
+warning from the Highs packages; the production bundle completed successfully.

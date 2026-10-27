@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-10-17-weekly-plan-generate-default",
+  "title": "无班表时生成排班按当天每周航班计划预选",
+  "startedFrom": "6f77c36d9d9ba79d21b8c0edbd93f989ad126645",
+  "expectation": {
+    "example": "目标工作日期为周六；当前组保存的 flights 仍是旧航班 CX937、CX938，但 assignments 为空；周六每周航班计划勾选 CX937、KE166。",
+    "expected": "点击生成排班后候选显示现有航班信息，默认只勾选周六计划且仍匹配模板的航班；空星期默认不选。允许用户临时增减，确认后的排班计算只使用最后所选航班。",
+    "unchanged": "已有 assignments 时生成排班、重新排班和归档后天的默认选择规则保持原样；模板以外独立当前航班仍可选择；候选的现有时段、岗位、人数和备注保留；取消或失败不改模型。",
+    "fallback": "无有效模板候选时保持原警告；每周计划为空、无效或引用已删除模板时默认不选，不退回旧航班列表；用户可手动选其他本地候选。"
+  },
+  "testedVersion": "",
+  "checks": {
+    "reproduction": {
+      "status": "unverified",
+      "reason": "",
+      "evidence": []
+    },
+    "normalPath": {
+      "status": "unverified",
+      "reason": "",
+      "evidence": []
+    },
+    "alternatePath": {
+      "status": "unverified",
+      "reason": "",
+      "evidence": []
+    },
+    "postProcessing": {
+      "status": "unverified",
+      "reason": "",
+      "evidence": []
+    },
+    "finalGuard": {
+      "status": "unverified",
+      "reason": "",
+      "evidence": []
+    },
+    "unchanged": {
+      "status": "unverified",
+      "reason": "",
+      "evidence": []
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "",
+      "evidence": []
+    }
+  },
+  "answers": {
+    "originalFailure": "",
+    "laterChanges": "",
+    "finalArtifact": ""
+  },
+  "review": {
+    "missedScope": "",
+    "rootCause": "",
+    "earlyDetection": ""
+  }
+}

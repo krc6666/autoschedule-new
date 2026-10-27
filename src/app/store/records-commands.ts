@@ -6,6 +6,7 @@ import {
 import {
   applyDutyRosterImport,
   applyWorkbookImport,
+  type WorkbookImportOptions,
 } from "../workbook-actions";
 import {
   clearDutyRosterOverride,
@@ -80,8 +81,10 @@ export function createRecordsCommands(command: StateCommand) {
       command((state) => applyDutyRosterImport(state, preview)),
     applyWorkbookImport: (
       imported: WorkbookImport,
-      mode: Exclude<WorkbookImportMode, "duty-roster" | "late-priority-counts">
-    ) => command((state) => applyWorkbookImport(state, imported, mode)),
+      mode: Exclude<WorkbookImportMode, "duty-roster" | "late-priority-counts">,
+      options?: WorkbookImportOptions
+    ) =>
+      command((state) => applyWorkbookImport(state, imported, mode, options)),
   };
 }
 

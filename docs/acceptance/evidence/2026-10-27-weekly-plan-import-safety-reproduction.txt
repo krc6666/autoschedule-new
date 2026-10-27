@@ -1,0 +1,11 @@
+Weekly plan import safety reproduction
+Date: 2026-10-27
+
+Before implementation, the focused Vitest run showed the malformed-sheet regressions:
+- Four parser cases (missing weekday, duplicate weekday, weekday 8, and unrecognized headers) expected weeklyFlightPlans to be undefined, but received a synthesized seven-day plan.
+- The import preview tests found no day-by-day effective plan and no unavailable-flight warning.
+- The application preview had no weeklyPlanPreview result to compare with the confirmation path.
+
+The first test draft also placed one assertion in the wrong scenario; that test-only mistake was corrected before implementation. The final focused command and passing output are recorded in 2026-10-27-weekly-plan-import-safety-focused.txt.
+
+Follow-up red tests found two more confusing outcomes: the warning did not identify the bad row or missing weekday, and the weekly sheet was also mistaken for an ordinary flight-plan sheet, producing an unrelated empty-flight warning. The final regression asserts precise diagnostics and absence of that false warning.

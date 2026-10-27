@@ -1,0 +1,110 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-10-27-import-flow-usability",
+  "title": "导入配置流程与下一步指引核对",
+  "startedFrom": "6f77c36d9d9ba79d21b8c0edbd93f989ad126645",
+  "expectation": {
+    "example": "用户从导入配置模板或导入数据选择含岗位配置、每周航班计划的工作簿；当前组已有未归档班表，确认前先阅读预览。",
+    "expected": "周计划入口指向实际所在的航班页；导入预览把模式显示为中文、按钮准确表达导入配置或历史；周计划与航班模板页面标明 A、B 共用；预览仍明确提示当前组未归档班表会被清空，成功后明确下一步去排班页。",
+    "unchanged": "确认导入仍按现有合同更新当前组岗位与规则、同步共享周计划，并清空当前组未归档班表；取消不写入；历史导入仍不清空班表。",
+    "fallback": "若导入内容无效或用户取消，保留原配置与班表；本次仅调整文案和文档指引，不改变应用失败回退逻辑。"
+  },
+  "testedVersion": "ab30bbc54e751c01712108fad410f9580add4bc5d4069c158004dfbac52a9b26",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "改前先加入用户流程断言，旧界面先在 4 项 UI 测试中失败；随后协调器回归又复现成功提示没有说明班表清空与下一步页面。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-27-import-flow-usability-reproduction.txt",
+          "summary": "修改前 UI 与协调器回归结果摘要：旧模式/按钮/共享范围文案和成功提示不明确。",
+          "sha256": "b3b2f40aead0cfbb72dbfd971c46abb3850f1d1079dc674dd89940bbd3de9075"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "配置/历史导入、成功提示及模板/周计划页面文案定向测试 22 项通过；最终类型检查和构建通过。完整功能与性能套件此前通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-27-import-flow-usability-focused.txt",
+          "summary": "最终 4 个 UI/协调器测试文件、22 项通过。",
+          "sha256": "017efbb7b7d85b9079748a7334f5d6758ea1e122bf531d58bb8da68f21ebfa1d"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-27-import-flow-usability-typecheck.txt",
+          "summary": "最终工作区类型检查退出 0。",
+          "sha256": "4b3f7cf1ed06cba39ee3b0608990fffcf42e1ff315949a5353a62ce478a2683c"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-27-import-flow-usability-build.txt",
+          "summary": "最终工作区生产构建退出 0。",
+          "sha256": "91367357cba2a11251d346124712938a76a47b71ae4569a8badde789da1dfdde"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-27-import-flow-usability-verify.txt",
+          "summary": "完整验证日志：148 个功能测试文件、1487 项通过，19 项性能测试通过，类型检查和构建完成。",
+          "sha256": "8cede2526ddc624d773dd9f8143fcd30130495f6ea2645aedd9239424a2ba311"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "历史导入仍明确显示只合并历史且保留未归档班表；配置与历史组合入口显示准确动作；成功回执指出清空范围和排班页；A/B 共用范围在编辑页可见。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-27-import-flow-usability-focused.txt",
+          "summary": "最终 22 项定向回归覆盖配置/历史导入、成功回执和共享范围标题。",
+          "sha256": "017efbb7b7d85b9079748a7334f5d6758ea1e122bf531d58bb8da68f21ebfa1d"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "not_applicable",
+      "reason": "本次只改导入界面文案和 README 入口指引，没有改动 assignments 或排班后置流程。",
+      "evidence": []
+    },
+    "finalGuard": {
+      "status": "not_applicable",
+      "reason": "本次没有修改硬约束或最终班表检查逻辑。",
+      "evidence": []
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "全量功能、性能、类型检查和生产构建均通过；当前组清班、历史保留及共享计划行为的既有回归继续通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-27-import-flow-usability-verify.txt",
+          "summary": "完整验证退出 0：功能 1487 项、性能 19 项、类型检查与构建通过。",
+          "sha256": "8cede2526ddc624d773dd9f8143fcd30130495f6ea2645aedd9239424a2ba311"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "自动 UI/协调器测试、类型检查、生产构建和完整测试通过；真实页面仍需 owner 刷新后核对入口、导入预览、成功回执及 A/B 共用标记，自动化证据不能代替现场页面验收。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-27-import-flow-usability-focused.txt",
+          "summary": "相关页面与协调器测试 22 项通过。",
+          "sha256": "017efbb7b7d85b9079748a7334f5d6758ea1e122bf531d58bb8da68f21ebfa1d"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-27-import-flow-usability-build.txt",
+          "summary": "最新工作区生产构建退出 0。",
+          "sha256": "91367357cba2a11251d346124712938a76a47b71ae4569a8badde789da1dfdde"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "文档与页面组成核对发现周计划入口写错；改前 UI 失败表明预览显示 config/history 内部值、配置按钮称将重新排班、两处共享数据页未标范围；协调器回归另发现成功提示没说班表已清空及去哪里重新排班。",
+    "laterChanges": "导入后共享周计划仍由原应用流程写入，模板开关、当前组岗位规则和历史导入边界未改；当前定向回归、类型检查和构建通过，完整 verify 也通过。真实页面仍待 owner 操作。",
+    "finalArtifact": "自动证据为最终 22 项定向回归、类型检查、生产构建，以及完整 verify 的 1487 项功能和 19 项性能测试；真实页面尚未由 owner 刷新核对，故本项保持未验收。"
+  },
+  "review": {
+    "missedScope": "第一轮漏查成功后的提示和导航下一步；继续走完导入收尾后才发现提示没说班表已清空或排班页位置。真实页面仍未取得现场证据。",
+    "rootCause": "页面拆分后 README 未同步；导入弹窗直接展示内部枚举，按钮与控制器实际动作不一致；成功回执只写重新排班，没有说明清空范围和页面位置；共享数据所有权未显示在编辑页标题。",
+    "earlyDetection": "每次改动用户工作流时，按实际导航走完入口、预览、确认、成功回执和下一步；对照组件装配、README、按钮/提交最终动作及数据归属，并为关键可见反馈加页面或协调器断言。"
+  }
+}

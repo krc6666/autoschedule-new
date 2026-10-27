@@ -20,6 +20,7 @@ import {
   removeTeamLeaderGapFillPositionReference,
   replaceTeamLeaderGapFillPositionReference,
 } from "../domain/coverage/team-leader-gap-fill-protection";
+import { synchronizeTemplatePositionRules } from "./template-position-rule-sync";
 
 export type ConfigurationValue = string | number | boolean;
 
@@ -64,46 +65,9 @@ function renameFlightConfigurationReferences(
     previous,
     next
   );
-  state.positionRules.forEach((rule) => {
-    rule.flightNo = rename(rule.flightNo);
-  });
-  state.positionRules = orderPositionRules(state.positionRules);
-  state.settings.latePriorityFlightNumbers =
-    state.settings.latePriorityFlightNumbers.map(rename);
-  state.settings.positionTransitionPolicies.forEach((policy) => {
-    policy.sourceFlightNo = rename(policy.sourceFlightNo);
-    policy.targetFlightNo = rename(policy.targetFlightNo);
-  });
-  state.settings.dutyPositionPriorities.forEach((policy) => {
-    policy.flightNo = rename(policy.flightNo);
-  });
-  state.settings.nextWorkdayRecoveryTargets.forEach((policy) => {
-    policy.flightNo = rename(policy.flightNo);
-  });
-  state.settings.lateShiftRecoveryPositionRules.forEach((policy) => {
-    policy.flightNo = rename(policy.flightNo);
-  });
-  state.settings.mobileSupervisorCoverageRules.forEach((policy) => {
-    policy.flightNo = rename(policy.flightNo);
-  });
-  state.settings.mobileSupervisorFillRules.forEach((policy) => {
-    policy.sourceFlightNo = rename(policy.sourceFlightNo);
-    policy.targetFlightNo = rename(policy.targetFlightNo);
-  });
-  state.settings.crossWorkdayQualificationReservations.forEach((policy) => {
-    policy.flightNo = rename(policy.flightNo);
-  });
-  state.settings.crossFlightPriorityPolicies.forEach((policy) => {
-    policy.flightNo = rename(policy.flightNo);
-  });
-  state.settings.sameFlightStaffExclusions.forEach((policy) => {
-    policy.flightNo = rename(policy.flightNo);
-  });
-  state.settings.teamLeaderGapFillPositionPolicies =
-    state.settings.teamLeaderGapFillPositionPolicies.map((policy) => ({
-      ...policy,
-      flightNo: rename(policy.flightNo),
-    }));
+  for (const group of Object.values(state.groups))
+    renameGroupFlightReferences(group.positionRules, group.settings, rename);
+  renameGroupFlightReferences(state.positionRules, state.settings, rename);
   for (const workspace of [
     state,
     ...Object.entries(state.groups)
@@ -126,6 +90,54 @@ function renameFlightConfigurationReferences(
     });
     if (affected) clearSchedule(workspace);
   }
+}
+
+function renameGroupFlightReferences(
+  positionRules: AppState["positionRules"],
+  settings: AppState["settings"],
+  rename: (flightNo: string) => string
+): void {
+  positionRules.forEach((rule) => {
+    rule.flightNo = rename(rule.flightNo);
+  });
+  const ordered = orderPositionRules(positionRules);
+  positionRules.splice(0, positionRules.length, ...ordered);
+  settings.latePriorityFlightNumbers =
+    settings.latePriorityFlightNumbers.map(rename);
+  settings.positionTransitionPolicies.forEach((policy) => {
+    policy.sourceFlightNo = rename(policy.sourceFlightNo);
+    policy.targetFlightNo = rename(policy.targetFlightNo);
+  });
+  settings.dutyPositionPriorities.forEach((policy) => {
+    policy.flightNo = rename(policy.flightNo);
+  });
+  settings.nextWorkdayRecoveryTargets.forEach((policy) => {
+    policy.flightNo = rename(policy.flightNo);
+  });
+  settings.lateShiftRecoveryPositionRules.forEach((policy) => {
+    policy.flightNo = rename(policy.flightNo);
+  });
+  settings.mobileSupervisorCoverageRules.forEach((policy) => {
+    policy.flightNo = rename(policy.flightNo);
+  });
+  settings.mobileSupervisorFillRules.forEach((policy) => {
+    policy.sourceFlightNo = rename(policy.sourceFlightNo);
+    policy.targetFlightNo = rename(policy.targetFlightNo);
+  });
+  settings.crossWorkdayQualificationReservations.forEach((policy) => {
+    policy.flightNo = rename(policy.flightNo);
+  });
+  settings.crossFlightPriorityPolicies.forEach((policy) => {
+    policy.flightNo = rename(policy.flightNo);
+  });
+  settings.sameFlightStaffExclusions.forEach((policy) => {
+    policy.flightNo = rename(policy.flightNo);
+  });
+  settings.teamLeaderGapFillPositionPolicies =
+    settings.teamLeaderGapFillPositionPolicies.map((policy) => ({
+      ...policy,
+      flightNo: rename(policy.flightNo),
+    }));
 }
 
 export function renameCurrentFlightToTemplate(
@@ -584,20 +596,11 @@ export function saveQualified(
 ): boolean {
   const rule = state.positionRules.find((item) => item.id === id);
   if (!rule) return false;
-  const currentStaffIds = new Set(state.staff.map((person) => person.id));
-  const otherGroupStaffIds = new Set(
-    Object.entries(state.groups)
-      .filter(([groupId]) => groupId !== state.activeGroupId)
-      .flatMap(([, group]) => group.staff.map((person) => person.id))
-  );
   rule.manual = manual;
-  rule.qualifiedStaffIds = [
-    ...rule.qualifiedStaffIds.filter(
-      (staffId) =>
-        !currentStaffIds.has(staffId) && otherGroupStaffIds.has(staffId)
-    ),
-    ...staffIds.filter((staffId) => currentStaffIds.has(staffId)),
-  ];
+  const currentStaffIds = new Set(state.staff.map((person) => person.id));
+  rule.qualifiedStaffIds = staffIds.filter((staffId) =>
+    currentStaffIds.has(staffId)
+  );
   clearSchedule(state);
   return true;
 }
@@ -709,15 +712,18 @@ export function updateConfigurationField(
       )
         return "duplicate";
     }
-    if (field === "positions") template.positions = splitList(value);
-    else
+    if (field === "positions") {
+      template.positions = splitList(value);
+      synchronizeTemplatePositionRules(state, [template]);
+    } else {
       (template as unknown as Record<string, unknown>)[field] =
         typeof value === "string" && field === "flightNo"
           ? normalizeWeeklyFlightNo(value)
           : value;
-    if (field === "flightNo" && typeof value === "string") {
-      renameFlightConfigurationReferences(state, previousFlightNo, value);
-      clearSchedule(state);
+      if (field === "flightNo" && typeof value === "string") {
+        renameFlightConfigurationReferences(state, previousFlightNo, value);
+        clearSchedule(state);
+      }
     }
     return "updated";
   }

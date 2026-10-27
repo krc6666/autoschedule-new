@@ -415,18 +415,9 @@ function updateCrossFlightPriorityPolicy(
         );
       if (field === "staffIds") {
         const currentStaffIds = new Set(state.staff.map((person) => person.id));
-        const otherGroupStaffIds = new Set(
-          Object.entries(state.groups)
-            .filter(([groupId]) => groupId !== state.activeGroupId)
-            .flatMap(([, group]) => group.staff.map((person) => person.id))
+        const staffIds = splitList(value).filter((staffId) =>
+          currentStaffIds.has(staffId)
         );
-        const staffIds = [
-          ...policy.staffIds.filter(
-            (staffId) =>
-              !currentStaffIds.has(staffId) && otherGroupStaffIds.has(staffId)
-          ),
-          ...splitList(value).filter((staffId) => currentStaffIds.has(staffId)),
-        ];
         if (policy.staffIds.join("\u0000") === staffIds.join("\u0000"))
           return "unchanged";
         policy.staffIds = staffIds;

@@ -54,6 +54,7 @@ describe("configuration page", () => {
     expect(text).toContain("岗位规则");
     expect(text).toContain("排班约束");
     expect(text).toContain("航班计划模板");
+    expect(text).toContain("A、B 共用");
     expect(text).not.toContain("每周航班计划");
     expect(element.querySelectorAll("[data-weekday]")).toHaveLength(0);
     expect(text).not.toContain("排班规则");

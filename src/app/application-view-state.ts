@@ -5,11 +5,11 @@ import type {
 import type { ScheduleProgressOutcome } from "../ui/projections/schedule-progress-tasks";
 import type { FlightPlanReconciliation } from "../domain/flights/flight-plan-reconciliation";
 import type { DutyRosterImportPreview } from "../infrastructure/duty-roster-excel";
+import type { WorkbookImport } from "../infrastructure/excel";
 import type { LegacyScheduleImportPreview } from "../infrastructure/legacy-schedule-excel";
 import type { OnlineFlight } from "../infrastructure/flight-query";
 import type {
   AppSection,
-  AppState,
   IsoWeekday,
   ScheduleGroupId,
   StaffStatus,
@@ -19,7 +19,10 @@ import type { FlightSelectionCandidate } from "../domain/flights/next-workday-fl
 import type { LatePriorityCountsImportPreview } from "../infrastructure/late-priority-counts-excel";
 import type { HalfRestMode } from "../domain/shared/schedule-run-preferences";
 import type { TeamLeaderGapFillPreview } from "../domain/coverage/team-leader-gap-fill";
-import type { HistoryImportSummary } from "./workbook-actions";
+import type {
+  HistoryImportSummary,
+  WeeklyPlanImportPreview,
+} from "./workbook-actions";
 import type { DutyRosterAssignment } from "../domain/duty-roster/roster";
 import type { ScheduleFailureDetails } from "../domain/shared/schedule-failure-details";
 
@@ -79,10 +82,13 @@ export type ApplicationDialog =
   | {
       kind: "workbook-import";
       mode: "all" | "config" | "history";
-      importedState: AppState;
+      imported: WorkbookImport;
       recognized: string;
       warnings: string[];
       changedConfig: boolean;
+      sharedTemplatesAvailable: boolean;
+      replaceSharedTemplates: boolean;
+      weeklyPlanPreview?: WeeklyPlanImportPreview;
       historySummary?: HistoryImportSummary;
     }
   | {

@@ -1,4 +1,4 @@
-import type { PositionRule, ScheduleGroupId, Staff } from "../../model";
+import type { PositionRule } from "../../model";
 import type { ScheduleGenerationFacts } from "../shared/scheduling-facts";
 import { diagnoseSupervisorFillRuleConfiguration } from "../coverage/supervisor-fill-facts";
 import {
@@ -36,10 +36,7 @@ type DiagnosedKey = Exclude<
 export interface PolicyConfigurationFacts extends Pick<
   ScheduleGenerationFacts,
   "staff" | "flights" | "templates" | "positionRules" | "settings" | "history"
-> {
-  activeGroupId: ScheduleGroupId;
-  groups: Record<ScheduleGroupId, { staff: Staff[] }>;
-}
+> {}
 const normalized = (value: string) => value.trim().toUpperCase();
 const target = (rule: PositionRule) => ({
   flightNo: rule.flightNo,
@@ -145,21 +142,6 @@ export function diagnosePolicyConfiguration(
   }
   const issues: PolicyDiagnostic[] = [];
   const currentStaffIds = new Set(state.staff.map((person) => person.id));
-  const otherGroupId = state.activeGroupId === "A" ? "B" : "A";
-  const knownStaffIds = new Set([
-    ...currentStaffIds,
-    ...state.groups[otherGroupId].staff.map((person) => person.id),
-  ]);
-  const otherGroupIssue = () =>
-    policyDiagnostic(
-      "other-group",
-      "本条人员不在当前组，本次不适用",
-      "其他组的人员配置仍保留，不能因为当前组名单没有他就当作已删除。",
-      [
-        "需要使用这条人员规则时，先切换到对应组；需要本组执行时，在本条规则选择本组人员。",
-      ],
-      "info"
-    );
   const checkFlight = (
     flightNo: string,
     field: string,
@@ -189,26 +171,20 @@ export function diagnosePolicyConfiguration(
         !rule.secondStaffId ||
         rule.firstStaffId === rule.secondStaffId ||
         [rule.firstStaffId, rule.secondStaffId].some(
-          (staffId) => !knownStaffIds.has(staffId)
+          (staffId) => !currentStaffIds.has(staffId)
         )
       )
         issues.push(
           policyDiagnostic(
             "staff-reference-invalid",
-            "互斥人员未选齐、已删除或重复",
-            "互斥需要两名不同的现有人员；人员当前休假不会使这条长期规则失效。",
+            "互斥人员未选齐、已删除、不属于当前组或重复",
+            "互斥需要两名不同的当前组人员；人员当前休假不会使这条长期规则失效。",
             [
               "在本条规则重新选择“人员 A”和“人员 B”，确保是两名不同人员。",
               "人员列表中没有所需人员时，先在配置 → 人员配置中建立人员。",
             ]
           )
         );
-      if (
-        !issues.length &&
-        (!currentStaffIds.has(rule.firstStaffId) ||
-          !currentStaffIds.has(rule.secondStaffId))
-      )
-        return [otherGroupIssue()];
       return issues.length ? issues : notInPlan(state, rule.flightNo);
     }
     case "crossFlightPriorityPolicies": {
@@ -218,21 +194,16 @@ export function diagnosePolicyConfiguration(
       checkFlight(rule.flightNo, "优先航班");
       if (
         !rule.staffIds.length ||
-        rule.staffIds.some((staffId) => !knownStaffIds.has(staffId))
+        rule.staffIds.some((staffId) => !currentStaffIds.has(staffId))
       )
         issues.push(
           policyDiagnostic(
             "staff-reference-invalid",
-            "优先人员未选择或含已删除人员",
+            "优先人员未选择、已删除或不属于当前组",
             "没有有效的人员关联就不能使用优先配置；优先人员仍需满足当天安全条件。",
             ["在本条规则的“优先人员”重新勾选现有人员；人员删除后应清理旧关联。"]
           )
         );
-      if (
-        !issues.length &&
-        !rule.staffIds.some((staffId) => currentStaffIds.has(staffId))
-      )
-        return [otherGroupIssue()];
       return issues.length ? issues : notInPlan(state, rule.flightNo);
     }
     case "dutyPositionPriorities": {

@@ -50,15 +50,11 @@ export interface CreateAutoscheduleStoreOptions {
 function syncSharedProjection(model: AppState): void {
   model.shared.templates = model.templates;
   model.shared.weeklyFlightPlans = model.weeklyFlightPlans;
-  model.shared.positionRules = model.positionRules;
-  model.shared.settings = model.settings;
 }
 
 function activateSharedProjection(model: AppState): void {
   model.templates = model.shared.templates;
   model.weeklyFlightPlans = model.shared.weeklyFlightPlans;
-  model.positionRules = model.shared.positionRules;
-  model.settings = model.shared.settings;
 }
 
 function reconcileInitialProjection(model: AppState): void {
@@ -77,10 +73,10 @@ function reconcileInitialProjection(model: AppState): void {
   active.schedulePolicyStale = model.schedulePolicyStale;
   if (model.scheduleRuleFingerprint !== undefined)
     active.scheduleRuleFingerprint = model.scheduleRuleFingerprint;
+  active.positionRules = model.positionRules;
+  active.settings = model.settings;
   model.shared.templates = model.templates;
   model.shared.weeklyFlightPlans = model.weeklyFlightPlans;
-  model.shared.positionRules = model.positionRules;
-  model.shared.settings = model.settings;
 }
 
 function syncActiveGroupProjection(model: AppState): void {
@@ -98,6 +94,8 @@ function syncActiveGroupProjection(model: AppState): void {
   group.activeScheduleDate = model.activeScheduleDate;
   group.schedulePolicyStale = model.schedulePolicyStale;
   group.scheduleRuleFingerprint = model.scheduleRuleFingerprint;
+  group.positionRules = model.positionRules;
+  group.settings = model.settings;
   syncSharedProjection(model);
 }
 
@@ -108,6 +106,8 @@ function activateGroupProjection(
   const group = model.groups[groupId];
   if (!group) return;
   model.activeGroupId = groupId;
+  model.positionRules = group.positionRules;
+  model.settings = group.settings;
   model.flights = group.flights;
   model.staff = group.staff;
   model.history = group.history;

@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-10-26-template-position-rules-sync",
+  "title": "共享航班模板岗位同步到 A/B 组",
+  "startedFrom": "6f77c36d9d9ba79d21b8c0edbd93f989ad126645",
+  "expectation": {
+    "example": "共享模板 CX937 的岗位从 H1 增加 H2；A 组 H1 为分流，B 组 H1 为常规，且两组 H2 原先都缺少岗位规则行。",
+    "expected": "模板编辑、选中共享计划的 Excel 导入会给 A/B 补岗位行；v1-v9 存档升到 v10 时也补一次。",
+    "unchanged": "已有岗位的分类、资质、状态和规则设置仍按组独立；周计划仍共享；删除模板岗位不自动删除规则；v10 后手动删岗位不会在下次打开时恢复。",
+    "fallback": "模板或岗位列表为空时不新增行；同航班同岗位已有规则时整条保留；普通组内导入不改共享模板或另一组。只有迁移实际补了岗位行的组清空旧班表。"
+  },
+  "testedVersion": "1e3031381430b8ec7ea7912601674df37d513a5022802bfadf0b032225dd6b78",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "修改前模板编辑、共享导入和恢复三条新增测试都失败，说明岗位行确实没有补齐；修复后的定向测试通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-26-template-position-rules-sync-reproduction.txt",
+          "summary": "修改前 3 个文件的新增用例失败，修改后同范围通过。",
+          "sha256": "418769ed3fdd002c5aa582310f6f06e633ec5b3d34ec280d8e94aea04bcc31be"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-26-template-position-rules-sync-tests.txt",
+          "summary": "相关 7 个测试文件 103 项通过，含模板编辑、共享导入、v9 迁移及后续删除保持。",
+          "sha256": "47b4a6f0892eaf31566cd8d920c535d2a7b138b39454c00b46a85f245ef159e3"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "编辑模板增加 H2 后，A/B 都得到规则行；已有分类和资质保持各自值，新岗位进入两组的航班岗位清单。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-26-template-position-rules-sync-tests.txt",
+          "summary": "模板编辑与 A/B 岗位清单回归通过。",
+          "sha256": "47b4a6f0892eaf31566cd8d920c535d2a7b138b39454c00b46a85f245ef159e3"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "显式共享模板导入后两组补齐缺项；v9 存档升 v10 只补一次，并保留后续 v10 的组内删除。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-26-template-position-rules-sync-tests.txt",
+          "summary": "Excel 共享导入、存储版本迁移和再次恢复回归通过。",
+          "sha256": "47b4a6f0892eaf31566cd8d920c535d2a7b138b39454c00b46a85f245ef159e3"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "补行只清除新增规则所在组的旧班表；改名不会补齐无关岗位，也不会清除无关组的班表。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-26-template-position-rules-sync-tests.txt",
+          "summary": "组内失效班表清理与航班改名无关组保留回归通过。",
+          "sha256": "47b4a6f0892eaf31566cd8d920c535d2a7b138b39454c00b46a85f245ef159e3"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "not_applicable",
+      "reason": "本次只补岗位配置行，不新增或修改候选资格、排班约束、后处理或最终守卫判断；新增行进入既有岗位清单消费路径。",
+      "evidence": []
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "普通岗位配置导入仍只替换当前组；模板移除岗位不删规则；已有分类与资质不覆盖。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-26-template-position-rules-sync-tests.txt",
+          "summary": "组内导入范围、模板移除、A/B 属性保留及人工删除回归通过。",
+          "sha256": "47b4a6f0892eaf31566cd8d920c535d2a7b138b39454c00b46a85f245ef159e3"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "还没有 owner 在修改版页面切换 A/B 核对岗位行；自动测试不能替代真实入口验收。",
+      "evidence": []
+    }
+  },
+  "answers": {
+    "originalFailure": "修改前三个新增回归分别证明模板编辑、显式共享导入和 v9 恢复都会留下缺行，修改后 103 项相关测试通过；证据见 reproduction.txt 和 tests.txt。",
+    "laterChanges": "显式共享导入、v1-v9 一次迁移和模板编辑均使用同一补齐逻辑；模板移除不删行，v10 组内删除保持，改名不会触碰无关组；证据见 tests.txt。",
+    "finalArtifact": "未完成现场页面核对。需要 owner 在修改版中编辑一个模板岗位，再切换 A/B 确认两组都出现岗位行且原分类各自保留。"
+  },
+  "review": {
+    "missedScope": "模板岗位名单虽共享，但前次只验证模板改名引用，没有核对模板增岗后的两组规则清单；本次检查模板编辑、Excel 显式共享、v1-v9 恢复和组内导入边界。",
+    "rootCause": "航班模板岗位清单和组内 PositionRule 是两份不同事实，之前的编辑、导入及恢复路径没有把模板岗位结构补入 A/B。",
+    "earlyDetection": "以后改共享模板或拆分组内规则前，先列模板编辑、共享导入、存档恢复和组内导入四类路径；为每类写 A/B 缺行与已有分类不同的失败回归。"
+  }
+}

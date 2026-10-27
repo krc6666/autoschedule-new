@@ -1,0 +1,25 @@
+Task: 2026-10-26-group-specific-scheduling-config
+
+Command:
+npm.cmd run verify
+
+Result:
+Exit code 1. Typecheck completed successfully. The test stage stopped the
+pipeline before its performance and build stages; those were run separately
+and passed (see 2026-10-26-group-specific-scheduling-config-tests.txt).
+
+Test Files  1 failed | 147 passed (148)
+Tests       7 failed | 1464 passed (1471)
+
+All seven failures are in tests/app/application-coordinator.test.ts and arise
+when those cases confirm an empty selected-flight list before expecting the
+schedule runner to execute. The test file is unchanged in this worktree. The
+working tree already contains a change in schedule-controller.ts that makes
+an empty schedule preflight default to the current weekday's weekly flight
+plan; the fixed test date and fixture plan do not match, so the selected list
+is empty. This unrelated change is left untouched.
+
+The initial full run also exposed one outdated Excel round-trip fixture that
+assumed shared templates import by default. That fixture now explicitly opts
+into shared-plan synchronization, matching the confirmed import contract; the
+focused 14-file suite passes after the correction.

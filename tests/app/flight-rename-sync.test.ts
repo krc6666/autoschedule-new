@@ -52,6 +52,10 @@ function scenario() {
       allowManual: true,
     },
   ];
+  state.groups.B.positionRules = [{ ...rule, flightNo: "TWB616" }];
+  state.groups.B.settings.mobileSupervisorFillRules = structuredClone(
+    state.settings.mobileSupervisorFillRules
+  );
   return createTestAutoscheduleStore(state);
 }
 
@@ -188,7 +192,17 @@ describe("flight rename synchronization", () => {
     store
       .getState()
       .configuration.updateField("template", "tw", "flightNo", "TW616");
-    expect(store.getState().model.groups.B).toEqual(before);
+    expect(store.getState().model.groups.B.positionRules[0]!.flightNo).toBe(
+      "TW616"
+    );
+    expect(
+      store.getState().model.groups.B.settings.mobileSupervisorFillRules[0]
+    ).toMatchObject({ sourceFlightNo: "TW616", targetFlightNo: "TW616" });
+    expect(store.getState().model.groups.B.flights).toEqual(before.flights);
+    expect(store.getState().model.groups.B.assignments).toEqual(
+      before.assignments
+    );
+    expect(store.getState().model.groups.B.history).toEqual(before.history);
   });
 
   it("retains the renamed default choice and relation through storage and both groups' Excel exports", () => {
@@ -235,9 +249,11 @@ describe("flight rename synchronization", () => {
       });
       const target = structuredClone(state);
       target.flights = [];
-      expect(applyWorkbookImport(target, parsed, "all").changedConfig).toBe(
-        true
-      );
+      expect(
+        applyWorkbookImport(target, parsed, "all", {
+          replaceSharedTemplates: true,
+        }).changedConfig
+      ).toBe(true);
       expect(
         buildCurrentScheduleFlightCandidates(
           target.templates,

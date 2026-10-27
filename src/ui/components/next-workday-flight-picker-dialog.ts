@@ -57,7 +57,7 @@ export class NextWorkdayFlightPickerDialogElement extends LightDomElement {
             this.dialog.kind === "reschedule-flight-picker"
               ? "恢复当前航班"
               : this.dialog.kind === "schedule-preflight"
-                ? "恢复当前航班"
+                ? "恢复默认选择"
                 : `恢复${weekdayLabel(this.dialog.weekday)}预设`,
             this.restorePreset
           )}

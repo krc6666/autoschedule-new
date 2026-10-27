@@ -1,0 +1,12 @@
+Task: 2026-10-27-position-rule-flights-to-template
+
+Before implementation, run:
+npm.cmd run test -- --run tests/app/workbook-import-scope.test.ts
+Result: exit 1. The new import regression expected the four existing template
+flights plus KE166, MF8683, and TW616. The actual imported template list still
+contained only CX937, FD573, CX931, and TR121.
+
+After implementation, run:
+npm.cmd run test -- --run tests/app/workbook-import-scope.test.ts tests/app/workbook-actions.test.ts tests/infrastructure/group-state-migration.test.ts tests/infrastructure/storage.test.ts tests/infrastructure/ordinary-priority-storage.test.ts tests/ui/app-dialog-view.test.ts
+Result: exit 0. Six test files passed, 79 tests passed. The import test now
+shows the missing rule flights in shared templates without selecting a weekday.

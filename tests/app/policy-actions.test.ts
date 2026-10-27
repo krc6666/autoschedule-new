@@ -203,14 +203,17 @@ describe("policy actions", () => {
     });
   });
 
-  it("edits only the active group's people in a shared cross-flight priority row", () => {
+  it("edits only the active group's people in its cross-flight priority row", () => {
     const state = createDefaultState();
     const otherGroupStaffId = "B-1";
     state.groups.B.staff = [
       { ...state.staff[0]!, id: otherGroupStaffId, name: "B组人员" },
     ];
     const policy = addCrossFlightPriorityPolicy(state);
-    policy.staffIds = [state.staff[0]!.id, otherGroupStaffId];
+    policy.staffIds = [state.staff[0]!.id];
+    state.groups.B.settings.crossFlightPriorityPolicies = [
+      { ...policy, staffIds: [otherGroupStaffId] },
+    ];
 
     expect(
       updatePolicyEntityField(
@@ -221,7 +224,10 @@ describe("policy actions", () => {
         state.staff[1]!.id
       )
     ).toBe("saved");
-    expect(policy.staffIds).toEqual([otherGroupStaffId, state.staff[1]!.id]);
+    expect(policy.staffIds).toEqual([state.staff[1]!.id]);
+    expect(
+      state.groups.B.settings.crossFlightPriorityPolicies[0]!.staffIds
+    ).toEqual([otherGroupStaffId]);
   });
 
   it("adds, edits, and deletes configurable same-flight staff exclusions", () => {

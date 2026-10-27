@@ -1,0 +1,13 @@
+修改前失败回归摘录（来自实际定向测试命令输出）
+
+命令：npm.cmd run test -- --run tests/app/configuration-actions.test.ts tests/app/workbook-actions.test.ts tests/app/group-workspace-isolation.test.ts
+
+失败的新增用例：
+- configuration-actions: adds new template positions to both groups without sharing rule settings
+  期望 A 组有 H1、H2 两条规则；实际只有 H1。
+- workbook-actions: fills missing template positions in both groups only when shared templates are imported
+  期望共享模板导入后 A/B 都有 H1、H2；实际只有 H1。
+- group-workspace-isolation: repairs missing template position rows on store creation and replacement
+  期望恢复后两组都有 H1、H2；实际只有 H1。
+
+修改前结果：3 个测试文件失败；44 项中 3 项失败、41 项通过。修改后相同范围扩展到 7 个文件、103 项，结果为 7 个文件通过、103 项通过，详见 2026-10-26-template-position-rules-sync-tests.txt。

@@ -82,6 +82,65 @@ it.each([
 });
 
 describe("next workday flight picker dialog", () => {
+  it("renders and restores the schedule preflight default selection", async () => {
+    const model = createDefaultState();
+    const candidates = buildCurrentScheduleFlightCandidates(
+      model.templates,
+      []
+    ).map((candidate, index) => ({
+      ...candidate,
+      selectedByDefault: index === 0,
+    }));
+    const element = await mountElement<
+      HTMLElement & { updateComplete: Promise<unknown> }
+    >("autoschedule-app-dialog", {
+      model,
+      dialog: {
+        kind: "schedule-preflight",
+        date: "2026-08-15",
+        groupId: model.activeGroupId,
+        adminSupportEnabled: false,
+        candidates,
+        selectedIds: candidates
+          .filter((candidate) => candidate.selectedByDefault)
+          .map((candidate) => candidate.id),
+        staffStatuses: Object.fromEntries(
+          model.staff.map((person) => [person.id, person.status])
+        ),
+        dutyRoster: {
+          date: "2026-08-15",
+          cxPreflightStaffId: null,
+          dutyStaffId: null,
+          standbyStaffIds: [null, null],
+        },
+      },
+    });
+    const boxes = [
+      ...element.querySelectorAll<HTMLInputElement>(
+        '.next-workday-flight-choice input[type="checkbox"]'
+      ),
+    ];
+    expect(boxes[0]?.checked).toBe(true);
+    expect(boxes.slice(1).every((box) => !box.checked)).toBe(true);
+    expect(element.textContent).toContain("恢复默认选择");
+
+    const commands: UiCommandEvent["detail"][] = [];
+    element.addEventListener(UI_COMMAND_EVENT, (event) =>
+      commands.push((event as UiCommandEvent).detail)
+    );
+    const restore = [
+      ...element.querySelectorAll<HTMLButtonElement>("button"),
+    ].find((button) => button.textContent?.trim() === "恢复默认选择");
+    expect(restore).toBeDefined();
+    restore!.click();
+    expect(commands.at(-1)).toEqual({
+      type: "update-schedule-preflight-selection",
+      selectedIds: candidates
+        .filter((candidate) => candidate.selectedByDefault)
+        .map((candidate) => candidate.id),
+    });
+  });
+
   it.each(
     (
       [

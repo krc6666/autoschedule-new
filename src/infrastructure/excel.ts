@@ -45,6 +45,7 @@ import { sameAirlinePriorityWarningsByAssignment } from "../domain/rules/airline
 import {
   createEmptyWeeklyFlightPlans,
   replaceWeeklyFlightPlan,
+  weekdayLabel,
 } from "../domain/flights/weekly-flight-plan";
 import {
   appendScheduleRuleSheets,
@@ -69,6 +70,7 @@ export interface WorkbookImport {
   flights?: Flight[];
   templates?: FlightTemplate[];
   weeklyFlightPlans?: WeeklyFlightPlanEntry[];
+  weeklyFlightPlanStatus?: "valid" | "invalid";
   positionRules?: PositionRule[];
   history?: HistoryRecord[];
   settings?: Partial<ScheduleSettings>;
@@ -290,9 +292,14 @@ export interface WorkbookImportOptions {
 
 function sheetHasDataRows(
   workbook: XLSX.WorkBook,
-  candidates: string[]
+  candidates: string[],
+  excludedNames: string[] = []
 ): boolean {
-  const sheetName = findSheet(workbook, candidates);
+  const sheetName = workbook.SheetNames.find(
+    (name) =>
+      candidates.some((candidate) => name.includes(candidate)) &&
+      !excludedNames.some((excluded) => name.includes(excluded))
+  );
   if (!sheetName) return false;
   return rows(workbook, sheetName)
     .slice(1)
@@ -385,7 +392,9 @@ function parseStaff(workbook: XLSX.WorkBook): Staff[] | undefined {
 }
 
 function parseFlights(workbook: XLSX.WorkBook): Flight[] | undefined {
-  const sheetName = findSheet(workbook, ["航班计划"]);
+  const sheetName = workbook.SheetNames.find(
+    (name) => name.includes("航班计划") && !name.includes("每周航班计划")
+  );
   if (!sheetName) return undefined;
   const data = rows(workbook, sheetName);
   const header = data[0] ?? [];
@@ -448,11 +457,29 @@ function parseTemplates(workbook: XLSX.WorkBook): FlightTemplate[] | undefined {
 
 function parseWeeklyFlightPlans(
   workbook: XLSX.WorkBook
-): WeeklyFlightPlanEntry[] | undefined {
+):
+  | { status: "valid"; plans: WeeklyFlightPlanEntry[] }
+  | { status: "invalid"; warning: string }
+  | undefined {
   const sheetName = findSheet(workbook, ["每周航班计划"]);
   if (!sheetName) return undefined;
   const data = rows(workbook, sheetName);
+  const header = data[0] ?? [];
+  const weekdayIndex = headerIndex(header, ["星期"], -1);
+  const flightIndex = headerIndex(header, ["航班号"], -1);
+  if (weekdayIndex < 0 || flightIndex < 0)
+    return {
+      status: "invalid",
+      warning: "每周航班计划表头需包含“星期”和“航班号”，现有计划保留",
+    };
+  const dataRows = data
+    .slice(1)
+    .map((row, index) => ({ row, excelRow: index + 2 }))
+    .filter(({ row }) => row.some((cell) => normalizeText(cell) !== ""));
+  if (!dataRows.length)
+    return { status: "valid", plans: createEmptyWeeklyFlightPlans() };
   let plans = createEmptyWeeklyFlightPlans();
+  const seenWeekdays = new Set<number>();
   const weekdayByLabel = new Map<string, number>([
     ["星期一", 1],
     ["周一", 1],
@@ -471,8 +498,8 @@ function parseWeeklyFlightPlans(
     ["周日", 7],
     ["周天", 7],
   ]);
-  for (const row of data.slice(1)) {
-    const rawWeekday = normalizeText(row[0]);
+  for (const { row, excelRow } of dataRows) {
+    const rawWeekday = normalizeText(row[weekdayIndex]);
     const numericWeekday = Number(rawWeekday);
     const weekday =
       weekdayByLabel.get(rawWeekday) ??
@@ -481,14 +508,37 @@ function parseWeeklyFlightPlans(
       numericWeekday <= 7
         ? numericWeekday
         : undefined);
-    if (!weekday) continue;
+    if (!weekday)
+      return {
+        status: "invalid",
+        warning: rawWeekday
+          ? `每周航班计划第${excelRow}行星期“${rawWeekday}”无效，现有计划保留`
+          : `每周航班计划第${excelRow}行没有填写星期，现有计划保留`,
+      };
+    if (seenWeekdays.has(weekday))
+      return {
+        status: "invalid",
+        warning: `每周航班计划第${excelRow}行星期“${rawWeekday}”重复，现有计划保留`,
+      };
+    seenWeekdays.add(weekday);
     plans = replaceWeeklyFlightPlan(
       plans,
       weekday as WeeklyFlightPlanEntry["weekday"],
-      splitList(row[1])
+      splitList(row[flightIndex])
     );
   }
-  return plans;
+  if (seenWeekdays.size !== 7) {
+    const missing = Array.from({ length: 7 }, (_, index) => index + 1)
+      .filter((weekday) => !seenWeekdays.has(weekday))
+      .map((weekday) =>
+        weekdayLabel(weekday as WeeklyFlightPlanEntry["weekday"])
+      );
+    return {
+      status: "invalid",
+      warning: `每周航班计划缺少${missing.join("、")}，现有计划保留`,
+    };
+  }
+  return { status: "valid", plans };
 }
 
 function parseFatigueMap(workbook: XLSX.WorkBook): Map<string, number> {
@@ -682,7 +732,11 @@ export function parseWorkbook(
   const effectiveStaff = staff !== undefined ? staff : currentStaff;
   const flights = parseFlights(workbook);
   const templates = parseTemplates(workbook);
-  const weeklyFlightPlans = parseWeeklyFlightPlans(workbook);
+  const weeklyFlightPlanImport = parseWeeklyFlightPlans(workbook);
+  const weeklyFlightPlans =
+    weeklyFlightPlanImport?.status === "valid"
+      ? weeklyFlightPlanImport.plans
+      : undefined;
   const positionRules = parsePositions(workbook);
   const history = parseHistory(workbook, effectiveStaff);
   const parsedRules = parseScheduleRuleSettings(workbook, effectiveStaff);
@@ -699,11 +753,13 @@ export function parseWorkbook(
     };
   }
   const warnings = [...parsedRules.warnings, ...dutyRoster.warnings];
+  if (weeklyFlightPlanImport?.status === "invalid")
+    warnings.push(weeklyFlightPlanImport.warning);
   const hasStandardSheet = Boolean(
     staff ||
     flights ||
     templates ||
-    weeklyFlightPlans ||
+    weeklyFlightPlanImport ||
     positionRules ||
     history ||
     parsedRules.recognized ||
@@ -727,7 +783,10 @@ export function parseWorkbook(
     sheetHasDataRows(workbook, ["人员信息", "员工信息"])
   )
     warnings.push("人员信息工作表没有有效数据");
-  if (flights?.length === 0 && sheetHasDataRows(workbook, ["航班计划"]))
+  if (
+    flights?.length === 0 &&
+    sheetHasDataRows(workbook, ["航班计划"], ["每周航班计划"])
+  )
     warnings.push("航班计划工作表没有有效数据");
   if (
     templates?.length === 0 &&
@@ -740,7 +799,7 @@ export function parseWorkbook(
     !staff &&
     !flights &&
     !templates &&
-    !weeklyFlightPlans &&
+    !weeklyFlightPlanImport &&
     !positionRules &&
     !history &&
     !parsedRules.recognized &&
@@ -756,6 +815,9 @@ export function parseWorkbook(
     flights,
     templates,
     weeklyFlightPlans,
+    ...(weeklyFlightPlanImport
+      ? { weeklyFlightPlanStatus: weeklyFlightPlanImport.status }
+      : {}),
     positionRules,
     history,
     legacySchedule,

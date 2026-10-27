@@ -304,7 +304,7 @@ describe("configuration diagnostics", () => {
     ]);
   });
 
-  it("does not call retained other-group personnel deleted", () => {
+  it("rejects personnel references that belong to another group", () => {
     const state = fillState();
     state.groups.B.staff = [
       { ...state.staff[0]!, id: "other-one" },
@@ -329,14 +329,10 @@ describe("configuration diagnostics", () => {
     ];
     expect(
       diagnosePolicyConfiguration(state, "crossFlightPriorityPolicies", "other")
-    ).toEqual([
-      expect.objectContaining({ code: "other-group", severity: "info" }),
-    ]);
+    ).toEqual([expect.objectContaining({ code: "staff-reference-invalid" })]);
     expect(
       diagnosePolicyConfiguration(state, "sameFlightStaffExclusions", "pair")
-    ).toEqual([
-      expect.objectContaining({ code: "other-group", severity: "info" }),
-    ]);
+    ).toEqual([expect.objectContaining({ code: "staff-reference-invalid" })]);
   });
 
   it("does not require next-workday targets to be in today's plan", () => {

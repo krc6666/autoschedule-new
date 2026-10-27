@@ -1,0 +1,14 @@
+Task: 2026-10-27-position-rule-flights-to-template
+
+Command: npm.cmd run verify
+Result: exit 1. Typecheck passed. The functional suite reported 147 of 148
+files passed and 1471 of 1478 tests passed. The seven failures were all in
+tests/app/application-coordinator.test.ts: one async schedule reservation test,
+five next-workday flight-picker failure-message tests, and one KE166 failure
+details test. They fail before reaching their expected calculation path because
+the picker reports "请至少选择一个航班" or the mocked calculation is not called.
+No failure was reported in the import or v10-to-v11 migration tests.
+
+The verify script stops after the functional suite on this non-zero result.
+Performance tests and production build were run separately and passed; see the
+separate evidence files.

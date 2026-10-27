@@ -1,0 +1,6 @@
+Command: npm.cmd test -- tests/ui/app-dialog-view.test.ts tests/ui/flights-view.test.ts tests/ui/config-view.test.ts
+Observed before the UI copy changes: exit 1, 4 failed and 12 passed out of 16.
+The failures showed the config preview rendering the internal value "config" and the button "确认导入并重新排班"; the history preview rendered "history". The flight-plan and template pages had no visible A/B shared-scope label.
+These failures were produced after adding the expected user-facing assertions and before changing the UI or README.
+
+The workbook import coordinator regression was then extended to require the success toast to identify the cleared group schedule and the Schedule page. Before changing the controller text, that test file had 1 failure and 5 passes: the old message only said "请重新排班".

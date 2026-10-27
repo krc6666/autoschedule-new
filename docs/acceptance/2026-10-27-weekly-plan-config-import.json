@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-10-27-weekly-plan-config-import",
+  "title": "配置导入自动恢复文件中的每周航班选择",
+  "startedFrom": "6f77c36d9d9ba79d21b8c0edbd93f989ad126645",
+  "expectation": {
+    "example": "导入用户提供的配置工作簿；其中‘每周航班计划’包含星期一至星期日各自已选航班，工作簿岗位规则覆盖这些航班。导入预览不勾选整份替换共用航班模板。",
+    "expected": "确认导入后，七天选择按工作簿应用到 A、B 共用的每周航班计划，不要求用户再逐日勾选；岗位规则仍只写入当前组。",
+    "unchanged": "整份共用航班模板替换仍需用户单独勾选；岗位规则导入仍只覆盖当前组；每周计划仅引用导入后可用的共用模板航班；排班算法与人员数据边界不变。",
+    "fallback": "工作簿没有每周航班计划工作表时保留现有计划；工作表存在但仅有表头时按既有合同清空七天计划。历史导入不写入每周计划。"
+  },
+  "testedVersion": "e8862cba6d115c14cb368fef7f68002da9554830237c6b090060d85bf9d7747f",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "修复前配置导入回归的两个断言都得到空星期选择；修复后不勾模板替换时按文件应用选择。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-27-weekly-plan-config-import-reproduction.txt",
+          "summary": "修复前两个导入断言均为期望 SHARED200、实际空数组。",
+          "sha256": "be3aa7b8802fd72f53f2759c3cb394f09228a04227143e6be820987303eaaa67"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-27-weekly-plan-config-import-focused.txt",
+          "summary": "修复后 8 个导入、组隔离、Excel、存储与界面测试文件 136 项通过。",
+          "sha256": "8eb2309b3f1205b31440f7525cbf5b6a3644cff655d0529a5bd70a5a527c07c7"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "配置工作簿七天选择在确认后写入共享计划；真实文件的计划航班均存在于模板和岗位配置，七天预设也由后续排班窗口读取。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-27-weekly-plan-config-import-source.txt",
+          "summary": "对用户提供的 Excel 脱敏核对：7 天、10 个计划航班，全部匹配模板和岗位规则；未输出人员信息。",
+          "sha256": "df2e1b26c200333b10b3b29b48aec5c1656eaff47f1a7d63426d4e3de69b07fb"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-27-weekly-plan-config-import-focused.txt",
+          "summary": "七天各选不同航班、不勾模板替换的导入集成回归通过。",
+          "sha256": "8eb2309b3f1205b31440f7525cbf5b6a3644cff655d0529a5bd70a5a527c07c7"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "缺少每周计划工作表时保留现值；模板整份替换仍由单独选项控制；纯历史导入不写入共享周计划。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-27-weekly-plan-config-import-focused.txt",
+          "summary": "覆盖缺表保留、模板替换勾选、A/B 规则边界和 Excel 往返的相关测试通过。",
+          "sha256": "8eb2309b3f1205b31440f7525cbf5b6a3644cff655d0529a5bd70a5a527c07c7"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "已保存的七日计划仍由现有日期预检读取，并决定下一班默认勾选航班；未改变排班计算和后续规则。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-27-weekly-plan-config-import-consumer.txt",
+          "summary": "每周预设到日期预检默认选项的消费者测试通过。",
+          "sha256": "a460ad918b18c74cebaf19c7596005e6f279012fb83349df018a3b5d77c92e94"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "not_applicable",
+      "reason": "本次只写入七日航班选择，不生成或修改 assignments；排班最终守卫不在导入路径中运行。",
+      "evidence": []
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "岗位规则仍只导入当前组；模板整份替换仍需单独勾选；新模板补缺不覆盖另一组已有岗位配置。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-27-weekly-plan-config-import-focused.txt",
+          "summary": "组内隔离、模板替换选项和已有岗位规则保留相关回归通过。",
+          "sha256": "8eb2309b3f1205b31440f7525cbf5b6a3644cff655d0529a5bd70a5a527c07c7"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "本地页面由 owner 操作验收：刷新现有页面并导入原文件，确认星期一至星期日已显示文件中的航班选择。自动测试和文件检查不能代替该页面证据。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-27-weekly-plan-config-import-source.txt",
+          "summary": "原始 Excel 的七天计划和航班覆盖关系已脱敏核对。",
+          "sha256": "df2e1b26c200333b10b3b29b48aec5c1656eaff47f1a7d63426d4e3de69b07fb"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "修复前导入测试显示已选星期仍为空；见 reproduction 与 focused 测试证据。根因是确认导入周计划受默认关闭的共享替换勾选限制。",
+    "laterChanges": "规则航班补模板在周计划过滤前执行；缺模板航班仍过滤。历史导入不应用周计划，整份模板替换保持独立；周计划在后续排班预检中的读取有消费者测试。",
+    "finalArtifact": "自动验证证明确认导入后的七日计划保存在共享状态；真实页面还需 owner 刷新 http://127.0.0.1:63943/ 并导入该文件后核对。"
+  },
+  "review": {
+    "missedScope": "自动证据覆盖文件内容、导入状态和排班预检消费者；真实浏览器里七天勾选是否按 owner 原文件显示尚未取得现场证据。",
+    "rootCause": "周计划解析成功，但应用阶段错误复用了默认关闭的整份共享替换开关，导入确认便丢弃解析结果。",
+    "earlyDetection": "以后改配置导入预览或共享周计划时，先用含七天已选航班的工作簿走完整确认流程；检查确认后的七天实际值、模板覆盖与 A/B 规则隔离，并保留缺表和历史导入回归。"
+  }
+}

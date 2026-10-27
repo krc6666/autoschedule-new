@@ -14,15 +14,29 @@ import {
   normalizeWeeklyFlightNo,
   replaceWeeklyFlightPlan,
 } from "../domain/flights/weekly-flight-plan";
+import {
+  synchronizeImportedRuleFlightsToTemplates,
+  synchronizeTemplatePositionRules,
+} from "./template-position-rule-sync";
 
 export type ImportMode = "all" | "config" | "history";
 
 export interface AppliedWorkbookImport {
   changedConfig: boolean;
   recognized: string;
+  weeklyPlanPreview?: WeeklyPlanImportPreview;
   historySummary?: HistoryImportSummary;
   rejected?: number;
   errors?: string[];
+}
+
+export interface WeeklyPlanImportPreview {
+  plans: AppState["weeklyFlightPlans"];
+  unavailableFlightNos: string[];
+}
+
+export interface WorkbookImportOptions {
+  replaceSharedTemplates?: boolean;
 }
 
 export interface HistoryImportSummary {
@@ -86,79 +100,6 @@ function mergeHistoryImport(
     ...state.history.filter((record) => !incomingKeys.has(historyKey(record))),
     ...incomingByKey.values(),
   ];
-}
-
-function mergePositionRuleQualifications(
-  current: AppState["positionRules"],
-  imported: AppState["positionRules"],
-  activeStaffIds: Set<string>,
-  otherStaffIds: Set<string>
-): AppState["positionRules"] {
-  const ruleKey = (rule: AppState["positionRules"][number]) =>
-    `${rule.flightNo.trim().toUpperCase()}|${rule.name.trim()}|${rule.category}`;
-  const currentByKey = new Map(current.map((rule) => [ruleKey(rule), rule]));
-  return imported.map((rule) => {
-    const existing = currentByKey.get(ruleKey(rule));
-    return {
-      ...rule,
-      qualifiedStaffIds: rule.manual
-        ? rule.qualifiedStaffIds
-        : [
-            ...(existing?.qualifiedStaffIds ?? []).filter((staffId) =>
-              otherStaffIds.has(staffId)
-            ),
-            ...rule.qualifiedStaffIds.filter((staffId) =>
-              activeStaffIds.has(staffId)
-            ),
-          ],
-    };
-  });
-}
-
-function mergeActiveGroupPersonnelRules(
-  current: AppState["settings"]["sameFlightStaffExclusions"],
-  imported: AppState["settings"]["sameFlightStaffExclusions"],
-  activeStaffIds: Set<string>,
-  otherStaffIds: Set<string>
-): AppState["settings"]["sameFlightStaffExclusions"] {
-  return [
-    ...current.filter(
-      (rule) =>
-        otherStaffIds.has(rule.firstStaffId) &&
-        otherStaffIds.has(rule.secondStaffId)
-    ),
-    ...imported.filter(
-      (rule) =>
-        activeStaffIds.has(rule.firstStaffId) &&
-        activeStaffIds.has(rule.secondStaffId)
-    ),
-  ];
-}
-
-function mergeActiveGroupCrossFlightPriorityRules(
-  current: AppState["settings"]["crossFlightPriorityPolicies"],
-  imported: AppState["settings"]["crossFlightPriorityPolicies"],
-  activeStaffIds: Set<string>,
-  otherStaffIds: Set<string>
-): AppState["settings"]["crossFlightPriorityPolicies"] {
-  const importedIds = new Set(imported.map((rule) => rule.id));
-  const merged = imported.map((rule) => ({
-    ...rule,
-    staffIds: [
-      ...(current
-        .find((item) => item.id === rule.id)
-        ?.staffIds.filter((staffId) => otherStaffIds.has(staffId)) ?? []),
-      ...rule.staffIds.filter((staffId) => activeStaffIds.has(staffId)),
-    ],
-  }));
-  const retainedOtherGroupRows = current.flatMap((rule) => {
-    if (importedIds.has(rule.id)) return [];
-    const staffIds = rule.staffIds.filter((staffId) =>
-      otherStaffIds.has(staffId)
-    );
-    return staffIds.length ? [{ ...rule, staffIds }] : [];
-  });
-  return [...merged, ...retainedOtherGroupRows];
 }
 
 export function applyLegacyScheduleImport(
@@ -264,9 +205,16 @@ export function applyDutyRosterImport(
 export function applyWorkbookImport(
   state: AppState,
   imported: WorkbookImport,
-  mode: ImportMode
+  mode: ImportMode,
+  options: WorkbookImportOptions = {}
 ): AppliedWorkbookImport {
   const importConfig = mode !== "history";
+  const replaceSharedTemplates = options.replaceSharedTemplates === true;
+  const importsSharedTemplates =
+    importConfig &&
+    replaceSharedTemplates &&
+    (imported.templates !== undefined ||
+      (imported.flights !== undefined && imported.templates === undefined));
   if (importConfig && imported.dutyRosterInvalid) {
     return {
       changedConfig: false,
@@ -309,32 +257,40 @@ export function applyWorkbookImport(
   }
   if (importConfig && imported.positionRules !== undefined)
     state.positionRules = orderPositionRules(
-      mergePositionRuleQualifications(
-        state.positionRules,
-        imported.positionRules,
-        activeStaffIds,
-        otherStaffIds
-      )
+      imported.positionRules.map((rule) => ({
+        ...rule,
+        qualifiedStaffIds: rule.manual
+          ? rule.qualifiedStaffIds
+          : rule.qualifiedStaffIds.filter((staffId) =>
+              activeStaffIds.has(staffId)
+            ),
+      }))
     );
-  if (importConfig && imported.templates !== undefined)
+  if (
+    importConfig &&
+    replaceSharedTemplates &&
+    imported.templates !== undefined
+  ) {
     state.templates = imported.templates;
+    state.shared.templates = state.templates;
+  }
   if (importConfig && imported.settings) {
     const settingsPatch = { ...imported.settings };
     if (imported.settings.sameFlightStaffExclusions !== undefined)
-      settingsPatch.sameFlightStaffExclusions = mergeActiveGroupPersonnelRules(
-        state.settings.sameFlightStaffExclusions,
-        imported.settings.sameFlightStaffExclusions,
-        activeStaffIds,
-        otherStaffIds
-      );
+      settingsPatch.sameFlightStaffExclusions =
+        imported.settings.sameFlightStaffExclusions.filter(
+          (rule) =>
+            activeStaffIds.has(rule.firstStaffId) &&
+            activeStaffIds.has(rule.secondStaffId)
+        );
     if (imported.settings.crossFlightPriorityPolicies !== undefined)
       settingsPatch.crossFlightPriorityPolicies =
-        mergeActiveGroupCrossFlightPriorityRules(
-          state.settings.crossFlightPriorityPolicies,
-          imported.settings.crossFlightPriorityPolicies,
-          activeStaffIds,
-          otherStaffIds
-        );
+        imported.settings.crossFlightPriorityPolicies.map((rule) => ({
+          ...rule,
+          staffIds: rule.staffIds.filter((staffId) =>
+            activeStaffIds.has(staffId)
+          ),
+        }));
     state.settings = applyScheduleSettingsPatch(state.settings, settingsPatch);
   }
   if (importConfig && imported.latePriorityFrequencyAdjustments !== undefined)
@@ -350,6 +306,7 @@ export function applyWorkbookImport(
     state.dutyRosterOverrides = structuredClone(imported.dutyRosterOverrides);
   if (
     importConfig &&
+    replaceSharedTemplates &&
     imported.flights !== undefined &&
     imported.templates === undefined
   ) {
@@ -359,12 +316,31 @@ export function applyWorkbookImport(
         id: createId("template"),
       })
     );
+    state.shared.templates = state.templates;
   }
-  if (importConfig && imported.weeklyFlightPlans) {
+  if (mode === "all" && imported.flights !== undefined)
+    state.flights = imported.flights;
+  const addedRuleFlightTemplates =
+    importConfig && imported.positionRules !== undefined
+      ? synchronizeImportedRuleFlightsToTemplates(
+          state,
+          state.positionRules,
+          imported.flights ?? [],
+          imported.templates ?? []
+        )
+      : [];
+  let weeklyPlanPreview: WeeklyPlanImportPreview | undefined;
+  if (importConfig && imported.weeklyFlightPlans !== undefined) {
     const availableFlightNos = new Set(
       state.templates.map((template) =>
         normalizeWeeklyFlightNo(template.flightNo)
       )
+    );
+    const importedFlightNos = new Set(
+      imported.weeklyFlightPlans
+        .flatMap((entry) => entry.flightNos)
+        .map(normalizeWeeklyFlightNo)
+        .filter(Boolean)
     );
     state.weeklyFlightPlans = imported.weeklyFlightPlans.reduce(
       (plans, entry) =>
@@ -377,18 +353,29 @@ export function applyWorkbookImport(
         ),
       createEmptyWeeklyFlightPlans()
     );
+    state.shared.weeklyFlightPlans = state.weeklyFlightPlans;
+    weeklyPlanPreview = {
+      plans: structuredClone(state.weeklyFlightPlans),
+      unavailableFlightNos: [...importedFlightNos].filter(
+        (flightNo) => !availableFlightNos.has(flightNo)
+      ),
+    };
   }
-  if (mode === "all" && imported.flights !== undefined)
-    state.flights = imported.flights;
+  if (importsSharedTemplates) synchronizeTemplatePositionRules(state);
+  else if (addedRuleFlightTemplates.length)
+    synchronizeTemplatePositionRules(state, addedRuleFlightTemplates);
   if (importHistory && imported.history)
     mergeHistoryImport(state, imported.history);
   const changedConfig =
     importConfig &&
     Boolean(
       imported.staff !== undefined ||
-      imported.flights !== undefined ||
-      imported.templates !== undefined ||
-      imported.weeklyFlightPlans ||
+      (mode === "all" && imported.flights !== undefined) ||
+      (replaceSharedTemplates &&
+        (imported.templates !== undefined ||
+          (imported.flights !== undefined &&
+            imported.templates === undefined))) ||
+      imported.weeklyFlightPlans !== undefined ||
       imported.positionRules !== undefined ||
       imported.settings ||
       imported.latePriorityFrequencyAdjustments !== undefined ||
@@ -402,12 +389,22 @@ export function applyWorkbookImport(
       imported.staff !== undefined &&
       `${imported.staff.length} 人`,
     importConfig &&
+      mode === "all" &&
       imported.flights !== undefined &&
       `${imported.flights.length} 个航班计划`,
     importConfig &&
+      replaceSharedTemplates &&
       imported.templates !== undefined &&
       `${imported.templates.length} 个航班模板`,
-    importConfig && imported.weeklyFlightPlans && "每周航班计划",
+    importConfig &&
+      addedRuleFlightTemplates.length > 0 &&
+      `${addedRuleFlightTemplates.length} 个岗位航班补入共用模板`,
+    importConfig &&
+      replaceSharedTemplates &&
+      imported.flights !== undefined &&
+      imported.templates === undefined &&
+      `${imported.flights.length} 个航班模板`,
+    importConfig && imported.weeklyFlightPlans !== undefined && "每周航班计划",
     importConfig &&
       imported.positionRules !== undefined &&
       `${imported.positionRules.length} 条岗位规则`,
@@ -424,5 +421,10 @@ export function applyWorkbookImport(
   ]
     .filter(Boolean)
     .join("、");
-  return { changedConfig, recognized, historySummary };
+  return {
+    changedConfig,
+    recognized,
+    ...(weeklyPlanPreview ? { weeklyPlanPreview } : {}),
+    historySummary,
+  };
 }

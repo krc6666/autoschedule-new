@@ -1,0 +1,12 @@
+Before-fix regression run, captured in this session.
+
+Command:
+npm.cmd exec vitest -- run tests/app/workbook-import-scope.test.ts
+
+Result:
+Test Files 1 failed (1)
+Tests 2 failed | 2 passed (4)
+
+Both failing assertions were in config imports where the workbook contained a selected Tuesday flight. Expected ["SHARED200"], received []. The preview's template-replacement option was left at its default false value.
+
+The regression fixture contains no staff records or staff identifiers.

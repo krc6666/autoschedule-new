@@ -222,12 +222,12 @@ export function createDefaultState(): AppState {
   const shared: SharedScheduleData = {
     templates: structuredClone(templates),
     weeklyFlightPlans: structuredClone(weeklyFlightPlans),
-    positionRules: structuredClone(positionRules),
-    settings: structuredClone(settings),
   };
   const groupA: GroupWorkspace = {
     flights: structuredClone(flights),
     staff: structuredClone(staff),
+    positionRules: structuredClone(positionRules),
+    settings: structuredClone(settings),
     history: [],
     dutyRosterOverrides: [],
     latePriorityFrequencyAdjustments: [],
@@ -239,6 +239,8 @@ export function createDefaultState(): AppState {
   const groupB: GroupWorkspace = {
     flights: [],
     staff: [],
+    positionRules: structuredClone(positionRules),
+    settings: structuredClone(settings),
     history: [],
     dutyRosterOverrides: [],
     latePriorityFrequencyAdjustments: [],
@@ -248,7 +250,7 @@ export function createDefaultState(): AppState {
     schedulePolicyStale: false,
   };
   return {
-    version: 8,
+    version: 11,
     shared,
     groups: { A: groupA, B: groupB },
     activeGroupId: "A",
@@ -256,7 +258,7 @@ export function createDefaultState(): AppState {
     flights,
     templates: shared.templates,
     weeklyFlightPlans: shared.weeklyFlightPlans,
-    positionRules: shared.positionRules,
+    positionRules: groupA.positionRules,
     history: groupA.history,
     dutyRosterOverrides: groupA.dutyRosterOverrides,
     latePriorityFrequencyAdjustments: groupA.latePriorityFrequencyAdjustments,
@@ -265,7 +267,7 @@ export function createDefaultState(): AppState {
     assignments: groupA.assignments,
     activeScheduleDate: groupA.activeScheduleDate,
     schedulePolicyStale: groupA.schedulePolicyStale,
-    settings: shared.settings,
+    settings: groupA.settings,
     updatedAt: new Date().toISOString(),
   };
 }

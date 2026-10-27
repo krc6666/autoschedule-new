@@ -26,7 +26,7 @@ export class WeeklyFlightPlanSectionElement extends LightDomElement {
     return html`<section class="workspace-section weekly-flight-plan-section">
       <div class="section-heading weekly-flight-plan-heading">
         <div>
-          <h3>每周航班计划</h3>
+          <h3>每周航班计划（A、B 共用）</h3>
           <span
             >${weekdayLabel(this.selectedWeekday)} · ${selected.size}
             个航班</span
@@ -55,14 +55,14 @@ export class WeeklyFlightPlanSectionElement extends LightDomElement {
         this.model.templates.length
           ? html`<div class="weekly-flight-template-list">
               ${this.model.templates.map((template) => {
-              const flightNo = normalizeWeeklyFlightNo(template.flightNo);
-              return html`<label class="weekly-flight-template-row">
-                <input
-                  class="form-check-input"
-                  type="checkbox"
-                  aria-label=${`${weekdayLabel(this.selectedWeekday)} ${flightNo}`}
-                  .checked=${selected.has(flightNo)}
-                  @change=${(event: Event) =>
+                const flightNo = normalizeWeeklyFlightNo(template.flightNo);
+                return html`<label class="weekly-flight-template-row">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    aria-label=${`${weekdayLabel(this.selectedWeekday)} ${flightNo}`}
+                    .checked=${selected.has(flightNo)}
+                    @change=${(event: Event) =>
                     dispatchUiCommand(this, {
                       type: "set-weekly-flight-template",
                       weekday: this.selectedWeekday,
@@ -70,12 +70,12 @@ export class WeeklyFlightPlanSectionElement extends LightDomElement {
                       selected: (event.currentTarget as HTMLInputElement)
                         .checked,
                     })}
-                />
-                <strong>${flightNo}</strong>
-                <span>${template.startTime}-${template.endTime}</span>
-                <span>${template.positions.length} 岗</span>
-              </label>`;
-            })}
+                  />
+                  <strong>${flightNo}</strong>
+                  <span>${template.startTime}-${template.endTime}</span>
+                  <span>${template.positions.length} 岗</span>
+                </label>`;
+              })}
             </div>`
           : html`<div class="empty-state">尚无航班模板</div>`
       }

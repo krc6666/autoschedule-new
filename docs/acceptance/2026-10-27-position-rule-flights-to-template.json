@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-10-27-position-rule-flights-to-template",
+  "title": "岗位规则中的航班补入共享航班模板",
+  "startedFrom": "6f77c36d9d9ba79d21b8c0edbd93f989ad126645",
+  "expectation": {
+    "example": "当前模板只有 CX937、FD573、CX931、TR121；导入的岗位规则还包含 KE166、MF8683、TW616。",
+    "expected": "导入岗位配置时，缺少的规则航班直接补入 A/B 共用模板，无需再勾完整共享计划；模板岗位名来自 A/B 两组规则。旧 v10 存档升级时也补入缺少的航班。",
+    "unchanged": "岗位分类、资质、状态和规则内容继续按 A/B 分开；已有模板的时间、岗位和备注不覆盖；仅导入岗位配置时每周计划保持原值，新航班不自动加入星期。完整模板与周计划仍只在用户勾选后整体替换。",
+    "fallback": "新增模板优先沿用匹配的现存航班时间和备注；没有可靠时段资料时起止时间留空，不能伪造时间；同一航班重复或空航班号不重复新增；取消或无效导入不改变现有数据。"
+  },
+  "testedVersion": "e5c4fd8339802b6d23cca15067eb3b6059c1cdba73ed7294605a9d0c9897525d",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "修改前工作簿导入回归显示规则航班 KE166、MF8683、TW616 没有补进模板；修改后同一导入入口在 79 项定向测试中通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-27-position-rule-flights-to-template-reproduction.txt",
+          "summary": "修改前失败、修改后导入入口及岗位规则模板同步回归通过。",
+          "sha256": "45fc269893f6b74357bd07c92bf072fe215c7ecfa1635ef8ef8610bf9ec8910b"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "导入岗位配置时补齐缺少模板航班，沿用来源时间和备注；无时间来源时留空；已有模板和每周计划保持原值，A/B 岗位属性分别保留。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-27-position-rule-flights-to-template-reproduction.txt",
+          "summary": "工作簿导入集成测试和模板字段、A/B 规则属性测试通过。",
+          "sha256": "45fc269893f6b74357bd07c92bf072fe215c7ecfa1635ef8ef8610bf9ec8910b"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "v10 存档升级时从 A/B 岗位规则补齐模板一次；同航班不重复、已有时间沿用、缺时间留空，升级后手动删除不会在下次打开时复活。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-27-position-rule-flights-to-template-reproduction.txt",
+          "summary": "v10 到 v11 迁移及升级后再次恢复测试通过。",
+          "sha256": "45fc269893f6b74357bd07c92bf072fe215c7ecfa1635ef8ef8610bf9ec8910b"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "模板增加另一组缺少的岗位行时，仅清除该组未归档班表；迁移中只有补出规则行的组清除班表。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-27-position-rule-flights-to-template-reproduction.txt",
+          "summary": "导入和迁移均覆盖受影响组班表清理与未受影响组保留。",
+          "sha256": "45fc269893f6b74357bd07c92bf072fe215c7ecfa1635ef8ef8610bf9ec8910b"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "not_applicable",
+      "reason": "本次只同步模板和岗位配置数据，不改变排班候选、约束、求解、后置流程或最终 assignments 不变量。",
+      "evidence": []
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "A/B 岗位分类和资质按组保留；模板已有字段不被覆盖；仅岗位配置导入时周计划不变，新航班不自动加入星期。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-27-position-rule-flights-to-template-reproduction.txt",
+          "summary": "A/B 规则、原模板、时间来源及周计划不变断言通过。",
+          "sha256": "45fc269893f6b74357bd07c92bf072fe215c7ecfa1635ef8ef8610bf9ec8910b"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "仍需 owner 在当前版本页面刷新并核对岗位规则里的缺失航班出现在模板中；自动测试和构建不能代替页面验收。",
+      "evidence": []
+    }
+  },
+  "answers": {
+    "originalFailure": "原始截图和修改前导入失败回归都显示模板只保留四个默认航班；修改后集成测试确认岗位规则中的 KE166、MF8683、TW616 进入共用模板。证据见 reproduction.txt。",
+    "laterChanges": "导入后另一组补岗位行会清理其旧班表；v10 一次迁移补齐两组模板航班，v11 后删除不复活；完整共享计划仍由单独勾选整体替换。证据见 reproduction.txt。",
+    "finalArtifact": "尚无修改后页面产物；需要 owner 刷新本地页面，核对原四个航班保留且岗位规则中的航班出现在共用模板，并确认时间来源或空白状态。"
+  },
+  "review": {
+    "missedScope": "上次只验证模板岗位新增后给 A/B 补规则，漏了规则航班反向进入共享模板；本次补查工作簿导入与本地状态升级。",
+    "rootCause": "岗位规则只保存航班号和岗位事实，共享模板另存时段和周计划；此前两个独立数据入口没有反向补模板的步骤。",
+    "earlyDetection": "修改组内岗位配置或共享模板前，先用岗位航班缺模板、模板岗位缺规则两种方向分别写导入和存档升级回归，并核对 A/B 与每周计划不变项。"
+  }
+}

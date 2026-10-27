@@ -209,18 +209,18 @@ export interface ScheduleSettings {
 
 export type ScheduleGroupId = "A" | "B";
 
-/** Facts shared by both groups. Group workspaces must not copy these values. */
+/** Reusable flight planning facts shared by both groups. */
 export interface SharedScheduleData {
   templates: FlightTemplate[];
   weeklyFlightPlans: WeeklyFlightPlanEntry[];
-  positionRules: PositionRule[];
-  settings: ScheduleSettings;
 }
 
-/** Facts that belong exclusively to one personnel group. */
+/** Scheduling facts and configuration owned exclusively by one group. */
 export interface GroupWorkspace {
   flights: Flight[];
   staff: Staff[];
+  positionRules: PositionRule[];
+  settings: ScheduleSettings;
   history: HistoryRecord[];
   dutyRosterOverrides: DutyRosterOverride[];
   latePriorityFrequencyAdjustments: LatePriorityFrequencyAdjustment[];
@@ -234,14 +234,14 @@ export interface GroupWorkspace {
 export type GroupWorkspaces = Record<ScheduleGroupId, GroupWorkspace>;
 
 export interface AppState {
-  version: 8;
-  /** Shared configuration and the two isolated group workspaces. */
+  version: 11;
+  /** Shared flight planning data and the two isolated group workspaces. */
   shared: SharedScheduleData;
   groups: GroupWorkspaces;
   activeGroupId: ScheduleGroupId;
   /**
-   * Legacy current-workspace projection kept during the staged migration.
-   * Consumers move to `shared`/`groups` in the following phase.
+   * Current-group projection consumed by existing scheduling and UI modules.
+   * The store activates it from groups while templates and weekly plans stay shared.
    */
   staff: Staff[];
   flights: Flight[];

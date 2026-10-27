@@ -4,8 +4,10 @@ import type { LegacyScheduleImportPreview } from "../infrastructure/legacy-sched
 import {
   applyWorkbookImport,
   type HistoryImportSummary,
+  type WeeklyPlanImportPreview,
   validateDutyRosterImport,
 } from "./workbook-actions";
+import type { WorkbookImport } from "../infrastructure/excel";
 
 export type WorkbookImportMode =
   "all" | "config" | "history" | "duty-roster" | "late-priority-counts";
@@ -21,6 +23,9 @@ export type PreparedWorkbookImport =
       recognized: string;
       warnings: string[];
       changedConfig: boolean;
+      imported: WorkbookImport;
+      weeklyPlanPreview?: WeeklyPlanImportPreview;
+      sharedTemplatesAvailable: boolean;
       historySummary?: HistoryImportSummary;
     };
 
@@ -60,6 +65,12 @@ export async function prepareWorkbookImport(
   const applied = applyWorkbookImport(state, imported, mode);
   return {
     kind: "workbook",
+    imported,
+    weeklyPlanPreview: applied.weeklyPlanPreview,
+    sharedTemplatesAvailable:
+      mode !== "history" &&
+      (imported.templates !== undefined ||
+        (imported.flights !== undefined && imported.templates === undefined)),
     recognized: applied.recognized,
     changedConfig: applied.changedConfig,
     historySummary: applied.historySummary,

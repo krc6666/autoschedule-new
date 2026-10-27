@@ -1,0 +1,84 @@
+
+> autoschedule@1.0.0 test
+> vitest run --exclude tests/performance/**
+
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/app/application-coordinator.test.ts (45 tests | 7 failed) 2904ms
+     × reserves a schedule run before asynchronous command routing 1067ms
+     × explains 'calculation-timeout' in plain language for 'generate' without adopting the failed draft 29ms
+     × explains 'program-error' in plain language for 'generate' without adopting the failed draft 20ms
+     × explains 'no-safe-schedule' in plain language for 'generate' without adopting the failed draft 12ms
+     × explains 'schedule-check' in plain language for 'generate' without adopting the failed draft 14ms
+     × explains 'schedule-check' in plain language for 'generate' without adopting the failed draft 15ms
+     × shows KE166 failure details and preserves the model for generate 30ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 7 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/app/application-coordinator.test.ts > application scheduling exclusivity > reserves a schedule run before asynchronous command routing
+AssertionError: expected "vi.fn()" to be called at least once
+ ❯ tests/app/application-coordinator.test.ts:651:46
+    649|
+    650|     await toggle;
+    651|     await vi.waitFor(() => expect(calculate).toHaveBeenCalled());
+       |                                              ^
+    652|     expect(calculate).toHaveBeenCalledTimes(1);
+    653|     expect(coordinator.model().settings.adminSupportEnabled).toBe(fals…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/7]⎯
+
+ FAIL  tests/app/application-coordinator.test.ts > next workday flight picker workflow > explains 'calculation-timeout' in plain language for 'generate' without adopting the failed draft
+ FAIL  tests/app/application-coordinator.test.ts > next workday flight picker workflow > explains 'program-error' in plain language for 'generate' without adopting the failed draft
+ FAIL  tests/app/application-coordinator.test.ts > next workday flight picker workflow > explains 'no-safe-schedule' in plain language for 'generate' without adopting the failed draft
+ FAIL  tests/app/application-coordinator.test.ts > next workday flight picker workflow > explains 'schedule-check' in plain language for 'generate' without adopting the failed draft
+ FAIL  tests/app/application-coordinator.test.ts > next workday flight picker workflow > explains 'schedule-check' in plain language for 'generate' without adopting the failed draft
+AssertionError: expected '请至少选择一个航班' to contain '原班表已保留'
+
+Expected: "原班表已保留"
+Received: "请至少选择一个航班"
+
+ ❯ tests/app/application-coordinator.test.ts:947:29
+    945|       const toast = coordinator.view().toast!;
+    946|       expect(coordinator.model()).toEqual(original);
+    947|       expect(toast.message).toContain("原班表已保留");
+       |                             ^
+    948|       expect(toast.message).toContain(reason);
+    949|       expect(toast.details).toMatchObject({
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/7]⎯
+
+ FAIL  tests/app/application-coordinator.test.ts > next workday flight picker workflow > shows KE166 failure details and preserves the model for generate
+AssertionError: expected undefined to match object { …(5) }
+
+- Expected:
+{
+  "code": "ke166-distinct-staff-capacity",
+  "date": "2026-08-15",
+  "facts": [
+    "人员甲没有重叠岗位",
+  ],
+  "reason": "人员甲可承担KE166/H05",
+  "steps": [
+    "导出诊断记录交给开发人员",
+  ],
+}
+
++ Received:
+undefined
+
+ ❯ tests/app/application-coordinator.test.ts:1024:49
+    1022|       expect(coordinator.model()).toEqual(beforeConfirm);
+    1023|       if (entry !== "generate") expect(coordinator.model()).toEqual(or…
+    1024|       expect(coordinator.view().toast?.details).toMatchObject({
+       |                                                 ^
+    1025|         ...details,
+    1026|         date: dialog.date,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/7]⎯
+
+
+ Test Files  1 failed | 147 passed (148)
+      Tests  7 failed | 1473 passed (1480)
+   Start at  09:36:34
+   Duration  89.76s (transform 18.89s, setup 0ms, import 59.73s, tests 296.02s, environment 15.48s)

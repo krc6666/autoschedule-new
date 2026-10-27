@@ -1,0 +1,131 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-10-27-weekly-plan-import-safety",
+  "title": "每周航班计划导入校验与结果预览",
+  "startedFrom": "6f77c36d9d9ba79d21b8c0edbd93f989ad126645",
+  "expectation": {
+    "example": "导入包含星期一至星期日计划的配置工作簿；逐日选中的航班均在文件中的岗位配置或模板中。另测试缺少星期、重复星期、错误星期和计划航班没有可用模板的工作簿。",
+    "expected": "完整合法计划仍自动同步到 A、B；预览逐日显示最终将应用的航班，并指出会因模板不存在而跳过的航班。错误或不完整工作表明确警告并保留当前计划。",
+    "unchanged": "只有表头的空计划仍清空七天；缺少工作表仍保留计划；岗位规则只覆盖当前组；整份共用模板替换仍需单独选择；每周计划仍由现有共享状态保存并供后续排班读取。",
+    "fallback": "计划表存在但缺少星期、重复星期、星期无效或表头无法识别时整张计划不应用；只跳过模板不存在的航班并在预览中明确列出，可通过单独替换文件模板让预览重新计算。"
+  },
+  "testedVersion": "77e1895508159078e6d71927022269fa90b1a33469dd680108fd629a8ef96f99",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "修改前测试确认缺日、重复日、星期八和错误表头都会被解析成七天计划，导入预览也没有逐日结果和不可用航班提示；修复后相关回归通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-27-weekly-plan-import-safety-reproduction.txt",
+          "summary": "记录修复前四类非法计划表被接受、预览缺少有效结果的问题及测试初稿修正。",
+          "sha256": "5d33d6e7b9ea741e096926ac377aecfe8c8c690a1ed0e4dd2a001d00ab9c6c61"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-27-weekly-plan-import-safety-focused.txt",
+          "summary": "最终 5 个相关测试文件、96 项通过。",
+          "sha256": "71adbd56f0f5db22e1a99142f40934d2b177fb9284f4b8ff082117e7debd64be"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "完整七日选择仍在确认导入后写入共享计划，逐日预览结果与最后应用结果一致；有效空表仍按合同清空。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-27-weekly-plan-import-safety-focused.txt",
+          "summary": "Excel 七日往返、导入确认与预览、真实日期预检消费者的 96 项定向测试通过。",
+          "sha256": "71adbd56f0f5db22e1a99142f40934d2b177fb9284f4b8ff082117e7debd64be"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "缺表保留、表头空表清空、缺日/重复日/错误星期/错误表头保留现值、缺模板航班提示，以及切换整份模板替换后预览重算均有覆盖。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-27-weekly-plan-import-safety-focused.txt",
+          "summary": "导入和解析分支的相关回归共 96 项通过。",
+          "sha256": "71adbd56f0f5db22e1a99142f40934d2b177fb9284f4b8ff082117e7debd64be"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "共享计划保存后仍由下一班日期预检读取并作为默认选择；本次没有改动排班 assignments。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-27-weekly-plan-import-safety-focused.txt",
+          "summary": "周计划消费者与日期预检默认选项相关测试在定向套件内通过。",
+          "sha256": "71adbd56f0f5db22e1a99142f40934d2b177fb9284f4b8ff082117e7debd64be"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "not_applicable",
+      "reason": "此流程只导入共用周计划，不生成或改写排班 assignments。",
+      "evidence": []
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "岗位规则仍只覆盖当前组；共用模板仍由单独开关整体替换；模板缺失筛选与 A/B 周计划使用保持。全量功能测试中的旧失败已确认为用例日期与周计划不匹配，修正测试场景后完整门禁通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-27-weekly-plan-import-safety-focused.txt",
+          "summary": "A/B 规则隔离、独立模板替换选项和共享周计划导入相关测试通过。",
+          "sha256": "71adbd56f0f5db22e1a99142f40934d2b177fb9284f4b8ff082117e7debd64be"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-27-weekly-plan-import-safety-verify.txt",
+          "summary": "最终 verify 退出 0，1487 项功能测试与 19 项性能测试全部通过，类型检查和生产构建通过。",
+          "sha256": "237513e0c0a56f7c4d9486957301171db057918c0160965d2ff0130c7548dd4d"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "自动验证已通过导入、预览、保存和日期预检路径；修改版真实页面仍需 owner 在 http://127.0.0.1:63943/ 导入原文件，确认星期一至星期日显示正确。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-27-weekly-plan-config-import-source.txt",
+          "summary": "用户原始 Excel 的脱敏事实：7 天、10 个计划航班，均存在于模板和岗位规则。此证据确认输入，不代替修改版页面验收。",
+          "sha256": "df2e1b26c200333b10b3b29b48aec5c1656eaff47f1a7d63426d4e3de69b07fb"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-27-weekly-plan-import-safety-focused.txt",
+          "summary": "自动导入与页面渲染测试通过；不是现场页面证据。",
+          "sha256": "71adbd56f0f5db22e1a99142f40934d2b177fb9284f4b8ff082117e7debd64be"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-27-weekly-plan-import-safety-verify.txt",
+          "summary": "最终完整 verify 退出 0：1487 项功能测试、19 项性能测试、类型检查和生产构建全部通过。",
+          "sha256": "237513e0c0a56f7c4d9486957301171db057918c0160965d2ff0130c7548dd4d"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-27-weekly-plan-import-safety-typecheck.txt",
+          "summary": "最新代码类型检查退出 0。",
+          "sha256": "6fca04d3c72065bc025ab49945050cc2dfbc1bdaca455b60715aa1bc1e49aa76"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-27-weekly-plan-import-safety-performance.txt",
+          "summary": "性能套件 7 个文件、19 项通过；本次 Excel 解析改动不触及排班算法。",
+          "sha256": "2a99c43bf553c815501e057e560ac086a4f821677d80a111543f9be07157caaa"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-10-27-weekly-plan-import-safety-build.txt",
+          "summary": "最新代码生产构建退出 0。",
+          "sha256": "934e49468259a68292ff1f6c05d785b12b2ec9400e9fa85ec3d9fb620a74c739"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "原问题由导入流程检查和新失败用例发现：错误周计划表过去仍会生成空白七日结果；详情见 reproduction，修复后 96 项相关回归通过。",
+    "laterChanges": "模板补缺先于周计划过滤；默认与整体替换模板两种预览都调用 applyWorkbookImport 同一应用逻辑；保存后的日期预检消费者有回归。全量 verify 暴露 7 个测试 fixture 的周计划星期不匹配与空选择，修正 fixture 后完整门禁通过，产品默认行为未变。",
+    "finalArtifact": "自动验证证据为 96 项定向回归和成功退出的完整 verify（1487 项功能、19 项性能、类型检查、构建）。用户原文件已脱敏核对。修改版真实页面仍需 owner 导入原文件核对星期一至星期日显示，现场验收尚未完成。"
+  },
+  "review": {
+    "missedScope": "解析、导入、预览、模板替换、Store 共享状态和日期预检均已自动检查；第一轮未意识到全量 coordinator 测试 fixture 的星期与固定日期不符，后续通过全量 verify 发现并修正；修改版真实页面仍需 owner 导入文件核验。",
+    "rootCause": "旧解析器从空的七天计划开始填充并跳过未知星期，缺日或重复日没有让工作表整体判无效；预览仅说明会导入，没有展示应用后过滤结果。",
+    "earlyDetection": "以后调整 Excel 全量表时，在实现前并列测试缺表、合法空表、缺行、重复行、未知值与缺少引用对象；预览通过真实应用函数投影最终结果，再验证确认后状态完全一致。调整按星期预选的入口后，协调器测试 fixture 必须令计划星期与实际打开日期一致，另保留空选择不启动计算的回归。"
+  }
+}

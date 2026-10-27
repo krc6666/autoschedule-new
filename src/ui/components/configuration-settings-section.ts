@@ -28,7 +28,7 @@ export class ConfigurationSettingsSectionElement extends LightDomElement {
       <div>
         <div class="section-heading">
           <div>
-            <h3>航班计划模板</h3>
+            <h3>航班计划模板（A、B 共用）</h3>
             <span>改名会同步两组对应的当前航班和规则，保留当天人数与时段</span>
           </div>
           <button

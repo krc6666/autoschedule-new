@@ -16,6 +16,7 @@ describe("flights page", () => {
 
     expect(text).toContain("在线查询航班");
     expect(text).toContain("每周航班计划");
+    expect(text).toContain("A、B 共用");
     expect(text).not.toContain("当日航班计划");
     expect(element.querySelectorAll("[data-weekday]")).toHaveLength(7);
     expect(text).not.toContain("选择模板");

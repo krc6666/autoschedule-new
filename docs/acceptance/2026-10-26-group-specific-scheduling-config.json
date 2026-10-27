@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-10-26-group-specific-scheduling-config",
+  "title": "A/B 岗位与排班规则配置隔离",
+  "startedFrom": "6f77c36d9d9ba79d21b8c0edbd93f989ad126645",
+  "expectation": {
+    "example": "A 组把 CX937/G12 设为分流并配置 A 组人员资质；B 组把同一岗位设为常规并配置 B 组人员资质。两组继续使用同一航班模板和每周航班计划。",
+    "expected": "切换 A/B 后只显示并使用当前组的岗位性质、资质和排班规则。配置工作簿导入只改当前组；只有显式选择同步时才改动两组共用模板和每周计划。当前组配置导出后再导入可恢复该组规则。",
+    "unchanged": "两组继续共用航班模板与每周航班计划；人员、当天航班、班表、历史、轮值和统计仍按组隔离；排班规则执行语义不变；历史工作簿中原有缺表保留规则不变。",
+    "fallback": "旧版只有一份规则配置，迁移时将旧配置分别复制为 A/B 初始配置；无效或重复人员配置不得覆盖当前组，失败导入保留原状态。损坏的新版组配置按既有恢复回退处理，不猜测另一组配置。"
+  },
+  "testedVersion": "0d5ef91f1db0a9d2d97ec586db5b282f3378a0c2b8030359db8a6ecef73d144d",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "A/B 岗位性质与参数隔离、切组恢复的回归断言已通过；这直接覆盖旧实现把两组规则放在 shared 中造成的无法独立配置问题。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-26-group-specific-scheduling-config-tests.txt",
+          "summary": "14 个分组配置、迁移、Excel 与诊断测试文件通过，共 243 项。",
+          "sha256": "b06f8945873d1950c3195a0cafe3a5afcbddbdba1ab6820d58bd44a0e9c2a3f8"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "验证 A/B 切组投影与保存恢复、当前组 Excel 导出导入，以及真实 XLSX 二进制预览和确认路径。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-26-group-specific-scheduling-config-tests.txt",
+          "summary": "14 个分组配置、迁移、Excel 与诊断测试文件通过，共 243 项。",
+          "sha256": "b06f8945873d1950c3195a0cafe3a5afcbddbdba1ab6820d58bd44a0e9c2a3f8"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "验证 v1-v8 旧配置复制为 A/B 独立初始值、v9 双组恢复，以及显式同步共用模板和每周计划的导入分支。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-26-group-specific-scheduling-config-tests.txt",
+          "summary": "14 个分组配置、迁移、Excel 与诊断测试文件通过，共 243 项。",
+          "sha256": "b06f8945873d1950c3195a0cafe3a5afcbddbdba1ab6820d58bd44a0e9c2a3f8"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "not_applicable",
+      "reason": "本次只调整规则配置的组归属和 Store 投影，不新增或改写补缺、恢复、轮岗、覆盖或人工调整逻辑；当前活动组配置仍由现有唯一 root 投影消费。",
+      "evidence": []
+    },
+    "finalGuard": {
+      "status": "not_applicable",
+      "reason": "不新增排班硬规则或最终守卫；配置投影的归属变化不改变最终校验合同。",
+      "evidence": []
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "验证模板与每周计划仍共享，同时人员、航班、班表、历史和轮值仍按组隔离；排班计算规则内容未改。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-10-26-group-specific-scheduling-config-tests.txt",
+          "summary": "14 个分组配置、迁移、Excel 与诊断测试文件通过，共 243 项。",
+          "sha256": "b06f8945873d1950c3195a0cafe3a5afcbddbdba1ab6820d58bd44a0e9c2a3f8"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "自动化已验证 localStorage v9 与真实 XLSX 二进制往返；按协作边界，仍待 owner 在本地页面切换 A/B 并检查导入预览和导出文件。",
+      "evidence": []
+    }
+  },
+  "answers": {
+    "originalFailure": "原实现把 positionRules/settings 放在 shared，无法让同一岗位在 A 为分流、B 为常规。group-workspace-isolation 回归现在断言两组类别和参数独立，并验证编辑 B 后 A 不变。",
+    "laterChanges": "Store 切组、配置编辑、v1-v8 迁移、v9 恢复、模板改名、Excel 导入范围、保存与恢复都可能影响配置归属；243 项定向测试覆盖这些路径。规则求解和最终守卫未改；完整 verify 另有 7 项既有次日航班预选相关失败，记录见 full-verify 证据。",
+    "finalArtifact": "自动化产物覆盖 v9 localStorage 状态和 XLSX 二进制导入导出；本次最终页面尚未由 owner 现场核对，所以真实入口验收仍未完成。"
+  },
+  "review": {
+    "missedScope": "页面中的实际 A/B 切换与导入预览效果仍需 owner 核对；检查范围已包含该手工步骤，未把自动化结果当作页面证据。",
+    "rootCause": "规则与设置的持久化所有权此前在全局 shared，而人员和班表按组保存，两个组自然只能消费同一份规则配置。",
+    "earlyDetection": "以后调整组配置或持久化字段时，改前先填传播矩阵并补 A→B→A、旧版迁移、Excel 往返和真实页面检查；在完整 verify 中逐项分辨新增失败与工作区既有改动。"
+  }
+}

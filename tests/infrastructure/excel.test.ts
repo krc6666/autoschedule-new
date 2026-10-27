@@ -13,6 +13,7 @@ import { replaceWeeklyFlightPlan } from "../../src/domain/flights/weekly-flight-
 import { SCHEDULE_SETTING_DEFINITIONS } from "../../src/domain/rules/schedule-settings";
 import { STRUCTURED_POLICY_DEFINITIONS } from "../../src/domain/rules/structured-policy-settings";
 import { createTestAutoscheduleStore } from "../helpers/application";
+import { applyWorkbookImport } from "../../src/app/workbook-actions";
 
 describe("workbook boundary", () => {
   it("labels the exported vacancy explanation column without inventing a history column", () => {
@@ -240,8 +241,7 @@ describe("workbook boundary", () => {
         remark: "B组历史",
       },
     ];
-    initial.positionRules[0]!.qualifiedStaffIds.push("b-only");
-    initial.shared.positionRules[0]!.qualifiedStaffIds.push("b-only");
+    initial.groups.B.positionRules[0]!.qualifiedStaffIds.push("b-only");
     initial.groups.B.flights = [
       {
         ...initial.flights[0]!,
@@ -727,6 +727,90 @@ describe("workbook boundary", () => {
     );
   });
 
+  it.each([
+    {
+      name: "缺少星期",
+      expectedWarning: "缺少星期日",
+      rows: [
+        ["星期", "航班号（用逗号分隔）"],
+        ["星期一", "CX937"],
+        ["星期二", "FD573"],
+        ["星期三", ""],
+        ["星期四", ""],
+        ["星期五", ""],
+        ["星期六", ""],
+      ],
+    },
+    {
+      name: "重复星期",
+      expectedWarning: "第3行星期“星期一”重复",
+      rows: [
+        ["星期", "航班号（用逗号分隔）"],
+        ["星期一", "CX937"],
+        ["星期一", "FD573"],
+        ["星期二", ""],
+        ["星期三", ""],
+        ["星期四", ""],
+        ["星期五", ""],
+        ["星期六", ""],
+        ["星期日", ""],
+      ],
+    },
+    {
+      name: "无效星期",
+      expectedWarning: "第8行星期“星期八”无效",
+      rows: [
+        ["星期", "航班号（用逗号分隔）"],
+        ["星期一", "CX937"],
+        ["星期二", ""],
+        ["星期三", ""],
+        ["星期四", ""],
+        ["星期五", ""],
+        ["星期六", ""],
+        ["星期八", ""],
+      ],
+    },
+    {
+      name: "无法识别的表头",
+      expectedWarning: "表头需包含“星期”和“航班号”",
+      rows: [
+        ["日期", "计划"],
+        ["星期一", "CX937"],
+        ["星期二", ""],
+        ["星期三", ""],
+        ["星期四", ""],
+        ["星期五", ""],
+        ["星期六", ""],
+        ["星期日", ""],
+      ],
+    },
+  ])("拒绝并保留现有计划并指出原因：$name", ({ rows, expectedWarning }) => {
+    const state = createDefaultState();
+    state.weeklyFlightPlans = replaceWeeklyFlightPlan(
+      state.weeklyFlightPlans,
+      1,
+      [state.templates[0]!.flightNo]
+    );
+    const before = structuredClone(state.weeklyFlightPlans);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(
+      workbook,
+      XLSX.utils.aoa_to_sheet(rows),
+      "每周航班计划"
+    );
+
+    const imported = parseWorkbook(workbook, state.staff);
+    expect(imported.weeklyFlightPlans).toBeUndefined();
+    expect(imported.weeklyFlightPlanStatus).toBe("invalid");
+    expect(imported.warnings.join(" ")).toContain(expectedWarning);
+    expect(imported.warnings.join(" ")).not.toContain(
+      "航班计划工作表没有有效数据"
+    );
+
+    applyWorkbookImport(state, imported, "config");
+    expect(state.weeklyFlightPlans).toEqual(before);
+  });
+
   it("round-trips cross-flight priority policies", () => {
     const state = createDefaultState();
     state.settings.crossFlightPriorityPolicies = [
@@ -741,6 +825,39 @@ describe("workbook boundary", () => {
     expect(imported.settings?.crossFlightPriorityPolicies).toEqual(
       state.settings.crossFlightPriorityPolicies
     );
+  });
+
+  it("exports only active-group rules and imports them without changing the other group", () => {
+    const state = createDefaultState();
+    state.groups.A.positionRules[0]!.category = "分流";
+    state.groups.A.settings.maxDailyHours = 9.5;
+    state.groups.B.positionRules[0]!.category = "常规";
+    state.groups.B.settings.maxDailyHours = 8.5;
+    state.positionRules = state.groups.A.positionRules;
+    state.settings = state.groups.A.settings;
+    const store = createTestAutoscheduleStore(state);
+    store.getState().switchGroup("B");
+    const source = store.getState().model;
+    const workbook = XLSX.read(
+      XLSX.write(buildConfigWorkbook(source), {
+        type: "array",
+        bookType: "xlsx",
+      }),
+      { type: "array" }
+    );
+    const imported = parseWorkbook(workbook, source.staff);
+    const beforeA = structuredClone(source.groups.A);
+    const target = structuredClone(source);
+    target.positionRules = target.groups.B.positionRules;
+    target.settings = target.groups.B.settings;
+
+    applyWorkbookImport(target, imported, "config");
+
+    expect(target.positionRules[0]!.category).toBe("常规");
+    expect(target.settings.maxDailyHours).toBe(8.5);
+    expect(target.groups.A).toEqual(beforeA);
+    expect(target.templates).toEqual(source.templates);
+    expect(target.weeklyFlightPlans).toEqual(source.weeklyFlightPlans);
   });
 
   it("rejects a cross-flight priority sheet with unknown staff ids", () => {

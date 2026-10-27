@@ -156,7 +156,9 @@ describe("workbook actions", () => {
       target.staff
     );
 
-    applyWorkbookImport(target, imported, "config");
+    applyWorkbookImport(target, imported, "config", {
+      replaceSharedTemplates: true,
+    });
 
     const { adminSupportEnabled: _sourceAdminMode, ...sourceSettings } =
       source.settings;
@@ -169,7 +171,17 @@ describe("workbook actions", () => {
       source.latePriorityFrequencyAdjustments
     );
     expect(target.templates).toEqual(imported.templates);
-    expect(target.positionRules).toEqual(imported.positionRules);
+    expect(target.positionRules).toEqual(
+      expect.arrayContaining(imported.positionRules ?? [])
+    );
+    for (const template of imported.templates ?? [])
+      for (const position of template.positions)
+        expect(
+          target.positionRules.some(
+            (rule) =>
+              rule.flightNo === template.flightNo && rule.name === position
+          )
+        ).toBe(true);
     expect(target.weeklyFlightPlans).toEqual(source.weeklyFlightPlans);
     expect(target.dutyRosterOverrides).toEqual(source.dutyRosterOverrides);
     expect(target.settings.positionTransitionPolicies[0]!.mode).toBe("forbid");
@@ -195,7 +207,8 @@ describe("workbook actions", () => {
         positionRules: [],
         warnings: [],
       },
-      "config"
+      "config",
+      { replaceSharedTemplates: true }
     );
 
     expect(result.changedConfig).toBe(true);
@@ -228,7 +241,8 @@ describe("workbook actions", () => {
     const result = applyWorkbookImport(
       state,
       { weeklyFlightPlans: importedPlan, warnings: [] },
-      "config"
+      "config",
+      { replaceSharedTemplates: true }
     );
 
     expect(
@@ -240,6 +254,10 @@ describe("workbook actions", () => {
     expect(result).toEqual({
       changedConfig: true,
       recognized: "每周航班计划",
+      weeklyPlanPreview: {
+        plans: state.weeklyFlightPlans,
+        unavailableFlightNos: ["MISSING100"],
+      },
     });
   });
 
@@ -460,17 +478,18 @@ describe("workbook actions", () => {
     expect(state.staff).toEqual(originalStaff);
   });
 
-  it("preserves the other group's qualifications when importing shared position rules", () => {
+  it("imports position qualifications only into the active group's rules", () => {
     const state = createDefaultState();
-    const currentId = state.staff[0]!.id;
     const otherId = "B-qualified";
     state.groups.B.staff = [
       { ...state.staff[1]!, id: otherId, name: "B组资质人员" },
     ];
-    const existing = state.positionRules[0]!;
-    existing.qualifiedStaffIds = [currentId, otherId];
+    state.groups.B.positionRules[0]!.qualifiedStaffIds = [otherId];
+    state.positionRules[0]!.qualifiedStaffIds = [state.staff[0]!.id];
+    state.groups.A.positionRules = state.positionRules;
+    const beforeB = structuredClone(state.groups.B.positionRules);
     const importedRule = {
-      ...existing,
+      ...state.positionRules[0]!,
       id: "imported-rule",
       qualifiedStaffIds: [state.staff[1]!.id],
     };
@@ -482,12 +501,12 @@ describe("workbook actions", () => {
     );
 
     expect(state.positionRules[0]!.qualifiedStaffIds).toEqual([
-      otherId,
       state.staff[1]!.id,
     ]);
+    expect(state.groups.B.positionRules).toEqual(beforeB);
   });
 
-  it("preserves the other group's personnel rules when importing shared settings", () => {
+  it("replaces only the active group's personnel rules on import", () => {
     const state = createDefaultState();
     const otherA = { ...state.staff[0]!, id: "B-1", name: "B组一" };
     const otherB = { ...state.staff[1]!, id: "B-2", name: "B组二" };
@@ -499,7 +518,8 @@ describe("workbook actions", () => {
       firstStaffId: otherA.id,
       secondStaffId: otherB.id,
     };
-    state.settings.sameFlightStaffExclusions = [otherRule];
+    state.groups.B.settings.sameFlightStaffExclusions = [otherRule];
+    const beforeB = structuredClone(state.groups.B.settings);
     const currentRule = {
       id: "a-pair",
       enabled: true,
@@ -517,26 +537,25 @@ describe("workbook actions", () => {
       "config"
     );
 
-    expect(state.settings.sameFlightStaffExclusions).toEqual([
-      otherRule,
-      currentRule,
-    ]);
+    expect(state.settings.sameFlightStaffExclusions).toEqual([currentRule]);
+    expect(state.groups.B.settings).toEqual(beforeB);
   });
 
-  it("preserves the other group's selected people when importing cross-flight priority rows", () => {
+  it("replaces cross-flight priority people only in the active group's settings", () => {
     const state = createDefaultState();
     const otherId = "B-priority";
     state.groups.B.staff = [
       { ...state.staff[0]!, id: otherId, name: "B组重点人员" },
     ];
-    state.settings.crossFlightPriorityPolicies = [
+    state.groups.B.settings.crossFlightPriorityPolicies = [
       {
         id: "priority-1",
         enabled: true,
         flightNo: "KE166",
-        staffIds: [state.staff[0]!.id, otherId],
+        staffIds: [otherId],
       },
     ];
+    const beforeB = structuredClone(state.groups.B.settings);
 
     applyWorkbookImport(
       state,
@@ -557,26 +576,234 @@ describe("workbook actions", () => {
     );
 
     expect(state.settings.crossFlightPriorityPolicies[0]!.staffIds).toEqual([
-      otherId,
       state.staff[1]!.id,
     ]);
+    expect(state.groups.B.settings).toEqual(beforeB);
 
     applyWorkbookImport(
       state,
-      {
-        settings: { crossFlightPriorityPolicies: [] },
-        warnings: [],
-      },
+      { settings: { crossFlightPriorityPolicies: [] }, warnings: [] },
       "config"
     );
-    expect(state.settings.crossFlightPriorityPolicies).toEqual([
-      {
-        id: "priority-1",
-        enabled: true,
-        flightNo: "KE166",
-        staffIds: [otherId],
-      },
+    expect(state.settings.crossFlightPriorityPolicies).toEqual([]);
+    expect(state.groups.B.settings).toEqual(beforeB);
+  });
+
+  it("imports group rules by default and changes shared templates only when selected", () => {
+    const state = createDefaultState();
+    const beforeTemplates = structuredClone(state.templates);
+    const beforeB = structuredClone(state.groups.B);
+    const importedTemplate = {
+      ...state.templates[0]!,
+      flightNo: "SHARED200",
+    };
+    const importedPlan = replaceWeeklyFlightPlan(
+      createDefaultState().weeklyFlightPlans,
+      2,
+      ["SHARED200"]
+    );
+    const importedRule = {
+      ...state.positionRules[0]!,
+      flightNo: "SHARED200",
+      name: importedTemplate.positions[0]!,
+      category: "分流" as const,
+    };
+    const imported = {
+      templates: [importedTemplate],
+      weeklyFlightPlans: importedPlan,
+      positionRules: [importedRule],
+      settings: { dutyFatiguePoints: 7 },
+      warnings: [],
+    };
+
+    const defaultScope = applyWorkbookImport(state, imported, "config");
+
+    expect(defaultScope.changedConfig).toBe(true);
+    expect(state.positionRules[0]!.category).toBe("分流");
+    expect(state.settings.dutyFatiguePoints).toBe(7);
+    expect(state.templates.map((template) => template.flightNo)).toEqual([
+      ...beforeTemplates.map((template) => template.flightNo),
+      "SHARED200",
     ]);
+    expect(state.templates.at(-1)).toMatchObject({
+      flightNo: "SHARED200",
+      startTime: importedTemplate.startTime,
+      endTime: importedTemplate.endTime,
+      positions: [importedRule.name],
+    });
+    expect(
+      state.weeklyFlightPlans.find((entry) => entry.weekday === 2)?.flightNos
+    ).toEqual(["SHARED200"]);
+    expect(
+      state.groups.B.positionRules.filter(
+        (rule) => rule.flightNo !== "SHARED200"
+      )
+    ).toEqual(beforeB.positionRules);
+    expect(state.groups.B.staff).toEqual(beforeB.staff);
+    expect(state.groups.B.settings).toEqual(beforeB.settings);
+    expect(defaultScope.recognized).toContain("1 条岗位规则");
+    expect(defaultScope.recognized).toContain("1 个岗位航班补入共用模板");
+    expect(defaultScope.recognized).not.toContain("航班模板");
+    expect(defaultScope.recognized).toContain("每周航班计划");
+
+    const sharedScope = applyWorkbookImport(state, imported, "config", {
+      replaceSharedTemplates: true,
+    });
+
+    expect(state.templates).toEqual([importedTemplate]);
+    expect(
+      state.weeklyFlightPlans.find((entry) => entry.weekday === 2)?.flightNos
+    ).toEqual(["SHARED200"]);
+    expect(
+      state.groups.B.positionRules.filter(
+        (rule) => rule.flightNo !== "SHARED200"
+      )
+    ).toEqual(beforeB.positionRules);
+    expect(state.groups.B.staff).toEqual(beforeB.staff);
+    expect(state.groups.B.settings).toEqual(beforeB.settings);
+    expect(sharedScope.recognized).toContain("1 个航班模板");
+    expect(sharedScope.recognized).toContain("每周航班计划");
+  });
+
+  it("fills missing template positions in both groups only when shared templates are imported", () => {
+    const state = createDefaultState();
+    const template = { ...state.templates[0]!, positions: ["H1", "H2"] };
+    const ruleA = {
+      ...state.positionRules[0]!,
+      id: "a-h1",
+      flightNo: template.flightNo,
+      name: "H1",
+      category: "分流" as const,
+    };
+    const ruleB = {
+      ...state.groups.B.positionRules[0]!,
+      id: "b-h1",
+      flightNo: template.flightNo,
+      name: "H1",
+      category: "常规" as const,
+    };
+    state.groups.A.positionRules = [ruleA];
+    state.groups.B.positionRules = [ruleB];
+    state.positionRules = state.groups.A.positionRules;
+
+    applyWorkbookImport(
+      state,
+      { templates: [template], warnings: [] },
+      "config",
+      { replaceSharedTemplates: true }
+    );
+
+    expect(state.groups.A.positionRules.map((rule) => rule.name)).toEqual([
+      "H1",
+      "H2",
+    ]);
+    expect(state.groups.B.positionRules.map((rule) => rule.name)).toEqual([
+      "H1",
+      "H2",
+    ]);
+    expect(state.groups.A.positionRules[0]!.category).toBe("分流");
+    expect(state.groups.B.positionRules[0]!.category).toBe("常规");
+  });
+
+  it("adds imported rule flights to the shared templates and preserves each group's rule values", () => {
+    const state = createDefaultState();
+    const beforeTemplateNos = state.templates.map(
+      (template) => template.flightNo
+    );
+    const beforeWeeklyPlans = structuredClone(state.weeklyFlightPlans);
+    const baseRule = state.positionRules[0]!;
+    const importedRules = [
+      {
+        ...baseRule,
+        id: "a-ke-g20",
+        flightNo: "KE166",
+        name: "G20",
+        category: "分流" as const,
+      },
+      {
+        ...baseRule,
+        id: "a-ke-g20-duplicate",
+        flightNo: "ke 166",
+        name: "G20",
+        category: "分流" as const,
+      },
+      {
+        ...baseRule,
+        id: "a-mf-h02",
+        flightNo: "MF8683",
+        name: "H02",
+        category: "引导" as const,
+      },
+    ];
+    state.positionRules = importedRules;
+    state.groups.A.positionRules = importedRules;
+    state.groups.B.positionRules = [
+      {
+        ...baseRule,
+        id: "b-ke-g20",
+        flightNo: "KE166",
+        name: "G20",
+        category: "常规",
+      },
+    ];
+    state.groups.B.activeScheduleDate = "2026-08-13";
+    const sourceFlight = {
+      ...state.flights[0]!,
+      id: "source-ke166",
+      flightNo: "KE166",
+      startTime: "12:10",
+      endTime: "14:10",
+      remark: "source time",
+    };
+    state.flights.push(sourceFlight);
+    state.groups.A.flights.push(sourceFlight);
+
+    const result = applyWorkbookImport(
+      state,
+      { positionRules: importedRules, warnings: [] },
+      "config"
+    );
+
+    expect(state.templates.map((template) => template.flightNo)).toEqual([
+      ...beforeTemplateNos,
+      "KE166",
+      "MF8683",
+    ]);
+    expect(state.templates.at(-2)).toMatchObject({
+      flightNo: "KE166",
+      startTime: "12:10",
+      endTime: "14:10",
+      positions: ["G20"],
+      remark: "source time",
+    });
+    expect(state.templates.at(-1)).toMatchObject({
+      flightNo: "MF8683",
+      startTime: "",
+      endTime: "",
+      positions: ["H02"],
+    });
+    expect(state.groups.A.positionRules.map((rule) => rule.flightNo)).toEqual([
+      "KE166",
+      "ke 166",
+      "MF8683",
+    ]);
+    expect(state.groups.A.positionRules.map((rule) => rule.category)).toEqual([
+      "分流",
+      "分流",
+      "引导",
+    ]);
+    expect(
+      state.groups.B.positionRules.find((rule) => rule.flightNo === "KE166")
+        ?.category
+    ).toBe("常规");
+    expect(
+      state.groups.B.positionRules.find((rule) => rule.flightNo === "MF8683")
+        ?.category
+    ).toBe("常规");
+    expect(state.groups.B.activeScheduleDate).toBeNull();
+    expect(state.weeklyFlightPlans).toEqual(beforeWeeklyPlans);
+    expect(state.shared.templates).toEqual(state.templates);
+    expect(result.recognized).toContain("2 个岗位航班补入共用模板");
   });
 
   it("merges imported rule settings, preserves omitted settings, and clears the active schedule", () => {

@@ -311,7 +311,7 @@ describe("preflight administrative mode draft", () => {
       expect(calculate).toHaveBeenCalledTimes(1);
       expect(coordinator.model().settings.adminSupportEnabled).toBe(!enabled);
       expect(persistence.load().settings.adminSupportEnabled).toBe(!enabled);
-      expect(coordinator.model().shared.settings.adminSupportEnabled).toBe(
+      expect(coordinator.model().groups.A.settings.adminSupportEnabled).toBe(
         !enabled
       );
       await coordinator.handle({ type: "generate-schedule" });
