@@ -9,7 +9,7 @@
     "unchanged": "确认导入仍按现有合同更新当前组岗位与规则、同步共享周计划，并清空当前组未归档班表；取消不写入；历史导入仍不清空班表。",
     "fallback": "若导入内容无效或用户取消，保留原配置与班表；本次仅调整文案和文档指引，不改变应用失败回退逻辑。"
   },
-  "testedVersion": "ab30bbc54e751c01712108fad410f9580add4bc5d4069c158004dfbac52a9b26",
+  "testedVersion": "bb3ac407ba3d00cafba0fa64db6fb6e6b6ea86ef031d7f0fd975b9281a8e2be9",
   "checks": {
     "reproduction": {
       "status": "verified",
