@@ -21,6 +21,7 @@ import {
 } from "../reviews/late-priority-policy";
 import { assignmentRule } from "../flights/schedule-position-rules";
 import { latePriorityFlightInScope } from "./late-priority-flight-scope";
+import { latePriorityRecordSemantics } from "./late-priority-record-semantics";
 
 function manualAdjustmentCount(
   state: ScheduleGenerationFacts,
@@ -44,12 +45,27 @@ function manualAdjustmentCount(
               state.settings.latePriorityFlightNumbers,
               itemFlight
             )) &&
-        state.positionRules.some(
+        (state.positionRules.some(
           (rule) =>
             rule.category === "常规" &&
             normalizeLatePriorityFlightNumber(rule.flightNo) === itemFlight &&
             latePriorityFrequencyKinds(rule).includes(kind)
-        )
+        ) ||
+          state.history.some((record) => {
+            if (
+              !record.date.startsWith(month) ||
+              normalizeLatePriorityFlightNumber(record.flightNo) !== itemFlight
+            )
+              return false;
+            const projected = scopedLatePriorityHistoryRecord(state, record);
+            return (
+              projected &&
+              latePriorityFrequencyKinds({
+                name: projected.position,
+                remark: projected.remark,
+              }).includes(kind)
+            );
+          }))
       );
     })
     .reduce((sum, item) => sum + item.delta, 0);
@@ -121,15 +137,19 @@ function scopedLatePriorityHistoryRecord(
   record: HistoryRecord
 ): HistoryRecord | undefined {
   const rule = historyRule(state, record);
+  const semantics = latePriorityRecordSemantics(record, rule);
   return rule &&
     latePriorityFlightInScope(
       state.settings.latePriorityFlightNumbers,
       record.flightNo
     ) &&
-    isLatePriorityPosition(rule, record, state.settings.lateShiftEndTime)
-    ? // Project current semantics for all monthly/recent/previous-workday consumers.
-      // Never overwrite the archived source or its separated remarks.
-      { ...record, position: rule.name, remark: rule.remark }
+    isLatePriorityPosition(
+      { ...rule, ...semantics },
+      record,
+      state.settings.lateShiftEndTime
+    )
+    ? // All historical consumers use role evidence without changing the archive.
+      { ...record, position: semantics.name, remark: semantics.remark }
     : undefined;
 }
 

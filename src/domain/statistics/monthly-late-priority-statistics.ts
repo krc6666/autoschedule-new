@@ -1,5 +1,6 @@
 import type { HistoryRecord, PositionRule, Staff } from "../../model";
 import type { SchedulingFacts } from "../shared/scheduling-facts";
+import { latePriorityRecordSemantics } from "./late-priority-record-semantics";
 import {
   baselineStaffId,
   hasQualificationOverride,
@@ -210,6 +211,43 @@ export function buildMonthlyLatePriorityStatistics(
   const flightNumbers = latePriorityStatisticsFlightNumbers(state);
   const rules = scopedRules(state);
   const countRecords = monthlyCountRecords(state, date);
+  const recordCategories = new Map(
+    countRecords.map((record) => [
+      record,
+      latePriorityFlightInScope(
+        state.settings.latePriorityFlightNumbers,
+        record.flightNo
+      ) && endsAfterLateShiftThreshold(record, state.settings.lateShiftEndTime)
+        ? categoryKinds(
+            latePriorityRecordSemantics(
+              record,
+              matchingRule(
+                state.positionRules,
+                record.flightNo,
+                record.position
+              )
+            )
+          )
+        : [],
+    ])
+  );
+  const applicableCategoriesByFlight = new Map(
+    flightNumbers.map((flightNo) => {
+      const configuredCategories = flightCategories(rules, flightNo);
+      return [
+        flightNo,
+        LATE_PRIORITY_STATISTICS_CATEGORIES.filter(
+          (category) =>
+            configuredCategories.includes(category) ||
+            countRecords.some(
+              (record) =>
+                normalizeLatePriorityFlightNumber(record.flightNo) ===
+                  flightNo && recordCategories.get(record)!.includes(category)
+            )
+        ),
+      ];
+    })
+  );
   const eligibleStaff = state.staff.filter(
     (person) =>
       person.staffType === "常规" &&
@@ -218,7 +256,7 @@ export function buildMonthlyLatePriorityStatistics(
         countRecords.some(
           (r) =>
             (r.staffId === person.id || baselineStaffId(r) === person.id) &&
-            matchingRule(rules, r.flightNo, r.position)
+            recordCategories.get(r)!.length > 0
         ) ||
         state.latePriorityFrequencyAdjustments.some(
           (a) =>
@@ -272,14 +310,7 @@ export function buildMonthlyLatePriorityStatistics(
     { staffId: string; override: boolean; unrecorded: boolean }
   >();
   const addHistoricalRecord = (record: HistoryRecord): void => {
-    const rule = matchingRule(rules, record.flightNo, record.position);
-    if (
-      !rule ||
-      !endsAfterLateShiftThreshold(record, state.settings.lateShiftEndTime)
-    )
-      return;
-    // Configuration owns the counting category; archived remarks remain evidence.
-    for (const category of categoryKinds(rule)) {
+    for (const category of recordCategories.get(record)!) {
       const baselineId = baselineStaffId(record);
       if (baselineId) {
         const key = [
@@ -368,7 +399,8 @@ export function buildMonthlyLatePriorityStatistics(
       }
       row.flights = Object.fromEntries(
         flightNumbers.map((flightNo) => {
-          const applicableCategories = flightCategories(rules, flightNo);
+          const applicableCategories =
+            applicableCategoriesByFlight.get(flightNo)!;
           const categories = Object.fromEntries(
             LATE_PRIORITY_STATISTICS_CATEGORIES.map((category) => {
               const categoryStatistics = row.categories[category];

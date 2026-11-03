@@ -1,0 +1,177 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-03-role-remark-history-counts",
+  "title": "岗位职责移动后当前和历史备注均计入对应次数",
+  "startedFrom": "f21d0e81eab5d6d48a3ae7d8f2bc29a428c39d63",
+  "expectation": {
+    "example": "owner工作簿10月29日TR121/H05历史岗位原备注送资料、实际结束23:55、承担人无H05资质；当前H05备注空、H04送资料。真实导入后送资料2次而漏该条，普通H05为1且下午无航班已计入。",
+    "expected": "记录的岗位原备注与当前精确匹配岗位配置共同识别职责，任一处命中即计入对应类别；同一岗位申报与送资料合并仍仅送资料1次。旧H05送资料不丢、新H04送资料也计。四类通用，当前/历史/历史编辑/自动历史频率/次数Excel口径一致，真实工作簿目标人10月送资料变为3次且含10月29日H05。",
+    "unchanged": "不改源Excel、历史原文、最终承担人员、人工基准/修正/清零、月份、已选航班范围、末班结束界线、同人同日同航班类别去重、引导及行政支援负荷例外；自动候选资质/类别及全部安全限制不放宽。普通重点仍按显式航司岗位集合；提前下班/下午无航班/当日航班数继续按实际安排计算，不按岗位资质过滤。",
+    "fallback": "没有对应当前岗位时仅识别记录自身岗位原文，不猜相似岗位。原文无职责且当前配置也无职责不计四类；结构化分离岗位备注优先于混合展示备注，人工备注与警告不作为类别。保留记录，不创建新历史或数值补丁。"
+  },
+  "testedVersion": "da9bf2971ec35624a1a7818d2e008137333a34a09b44db9e9b39101812d95302",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "真实文件闭合根因：当前H05空备注抹掉历史送资料，非岗位资质过滤。14项失败回归修复后转绿。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-qualification-statistics-workbook.txt",
+          "summary": "指定私有Excel真实导入前诊断：送资料2缺目标日，普通H05为1、下午已计；不改资质仅内存改回H05职责就3，原文件未改。",
+          "sha256": "e0219b65a2a177cb1359a744ed5e29ab3bcf90acf6c87a69a129c515db80ec05"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-role-remarks-red.txt",
+          "summary": "旧实现14项新回归全部失败：旧岗位空备注使历史四类、自动频率、编辑与往返漏计。",
+          "sha256": "b4ecc641474783a43c93396c262bd72d2ea31109c4441782cb51c7d19037c21e"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-role-remarks-green.txt",
+          "summary": "12文件107项定向通过：15项职责移动、3分支无资质、旧H04联动、两表/其他统计、自动历史频率、清零、存储与Excel及真实Worker/WASM。",
+          "sha256": "01b8b5f060e116eff1b37deaeb98ba0cdeb2f7cbc1a5f2f8e67029b7737ba72e"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "岗位原备注与当前精确配置统一编译；四类旧H05与新H04均计数、无资质照计，二合一仅送资料。真实页面总计3。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-role-remarks-green.txt",
+          "summary": "12文件107项定向通过：15项职责移动、3分支无资质、旧H04联动、两表/其他统计、自动历史频率、清零、存储与Excel及真实Worker/WASM。",
+          "sha256": "01b8b5f060e116eff1b37deaeb98ba0cdeb2f7cbc1a5f2f8e67029b7737ba72e"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-role-remarks-browser.txt",
+          "summary": "独立Chrome实际导入owner工作簿：送资料3且含10-29 TR121/H05，独立原记录重算3，普通H05为1；实际下载、刷新、390px及源文件哈希核对通过。",
+          "sha256": "19243431406e33c7e460e92c8b84df3993662974b6644659816773362460de8a"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-role-remarks-page.png",
+          "summary": "实际统计页面脱敏截取：送资料1、实际0修正+1，明细10-29 H05，来自真实工作簿导入。",
+          "sha256": "ac8b0e5181a6c4f95273868d77af857ae343a942d5aa6c029f34965376fd0520"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "历史类别独存、岗位删除/改职责、跨月份/范围/界线/重复、无资质当前/历史/历史编辑、轻松班与每日航班数、Excel/localStorage均覆盖。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-role-remarks-green.txt",
+          "summary": "12文件107项定向通过：15项职责移动、3分支无资质、旧H04联动、两表/其他统计、自动历史频率、清零、存储与Excel及真实Worker/WASM。",
+          "sha256": "01b8b5f060e116eff1b37deaeb98ba0cdeb2f7cbc1a5f2f8e67029b7737ba72e"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-qualification-statistics-browser.txt",
+          "summary": "匿名Chrome实际人工输入触发无资质警告：当前与历史送资料/普通H05均2，晨班提前/下午均2，晚班下午2，刷新保持且无页面错误。",
+          "sha256": "88ff3dafd69e43ef71948510c2c474fb32e4aa635ac4e0fe329c3e97412c9a48"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-role-remarks-commit-verify.txt",
+          "summary": "??commit?npm.cmd run verify??0?153??1539????7??19????????????????",
+          "sha256": "0d4de0ddd7facf61b22cc42ec6ae9043b9a57a3b8c3a74b8d3867396576c24d6"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "历史编辑恢复旧备注、人工换人、再次归档、清空、配置再次变化复用自动facts、次数导入和清零均有回归；实际浏览器刷新保持。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-role-remarks-green.txt",
+          "summary": "12文件107项定向通过：15项职责移动、3分支无资质、旧H04联动、两表/其他统计、自动历史频率、清零、存储与Excel及真实Worker/WASM。",
+          "sha256": "01b8b5f060e116eff1b37deaeb98ba0cdeb2f7cbc1a5f2f8e67029b7737ba72e"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-role-remarks-browser.txt",
+          "summary": "独立Chrome实际导入owner工作簿：送资料3且含10-29 TR121/H05，独立原记录重算3，普通H05为1；实际下载、刷新、390px及源文件哈希核对通过。",
+          "sha256": "19243431406e33c7e460e92c8b84df3993662974b6644659816773362460de8a"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-role-remarks-commit-verify.txt",
+          "summary": "??commit?npm.cmd run verify??0?153??1539????7??19????????????????",
+          "sha256": "0d4de0ddd7facf61b22cc42ec6ae9043b9a57a3b8c3a74b8d3867396576c24d6"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "非新增硬约束，无需新增安全凭证；自动当前岗位仍按当前常规规则和真实资质，人工突破仍有警告。既有自动资格、规则及完整Worker/WASM安全链回归通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-role-remarks-green.txt",
+          "summary": "12文件107项定向通过：15项职责移动、3分支无资质、旧H04联动、两表/其他统计、自动历史频率、清零、存储与Excel及真实Worker/WASM。",
+          "sha256": "01b8b5f060e116eff1b37deaeb98ba0cdeb2f7cbc1a5f2f8e67029b7737ba72e"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-role-remarks-commit-verify.txt",
+          "summary": "??commit?npm.cmd run verify??0?153??1539????7??19????????????????",
+          "sha256": "0d4de0ddd7facf61b22cc42ec6ae9043b9a57a3b8c3a74b8d3867396576c24d6"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "源工作簿哈希保持，历史原文/最终人员/人工基准不重写；普通重点集合、末班范围/界线/去重、引导例外及自动安全规则保留；提前/下午按原业务条件。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-role-remarks-green.txt",
+          "summary": "12文件107项定向通过：15项职责移动、3分支无资质、旧H04联动、两表/其他统计、自动历史频率、清零、存储与Excel及真实Worker/WASM。",
+          "sha256": "01b8b5f060e116eff1b37deaeb98ba0cdeb2f7cbc1a5f2f8e67029b7737ba72e"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-role-remarks-browser.txt",
+          "summary": "独立Chrome实际导入owner工作簿：送资料3且含10-29 TR121/H05，独立原记录重算3，普通H05为1；实际下载、刷新、390px及源文件哈希核对通过。",
+          "sha256": "19243431406e33c7e460e92c8b84df3993662974b6644659816773362460de8a"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-qualification-statistics-browser.txt",
+          "summary": "匿名Chrome实际人工输入触发无资质警告：当前与历史送资料/普通H05均2，晨班提前/下午均2，晚班下午2，刷新保持且无页面错误。",
+          "sha256": "88ff3dafd69e43ef71948510c2c474fb32e4aa635ac4e0fe329c3e97412c9a48"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-role-remarks-commit-verify.txt",
+          "summary": "??commit?npm.cmd run verify??0?153??1539????7??19????????????????",
+          "sha256": "0d4de0ddd7facf61b22cc42ec6ae9043b9a57a3b8c3a74b8d3867396576c24d6"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "verified",
+      "reason": "真实导入后的目标人10月送资料3、明细含10-29 H05，原记录独立重算3；下载次数TR送资料1、刷新与窄屏一致。脱敏结果与截图见材料。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-role-remarks-browser.txt",
+          "summary": "独立Chrome实际导入owner工作簿：送资料3且含10-29 TR121/H05，独立原记录重算3，普通H05为1；实际下载、刷新、390px及源文件哈希核对通过。",
+          "sha256": "19243431406e33c7e460e92c8b84df3993662974b6644659816773362460de8a"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-role-remarks-page.png",
+          "summary": "实际统计页面脱敏截取：送资料1、实际0修正+1，明细10-29 H05，来自真实工作簿导入。",
+          "sha256": "ac8b0e5181a6c4f95273868d77af857ae343a942d5aa6c029f34965376fd0520"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-qualification-statistics-browser.txt",
+          "summary": "匿名Chrome实际人工输入触发无资质警告：当前与历史送资料/普通H05均2，晨班提前/下午均2，晚班下午2，刷新保持且无页面错误。",
+          "sha256": "88ff3dafd69e43ef71948510c2c474fb32e4aa635ac4e0fe329c3e97412c9a48"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-role-remarks-commit-verify.txt",
+          "summary": "??commit?npm.cmd run verify??0?153??1539????7??19????????????????",
+          "sha256": "0d4de0ddd7facf61b22cc42ec6ae9043b9a57a3b8c3a74b8d3867396576c24d6"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "before材料真实导入确认2漏1，red记录四类跨岗位移动全部失败；green与真实browser证明3且补上10-29 H05，原文件不改。",
+    "laterChanges": "历史草稿/人工改派/清空/再归档、配置再次修改、存储Excel恢复与次数导入清零可能使结果再丢失；green覆盖这些后置路径，browser实际刷新及下载核对。",
+    "finalArtifact": "browser.txt和page.png来自本次实际导入指定私有工作簿；独立从原始记录重算3，实际下载TR送资料1；qualification-browser.txt补当前和历史无资质页面结果，verify记录完整验证。"
+  },
+  "review": {
+    "missedScope": "前次只验证同一H04变更，遗漏职责移到别的岗位。本次参数化四类、空备注/改职责/删除当前规则、类别展示/人工修正/清零/Excel、自动历史频率/缓存均已查。真实原文件只读，未修改owner浏览器或做数据修正；未commit/push/部署。自动当前目标的常规分类和资格仍按现合同，未扩充自动规则。",
+    "rootCause": "统计与自动历史投影只读当前岗位类别；旧H05送资料移动到H04后，当前H05无类别就抛掉旧承担事实。无资质提醒同时存在但不是漏计原因，真实导入和控制变量实验已排除。owner最新明确原备注也必须保留计数，故合并职责证据而非回滚上次H04联动。",
+    "earlyDetection": "以后改备注或角色位置前先读真实文件，比较记录原备注和当前规则；用职责由一个岗位移到另一个岗位的四类参数化例，核对当前/历史两张表、自动历史账本、适用类别与实际Excel下载；先独立核对计数，再把警告当线索，不能把同时出现当作因果。"
+  }
+}

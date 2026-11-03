@@ -1,0 +1,31 @@
+{
+  "source": "Owner-provided private configuration workbook; read-only, source not copied or modified.",
+  "sourceSha256": "8bb0e6e9546ae2ee46d4aac2a2628f2d03b24b4825cf7caeb170229f650927ed",
+  "replay": "parseWorkbook -> applyWorkbookImport(config) -> shared domain statistics",
+  "target": {
+    "date": "2026-10-29",
+    "flight": "TR121",
+    "position": "H05",
+    "historicalRole": "送资料",
+    "currentRole": "",
+    "start": "21:55",
+    "end": "23:55",
+    "qualified": false,
+    "staffIdentityMatched": true
+  },
+  "actual": {
+    "monthlyDeliveryCount": 2,
+    "targetDeliveryDetail": false,
+    "ordinaryH05Count": 1,
+    "afternoonRestIncludesTargetDate": true,
+    "earlyDepartureIncludesTargetDate": false,
+    "monthlyDeliveryAdjustments": 0
+  },
+  "isolatedExperiment": {
+    "change": "Set H05 remark to delivery only in memory; keep qualification unchanged.",
+    "monthlyDeliveryCount": 3,
+    "targetDeliveryDetail": true,
+    "sourceWorkbookUnchanged": true
+  },
+  "conclusion": "Missing delivery record follows empty current role classification, not qualification rejection. Product implementation unchanged. Historical fallback requires resolving the current-config counting contract."
+}

@@ -1,0 +1,40 @@
+{
+  "sourceSha256": "8bb0e6e9546ae2ee46d4aac2a2628f2d03b24b4825cf7caeb170229f650927ed",
+  "source": "Owner-provided private workbook, isolated browser; no source data copied into evidence.",
+  "checks": {
+    "realImport": {
+      "delivery": 3,
+      "deliveryDetails": [
+        {
+          "date": "2026-10-11",
+          "flightNo": "TW616",
+          "position": "G14"
+        },
+        {
+          "date": "2026-10-25",
+          "flightNo": "AK151",
+          "position": "G08"
+        },
+        {
+          "date": "2026-10-29",
+          "flightNo": "TR121",
+          "position": "H05"
+        }
+      ],
+      "targetPositionQualified": false,
+      "targetCurrentRemark": "",
+      "ordinaryH05": 1,
+      "afternoonRestIncludesTargetDate": true,
+      "earlyDepartureIncludesTargetDate": false,
+      "independentlyRecountedDelivery": 3
+    },
+    "visibleTargetDetail": "TR121 delivery 1; 10-29 H05 shown with no qualification requirement.",
+    "actualDownloadedWorkbook": {
+      "targetTRDelivery": 1
+    },
+    "persistedAfterReload": true,
+    "mobileViewport": true,
+    "privateWorkbookUnchanged": true
+  },
+  "pageErrors": []
+}

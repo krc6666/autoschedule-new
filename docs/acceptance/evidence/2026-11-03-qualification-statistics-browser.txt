@@ -1,0 +1,15 @@
+{
+  "input": "Anonymous unqualified TR121/H05 and morning position, past 11/01 plus current 11/03",
+  "checks": {
+    "actualManualQualificationWarningsBothPositions": true,
+    "currentAndPastCounts": {
+      "delivery": 2,
+      "ordinaryH05": 2,
+      "lateAfternoonRest": 2,
+      "morningEarlyDeparture": 2,
+      "morningAfternoonRest": 2
+    },
+    "persistedAfterReload": true
+  },
+  "pageErrors": []
+}

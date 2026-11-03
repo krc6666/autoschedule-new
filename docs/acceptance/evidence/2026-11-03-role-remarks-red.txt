@@ -1,0 +1,158 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/app/role-remark-history-counts.test.ts (14 tests | 14 failed) 89ms
+     × counts historical H05 and current H04 督导 despite missing qualifications 9ms
+     × counts historical H05 and current H04 一号 despite missing qualifications 2ms
+     × counts historical H05 and current H04 申报 despite missing qualifications 1ms
+     × counts historical H05 and current H04 送资料 despite missing qualifications 1ms
+     × keeps recorded 督导 when all current role remarks are removed 1ms
+     × keeps recorded 一号 when all current role remarks are removed 2ms
+     × keeps recorded 申报 when all current role remarks are removed 1ms
+     × keeps recorded 送资料 when all current role remarks are removed 1ms
+     × retains recorded roles when a position is removed or reassigned another role 5ms
+     × ignores separated manual remarks and warnings while preserving combined-role counting 2ms
+     × shares the historical role projection with monthly/recent/previous-shift auto counts 4ms
+     × counts a historical edit, qualification override, rearchive, and clear from final people 3ms
+     × preserves source and counts through Excel/storage and counts import/reset 51ms
+     × keeps scope/month/time/dedup and does not treat keywords in free notes as positions 1ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 14 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/app/role-remark-history-counts.test.ts > role remarks across moved positions > counts historical H05 and current H04 督导 despite missing qualifications
+ FAIL  tests/app/role-remark-history-counts.test.ts > role remarks across moved positions > counts historical H05 and current H04 一号 despite missing qualifications
+ FAIL  tests/app/role-remark-history-counts.test.ts > role remarks across moved positions > counts historical H05 and current H04 申报 despite missing qualifications
+ FAIL  tests/app/role-remark-history-counts.test.ts > role remarks across moved positions > counts historical H05 and current H04 送资料 despite missing qualifications
+TypeError: Cannot read properties of undefined (reading 'categories')
+ ❯ cell tests/app/role-remark-history-counts.test.ts:54:115
+     52|
+     53| function cell(state: AppState, staffIndex: number, role = "送资料" as typ…
+     54|   return buildMonthlyLatePriorityStatistics(state, date).rows.find(r =…
+       |                                                                                                                   ^
+     55| }
+     56|
+ ❯ tests/app/role-remark-history-counts.test.ts:61:12
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/14]⎯
+
+ FAIL  tests/app/role-remark-history-counts.test.ts > role remarks across moved positions > keeps recorded 督导 when all current role remarks are removed
+ FAIL  tests/app/role-remark-history-counts.test.ts > role remarks across moved positions > keeps recorded 一号 when all current role remarks are removed
+ FAIL  tests/app/role-remark-history-counts.test.ts > role remarks across moved positions > keeps recorded 申报 when all current role remarks are removed
+ FAIL  tests/app/role-remark-history-counts.test.ts > role remarks across moved positions > keeps recorded 送资料 when all current role remarks are removed
+TypeError: Cannot read properties of undefined (reading 'categories')
+ ❯ cell tests/app/role-remark-history-counts.test.ts:54:115
+     52|
+     53| function cell(state: AppState, staffIndex: number, role = "送资料" as typ…
+     54|   return buildMonthlyLatePriorityStatistics(state, date).rows.find(r =…
+       |                                                                                                                   ^
+     55| }
+     56|
+ ❯ tests/app/role-remark-history-counts.test.ts:70:12
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/14]⎯
+
+ FAIL  tests/app/role-remark-history-counts.test.ts > role remarks across moved positions > retains recorded roles when a position is removed or reassigned another role
+AssertionError: expected +0 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ tests/app/role-remark-history-counts.test.ts:81:43
+     79|     const { state, oldRule } = fixture();
+     80|     oldRule.remark = "一号";
+     81|     expect(cell(state, 0).effectiveCount).toBe(1);
+       |                                           ^
+     82|     expect(cell(state, 0, "一号").effectiveCount).toBe(1);
+     83|     state.positionRules = state.positionRules.filter(r => r !== oldRul…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/14]⎯
+
+ FAIL  tests/app/role-remark-history-counts.test.ts > role remarks across moved positions > ignores separated manual remarks and warnings while preserving combined-role counting
+AssertionError: expected +0 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ tests/app/role-remark-history-counts.test.ts:94:43
+     92|     record.assignmentRemarks!.manualRemark = "督导";
+     93|     oldRule.remark = "申报";
+     94|     expect(cell(state, 0).effectiveCount).toBe(1);
+       |                                           ^
+     95|     expect(cell(state, 0, "申报").effectiveCount).toBe(0);
+     96|     expect(cell(state, 0, "督导").effectiveCount).toBe(0);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/14]⎯
+
+ FAIL  tests/app/role-remark-history-counts.test.ts > role remarks across moved positions > shares the historical role projection with monthly/recent/previous-shift auto counts
+AssertionError: expected { currentMonthCount: +0, …(1) } to deeply equal { currentMonthCount: 1, …(1) }
+
+- Expected
++ Received
+
+  {
+-   "currentMonthCount": 1,
+-   "recentWorkdayCount": 1,
++   "currentMonthCount": 0,
++   "recentWorkdayCount": 0,
+  }
+
+ ❯ tests/app/role-remark-history-counts.test.ts:109:39
+    107|     const facts = createScheduleFrequencyFacts(state, TODAY);
+    108|     const profile = () => latePriorityFrequencyProfileForRule(state, s…
+    109|     expect(profile().counts.delivery).toEqual({ currentMonthCount: 1, …
+       |                                       ^
+    110|     expect(profile().previousWorkdayAssigned).toBe(true);
+    111|     oldRule.remark = "一号";
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/14]⎯
+
+ FAIL  tests/app/role-remark-history-counts.test.ts > role remarks across moved positions > counts a historical edit, qualification override, rearchive, and clear from final people
+TypeError: Cannot read properties of undefined (reading 'categories')
+ ❯ cell tests/app/role-remark-history-counts.test.ts:54:115
+     52|
+     53| function cell(state: AppState, staffIndex: number, role = "送资料" as typ…
+     54|   return buildMonthlyLatePriorityStatistics(state, date).rows.find(r =…
+       |                                                                                                                   ^
+     55| }
+     56|
+ ❯ tests/app/role-remark-history-counts.test.ts:123:12
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/14]⎯
+
+ FAIL  tests/app/role-remark-history-counts.test.ts > role remarks across moved positions > preserves source and counts through Excel/storage and counts import/reset
+TypeError: Cannot read properties of undefined (reading 'categories')
+ ❯ cell tests/app/role-remark-history-counts.test.ts:54:115
+     52|
+     53| function cell(state: AppState, staffIndex: number, role = "送资料" as typ…
+     54|   return buildMonthlyLatePriorityStatistics(state, date).rows.find(r =…
+       |                                                                                                                   ^
+     55| }
+     56|
+ ❯ tests/app/role-remark-history-counts.test.ts:144:12
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/14]⎯
+
+ FAIL  tests/app/role-remark-history-counts.test.ts > role remarks across moved positions > keeps scope/month/time/dedup and does not treat keywords in free notes as positions
+TypeError: Cannot read properties of undefined (reading 'categories')
+ ❯ cell tests/app/role-remark-history-counts.test.ts:54:115
+     52|
+     53| function cell(state: AppState, staffIndex: number, role = "送资料" as typ…
+     54|   return buildMonthlyLatePriorityStatistics(state, date).rows.find(r =…
+       |                                                                                                                   ^
+     55| }
+     56|
+ ❯ tests/app/role-remark-history-counts.test.ts:158:12
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/14]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  14 failed (14)
+   Start at  20:39:49
+   Duration  1.60s (transform 932ms, setup 0ms, import 1.22s, tests 89ms, environment 0ms)
