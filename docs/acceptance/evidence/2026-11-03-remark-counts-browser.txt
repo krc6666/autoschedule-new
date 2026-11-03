@@ -1,0 +1,17 @@
+{
+  "input": "TR121/H04 old declaration history; edit current remark to combined",
+  "checks": {
+    "actualConfigurationEditTwoTablesAndHistoryPreserved": true,
+    "reloadKeepsCounts": true,
+    "historicalDraftRetainsOldRemark": true,
+    "historyEditSaveKeepsCountsAndSource": true,
+    "actualExportDeliveryOneNoDeclaration": true,
+    "mobileTwoTables": true
+  },
+  "independentExpected": {
+    "delivery": 1,
+    "declaration": 0,
+    "ordinaryH04": 1
+  },
+  "pageErrors": []
+}

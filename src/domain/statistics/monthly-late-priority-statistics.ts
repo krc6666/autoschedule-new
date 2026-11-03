@@ -278,11 +278,8 @@ export function buildMonthlyLatePriorityStatistics(
       !endsAfterLateShiftThreshold(record, state.settings.lateShiftEndTime)
     )
       return;
-    for (const category of categoryKinds({
-      name: record.position,
-      remark: record.assignmentRemarks?.remark ?? record.remark,
-    })) {
-      if (!categoryKinds(rule).includes(category)) continue;
+    // Configuration owns the counting category; archived remarks remain evidence.
+    for (const category of categoryKinds(rule)) {
       const baselineId = baselineStaffId(record);
       if (baselineId) {
         const key = [

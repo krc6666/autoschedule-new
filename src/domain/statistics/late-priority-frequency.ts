@@ -112,29 +112,25 @@ function historyRule(
       normalizeLatePriorityFlightNumber(rule.flightNo) ===
         normalizeLatePriorityFlightNumber(record.flightNo) &&
       normalizeLatePriorityPositionReference(rule.name) ===
-        normalizeLatePriorityPositionReference(record.position) &&
-      latePriorityFrequencyKinds(rule).some((kind) =>
-        latePriorityFrequencyKinds({
-          name: record.position,
-          remark: record.remark,
-        }).includes(kind)
-      )
+        normalizeLatePriorityPositionReference(record.position)
   );
 }
 
-function isScopedLatePriorityHistoryRecord(
+function scopedLatePriorityHistoryRecord(
   state: ScheduleGenerationFacts,
   record: HistoryRecord
-): boolean {
+): HistoryRecord | undefined {
   const rule = historyRule(state, record);
-  return Boolean(
-    rule &&
+  return rule &&
     latePriorityFlightInScope(
       state.settings.latePriorityFlightNumbers,
       record.flightNo
     ) &&
     isLatePriorityPosition(rule, record, state.settings.lateShiftEndTime)
-  );
+    ? // Project current semantics for all monthly/recent/previous-workday consumers.
+      // Never overwrite the archived source or its separated remarks.
+      { ...record, position: rule.name, remark: rule.remark }
+    : undefined;
 }
 
 function countForKind(
@@ -184,10 +180,11 @@ function scopedRecordsForStaff(
   date: string,
   facts: ScheduleFrequencyFacts
 ): HistoryRecord[] {
-  return (facts.recordsByStaffId.get(staffId) ?? []).filter(
-    (record) =>
-      record.date < date && isScopedLatePriorityHistoryRecord(state, record)
-  );
+  return (facts.recordsByStaffId.get(staffId) ?? []).flatMap((record) => {
+    if (record.date >= date) return [];
+    const projected = scopedLatePriorityHistoryRecord(state, record);
+    return projected ? [projected] : [];
+  });
 }
 
 function currentMonthKindCount(

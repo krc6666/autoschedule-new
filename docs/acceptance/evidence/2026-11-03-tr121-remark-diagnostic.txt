@@ -1,0 +1,266 @@
+{
+  "before": {
+    "late": {
+      "督导": {
+        "qualified": false,
+        "details": [],
+        "visibleDetails": [],
+        "manualCorrection": 0,
+        "baseCount": 0,
+        "effectiveCount": 0
+      },
+      "一号": {
+        "qualified": true,
+        "details": [],
+        "visibleDetails": [],
+        "manualCorrection": 0,
+        "baseCount": 0,
+        "effectiveCount": 0
+      },
+      "申报": {
+        "qualified": true,
+        "details": [
+          {
+            "date": "2026-11-03",
+            "flightNo": "TR121",
+            "position": "H04"
+          }
+        ],
+        "visibleDetails": [
+          {
+            "date": "2026-11-03",
+            "flightNo": "TR121",
+            "position": "H04"
+          }
+        ],
+        "manualCorrection": 0,
+        "baseCount": 1,
+        "effectiveCount": 1
+      },
+      "送资料": {
+        "qualified": true,
+        "details": [],
+        "visibleDetails": [],
+        "manualCorrection": 0,
+        "baseCount": 0,
+        "effectiveCount": 0
+      }
+    },
+    "ordinary": [
+      {
+        "staff": {
+          "id": "2",
+          "name": "测试人员",
+          "staffType": "常规",
+          "teamLeader": false,
+          "cxPreflightQualified": false,
+          "dutyQualified": true,
+          "standbyQualified": true,
+          "nightShift": true,
+          "status": "正常",
+          "remark": ""
+        },
+        "airlineCode": "TR",
+        "position": "H04",
+        "qualified": true,
+        "actualCount": 1,
+        "manualCorrection": 0,
+        "effectiveCount": 1,
+        "qualificationOverrideCount": 0,
+        "qualificationUnrecordedCount": 1
+      }
+    ]
+  },
+  "archivedAfterEdit": {
+    "late": {
+      "督导": {
+        "qualified": false,
+        "details": [],
+        "visibleDetails": [],
+        "manualCorrection": 0,
+        "baseCount": 0,
+        "effectiveCount": 0
+      },
+      "一号": {
+        "qualified": true,
+        "details": [],
+        "visibleDetails": [],
+        "manualCorrection": 0,
+        "baseCount": 0,
+        "effectiveCount": 0
+      },
+      "申报": {
+        "qualified": false,
+        "details": [],
+        "visibleDetails": [],
+        "manualCorrection": 0,
+        "baseCount": 0,
+        "effectiveCount": 0
+      },
+      "送资料": {
+        "qualified": true,
+        "details": [],
+        "visibleDetails": [],
+        "manualCorrection": 0,
+        "baseCount": 0,
+        "effectiveCount": 0
+      }
+    },
+    "ordinary": [
+      {
+        "staff": {
+          "id": "2",
+          "name": "测试人员",
+          "staffType": "常规",
+          "teamLeader": false,
+          "cxPreflightQualified": false,
+          "dutyQualified": true,
+          "standbyQualified": true,
+          "nightShift": true,
+          "status": "正常",
+          "remark": ""
+        },
+        "airlineCode": "TR",
+        "position": "H04",
+        "qualified": true,
+        "actualCount": 1,
+        "manualCorrection": 0,
+        "effectiveCount": 1,
+        "qualificationOverrideCount": 0,
+        "qualificationUnrecordedCount": 1
+      }
+    ]
+  },
+  "historyDraftAfterEdit": {
+    "late": {
+      "督导": {
+        "qualified": false,
+        "details": [],
+        "visibleDetails": [],
+        "manualCorrection": 0,
+        "baseCount": 0,
+        "effectiveCount": 0
+      },
+      "一号": {
+        "qualified": true,
+        "details": [],
+        "visibleDetails": [],
+        "manualCorrection": 0,
+        "baseCount": 0,
+        "effectiveCount": 0
+      },
+      "申报": {
+        "qualified": false,
+        "details": [],
+        "visibleDetails": [],
+        "manualCorrection": 0,
+        "baseCount": 0,
+        "effectiveCount": 0
+      },
+      "送资料": {
+        "qualified": true,
+        "details": [],
+        "visibleDetails": [],
+        "manualCorrection": 0,
+        "baseCount": 0,
+        "effectiveCount": 0
+      }
+    },
+    "ordinary": [
+      {
+        "staff": {
+          "id": "2",
+          "name": "测试人员",
+          "staffType": "常规",
+          "teamLeader": false,
+          "cxPreflightQualified": false,
+          "dutyQualified": true,
+          "standbyQualified": true,
+          "nightShift": true,
+          "status": "正常",
+          "remark": ""
+        },
+        "airlineCode": "TR",
+        "position": "H04",
+        "qualified": true,
+        "actualCount": 1,
+        "manualCorrection": 0,
+        "effectiveCount": 1,
+        "qualificationOverrideCount": 0,
+        "qualificationUnrecordedCount": 1
+      }
+    ]
+  },
+  "freshAfterEdit": {
+    "late": {
+      "督导": {
+        "qualified": false,
+        "details": [],
+        "visibleDetails": [],
+        "manualCorrection": 0,
+        "baseCount": 0,
+        "effectiveCount": 0
+      },
+      "一号": {
+        "qualified": true,
+        "details": [],
+        "visibleDetails": [],
+        "manualCorrection": 0,
+        "baseCount": 0,
+        "effectiveCount": 0
+      },
+      "申报": {
+        "qualified": false,
+        "details": [],
+        "visibleDetails": [],
+        "manualCorrection": 0,
+        "baseCount": 0,
+        "effectiveCount": 0
+      },
+      "送资料": {
+        "qualified": true,
+        "details": [
+          {
+            "date": "2026-11-03",
+            "flightNo": "TR121",
+            "position": "H04"
+          }
+        ],
+        "visibleDetails": [
+          {
+            "date": "2026-11-03",
+            "flightNo": "TR121",
+            "position": "H04"
+          }
+        ],
+        "manualCorrection": 0,
+        "baseCount": 1,
+        "effectiveCount": 1
+      }
+    },
+    "ordinary": [
+      {
+        "staff": {
+          "id": "2",
+          "name": "测试人员",
+          "staffType": "常规",
+          "teamLeader": false,
+          "cxPreflightQualified": false,
+          "dutyQualified": true,
+          "standbyQualified": true,
+          "nightShift": true,
+          "status": "正常",
+          "remark": ""
+        },
+        "airlineCode": "TR",
+        "position": "H04",
+        "qualified": true,
+        "actualCount": 1,
+        "manualCorrection": 0,
+        "effectiveCount": 1,
+        "qualificationOverrideCount": 0,
+        "qualificationUnrecordedCount": 1
+      }
+    ]
+  }
+}

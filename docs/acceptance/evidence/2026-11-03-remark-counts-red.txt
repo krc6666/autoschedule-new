@@ -1,0 +1,144 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/app/position-remark-counts.test.ts (9 tests | 7 failed) 89ms
+     × reclassifies saved H04 from "申报" using the current rule without changing history 12ms
+     × reclassifies saved H04 from "" using the current rule without changing history 2ms
+     × uses current semantics for stale draft remarks and manual baseline deductions 4ms
+     × keeps old remarks through historical editing and rearchive while counting delivery 2ms
+     × updates monthly, recent and previous-workday auto facts even when reusing the frequency snapshot 4ms
+     × keeps scope, end-time and unmatched-position boundaries after changing remarks 2ms
+     × preserves source remarks and linked counts through config Excel, storage and counts Excel 56ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 7 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/app/position-remark-counts.test.ts > position remark count linkage > reclassifies saved H04 from "申报" using the current rule without changing history
+ FAIL  tests/app/position-remark-counts.test.ts > position remark count linkage > reclassifies saved H04 from "" using the current rule without changing history
+AssertionError: expected +0 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ tests/app/position-remark-counts.test.ts:67:48
+     65|       const original = structuredClone(state.history);
+     66|       updateConfigurationField(state, "position", rule.id, "remark", "…
+     67|       expect(counts(state).送资料.effectiveCount).toBe(1);
+       |                                                ^
+     68|       expect(counts(state).申报.effectiveCount).toBe(0);
+     69|       const ordinary = buildOrdinaryPriorityStatistics(state, DATE)[0]…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/7]⎯
+
+ FAIL  tests/app/position-remark-counts.test.ts > position remark count linkage > uses current semantics for stale draft remarks and manual baseline deductions
+AssertionError: expected { qualified: true, details: [], …(4) } to match object { baseCount: 1, …(2) }
+(3 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "baseCount": 1,
++   "baseCount": 0,
+    "effectiveCount": 0,
+-   "manualCorrection": -1,
++   "manualCorrection": 0,
+  }
+
+ ❯ tests/app/position-remark-counts.test.ts:88:35
+     86|     const before = rows.find((r) => r.staff.id === state.staff[0]!.id)…
+     87|     const after = rows.find((r) => r.staff.id === state.staff[1]!.id)!;
+     88|     expect(before.categories.送资料).toMatchObject({ baseCount: 1, manual…
+       |                                   ^
+     89|     expect(after.categories.送资料).toMatchObject({ baseCount: 0, manualC…
+     90|     expect(after.categories.申报.effectiveCount).toBe(0);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/7]⎯
+
+ FAIL  tests/app/position-remark-counts.test.ts > position remark count linkage > keeps old remarks through historical editing and rearchive while counting delivery
+AssertionError: expected +0 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ tests/app/position-remark-counts.test.ts:108:46
+    106|     state.activeScheduleDate = DATE;
+    107|     expect(state.assignments[0]!.remark).toBe("申报");
+    108|     expect(counts(state).送资料.effectiveCount).toBe(1);
+       |                                              ^
+    109|     replaceHistoryForDate(state, DATE, currentScheduleHistory(state, D…
+    110|     state.assignments = [];
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/7]⎯
+
+ FAIL  tests/app/position-remark-counts.test.ts > position remark count linkage > updates monthly, recent and previous-workday auto facts even when reusing the frequency snapshot
+AssertionError: expected { currentMonthCount: +0, …(1) } to deeply equal { currentMonthCount: 1, …(1) }
+
+- Expected
++ Received
+
+  {
+-   "currentMonthCount": 1,
+-   "recentWorkdayCount": 1,
++   "currentMonthCount": 0,
++   "recentWorkdayCount": 0,
+  }
+
+ ❯ tests/app/position-remark-counts.test.ts:122:39
+    120|     expect(profile().counts.declaration.currentMonthCount).toBe(1);
+    121|     updateConfigurationField(state, "position", rule.id, "remark", "申报…
+    122|     expect(profile().counts.delivery).toEqual({ currentMonthCount: 1, …
+       |                                       ^
+    123|     expect(profile().counts.declaration).toEqual({ currentMonthCount: …
+    124|     expect(profile().previousWorkdayAssigned).toBe(true);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/7]⎯
+
+ FAIL  tests/app/position-remark-counts.test.ts > position remark count linkage > keeps scope, end-time and unmatched-position boundaries after changing remarks
+AssertionError: expected +0 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ tests/app/position-remark-counts.test.ts:137:46
+    135|     updateConfigurationField(state, "position", rule.id, "remark", "申报…
+    136|     state.history.push({ ...state.history[0]!, id: "duplicate" });
+    137|     expect(counts(state).送资料.effectiveCount).toBe(1);
+       |                                              ^
+    138|     state.history.forEach((r) => { r.endTime = "23:00"; });
+    139|     expect(counts(state).送资料.effectiveCount).toBe(0);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/7]⎯
+
+ FAIL  tests/app/position-remark-counts.test.ts > position remark count linkage > preserves source remarks and linked counts through config Excel, storage and counts Excel
+AssertionError: expected +0 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ tests/app/position-remark-counts.test.ts:158:47
+    156|     expect(loaded.history[0]!.assignmentRemarks?.remark).toBe("申报");
+    157|     expect(loaded.positionRules.find((r) => r.flightNo === "TR121" && …
+    158|     expect(counts(loaded).送资料.effectiveCount).toBe(1);
+       |                                               ^
+    159|     expect(buildOrdinaryPriorityStatistics(loaded, DATE)[0]!.effective…
+    160|     const book = buildLatePriorityCountsWorkbook(loaded, DATE);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/7]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  7 failed | 2 passed (9)
+   Start at  19:22:13
+   Duration  1.48s (transform 892ms, setup 0ms, import 1.16s, tests 89ms, environment 0ms)
