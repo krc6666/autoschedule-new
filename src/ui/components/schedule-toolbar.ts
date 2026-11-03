@@ -64,7 +64,7 @@ export class ScheduleToolbarElement extends LightDomElement {
         ${this.iconCommand("file-earmark-image", "导出图片", "export-share-png")}
         ${this.command("archive", "仅归档", "archive-schedule", "btn-outline-secondary")}
         ${this.previousScheduleCommand()}
-        ${this.iconCommand("x-circle", "清空排班", "clear-schedule", "btn-outline-danger")}
+        ${this.iconCommand("x-circle", "清空全部人员", "clear-schedule", "btn-outline-danger")}
       </div>
       <div class="schedule-toolbar-meta">
         <autoschedule-half-rest-selector

@@ -1,0 +1,15 @@
+{
+  "date": "2026-11-03",
+  "input": "synthetic two flights; normal/manual/temporary positions",
+  "checks": {
+    "cancelKeepsOriginal": true,
+    "clearPreservesTwoFlightsFivePositionsAndRemarks": true,
+    "allFivePeopleEmptyAndOtherGroupUnchanged": true,
+    "reloadRetainsFiveEmptyPositions": true,
+    "manualRefillAfterReload": true,
+    "refilledPersonPersists": true,
+    "mobileClearRetainsAllFivePositions": true,
+    "noBrowserErrors": true
+  },
+  "status": "passed"
+}

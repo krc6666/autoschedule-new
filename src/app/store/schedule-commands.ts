@@ -1,13 +1,11 @@
 import {
   assignStaff,
+  clearScheduleStaff,
   createTemporaryAssignment,
   deleteTemporaryAssignment,
   updateAssignmentField,
 } from "../schedule-actions";
-import {
-  clearActiveSchedule,
-  installGeneratedSchedule,
-} from "../../domain/kernel/schedule-lifecycle";
+import { installGeneratedSchedule } from "../../domain/kernel/schedule-lifecycle";
 import { applyStaffStatusChange } from "../../domain/kernel/schedule-state";
 import type { ScheduleResult, StaffStatus } from "../../model";
 import type { StateCommand } from "./store-command";
@@ -20,7 +18,7 @@ export function createScheduleCommands(command: StateCommand) {
   return {
     install: (date: string, result: ScheduleResult) =>
       command((state) => installGeneratedSchedule(state, date, result)),
-    clear: () => command(clearActiveSchedule),
+    clearStaff: () => command(clearScheduleStaff),
     assignStaff: (
       assignmentId: string,
       staffId: string,

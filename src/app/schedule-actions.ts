@@ -26,7 +26,7 @@ import {
   isNextWorkdayCutoffConflict,
   nextWorkdayCutoffProtection,
 } from "../domain/reviews/cross-day-recovery";
-import type { AppState } from "../model";
+import type { AppState, Assignment } from "../model";
 import type { Flight, HistoryRecord, ScheduleResult } from "../model";
 import { replaceHistoryForDate } from "./history-actions";
 import { installGeneratedSchedule } from "../domain/kernel/schedule-lifecycle";
@@ -202,6 +202,39 @@ function refreshSameFlightGuides(state: AppState, flightIds: string[]): void {
   }
 }
 
+function clearAssignmentStaff(state: AppState, assignment: Assignment): void {
+  captureCountBaseline(assignment);
+  const rule = assignment.positionRuleId
+    ? state.positionRules.find((item) => item.id === assignment.positionRuleId)
+    : undefined;
+  clearSupervisorLink(state, assignment);
+  assignment.staffId = null;
+  assignment.staffName = "";
+  assignment.status =
+    rule?.manual ||
+    isAuxiliaryCategory(rule?.category) ||
+    !assignment.positionRuleId
+      ? "manual"
+      : "unfilled";
+  clearAutomaticAssignmentEvidence(assignment);
+  delete assignment.manualOverrideWarnings;
+  // Explicit clearing must not refill cells through same-flight guide reuse.
+  for (const linked of state.assignments) {
+    if (linked.supervisorSourceAssignmentId !== assignment.id) continue;
+    clearSupervisorLink(state, linked);
+  }
+}
+
+export function clearScheduleStaff(state: AppState): void {
+  // Linked cells can be cleared along with their supervisor. Capture all
+  // original people before changing any cell, including those linked targets.
+  state.assignments.forEach((assignment) => captureCountBaseline(assignment));
+  state.assignments.forEach((assignment) =>
+    clearAssignmentStaff(state, assignment)
+  );
+  refreshManualRuleEvidence(state);
+}
+
 export function assignStaff(
   state: AppState,
   assignmentId: string,
@@ -212,29 +245,7 @@ export function assignStaff(
   if (!assignment || sourceAssignmentId === assignmentId)
     return { changed: false };
   if (!staffId) {
-    captureCountBaseline(assignment);
-    const rule = assignment.positionRuleId
-      ? state.positionRules.find(
-          (item) => item.id === assignment.positionRuleId
-        )
-      : undefined;
-    clearSupervisorLink(state, assignment);
-    assignment.staffId = null;
-    assignment.staffName = "";
-    assignment.status =
-      rule?.manual ||
-      isAuxiliaryCategory(rule?.category) ||
-      !assignment.positionRuleId
-        ? "manual"
-        : "unfilled";
-    clearAutomaticAssignmentEvidence(assignment);
-    delete assignment.manualOverrideWarnings;
-    // Explicitly clearing a cell must not immediately refill it through the
-    // same-flight guide reuse pass. Linked reuse cells are cleared together.
-    for (const linked of state.assignments) {
-      if (linked.supervisorSourceAssignmentId !== assignment.id) continue;
-      clearSupervisorLink(state, linked);
-    }
+    clearAssignmentStaff(state, assignment);
     refreshManualRuleEvidence(state);
     return { changed: true, message: "岗位已设为待补位" };
   }

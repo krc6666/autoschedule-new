@@ -1,0 +1,141 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-03-clear-schedule-staff",
+  "title": "红叉清空当前班表全部人员并保留航班与岗位",
+  "startedFrom": "60e9199a8148d4e9072d8e05d98af5c0ee2c3e96",
+  "expectation": {
+    "example": "owner 正在手工录入真实班表；当前表多个航班各有若干已排人员和临时岗位，点击工具栏红叉并确认。",
+    "expected": "当前组当前班表所有岗位人员为空，全部航班与岗位仍显示且可重新填写；保存刷新后维持此结果。",
+    "unchanged": "航班、岗位ID/数量/排列/时段、岗位备注和手工备注、当前日期、历史、另一组班表、配置与轮值不变。人工基准与证据处理遵守spec原合同。",
+    "fallback": "取消不改状态；清空动作通过Store单次事务提交，异常不提交半份修改。保存失败沿原合同明确提示未保存，不冒充持久化成功。"
+  },
+  "testedVersion": "afa74bebfaa6329806189ac72288fa8cbf4bafe0d582206e4d41d6b6b8f6e862",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "原红叉删除全部 assignments，修改前5项失败；修复后定向回归和实际页面通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-clear-staff-red.txt",
+          "summary": "修改前6项中5项失败：红叉删除全部岗位，存储恢复和Excel结果为空；取消路径通过。",
+          "sha256": "d252f6471b37b75e90cddac0b1ec9641fc1ca7f829c8b058b237d820a11e4897"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-clear-staff-focused.txt",
+          "summary": "5个定向测试文件106项通过，包含6项新增回归及单格编辑、预检、生命周期和页面消费者。",
+          "sha256": "98989ed55492dc760d53daa419f590ee1e397d27d55c2edb593f36b1e26b088d"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-clear-staff-browser.txt",
+          "summary": "独立Chrome实际验证取消、红叉清空、刷新、再次填人保存和390px窄屏；2航班5岗位保留，姓名全空，另一组不变，无页面错误。",
+          "sha256": "4c3ee229d0255f12da82d402563087d6e6dcbadbba18c239017cbe069dbaf5c1"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "真实工具栏命令清空人员，保留航班、岗位顺序、时段、备注和日期，空格可继续手工填写。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-clear-staff-focused.txt",
+          "summary": "5个定向测试文件106项通过，包含6项新增回归及单格编辑、预检、生命周期和页面消费者。",
+          "sha256": "98989ed55492dc760d53daa419f590ee1e397d27d55c2edb593f36b1e26b088d"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-clear-staff-browser.txt",
+          "summary": "独立Chrome实际验证取消、红叉清空、刷新、再次填人保存和390px窄屏；2航班5岗位保留，姓名全空，另一组不变，无页面错误。",
+          "sha256": "4c3ee229d0255f12da82d402563087d6e6dcbadbba18c239017cbe069dbaf5c1"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "覆盖取消、空表、重复清空、300岗位、临时/手工/行政/引导岗位、督导关联基准、两组隔离及窄屏。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-clear-staff-focused.txt",
+          "summary": "5个定向测试文件106项通过，包含6项新增回归及单格编辑、预检、生命周期和页面消费者。",
+          "sha256": "98989ed55492dc760d53daa419f590ee1e397d27d55c2edb593f36b1e26b088d"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-clear-staff-browser.txt",
+          "summary": "独立Chrome实际验证取消、红叉清空、刷新、再次填人保存和390px窄屏；2航班5岗位保留，姓名全空，另一组不变，无页面错误。",
+          "sha256": "4c3ee229d0255f12da82d402563087d6e6dcbadbba18c239017cbe069dbaf5c1"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "清空不调用自动补人；localStorage恢复和实际刷新仍为空，后续填人可保存；Excel二进制往返保留岗位和空人员。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-clear-staff-focused.txt",
+          "summary": "5个定向测试文件106项通过，包含6项新增回归及单格编辑、预检、生命周期和页面消费者。",
+          "sha256": "98989ed55492dc760d53daa419f590ee1e397d27d55c2edb593f36b1e26b088d"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-clear-staff-browser.txt",
+          "summary": "独立Chrome实际验证取消、红叉清空、刷新、再次填人保存和390px窄屏；2航班5岗位保留，姓名全空，另一组不变，无页面错误。",
+          "sha256": "4c3ee229d0255f12da82d402563087d6e6dcbadbba18c239017cbe069dbaf5c1"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "not_applicable",
+      "reason": "人工清空不新增自动硬约束、不安装自动结果或签发凭证。原计算中命令阻断、人工入口和自动守卫保持原合同，完整verify验证既有链路。",
+      "evidence": []
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "航班、岗位结构、备注、临时岗位、历史、配置、轮值、日期、规则过期标志和另一组保持；配置失效清表仍走原生命周期入口。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-clear-staff-focused.txt",
+          "summary": "5个定向测试文件106项通过，包含6项新增回归及单格编辑、预检、生命周期和页面消费者。",
+          "sha256": "98989ed55492dc760d53daa419f590ee1e397d27d55c2edb593f36b1e26b088d"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-clear-staff-verify.txt",
+          "summary": "npm.cmd run verify退出0：类型检查、149文件1493项功能、7文件19项性能和生产构建通过；保留既有HiGHS node:module外置提示。",
+          "sha256": "3f4211c93874a3288411eb8bf7a466832a37bb884d023843a46b93f926ad1010"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-clear-staff-browser.txt",
+          "summary": "独立Chrome实际验证取消、红叉清空、刷新、再次填人保存和390px窄屏；2航班5岗位保留，姓名全空，另一组不变，无页面错误。",
+          "sha256": "4c3ee229d0255f12da82d402563087d6e6dcbadbba18c239017cbe069dbaf5c1"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "verified",
+      "reason": "当前修复版独立Chrome实际点击后，2航班、5岗位和备注保留，5个姓名格为空；刷新、再次填人及保存均通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-clear-staff-browser.txt",
+          "summary": "独立Chrome实际验证取消、红叉清空、刷新、再次填人保存和390px窄屏；2航班5岗位保留，姓名全空，另一组不变，无页面错误。",
+          "sha256": "4c3ee229d0255f12da82d402563087d6e6dcbadbba18c239017cbe069dbaf5c1"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-clear-staff-page.png",
+          "summary": "本次实际点击后的页面截图：2航班、5岗位和备注保留，姓名格全部为空。",
+          "sha256": "1510282062ba4ced334aa65f958861857d09e1972203fd5cd3bad19fc5c1b084"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-clear-staff-verify.txt",
+          "summary": "npm.cmd run verify退出0：类型检查、149文件1493项功能、7文件19项性能和生产构建通过；保留既有HiGHS node:module外置提示。",
+          "sha256": "3f4211c93874a3288411eb8bf7a466832a37bb884d023843a46b93f926ad1010"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "red.txt记录原实现岗位变为0的5项失败；focused.txt记录修复后106项通过；browser.txt记录实际点击保留2航班5岗位。",
+    "laterChanges": "督导同步可能先清目标人员，批量先捕获整表基准并回归；存储恢复、引导复用及重新录入可能重写结果，定向与实际刷新证据证明没有自动回填，填人可保存。",
+    "finalArtifact": "browser.txt和page.png是当前本地修复版实际点击后的产物，逐项核对5个岗位和空姓名；verify.txt保存完整验证。未发布线上。"
+  },
+  "review": {
+    "missedScope": "已核对隐藏临时/手工/行政/引导岗位、督导关联、首次基准、规则过期、重复清空、300岗位、A/B隔离、存储/Excel及窄屏。页面验收用独立合成数据，未修改owner现用浏览器真实班表；线上未发布。",
+    "rootCause": "工具栏把清空人员误接成clearActiveSchedule，删除assignments导致未生成页面。现已连接唯一人工批量清空动作，配置失效清表仍使用原生命周期动作。",
+    "earlyDetection": "修改清空入口前先以实际按钮命令断言航班列数、岗位ID和数量不变且姓名全空；同时核对关联基准、刷新、再次填写，并以取消和另一组不变提供保护。"
+  }
+}

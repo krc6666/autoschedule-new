@@ -1,0 +1,213 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+npm.cmd : stderr | tests/app/clear-schedule-staff.test.ts
+所在位置 行:2 字符: 1
++ npm.cmd exec vitest -- run tests/app/clear-schedule-staff.test.ts *>  ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (stderr | tests/...e-staff.test.ts:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+
+ ❯ tests/app/clear-schedule-staff.test.ts (6 tests | 5 failed) 277ms
+     × 真实工具栏命令保留所有航班和岗位，空格仍可手工填写 189ms
+     × 清空督导关联及旧证据，先保留整表基准，重复清空不丢基准 13ms
+     × 保存后恢复仍保留空岗位、临时岗位、历史、另一组及规则过期标记 17ms
+     × 整表人员清空后Excel排班结果保留每个岗位和空人员 29ms
+     × 大班表清空全部300个岗位，无漏清或自动回填 13ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/app/clear-schedule-staff.test.ts > 红叉清空全部人员 > 真实工具栏命令保留所有航班和岗位，空格仍可手工填写
+AssertionError: expected [] to have a length of 7 but got +0
+
+- Expected
++ Received
+
+- 7
++ 0
+
+ ❯ tests/app/clear-schedule-staff.test.ts:119:45
+    117|     await settleLit();
+    118|
+    119|     expect(coordinator.model().assignments).toHaveLength(before.assign…
+       |                                             ^
+    120|     expect(structure(coordinator.model().assignments)).toEqual(structu…
+    121|     expect(coordinator.model().flights).toEqual(before.flights);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  tests/app/clear-schedule-staff.test.ts > 红叉清空全部人员 > 清空督导关联及旧证据，先保留整表基准，重复清空不丢基准
+AssertionError: expected [] to have a length of 7 but got +0
+
+- Expected
++ Received
+
+- 7
++ 0
+
+ ❯ tests/app/clear-schedule-staff.test.ts:141:33
+    139|     await coordinator.handle({ type: "clear-schedule" });
+    140|     const cleared = coordinator.model();
+    141|     expect(cleared.assignments).toHaveLength(before.assignments.length…
+       |                                 ^
+    142|     cleared.assignments.forEach((a, index) => {
+    143|       expect(a.staffId).toBeNull();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  tests/app/clear-schedule-staff.test.ts > 红叉清空全部人员 > 保存后恢复仍保留空岗位、临时岗位、历史、另一组及规则过期标记
+AssertionError: expected [] to deeply equal [ { …(11) }, { …(11) }, …(5) ]
+
+- Expected
++ Received
+
+- [
+-   {
+-     "endTime": "10:30",
+-     "flightId": "flight-cx937",
+-     "flightNo": "CX937",
+-     "id": "clear-assignment-0",
+-     "layoutGroup": "primary",
+-     "layoutIndex": 0,
+-     "manualRemark": "手工备注0",
+-     "position": "测试岗位0",
+-     "positionRuleId": "clear-rule-0",
+-     "remark": "岗位备注0",
+-     "startTime": "08:30",
+-   },
+-   {
+-     "endTime": "10:30",
+-     "flightId": "second-flight",
+-     "flightNo": "TEST002",
+-     "id": "clear-assignment-1",
+-     "layoutGroup": "primary",
+-     "layoutIndex": 1,
+-     "manualRemark": "手工备注1",
+-     "position": "测试岗位1",
+-     "positionRuleId": "clear-rule-1",
+-     "remark": "岗位备注1",
+-     "startTime": "08:30",
+-   },
+-   {
+-     "endTime": "10:30",
+-     "flightId": "flight-cx937",
+-     "flightNo": "CX937",
+-     "id": "clear-assignment-2",
+-     "layoutGroup": "primary",
+-     "layoutIndex": 2,
+-     "manualRemark": "手工备注2",
+-     "position": "测试岗位2",
+-     "positionRuleId": "clear-rule-2",
+-     "remark": "岗位备注2",
+-     "startTime": "08:30",
+-   },
+-   {
+-     "endTime": "10:30",
+-     "flightId": "second-flight",
+-     "flightNo": "TEST002",
+-     "id": "clear-assignment-3",
+-     "layoutGroup": "primary",
+-     "layoutIndex": 3,
+-     "manualRemark": "手工备注3",
+-     "position": "测试岗位3",
+-     "positionRuleId": "clear-rule-3",
+-     "remark": "岗位备注3",
+-     "startTime": "08:30",
+-   },
+-   {
+-     "endTime": "10:30",
+-     "flightId": "flight-cx937",
+-     "flightNo": "CX937",
+-     "id": "clear-assignment-4",
+-     "layoutGroup": "primary",
+-     "layoutIndex": 4,
+-     "manualRemark": "手工备注4",
+-     "position": "测试岗位4",
+-     "positionRuleId": "clear-rule-4",
+-     "remark": "岗位备注4",
+-     "startTime": "08:30",
+-   },
+-   {
+-     "endTime": "10:30",
+-     "flightId": "second-flight",
+-     "flightNo": "TEST002",
+-     "id": "clear-assignment-5",
+-     "layoutGroup": "primary",
+-     "layoutIndex": 5,
+-     "manualRemark": "手工备注5",
+
+-     "position": "测试岗位5",
+-     "positionRuleId": "clear-rule-5",
+-     "remark": "岗位备注5",
+-     "startTime": "08:30",
+-   },
+-   {
+-     "endTime": "10:30",
+-     "flightId": "flight-cx937",
+-     "flightNo": "CX937",
+-     "id": "clear-assignment-6",
+-     "layoutGroup": "bottom",
+-     "layoutIndex": 6,
+-     "manualRemark": "手工备注6",
+-     "position": "测试岗位6",
+-     "positionRuleId": null,
+-     "remark": "岗位备注6",
+-     "startTime": "08:30",
+-   },
+- ]
++ []
+
+ Test Files  1 failed (1)
+      Tests  5 failed | 1 passed (6)
+   Start at  14:27:45
+   Duration  3.19s (transform 1.53s, setup 0ms, import 1.93s, tests 277ms, environment 744ms)
+
+ ❯ tests/app/clear-schedule-staff.test.ts:168:45
+    166|     expect(save).toHaveBeenCalledTimes(1);
+    167|     const restored = persistence.load();
+    168|     expect(structure(restored.assignments)).toEqual(structure(before.a…
+       |                                             ^
+    169|     expect(restored.assignments.every((a) => !a.staffId && !a.staffNam…
+    170|     expect(restored.groups.B).toEqual(before.groups.B);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL  tests/app/clear-schedule-staff.test.ts > 红叉清空全部人员 > 整表人员清空后Excel排班结果保留每个岗位和空人员
+AssertionError: expected [ [ '日期', '航班号', '岗位', '姓名', …(10) ] ] to have a length of 8 but got 1
+
+- Expected
++ Received
+
+- 8
++ 1
+
+ ❯ tests/app/clear-schedule-staff.test.ts:204:18
+    202|     const restored = XLSX.read(bytes, { type: "buffer" });
+    203|     const rows = XLSX.utils.sheet_to_json<string[]>(restored.Sheets["排…
+    204|     expect(rows).toHaveLength(before.assignments.length + 1);
+       |                  ^
+    205|     const header = rows[0]!;
+    206|     const nameIndex = header.indexOf("姓名");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+ FAIL  tests/app/clear-schedule-staff.test.ts > 红叉清空全部人员 > 大班表清空全部300个岗位，无漏清或自动回填
+AssertionError: expected [] to have a length of 300 but got +0
+
+- Expected
++ Received
+
+- 300
++ 0
+
+ ❯ tests/app/clear-schedule-staff.test.ts:217:45
+    215|     const { coordinator } = setup(exampleState(300));
+    216|     await coordinator.handle({ type: "clear-schedule" });
+    217|     expect(coordinator.model().assignments).toHaveLength(300);
+       |                                             ^
+    218|     expect(coordinator.model().assignments.every((a) => !a.staffId && …
+    219|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯

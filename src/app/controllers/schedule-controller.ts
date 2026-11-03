@@ -215,10 +215,12 @@ export class ScheduleController implements UiCommandController {
       case "clear-schedule":
         if (
           this.context.model().assignments.length &&
-          this.context.confirm("确认清空当前排班？")
+          this.context.confirm(
+            "确认清空当前班表所有岗位的人员？航班、岗位和备注都会保留。"
+          )
         ) {
-          schedule.clear();
-          this.context.commit("当前排班已清空");
+          schedule.clearStaff();
+          this.context.commit("当前班表人员已全部清空，航班和岗位已保留");
         }
         return true;
       case "archive-schedule":
