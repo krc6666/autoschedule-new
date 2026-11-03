@@ -1,0 +1,46 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/app/preflight-admin-mode.test.ts (31 tests | 2 failed) 1052ms
+     × 'generate-schedule' adopts a stopped result and its mode only with a safety credential (true) 38ms
+     × 'archive-next-duty-day' adopts a stopped result and its mode only with a safety credential (true) 35ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/app/preflight-admin-mode.test.ts > preflight administrative mode draft > 'generate-schedule' adopts a stopped result and its mode only with a safety credential (true)
+AssertionError: expected '排班已停止，并采用最近一份完整安全方案' to contain '已采用'
+
+Expected: "已采用"
+Received: "排班已停止，并采用最近一份完整安全方案"
+
+ ❯ tests/app/preflight-admin-mode.test.ts:365:51
+    363|         expect(persistence.load().settings.adminSupportEnabled).toBe(t…
+    364|         expect(persistence.load().assignments).toEqual([]);
+    365|         expect(coordinator.view().toast?.message).toContain("已采用");
+       |                                                   ^
+    366|       } else {
+    367|         expect(coordinator.model()).toEqual(original);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/app/preflight-admin-mode.test.ts > preflight administrative mode draft > 'archive-next-duty-day' adopts a stopped result and its mode only with a safety credential (true)
+AssertionError: expected '已归档本班，并采用后天最近一份完整安全方案' to contain '已采用'
+
+Expected: "已采用"
+Received: "已归档本班，并采用后天最近一份完整安全方案"
+
+ ❯ tests/app/preflight-admin-mode.test.ts:365:51
+    363|         expect(persistence.load().settings.adminSupportEnabled).toBe(t…
+    364|         expect(persistence.load().assignments).toEqual([]);
+    365|         expect(coordinator.view().toast?.message).toContain("已采用");
+       |                                                   ^
+    366|       } else {
+    367|         expect(coordinator.model()).toEqual(original);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed | 6 passed (7)
+      Tests  2 failed | 168 passed (170)
+   Start at  15:50:05
+   Duration  12.41s (transform 7.02s, setup 0ms, import 10.13s, tests 15.08s, environment 505ms)

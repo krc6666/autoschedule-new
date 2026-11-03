@@ -1,0 +1,50 @@
+{
+  "input": "Independent anonymous scenario: 2 flights, 6 positions, 8 qualified people; real Worker and HiGHS/WASM. Final result delivery held only to make the stop click deterministic; no synthetic solver result.",
+  "cases": [
+    {
+      "entry": "generate",
+      "safeSnapshots": 1,
+      "finalDeliveryHeld": true,
+      "workersTerminated": 1,
+      "positions": 6,
+      "assigned": 6,
+      "exactSnapshotAdopted": true,
+      "visibleInputsMatch": true,
+      "savedReloadMatches": true,
+      "date": "2026-11-03",
+      "modeSaved": true,
+      "groupAndWeeklyPlanUnchanged": true,
+      "pageErrors": []
+    },
+    {
+      "entry": "reschedule",
+      "safeSnapshots": 1,
+      "finalDeliveryHeld": true,
+      "workersTerminated": 1,
+      "positions": 6,
+      "assigned": 6,
+      "exactSnapshotAdopted": true,
+      "visibleInputsMatch": true,
+      "savedReloadMatches": true,
+      "date": "2026-11-03",
+      "modeSaved": true,
+      "groupAndWeeklyPlanUnchanged": true,
+      "pageErrors": []
+    },
+    {
+      "entry": "next",
+      "safeSnapshots": 1,
+      "finalDeliveryHeld": true,
+      "workersTerminated": 1,
+      "positions": 6,
+      "assigned": 6,
+      "exactSnapshotAdopted": true,
+      "visibleInputsMatch": true,
+      "savedReloadMatches": true,
+      "date": "2026-11-05",
+      "modeSaved": true,
+      "groupAndWeeklyPlanUnchanged": true,
+      "pageErrors": []
+    }
+  ]
+}

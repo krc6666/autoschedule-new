@@ -814,7 +814,7 @@ export class ScheduleController implements UiCommandController {
           halfRestModes: this.context.view().halfRestModes,
         }
       );
-      if (outcome.kind !== "completed") {
+      if (outcome.kind === "stopped-without-result") {
         this.context.toast("排班已停止，原班表保持不变", "warning");
         return;
       }
@@ -822,9 +822,11 @@ export class ScheduleController implements UiCommandController {
       this.context.store.getState().replaceModel(temporaryState);
       this.context.updateView({ section: "schedule" });
       this.context.commit(
-        outcome.result.unfilledCount
-          ? `排班已生成，${outcome.result.unfilledCount} 个常规岗位待补位`
-          : "排班已生成"
+        outcome.kind === "stopped-with-result"
+          ? "排班已停止，并采用最近一份完整安全方案"
+          : outcome.result.unfilledCount
+            ? `排班已生成，${outcome.result.unfilledCount} 个常规岗位待补位`
+            : "排班已生成"
       );
       this.reportScheduleWarnings(outcome.result, dialog.date);
     } catch (error) {
@@ -1110,7 +1112,7 @@ export class ScheduleController implements UiCommandController {
         temporaryState,
         nextDate
       );
-      if (outcome.kind !== "completed") {
+      if (outcome.kind === "stopped-without-result") {
         this.context.toast("排班已停止，原班表保持不变", "warning");
         return;
       }
@@ -1131,9 +1133,11 @@ export class ScheduleController implements UiCommandController {
         halfRestModes: {},
       });
       this.context.commit(
-        outcome.result.unfilledCount
-          ? `后天排班已生成，${outcome.result.unfilledCount} 个常规岗位待补位`
-          : "后天排班已生成"
+        outcome.kind === "stopped-with-result"
+          ? "已归档本班，并采用后天最近一份完整安全方案"
+          : outcome.result.unfilledCount
+            ? `后天排班已生成，${outcome.result.unfilledCount} 个常规岗位待补位`
+            : "后天排班已生成"
       );
       this.reportScheduleWarnings(outcome.result, nextDate);
     } catch (error) {

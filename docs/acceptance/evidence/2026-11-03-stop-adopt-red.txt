@@ -1,0 +1,110 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/app/stop-and-adopt.test.ts (12 tests | 4 failed) 821ms
+     × adopt 105ms
+     × tampered 67ms
+     × adopt 66ms
+     × tampered 67ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/app/stop-and-adopt.test.ts > 停止结果完整链路：'generate-schedule' > adopt
+AssertionError: expected [ { id: 'original', …(13) } ] to deeply equal [ { id: 'latest', …(13) } ]
+
+- Expected
++ Received
+
+@@ -2,17 +2,17 @@
+    {
+      "endTime": "15:00",
+      "fatiguePoints": 2,
+      "flightId": "flight-cx937",
+      "flightNo": "TEST001",
+-     "id": "latest",
++     "id": "original",
+      "manualRemark": "",
+      "position": "G01",
+      "positionRuleId": "test-rule",
+      "remark": "",
+-     "staffId": "person-1",
+-     "staffName": "测试1",
++     "staffId": "person-0",
++     "staffName": "测试0",
+      "startTime": "13:00",
+      "status": "assigned",
+      "workHours": 2,
+    },
+  ]
+
+ ❯ tests/app/stop-and-adopt.test.ts:113:47
+    111|     expect(coordinator.scheduleRunner.isRunning()).toBe(false);
+    112|     if (mode === "adopt") {
+    113|       expect(coordinator.model().assignments).toEqual(latest!.assignme…
+       |                                               ^
+    114|       expect(coordinator.model().assignments[0]!.staffId).toBe("person…
+    115|       expect(coordinator.model().settings.adminSupportEnabled).toBe(tr…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  tests/app/stop-and-adopt.test.ts > 停止结果完整链路：'generate-schedule' > tampered
+ FAIL  tests/app/stop-and-adopt.test.ts > 停止结果完整链路：'archive-next-duty-day' > tampered
+AssertionError: expected 'warning' to be 'danger' // Object.is equality
+
+Expected: "danger"
+Received: "warning"
+
+ ❯ tests/app/stop-and-adopt.test.ts:141:46
+    139|       expect(saveDate).not.toHaveBeenCalled();
+    140|       expect(setItem).not.toHaveBeenCalled();
+    141|       expect(coordinator.view().toast?.tone).toBe(mode === "tampered" …
+       |                                              ^
+    142|     }
+    143|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  tests/app/stop-and-adopt.test.ts > 停止结果完整链路：'archive-next-duty-day' > adopt
+AssertionError: expected [ { id: 'original', …(13) } ] to deeply equal [ { id: 'latest', …(13) } ]
+
+- Expected
++ Received
+
+  [
+    {
+      "endTime": "15:00",
+      "fatiguePoints": 2,
+-     "flightId": "next-test001",
++     "flightId": "flight-cx937",
+      "flightNo": "TEST001",
+-     "id": "latest",
++     "id": "original",
+      "manualRemark": "",
+      "position": "G01",
+      "positionRuleId": "test-rule",
+      "remark": "",
+-     "staffId": "person-1",
+-     "staffName": "测试1",
++     "staffId": "person-0",
++     "staffName": "测试0",
+      "startTime": "13:00",
+      "status": "assigned",
+      "workHours": 2,
+    },
+  ]
+
+ ❯ tests/app/stop-and-adopt.test.ts:113:47
+    111|     expect(coordinator.scheduleRunner.isRunning()).toBe(false);
+    112|     if (mode === "adopt") {
+    113|       expect(coordinator.model().assignments).toEqual(latest!.assignme…
+       |                                               ^
+    114|       expect(coordinator.model().assignments[0]!.staffId).toBe("person…
+    115|       expect(coordinator.model().settings.adminSupportEnabled).toBe(tr…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed | 8 passed (12)
+   Start at  15:49:25
+   Duration  2.62s (transform 1.36s, setup 0ms, import 1.59s, tests 821ms, environment 0ms)

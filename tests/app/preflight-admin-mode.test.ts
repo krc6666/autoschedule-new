@@ -325,7 +325,7 @@ describe("preflight administrative mode draft", () => {
   it.each(
     entries.flatMap((entry) => [true, false].map((safe) => ({ entry, safe })))
   )(
-    "$entry adopts a stopped result and its mode only for a safe reschedule ($safe)",
+    "$entry adopts a stopped result and its mode only with a safety credential ($safe)",
     async ({ entry, safe }) => {
       const persistence = createMemoryStatePersistence();
       const saveScheduleDate = vi.fn();
@@ -351,23 +351,26 @@ describe("preflight administrative mode draft", () => {
       });
       await coordinator.handle(confirmation(coordinator.view().dialog));
       expect(calculate).toHaveBeenCalledTimes(1);
-      expect(coordinator.view().date).toBe("2026-08-15");
-      expect(saveScheduleDate).not.toHaveBeenCalled();
-      if (entry === "open-reschedule-flight-picker" && safe) {
+      expect(coordinator.view().date).toBe(
+        entry === "archive-next-duty-day" && safe ? "2026-08-17" : "2026-08-15"
+      );
+      if (entry === "archive-next-duty-day" && safe)
+        expect(saveScheduleDate).toHaveBeenCalledWith("2026-08-17");
+      else expect(saveScheduleDate).not.toHaveBeenCalled();
+      if (safe) {
         expect(coordinator.model().settings.adminSupportEnabled).toBe(true);
         expect(coordinator.model().assignments).toEqual([]);
         expect(persistence.load().settings.adminSupportEnabled).toBe(true);
         expect(persistence.load().assignments).toEqual([]);
-        expect(coordinator.view().toast?.message).toContain("已采用");
+        expect(coordinator.view().toast?.message).toContain("采用");
       } else {
         expect(coordinator.model()).toEqual(original);
-        if (entry === "open-reschedule-flight-picker")
-          expect(coordinator.view().toast?.tone).toBe("danger");
+        expect(coordinator.view().toast?.tone).toBe("danger");
       }
       await coordinator.handle({ type: entry });
       expect(coordinator.view().dialog).toHaveProperty(
         "adminSupportEnabled",
-        entry === "open-reschedule-flight-picker" && safe
+        safe
       );
     }
   );

@@ -1536,7 +1536,7 @@ describe("next workday flight picker workflow", () => {
     expect(coordinator.view().toast?.message).toContain("后天排班生成失败");
   });
 
-  it("keeps the original model when the run is stopped, even with a latest result", async () => {
+  it("keeps the original model when a stopped result has no safety credential", async () => {
     const state = stateWithCurrentSchedule();
     const coordinator = createTestApplicationCoordinator(
       createTestAutoscheduleStore(state),
@@ -1561,7 +1561,8 @@ describe("next workday flight picker workflow", () => {
     });
 
     expect(coordinator.model()).toEqual(original);
-    expect(coordinator.view().toast?.message).toContain("原班表保持不变");
+    expect(coordinator.view().toast?.tone).toBe("danger");
+    expect(coordinator.view().toast?.message).toContain("原班表已保留");
   });
 
   it("commits archive, selected flights, date, and result only after success", async () => {

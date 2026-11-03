@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { createDefaultState } from "../../src/defaults";
 import type { ApplicationPreferences } from "../../src/app/application-preferences";
 import type { AppState, ScheduleResult } from "../../src/model";
+import type { ScheduleRunOutcome } from "../../src/infrastructure/schedule-runner";
 import { createScheduleSafetySession } from "../../src/domain/kernel/schedule-safety-session";
 import { createScheduleRunFacts } from "../../src/domain/shared/schedule-run-facts";
 import { createStatePersistence } from "../../src/infrastructure/storage";
@@ -335,10 +336,15 @@ describe.each(entries)("排班前确认：$name", (entry) => {
       createTestAutoscheduleStore(state, persistence),
       { preferences, confirm: () => true }
     );
-    const calculate = vi.fn(async (input: AppState, resultDate: string) => ({
-      kind: "completed" as const,
-      result: safeResult(input, resultDate),
-    }));
+    const calculate = vi.fn(
+      async (
+        input: AppState,
+        resultDate: string
+      ): Promise<ScheduleRunOutcome> => ({
+        kind: "completed" as const,
+        result: safeResult(input, resultDate),
+      })
+    );
     setTestScheduleRunner(coordinator, { calculate, isRunning: () => false });
     const before = structuredClone(coordinator.model());
     await coordinator.handle({ type: entry.open });
@@ -372,50 +378,58 @@ describe.each(entries)("排班前确认：$name", (entry) => {
     expect(setItem).not.toHaveBeenCalled();
   });
 
-  it("成功一起提交，配置、当前组、保存恢复与 Excel 状态一致", async () => {
-    const { coordinator, before, calculate, persistence, setItem, dialog } =
-      await setup();
-    await coordinator.handle({
-      type: entry.confirm,
-      selectedIds: dialog.selectedIds,
-    });
-    expect(coordinator.view().toast?.tone).not.toBe("danger");
-    const staffId = before.staff[0]!.id;
-    expect(calculate).toHaveBeenCalledTimes(1);
-    expect(
-      calculate.mock.calls[0]![0].staff.find((person) => person.id === staffId)
-        ?.status
-    ).toBe("休假");
-    const model = coordinator.model();
-    expect(model.staff.find((person) => person.id === staffId)?.status).toBe(
-      "休假"
-    );
-    expect(
-      model.groups.A.staff.find((person) => person.id === staffId)?.status
-    ).toBe("休假");
-    expect(model.groups.B).toEqual(before.groups.B);
-    expect(model.activeScheduleDate).toBe(dialog.date);
-    expect(model.flights).toEqual(calculate.mock.calls[0]![0].flights);
-    if (entry.kind === "next-workday-flight-picker") {
-      expect(model.history).toEqual(
-        expect.arrayContaining([expect.objectContaining({ date, staffId })])
+  it.each(["completed", "stopped-with-result"] as const)(
+    "%s 一起提交，配置、当前组、保存恢复与 Excel 状态一致",
+    async (kind) => {
+      const { coordinator, before, calculate, persistence, setItem, dialog } =
+        await setup();
+      calculate.mockImplementationOnce(async (input, resultDate) => ({
+        kind,
+        result: safeResult(input, resultDate),
+      }));
+      await coordinator.handle({
+        type: entry.confirm,
+        selectedIds: dialog.selectedIds,
+      });
+      expect(coordinator.view().toast?.tone).not.toBe("danger");
+      const staffId = before.staff[0]!.id;
+      expect(calculate).toHaveBeenCalledTimes(1);
+      expect(
+        calculate.mock.calls[0]![0].staff.find(
+          (person) => person.id === staffId
+        )?.status
+      ).toBe("休假");
+      const model = coordinator.model();
+      expect(model.staff.find((person) => person.id === staffId)?.status).toBe(
+        "休假"
       );
-      expect(coordinator.view().date).toBe("2026-08-17");
+      expect(
+        model.groups.A.staff.find((person) => person.id === staffId)?.status
+      ).toBe("休假");
+      expect(model.groups.B).toEqual(before.groups.B);
+      expect(model.activeScheduleDate).toBe(dialog.date);
+      expect(model.flights).toEqual(calculate.mock.calls[0]![0].flights);
+      if (entry.kind === "next-workday-flight-picker") {
+        expect(model.history).toEqual(
+          expect.arrayContaining([expect.objectContaining({ date, staffId })])
+        );
+        expect(coordinator.view().date).toBe("2026-08-17");
+      }
+      expect(setItem).toHaveBeenCalledTimes(1);
+      expect(
+        persistence.load().staff.find((person) => person.id === staffId)?.status
+      ).toBe("休假");
+      const imported = parseWorkbook(buildConfigWorkbook(model), model.staff);
+      expect(
+        imported.staff?.find((person) => person.id === staffId)?.status
+      ).toBe("休假");
     }
-    expect(setItem).toHaveBeenCalledTimes(1);
-    expect(
-      persistence.load().staff.find((person) => person.id === staffId)?.status
-    ).toBe("休假");
-    const imported = parseWorkbook(buildConfigWorkbook(model), model.staff);
-    expect(
-      imported.staff?.find((person) => person.id === staffId)?.status
-    ).toBe("休假");
-  });
+  );
 
   it.each([
     "error",
     "stopped-without-result",
-    "stopped-with-result",
+    "unsafe-stopped",
     "unsafe",
   ] as const)(
     "%s 时班表、人员状态、航班、历史和保存均不变",
@@ -432,9 +446,10 @@ describe.each(entries)("排班前确认：$name", (entry) => {
       else
         setTestScheduleRunner(coordinator, {
           calculate: async (state, resultDate) =>
-            outcome === "unsafe"
+            outcome === "unsafe" || outcome === "unsafe-stopped"
               ? {
-                  kind: "completed",
+                  kind:
+                    outcome === "unsafe" ? "completed" : "stopped-with-result",
                   result: { assignments: [], warnings: [], unfilledCount: 0 },
                 }
               : outcome === "stopped-without-result"
@@ -453,7 +468,7 @@ describe.each(entries)("排班前确认：$name", (entry) => {
       expect(coordinator.view().date).toBe(date);
       expect(setItem).not.toHaveBeenCalled();
       expect(coordinator.view().toast?.tone).toBe(
-        outcome === "error" || outcome === "unsafe" ? "danger" : "warning"
+        outcome === "stopped-without-result" ? "warning" : "danger"
       );
     }
   );

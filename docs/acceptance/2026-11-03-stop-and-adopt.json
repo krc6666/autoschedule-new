@@ -1,0 +1,172 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-03-stop-and-adopt",
+  "title": "三个计算入口停止并采用最近安全班表",
+  "startedFrom": "c774186975db5de81fc5edae9c8973dc6a769722",
+  "expectation": {
+    "example": "owner反馈生成、重新排班、归档并排后天计算中点击停止并采用均未呈现已排结果；明确要求三个入口统一，并授权按推荐方案完成。",
+    "expected": "例如后台先发出安全版本甲、再发出版本乙，点击停止并采用即终止计算并显示乙；航班、人员状态、行政模式和轮值草稿同时提交。后天入口同时归档本班并切到目标日，保存刷新保持采用结果。",
+    "unchanged": "不修改排班算法、完整安全方案标准、最终凭证检查、每周计划、模板、另一组及停止不采用语义；不采用未经安全检查的半成品。",
+    "fallback": "没有安全快照时不可采用；停止不采用、计算异常或安全安装拒绝保留原模型、日期和历史，不保存草稿。"
+  },
+  "testedVersion": "145a85b00cf884596581d66b49c70a5c92d5f2df334b86aa271a32a6757dd917",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "旧实现将stopped-with-result一起回退；新12项回归先出现4项失败，修复后170项定向通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-stop-adopt-red.txt",
+          "summary": "修改前12项完整停止链回归中4项失败：生成/后天未采用最新人员结果，且停止后未进入安全安装。重新排班与停止不采用等8项通过。",
+          "sha256": "119218e10b7888bbaed0f7ea8e269b174294dbabae8ba6a92ddd07d9fb17428b"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-stop-adopt-focused-green.txt",
+          "summary": "7文件170项通过：三入口最新安全结果、停止不采用、未就绪、被改坏凭证、晚到消息、模式/人员状态/轮值/航班/历史/日期与存储和Excel消费者。",
+          "sha256": "f5b1566f3917fa9936f29eb0f9338174b47e9ee6665e4db7be0e91100dd703f4"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "三入口实际停止命令和浏览器点击均采用收到的最近安全结果；页面姓名输入与最终人员一致。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-stop-adopt-focused-green.txt",
+          "summary": "7文件170项通过：三入口最新安全结果、停止不采用、未就绪、被改坏凭证、晚到消息、模式/人员状态/轮值/航班/历史/日期与存储和Excel消费者。",
+          "sha256": "f5b1566f3917fa9936f29eb0f9338174b47e9ee6665e4db7be0e91100dd703f4"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-stop-adopt-browser.txt",
+          "summary": "独立Chrome真实Worker/HiGHS/WASM，三个入口点击停止并采用；6岗位6人员与最近快照完全一致，保存刷新保持，后天归档并切日，模式保存、另一组/周计划不变、无页面错误。仅延迟最终消息留出点击窗口。",
+          "sha256": "be4c8ef2ce06fc0dce09d476b885c54affb0a45ad6edd482bdb1c7b2813d0e99"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "停止不采用、未就绪、被改坏凭证均保留原模型；模式、休病假状态、轮值、后天归档和另一组隔离均覆盖。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-stop-adopt-focused-green.txt",
+          "summary": "7文件170项通过：三入口最新安全结果、停止不采用、未就绪、被改坏凭证、晚到消息、模式/人员状态/轮值/航班/历史/日期与存储和Excel消费者。",
+          "sha256": "f5b1566f3917fa9936f29eb0f9338174b47e9ee6665e4db7be0e91100dd703f4"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-stop-adopt-full.txt",
+          "summary": "npm.cmd test原生退出0：150文件1512项功能测试通过，含Worker、快照后置、最终安全、存储、Excel及页面消费者。",
+          "sha256": "ec340281f8b19ed186c4866dcb409b08c6f3d076a6673cf9b5f203b3c08bbbab"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "先发布安全版本甲再乙，采用乙；终止后晚到最终消息不能覆盖。保存恢复人员与模式一致，后天源历史及目标日期同步提交。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-stop-adopt-focused-green.txt",
+          "summary": "7文件170项通过：三入口最新安全结果、停止不采用、未就绪、被改坏凭证、晚到消息、模式/人员状态/轮值/航班/历史/日期与存储和Excel消费者。",
+          "sha256": "f5b1566f3917fa9936f29eb0f9338174b47e9ee6665e4db7be0e91100dd703f4"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-stop-adopt-browser.txt",
+          "summary": "独立Chrome真实Worker/HiGHS/WASM，三个入口点击停止并采用；6岗位6人员与最近快照完全一致，保存刷新保持，后天归档并切日，模式保存、另一组/周计划不变、无页面错误。仅延迟最终消息留出点击窗口。",
+          "sha256": "be4c8ef2ce06fc0dce09d476b885c54affb0a45ad6edd482bdb1c7b2813d0e99"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "未就绪不可采用，被改坏快照及无安全凭证均拒绝安装且不持久化；完整快照后置与最终守卫由既有全量回归覆盖。未改安全标准。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-stop-adopt-focused-green.txt",
+          "summary": "7文件170项通过：三入口最新安全结果、停止不采用、未就绪、被改坏凭证、晚到消息、模式/人员状态/轮值/航班/历史/日期与存储和Excel消费者。",
+          "sha256": "f5b1566f3917fa9936f29eb0f9338174b47e9ee6665e4db7be0e91100dd703f4"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-stop-adopt-full.txt",
+          "summary": "npm.cmd test原生退出0：150文件1512项功能测试通过，含Worker、快照后置、最终安全、存储、Excel及页面消费者。",
+          "sha256": "ec340281f8b19ed186c4866dcb409b08c6f3d076a6673cf9b5f203b3c08bbbab"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-stop-adopt-typecheck.txt",
+          "summary": "npm.cmd run typecheck原生退出0；测试mock按真实ScheduleRunOutcome联合类型声明。",
+          "sha256": "4b3f7cf1ed06cba39ee3b0608990fffcf42e1ff315949a5353a62ce478a2683c"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-stop-adopt-precommit-verify.txt",
+          "summary": "提交前完整 npm.cmd run verify 原生退出0：150文件1512项功能、7文件19项性能、类型检查与生产构建通过。",
+          "sha256": "161a63f4ec366b4341e59776c3dc8e0254cc2d3cc95484e7eef29e1117b17b5f"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "不改算法/规则/凭证/存储结构；停止不采用、错误回退、另一组、模板/周计划、人工历史与Excel消费者继续通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-stop-adopt-focused-green.txt",
+          "summary": "7文件170项通过：三入口最新安全结果、停止不采用、未就绪、被改坏凭证、晚到消息、模式/人员状态/轮值/航班/历史/日期与存储和Excel消费者。",
+          "sha256": "f5b1566f3917fa9936f29eb0f9338174b47e9ee6665e4db7be0e91100dd703f4"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-stop-adopt-full.txt",
+          "summary": "npm.cmd test原生退出0：150文件1512项功能测试通过，含Worker、快照后置、最终安全、存储、Excel及页面消费者。",
+          "sha256": "ec340281f8b19ed186c4866dcb409b08c6f3d076a6673cf9b5f203b3c08bbbab"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-stop-adopt-build.txt",
+          "summary": "npm.cmd run build原生退出0，含生产Worker/WASM资产；保留既有HiGHS node:module浏览器外置提示。",
+          "sha256": "7c54159a36c3df2cb7526684799dd25fb08f8b61f6f49f832b92ab81bbcc93a0"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-stop-adopt-precommit-verify.txt",
+          "summary": "提交前完整 npm.cmd run verify 原生退出0：150文件1512项功能、7文件19项性能、类型检查与生产构建通过。",
+          "sha256": "161a63f4ec366b4341e59776c3dc8e0254cc2d3cc95484e7eef29e1117b17b5f"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "verified",
+      "reason": "三个实际页面均呈现真实Worker算出的6岗位6人员；逐项等于最近快照，刷新后保持；后天实际切换11月5日且本班归档。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-stop-adopt-browser.txt",
+          "summary": "独立Chrome真实Worker/HiGHS/WASM，三个入口点击停止并采用；6岗位6人员与最近快照完全一致，保存刷新保持，后天归档并切日，模式保存、另一组/周计划不变、无页面错误。仅延迟最终消息留出点击窗口。",
+          "sha256": "be4c8ef2ce06fc0dce09d476b885c54affb0a45ad6edd482bdb1c7b2813d0e99"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-stop-adopt-next.png",
+          "summary": "实际归档后天停止采用后的完整页面：2026-11-05、两航班六岗位及人员，成功回执显示归档并采用。匿名测试数据。",
+          "sha256": "8cb8a46d9b3951f3990e4ce3e6731dec00223b0215787625336135de8e8a53bf"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-stop-adopt-full.txt",
+          "summary": "npm.cmd test原生退出0：150文件1512项功能测试通过，含Worker、快照后置、最终安全、存储、Excel及页面消费者。",
+          "sha256": "ec340281f8b19ed186c4866dcb409b08c6f3d076a6673cf9b5f203b3c08bbbab"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-stop-adopt-build.txt",
+          "summary": "npm.cmd run build原生退出0，含生产Worker/WASM资产；保留既有HiGHS node:module浏览器外置提示。",
+          "sha256": "7c54159a36c3df2cb7526684799dd25fb08f8b61f6f49f832b92ab81bbcc93a0"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-stop-adopt-precommit-verify.txt",
+          "summary": "提交前完整 npm.cmd run verify 原生退出0：150文件1512项功能、7文件19项性能、类型检查与生产构建通过。",
+          "sha256": "161a63f4ec366b4341e59776c3dc8e0254cc2d3cc95484e7eef29e1117b17b5f"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "red.txt记录旧代码4项失败，focused-green.txt记录最新两版非空安全快照采用和拒绝坏凭证通过；browser.txt逐项核对最终实际人员。",
+    "laterChanges": "controller草稿提交、后天归档切日、晚到Worker结果、持久化恢复可能覆盖结果。focused-green.txt覆盖两版快照和晚到消息，browser.txt核对三个页面、归档日期及保存刷新。",
+    "finalArtifact": "browser.txt与三个截图为本次匿名实际入口产物；真实Worker/WASM结果无伪造，仅延迟最终消息以留出点击窗口。next.png显示后天六岗位人员及归档采用回执，full.txt为当前实现1512项全量功能通过。"
+  },
+  "review": {
+    "missedScope": "已检查全部四个calculate调用方，两个旧例外修正，重新排班和即时生成保持原消费逻辑；真实runner非空两版快照与独立Chrome三个入口和刷新均覆盖。未重放owner私有原次输入；浏览器仅延迟最终消息，不代表现场耗时。提交前完整verify通过1512项功能、19项性能、类型检查及构建。owner已授权开发提交；未推送或部署。",
+    "rootCause": "生成/后天入口只允许completed，并按旧规范把stopped-with-result丢弃；原测试也断言回退，掩盖按钮“采用”与实际动作不一致。本次owner明确取消旧例外。重新排班本身已有正确采用分支，测试和匿名页面中未复现其丢弃，不编造另一根因。",
+    "earlyDetection": "变更共享停止动作前枚举每个outcome消费者，以至少两份非空安全结果通过真实停止命令检查最终人员，再交叉核对无结果、坏凭证、晚到消息、归档切日和刷新。不能只检查按钮文案、停止状态或空assignments。"
+  }
+}
