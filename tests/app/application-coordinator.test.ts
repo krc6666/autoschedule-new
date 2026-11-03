@@ -376,6 +376,238 @@ describe("historical schedule editing", () => {
     loadScheduleDate: () => "2026-08-22",
   };
 
+  function historicalClearSetup() {
+    const state = editableHistoricalState();
+    const template = state.templates[1]!;
+    const rule = state.positionRules.find(
+      (r) => r.flightNo === template.flightNo
+    )!;
+    state.history.push({
+      ...state.history[1]!,
+      id: "target-second-flight",
+      flightNo: template.flightNo,
+      position: rule.name,
+      startTime: template.startTime,
+      endTime: template.endTime,
+      assignmentRemarks: {
+        remark: "保留历史岗位备注",
+        manualRemark: "保留历史手工备注",
+      },
+    });
+    state.history.push({
+      ...state.history[1]!,
+      id: "target-duty",
+      flightNo: "轮值",
+      position: "值班",
+    });
+    const persistence = createMemoryStatePersistence();
+    const save = vi.spyOn(persistence, "save");
+    const confirm = vi.fn(() => true);
+    const coordinator = createTestApplicationCoordinator(
+      createTestAutoscheduleStore(state, persistence),
+      { preferences: historicalPreferences, confirm }
+    );
+    const original = structuredClone(coordinator.model());
+    return { coordinator, original, persistence, save, confirm };
+  }
+
+  it("历史编辑红叉清空所有人员且保留岗位、备注；取消编辑恢复原表", async () => {
+    const { coordinator, original, save, confirm } = historicalClearSetup();
+    await coordinator.handle({ type: "edit-history-date", date: "2026-08-20" });
+    const draft = structuredClone(coordinator.model());
+    expect(draft.flights).toHaveLength(2);
+    expect(draft.assignments.filter((a) => a.staffId)).toHaveLength(2);
+
+    await coordinator.handle({ type: "clear-schedule" });
+
+    expect(confirm).toHaveBeenCalledWith(
+      "确认清空当前班表所有岗位的人员？航班、岗位和备注都会保留。"
+    );
+    expect(coordinator.model().assignments).toHaveLength(
+      draft.assignments.length
+    );
+    expect(
+      coordinator.model().assignments.every((a) => !a.staffId && !a.staffName)
+    ).toBe(true);
+    expect(
+      coordinator
+        .model()
+        .assignments.map((a) => [
+          a.id,
+          a.positionRuleId,
+          a.position,
+          a.startTime,
+          a.endTime,
+          a.remark,
+          a.manualRemark,
+        ])
+    ).toEqual(
+      draft.assignments.map((a) => [
+        a.id,
+        a.positionRuleId,
+        a.position,
+        a.startTime,
+        a.endTime,
+        a.remark,
+        a.manualRemark,
+      ])
+    );
+    expect(coordinator.model().flights).toEqual(draft.flights);
+    expect(coordinator.model().history).toEqual(original.history);
+    expect(coordinator.model().groups.B).toEqual(original.groups.B);
+    expect(coordinator.view().historyEditDate).toBe("2026-08-20");
+    expect(save).not.toHaveBeenCalled();
+
+    await coordinator.handle({ type: "cancel-history-edit" });
+    expect(coordinator.model().assignments).toEqual(original.assignments);
+    expect(coordinator.model().flights).toEqual(original.flights);
+    expect(coordinator.model().history).toEqual(original.history);
+    expect(coordinator.model().groups.B).toEqual(original.groups.B);
+    expect(coordinator.model().activeScheduleDate).toBe(
+      original.activeScheduleDate
+    );
+    expect(coordinator.view().historyEditDate).toBeNull();
+    expect(coordinator.view().date).toBe("2026-08-22");
+  });
+
+  it("历史红叉取消不改草稿；拒绝保存确认时原历史不变", async () => {
+    const { coordinator, original, confirm, save } = historicalClearSetup();
+    await coordinator.handle({ type: "edit-history-date", date: "2026-08-20" });
+    const draft = structuredClone(coordinator.model());
+    confirm.mockReturnValueOnce(false);
+    await coordinator.handle({ type: "clear-schedule" });
+    expect(confirm).toHaveBeenCalledOnce();
+    expect(coordinator.model()).toEqual(draft);
+    expect(save).not.toHaveBeenCalled();
+
+    await coordinator.handle({ type: "clear-schedule" });
+    expect(coordinator.model().assignments.every((a) => !a.staffId)).toBe(true);
+    confirm.mockReturnValueOnce(false);
+    await coordinator.handle({ type: "save-history-edit" });
+    expect(coordinator.model().history).toEqual(original.history);
+    expect(coordinator.view().historyEditDate).toBe("2026-08-20");
+    expect(save).not.toHaveBeenCalled();
+  });
+
+  it("历史红叉保存仅清空目标日期人员，持久化后可重开补人并保留基准", async () => {
+    const { coordinator, original, save, persistence } = historicalClearSetup();
+    await coordinator.handle({ type: "edit-history-date", date: "2026-08-20" });
+    await coordinator.handle({ type: "clear-schedule" });
+    expect(save).not.toHaveBeenCalled();
+    await coordinator.handle({ type: "save-history-edit" });
+    expect(save).toHaveBeenCalledTimes(1);
+    const saved = persistence.load();
+    const cleared = saved.history.filter(
+      (r) => r.date === "2026-08-20" && r.flightNo !== "轮值"
+    );
+    expect(cleared).toHaveLength(2);
+    expect(
+      cleared.every(
+        (r) =>
+          !r.staffId &&
+          !r.staffName &&
+          r.workHours === 0 &&
+          r.fatiguePoints === 0
+      )
+    ).toBe(true);
+    expect(
+      cleared.map((r) => [r.flightNo, r.position, r.countBaseline?.staffId])
+    ).toEqual(
+      original.history
+        .filter((r) => r.date === "2026-08-20" && r.flightNo !== "轮值")
+        .map((r) => [r.flightNo, r.position, r.staffId])
+    );
+    expect(
+      saved.history.filter(
+        (r) => r.date !== "2026-08-20" || r.flightNo === "轮值"
+      )
+    ).toEqual(
+      original.history.filter(
+        (r) => r.date !== "2026-08-20" || r.flightNo === "轮值"
+      )
+    );
+    expect(saved.assignments).toEqual(original.assignments);
+    expect(saved.flights).toEqual(original.flights);
+    expect(saved.groups.B).toEqual(original.groups.B);
+
+    await coordinator.handle({ type: "edit-history-date", date: "2026-08-20" });
+    const slot = coordinator
+      .model()
+      .assignments.find((a) => a.countBaseline?.staffId)!;
+    expect(slot.staffId).toBeNull();
+    expect(slot.workHours).toBeGreaterThan(0);
+    await coordinator.handle({
+      type: "assign-staff",
+      assignmentId: slot.id,
+      staffId: slot.countBaseline!.staffId!,
+    });
+    await coordinator.handle({ type: "save-history-edit" });
+    expect(
+      persistence
+        .load()
+        .history.find(
+          (r) =>
+            r.date === "2026-08-20" &&
+            r.flightNo === slot.flightNo &&
+            r.position === slot.position
+        )
+    ).toMatchObject({
+      staffId: slot.countBaseline!.staffId,
+      countBaseline: slot.countBaseline,
+      workHours: slot.workHours,
+    });
+  });
+
+  it("历史清空后日期、组、配置、自动排班和归档仍被拦截", async () => {
+    const { coordinator } = historicalClearSetup();
+    await coordinator.handle({ type: "edit-history-date", date: "2026-08-20" });
+    await coordinator.handle({ type: "clear-schedule" });
+    expect(coordinator.model().assignments.every((a) => !a.staffId)).toBe(true);
+    const cleared = structuredClone(coordinator.model());
+    const commands = [
+      { type: "change-date", date: "2026-08-24" },
+      { type: "switch-group", groupId: "B" },
+      {
+        type: "update-configuration",
+        entity: "staff",
+        id: cleared.staff[0]!.id,
+        field: "status",
+        value: "病假",
+      },
+      { type: "open-reschedule-flight-picker" },
+      { type: "archive-schedule" },
+      { type: "clear-history" },
+    ] as const;
+    for (const command of commands) {
+      await coordinator.handle(command);
+      expect(coordinator.model()).toEqual(cleared);
+      expect(coordinator.view().historyEditDate).toBe("2026-08-20");
+      expect(coordinator.view().toast?.message).toBe(
+        "历史排班正在编辑，请先保存或取消编辑"
+      );
+    }
+  });
+
+  it("历史红叉不会绕过记录未匹配时的禁止覆盖保护", async () => {
+    const state = editableHistoricalState();
+    state.history[1]!.position = "没有对应配置的历史岗位";
+    const persistence = createMemoryStatePersistence();
+    const save = vi.spyOn(persistence, "save");
+    const confirm = vi.fn(() => true);
+    const coordinator = createTestApplicationCoordinator(
+      createTestAutoscheduleStore(state, persistence),
+      { preferences: historicalPreferences, confirm }
+    );
+    await coordinator.handle({ type: "edit-history-date", date: "2026-08-20" });
+    await coordinator.handle({ type: "clear-schedule" });
+    expect(confirm).toHaveBeenCalledOnce();
+    await coordinator.handle({ type: "save-history-edit" });
+    expect(coordinator.view().toast?.message).toContain("不能覆盖保存");
+    expect(coordinator.view().historyEditDate).toBe("2026-08-20");
+    expect(coordinator.model().history).toEqual(state.history);
+    expect(save).not.toHaveBeenCalled();
+  });
+
   it("opens the archived date as an isolated draft and cancels back to the current schedule", async () => {
     const state = editableHistoricalState();
     const originalFlights = structuredClone(state.flights);

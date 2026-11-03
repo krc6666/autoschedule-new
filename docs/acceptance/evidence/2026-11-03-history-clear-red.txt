@@ -1,0 +1,87 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/app/application-coordinator.test.ts (49 tests | 4 failed | 45 skipped) 50ms
+     × 历史编辑红叉清空所有人员且保留岗位、备注；取消编辑恢复原表 20ms
+     × 历史红叉取消不改草稿；拒绝保存确认时原历史不变 6ms
+     × 历史红叉保存仅清空目标日期人员，持久化后可重开补人并保留基准 17ms
+     × 历史清空后日期、组、配置、自动排班和归档仍被拦截 5ms
+npm.cmd :
+所在位置 行:2 字符: 1
++ npm.cmd exec vitest -- run tests/app/application-coordinator.test.ts  ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/app/application-coordinator.test.ts > historical schedule editing > 历史编辑红叉清空所有人员且保留岗位、备注；取消编辑恢复原表
+AssertionError: expected "vi.fn()" to be called with arguments: [ '确认清空当前班表所有岗位的人员？航班、岗位和备注都会保留。' ]
+
+Number of calls: 0
+
+ ❯ tests/app/application-coordinator.test.ts:413:21
+    411|     await coordinator.handle({ type: "clear-schedule" });
+    412|
+    413|     expect(confirm).toHaveBeenCalledWith("确认清空当前班表所有岗位的人员？航班、岗位和备注都会保留…
+       |                     ^
+    414|     expect(coordinator.model().assignments).toHaveLength(draft.assignm…
+    415|     expect(coordinator.model().assignments.every((a) => !a.staffId && …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  tests/app/application-coordinator.test.ts > historical schedule editing > 历史红叉取消不改草稿；拒绝保存确认时原历史不变
+AssertionError: expected "vi.fn()" to be called once, but got 0 times
+ ❯ tests/app/application-coordinator.test.ts:437:21
+    435|     confirm.mockReturnValueOnce(false);
+    436|     await coordinator.handle({ type: "clear-schedule" });
+    437|     expect(confirm).toHaveBeenCalledOnce();
+       |                     ^
+    438|     expect(coordinator.model()).toEqual(draft);
+    439|     expect(save).not.toHaveBeenCalled();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  tests/app/application-coordinator.test.ts > historical schedule editing > 历史红叉保存仅清空目标日期人员，持久化后可重开补人并保留基准
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/app/application-coordinator.test.ts:460:108
+    458|     const cleared = saved.history.filter((r) => r.date === "2026-08-20…
+    459|     expect(cleared).toHaveLength(2);
+    460|     expect(cleared.every((r) => !r.staffId && !r.staffName && r.workHo…
+       |                                                                                                            ^
+    461|     expect(cleared.map((r) => [r.flightNo, r.position, r.countBaseline…
+    462|       original.history.filter((r) => r.date === "2026-08-20" && r.flig…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  tests/app/application-coordinator.test.ts > historical schedule editing > 历史清空后日期、组、配置、自动排班和归档仍被拦截
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/app/application-coordinator.test.ts:488:70
+    486|     await coordinator.handle({ type: "edit-history-date", date: "2026-…
+    487|     await coordinator.handle({ type: "clear-schedule" });
+    488|     expect(coordinator.model().assignments.every((a) => !a.staffId)).t…
+       |                                                                      ^
+    489|     const cleared = structuredClone(coordinator.model());
+    490|     const commands = [
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed | 45 skipped (49)
+   Start at  15:18:25
+   Duration  2.32s (transform 1.67s, setup 0ms, import 2.04s, tests 50ms, environment 0ms)

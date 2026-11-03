@@ -1,0 +1,182 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-03-history-clear-staff",
+  "title": "历史编辑支持红叉清空全部人员并保留岗位",
+  "startedFrom": "34ad9dfee43754ee2851977b1766a112c44cf0b1",
+  "expectation": {
+    "example": "owner截图：编辑2026-10-21历史班表，6个航班54个岗位，点红叉被历史编辑保护提示拦截。",
+    "expected": "编辑完整历史时红叉清空所有岗位人员并保留航班、岗位、时段和备注；只修改草稿。保存并更新历史确认后仅替换目标日期，取消编辑恢复原班表和历史。",
+    "unchanged": "复用现有clearScheduleStaff；不改变自动排班、日期/配置/归档保护、历史匹配保护、部分历史只读、统计基准、另一组、其他日期和轮值。",
+    "fallback": "取消清空不改草稿；取消编辑不改原历史；拒绝覆盖确认或匹配不完整时不保存；编辑中不持久化草稿。"
+  },
+  "testedVersion": "f178eae905e5e8e2ad18124377277ad4deb65e23d09b16c79e6c8276ddf69ded",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "owner截图与旧准入清单吻合，新增4项回归先失败；只在唯一历史编辑准入清单增加clear-schedule后5项通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-history-clear-red.txt",
+          "summary": "新增4项历史红叉回归在旧代码全部失败：确认未触发、人员未清空，匹配现场拦截现象。",
+          "sha256": "0a9f5644a2efa3e84a9a162c9cdacfaada57247f5a9496e9166d61cfa31f1aa2"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-history-clear-focused.txt",
+          "summary": "5个直接相关测试文件92项通过，含新增5项历史清空/取消/保存补人/命令与匹配保护回归，以及已有清空和人工历史往返验证。",
+          "sha256": "33b13b8d2f9505d0753dbac982b23c350b40053fbe4c34fe20498c0ae96ac37e"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-history-clear-browser.txt",
+          "summary": "独立Chrome真实点击历史编辑/红叉/取消/保存/刷新/再编辑补人及390px窄屏通过；6航班54岗位保留，人员清空，草稿未持久化，其他日期/轮值/另一组和原当前班表保持。",
+          "sha256": "3341be85ec47dd2ca66de7e14eff2ab5ffd69d243e501996d2925e26dc44eb48"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "历史编辑经真实工具栏复用原清空动作，航班、岗位、时段及备注保持，人员全空且不提前写回历史或存储。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-history-clear-focused.txt",
+          "summary": "5个直接相关测试文件92项通过，含新增5项历史清空/取消/保存补人/命令与匹配保护回归，以及已有清空和人工历史往返验证。",
+          "sha256": "33b13b8d2f9505d0753dbac982b23c350b40053fbe4c34fe20498c0ae96ac37e"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-history-clear-browser.txt",
+          "summary": "独立Chrome真实点击历史编辑/红叉/取消/保存/刷新/再编辑补人及390px窄屏通过；6航班54岗位保留，人员清空，草稿未持久化，其他日期/轮值/另一组和原当前班表保持。",
+          "sha256": "3341be85ec47dd2ca66de7e14eff2ab5ffd69d243e501996d2925e26dc44eb48"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "取消红叉、取消编辑、拒绝保存确认、保存后重开补人、两组/其他日期/轮值隔离及窄屏已验证；此前300岗位和特殊分类清空回归继续通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-history-clear-focused.txt",
+          "summary": "5个直接相关测试文件92项通过，含新增5项历史清空/取消/保存补人/命令与匹配保护回归，以及已有清空和人工历史往返验证。",
+          "sha256": "33b13b8d2f9505d0753dbac982b23c350b40053fbe4c34fe20498c0ae96ac37e"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-history-clear-browser.txt",
+          "summary": "独立Chrome真实点击历史编辑/红叉/取消/保存/刷新/再编辑补人及390px窄屏通过；6航班54岗位保留，人员清空，草稿未持久化，其他日期/轮值/另一组和原当前班表保持。",
+          "sha256": "3341be85ec47dd2ca66de7e14eff2ab5ffd69d243e501996d2925e26dc44eb48"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "实际保存后刷新保留54条空人员零负荷历史，再编辑仍有54空格，补入1人保存刷新后恰有1人；原当前表、其他日期及轮值不变。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-history-clear-focused.txt",
+          "summary": "5个直接相关测试文件92项通过，含新增5项历史清空/取消/保存补人/命令与匹配保护回归，以及已有清空和人工历史往返验证。",
+          "sha256": "33b13b8d2f9505d0753dbac982b23c350b40053fbe4c34fe20498c0ae96ac37e"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-history-clear-browser.txt",
+          "summary": "独立Chrome真实点击历史编辑/红叉/取消/保存/刷新/再编辑补人及390px窄屏通过；6航班54岗位保留，人员清空，草稿未持久化，其他日期/轮值/另一组和原当前班表保持。",
+          "sha256": "3341be85ec47dd2ca66de7e14eff2ab5ffd69d243e501996d2925e26dc44eb48"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "历史编辑放行清空后，切日期/切组/配置/重新排班/归档/清历史仍阻断；历史匹配不完整时即使已清空也不能覆盖，未写入存储。无自动凭证变更。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-history-clear-focused.txt",
+          "summary": "5个直接相关测试文件92项通过，含新增5项历史清空/取消/保存补人/命令与匹配保护回归，以及已有清空和人工历史往返验证。",
+          "sha256": "33b13b8d2f9505d0753dbac982b23c350b40053fbe4c34fe20498c0ae96ac37e"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-history-clear-validation.txt",
+          "summary": "npm.cmd run typecheck、npm.cmd test、npm.cmd run build依次退出0；149文件1498项功能测试通过。构建保留既有HiGHS node:module外置提示。",
+          "sha256": "a340982336c18938222d8a0929e41526eac63255486f6aeee46cd8698df6b6cd"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-history-clear-verify-retry.txt",
+          "summary": "完整 npm.cmd run verify 退出0：149文件1498项功能、7文件19项性能、类型检查和生产构建通过。首次验收脚本单项超时，单独16项与完整复跑通过，未放宽超时。",
+          "sha256": "9805861a303a6864d1cbc4b3a8eea1e4198b329784356578e1d74f7ad01ce83a"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-history-clear-verify-native.txt",
+          "summary": "Native npm.cmd run verify exited 0: 1498 functional tests, 19 performance tests, typecheck and build passed.",
+          "sha256": "91629a33fcc4aecbdcefdb4c220a3cd799a97e1719e59fdcd7514f9958812dd1"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "单格清空、原历史取消与保存、首次统计基准、其他日期、轮值、另一组、原当前班表及配置保护由定向和全量测试核对。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-history-clear-focused.txt",
+          "summary": "5个直接相关测试文件92项通过，含新增5项历史清空/取消/保存补人/命令与匹配保护回归，以及已有清空和人工历史往返验证。",
+          "sha256": "33b13b8d2f9505d0753dbac982b23c350b40053fbe4c34fe20498c0ae96ac37e"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-history-clear-validation.txt",
+          "summary": "npm.cmd run typecheck、npm.cmd test、npm.cmd run build依次退出0；149文件1498项功能测试通过。构建保留既有HiGHS node:module外置提示。",
+          "sha256": "a340982336c18938222d8a0929e41526eac63255486f6aeee46cd8698df6b6cd"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-history-clear-browser.txt",
+          "summary": "独立Chrome真实点击历史编辑/红叉/取消/保存/刷新/再编辑补人及390px窄屏通过；6航班54岗位保留，人员清空，草稿未持久化，其他日期/轮值/另一组和原当前班表保持。",
+          "sha256": "3341be85ec47dd2ca66de7e14eff2ab5ffd69d243e501996d2925e26dc44eb48"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-history-clear-verify-retry.txt",
+          "summary": "完整 npm.cmd run verify 退出0：149文件1498项功能、7文件19项性能、类型检查和生产构建通过。首次验收脚本单项超时，单独16项与完整复跑通过，未放宽超时。",
+          "sha256": "9805861a303a6864d1cbc4b3a8eea1e4198b329784356578e1d74f7ad01ce83a"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-history-clear-verify-native.txt",
+          "summary": "Native npm.cmd run verify exited 0: 1498 functional tests, 19 performance tests, typecheck and build passed.",
+          "sha256": "91629a33fcc4aecbdcefdb4c220a3cd799a97e1719e59fdcd7514f9958812dd1"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "verified",
+      "reason": "本次真实浏览器匿名场景实际核对54个岗位输入框全部为空、6个航班表头保留、结构与备注前后一致，并完成保存/刷新/补人闭环。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-history-clear-browser.txt",
+          "summary": "独立Chrome真实点击历史编辑/红叉/取消/保存/刷新/再编辑补人及390px窄屏通过；6航班54岗位保留，人员清空，草稿未持久化，其他日期/轮值/另一组和原当前班表保持。",
+          "sha256": "3341be85ec47dd2ca66de7e14eff2ab5ffd69d243e501996d2925e26dc44eb48"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-history-clear-page.png",
+          "summary": "历史编辑实际红叉清空后的截图：日期2026-10-21、6航班54岗位保留，人员格全空，保存和取消入口仍可用。",
+          "sha256": "d9f2cecdc82e3fb2c6d8af08cfa186e85918b9c58cf2983b4c9dcf012713a4c9"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-history-clear-validation.txt",
+          "summary": "npm.cmd run typecheck、npm.cmd test、npm.cmd run build依次退出0；149文件1498项功能测试通过。构建保留既有HiGHS node:module外置提示。",
+          "sha256": "a340982336c18938222d8a0929e41526eac63255486f6aeee46cd8698df6b6cd"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-history-clear-verify-retry.txt",
+          "summary": "完整 npm.cmd run verify 退出0：149文件1498项功能、7文件19项性能、类型检查和生产构建通过。首次验收脚本单项超时，单独16项与完整复跑通过，未放宽超时。",
+          "sha256": "9805861a303a6864d1cbc4b3a8eea1e4198b329784356578e1d74f7ad01ce83a"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-03-history-clear-verify-native.txt",
+          "summary": "Native npm.cmd run verify exited 0: 1498 functional tests, 19 performance tests, typecheck and build passed.",
+          "sha256": "91629a33fcc4aecbdcefdb4c220a3cd799a97e1719e59fdcd7514f9958812dd1"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "red.txt记录4项原失败，来自遗漏clear-schedule准入；focused.txt记录5项新回归和直接消费者通过，browser.txt记录真实历史红叉成功。",
+    "laterChanges": "历史草稿commit、取消恢复、保存覆盖及刷新恢复均可能改坏结果；focused.txt逐项检查未提前保存、取消原表、只覆盖目标日期及匹配保护，browser.txt独立核对保存刷新与补人结果。",
+    "finalArtifact": "browser.txt与page.png为本次实际入口产物：6航班54岗位和备注保持、姓名全空；保存后54条空记录、刷新重开补1人后仅1条有人员。validation.txt对应当前产品代码的完整功能验证。"
+  },
+  "review": {
+    "missedScope": "前次遗漏历史编辑模式，本次核对准入、草稿、保存、取消、刷新、补人及其他命令，并验证桌面与390px窄屏。使用独立匿名场景，未访问owner浏览器。完整verify与性能已通过；首次验收脚本单项超时后单独及完整重验通过。未推送或发布。",
+    "rootCause": "同一工具栏虽然显示在普通班表和历史草稿中，历史编辑命令保护清单却没有clear-schedule，导致命令到达清空动作前就被拒绝。前次只验证普通模式，没有交叉检查历史准入。",
+    "earlyDetection": "复用工具栏命令变更时先枚举页面模式和准入清单，用实际命令证明两种模式均到达目标动作；再验证草稿未保存、保存目标范围、取消回退与存储重开，避免只测共享函数。"
+  }
+}

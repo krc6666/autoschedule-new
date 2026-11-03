@@ -1,0 +1,15 @@
+{
+  "input": "Independent synthetic history: 2026-10-21, 6 flights, 54 positions. Current schedule 2026-11-03; other history 2026-10-19; separate duty record.",
+  "checks": {
+    "declineClearKeepsDraftAndStorage": true,
+    "redCrossClears54PeopleKeepsSixFlightsPositionsRemarks": true,
+    "draftDoesNotPersistOrChangeOriginalHistory": true,
+    "cancelRestoresOriginalScheduleAndHistory": true,
+    "save54EmptyHistoryRowsPreservesCurrentOtherDateDutyAndGroup": true,
+    "refreshAndReeditKeep54EmptyPositions": true,
+    "refillOneHistoryPersonSaveAndReload": true,
+    "mobileClearAndCancelKeepSavedHistory": true,
+    "noBrowserErrors": true
+  },
+  "status": "passed"
+}
