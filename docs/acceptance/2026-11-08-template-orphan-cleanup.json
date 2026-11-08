@@ -9,7 +9,7 @@
     "unchanged": "不自动重排、不沿用旧人员 assignments，不改历史、岗位资质、其他模板字段、未匹配组的当前航班和班表。模板删除不自动删除当天航班；取消清理不修改规则。",
     "fallback": "某组没有规范化同号当天航班时只保存模板供后续使用，该组当前班表保持；模板仍存在、航班号为空或用户取消清理时不执行清理。"
   },
-  "testedVersion": "82f23ae42129e017568aa20ec000ddc034018def6b48062baec511ed27a57aac",
+  "testedVersion": "e4594a448c9028cb20e95ad7a887cf5c2ba7cf63e84ef002cbb24aad812b0204",
   "checks": {
     "reproduction": {
       "status": "verified",
