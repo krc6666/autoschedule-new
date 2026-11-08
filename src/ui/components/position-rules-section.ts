@@ -5,6 +5,7 @@ import { dispatchUiCommand } from "../events/ui-command";
 import { configurationInput, configurationSelect } from "./configuration-field";
 import { LightDomElement } from "./light-dom-element";
 import { dynamicSelectValue } from "./dynamic-select";
+import { normalizeWeeklyFlightNo } from "../../domain/flights/weekly-flight-plan";
 
 const POSITION_CATEGORIES = [
   "常规",
@@ -21,6 +22,9 @@ export class PositionRulesSectionElement extends LightDomElement {
   private batchCount = 5;
 
   protected override render() {
+    const templateFlightNumbers = new Set(
+      this.model.templates.map((item) => normalizeWeeklyFlightNo(item.flightNo))
+    );
     const flightNumbers = [
       ...new Set(
         [
@@ -35,6 +39,9 @@ export class PositionRulesSectionElement extends LightDomElement {
     const groups = flightNumbers
       .map((flightNo) => ({
         flightNo,
+        hasTemplate: templateFlightNumbers.has(
+          normalizeWeeklyFlightNo(flightNo)
+        ),
         rules: this.model.positionRules.filter(
           (rule) => rule.flightNo === flightNo
         ),
@@ -93,14 +100,16 @@ export class PositionRulesSectionElement extends LightDomElement {
       <div class="position-rule-groups">
         ${
           groups.length
-            ? groups.map((group) => this.group(group.flightNo, group.rules))
+            ? groups.map((group) =>
+                this.group(group.flightNo, group.rules, group.hasTemplate)
+              )
             : html`<div class="empty-state">尚无岗位规则</div>`
         }
       </div>
     </section>`;
   }
 
-  private group(flightNo: string, rules: PositionRule[]) {
+  private group(flightNo: string, rules: PositionRule[], hasTemplate: boolean) {
     const count = (category: PositionRule["category"]) =>
       rules.filter((rule) => rule.category === category).length;
     return html`<details class="position-rule-group">
@@ -108,8 +117,27 @@ export class PositionRulesSectionElement extends LightDomElement {
         <strong>${flightNo}</strong
         ><span>
           ${count("常规")} 常规 · ${count("引导")} 引导 · ${count("机动督导")}
-          机动督导 · ${count("分流")} 分流 · ${count("行政支援")} 行政支援 </span
-        ><i class="bi bi-chevron-down"></i>
+          机动督导 · ${count("分流")} 分流 · ${count("行政支援")} 行政支援
+        </span>
+        ${
+          hasTemplate
+            ? null
+            : html`<span class="badge text-bg-warning ms-2">无模板航班</span>
+                <button
+                  class="btn btn-sm btn-outline-danger ms-2"
+                  type="button"
+                  title="清理无模板航班岗位规则"
+                  aria-label="清理无模板航班岗位规则"
+                  @click=${() =>
+                    dispatchUiCommand(this, {
+                      type: "cleanup-orphaned-flight-rules",
+                      flightNo,
+                    })}
+                >
+                  <i class="bi bi-trash3 me-1"></i>清理岗位规则
+                </button>`
+        }
+        <i class="bi bi-chevron-down"></i>
       </summary>
       <div class="position-group-toolbar">
         <button

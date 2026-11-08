@@ -193,6 +193,34 @@ describe("configuration controller", () => {
     );
   });
 
+  it("requires confirmation before cleaning orphaned flight rules", async () => {
+    const initial = createDefaultState();
+    const template = initial.templates[0]!;
+    initial.templates = initial.templates.filter(
+      (item) => item.id !== template.id
+    );
+    const store = createTestAutoscheduleStore(initial);
+    const confirm = vi.fn(() => false);
+    const coordinator = createTestApplicationCoordinator(store, {
+      preferences,
+      confirm,
+    });
+
+    await coordinator.handle({
+      type: "cleanup-orphaned-flight-rules",
+      flightNo: template.flightNo,
+    });
+
+    expect(confirm).toHaveBeenCalledWith(
+      `确认清理无模板航班 ${template.flightNo} 的 A、B 两组岗位规则？当前航班和历史不删除，受影响未归档班表会清空并需重新排班。`
+    );
+    expect(
+      store
+        .getState()
+        .model.positionRules.some((rule) => rule.flightNo === template.flightNo)
+    ).toBe(true);
+  });
+
   it("persists a staff status change when background rescheduling fails", async () => {
     const storage = memoryStorage();
     const initial = createDefaultState();

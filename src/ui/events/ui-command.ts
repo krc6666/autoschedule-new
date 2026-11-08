@@ -134,6 +134,7 @@ export type UiCommand =
   | { type: "add-template-flight"; id: string }
   | { type: "add-template" }
   | { type: "delete-template"; id: string }
+  | { type: "cleanup-orphaned-flight-rules"; flightNo: string }
   | {
       type: "rename-current-flight-to-template";
       flightId: string;

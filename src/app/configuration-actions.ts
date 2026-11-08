@@ -1,6 +1,12 @@
 import { isAuxiliaryCategory } from "../domain/flights/schedule-position-rules";
 import type { FlightPlanReconciliation } from "../domain/flights/flight-plan-reconciliation";
-import type { AppState, Flight, FlightTemplate, IsoWeekday } from "../model";
+import type {
+  AppState,
+  Flight,
+  FlightTemplate,
+  IsoWeekday,
+  PositionRule,
+} from "../model";
 import { currentFlightsWithoutTemplates } from "../domain/flights/next-workday-flight-plan";
 import { clearActiveSchedule } from "../domain/kernel/schedule-lifecycle";
 import { clearUnqualifiedStandbyOverrides } from "../domain/duty-roster/roster";
@@ -250,6 +256,195 @@ export function deleteTemplate(state: AppState, id: string): void {
       deleted.flightNo,
       ""
     );
+}
+
+function removePositionRuleReferences(
+  settings: AppState["settings"],
+  deleted: Pick<PositionRule, "flightNo" | "name">
+): void {
+  settings.teamLeaderGapFillPositionPolicies =
+    removeTeamLeaderGapFillPositionReference(
+      settings.teamLeaderGapFillPositionPolicies,
+      deleted
+    );
+  settings.mobileSupervisorFillRules =
+    settings.mobileSupervisorFillRules.filter(
+      (rule) =>
+        !(
+          rule.sourceFlightNo === deleted.flightNo &&
+          rule.sourcePositionKeyword === deleted.name
+        ) &&
+        !(
+          rule.targetFlightNo === deleted.flightNo &&
+          rule.targetPositionKeyword === deleted.name
+        )
+    );
+}
+
+function removeFlightScopedReferences(
+  settings: AppState["settings"],
+  normalizedFlightNo: string
+): boolean {
+  const beforeCount =
+    settings.latePriorityFlightNumbers.length +
+    settings.positionTransitionPolicies.length +
+    settings.dutyPositionPriorities.length +
+    settings.nextWorkdayRecoveryTargets.length +
+    settings.lateShiftRecoveryPositionRules.length +
+    settings.mobileSupervisorCoverageRules.length +
+    settings.mobileSupervisorFillRules.length +
+    settings.crossWorkdayQualificationReservations.length +
+    settings.crossFlightPriorityPolicies.length +
+    settings.sameFlightStaffExclusions.length +
+    settings.teamLeaderGapFillPositionPolicies.length;
+  const keepsFlight = (flightNo: string) =>
+    normalizeWeeklyFlightNo(flightNo) !== normalizedFlightNo;
+  settings.latePriorityFlightNumbers =
+    settings.latePriorityFlightNumbers.filter(keepsFlight);
+  settings.positionTransitionPolicies =
+    settings.positionTransitionPolicies.filter(
+      (policy) =>
+        keepsFlight(policy.sourceFlightNo) && keepsFlight(policy.targetFlightNo)
+    );
+  settings.dutyPositionPriorities = settings.dutyPositionPriorities.filter(
+    (policy) => keepsFlight(policy.flightNo)
+  );
+  settings.nextWorkdayRecoveryTargets =
+    settings.nextWorkdayRecoveryTargets.filter((policy) =>
+      keepsFlight(policy.flightNo)
+    );
+  settings.lateShiftRecoveryPositionRules =
+    settings.lateShiftRecoveryPositionRules.filter((policy) =>
+      keepsFlight(policy.flightNo)
+    );
+  settings.mobileSupervisorCoverageRules =
+    settings.mobileSupervisorCoverageRules.filter((policy) =>
+      keepsFlight(policy.flightNo)
+    );
+  settings.mobileSupervisorFillRules =
+    settings.mobileSupervisorFillRules.filter(
+      (policy) =>
+        keepsFlight(policy.sourceFlightNo) && keepsFlight(policy.targetFlightNo)
+    );
+  settings.crossWorkdayQualificationReservations =
+    settings.crossWorkdayQualificationReservations.filter((policy) =>
+      keepsFlight(policy.flightNo)
+    );
+  settings.crossFlightPriorityPolicies =
+    settings.crossFlightPriorityPolicies.filter((policy) =>
+      keepsFlight(policy.flightNo)
+    );
+  settings.sameFlightStaffExclusions =
+    settings.sameFlightStaffExclusions.filter(
+      (policy) => !policy.flightNo || keepsFlight(policy.flightNo)
+    );
+  settings.teamLeaderGapFillPositionPolicies =
+    settings.teamLeaderGapFillPositionPolicies.filter((policy) =>
+      keepsFlight(policy.flightNo)
+    );
+  const afterCount =
+    settings.latePriorityFlightNumbers.length +
+    settings.positionTransitionPolicies.length +
+    settings.dutyPositionPriorities.length +
+    settings.nextWorkdayRecoveryTargets.length +
+    settings.lateShiftRecoveryPositionRules.length +
+    settings.mobileSupervisorCoverageRules.length +
+    settings.mobileSupervisorFillRules.length +
+    settings.crossWorkdayQualificationReservations.length +
+    settings.crossFlightPriorityPolicies.length +
+    settings.sameFlightStaffExclusions.length +
+    settings.teamLeaderGapFillPositionPolicies.length;
+  return afterCount !== beforeCount;
+}
+
+function synchronizeTemplateTimesToCurrentFlights(
+  state: AppState,
+  template: FlightTemplate
+): void {
+  const normalized = normalizeWeeklyFlightNo(template.flightNo);
+  for (const groupId of ["A", "B"] as const) {
+    const group = state.groups[groupId];
+    const active = groupId === state.activeGroupId;
+    const flightCollections = active
+      ? [state.flights, group.flights]
+      : [group.flights];
+    let changed = false;
+    for (const flights of flightCollections) {
+      for (const flight of flights) {
+        if (normalizeWeeklyFlightNo(flight.flightNo) !== normalized) continue;
+        if (
+          flight.startTime === template.startTime &&
+          flight.endTime === template.endTime
+        )
+          continue;
+        flight.startTime = template.startTime;
+        flight.endTime = template.endTime;
+        changed = true;
+      }
+    }
+    if (!changed) continue;
+
+    if (active) {
+      clearSchedule(state);
+      clearSchedule(group);
+      group.flights = state.flights;
+      group.assignments = state.assignments;
+      group.activeScheduleDate = state.activeScheduleDate;
+      group.schedulePolicyStale = state.schedulePolicyStale;
+      delete group.scheduleRuleFingerprint;
+    } else clearSchedule(group);
+  }
+}
+
+/** Explicitly removes rules for a flight with no shared template. */
+export function cleanupOrphanedFlightRules(
+  state: AppState,
+  flightNo: string
+): number {
+  const normalized = normalizeWeeklyFlightNo(flightNo);
+  if (
+    !normalized ||
+    state.templates.some(
+      (template) => normalizeWeeklyFlightNo(template.flightNo) === normalized
+    )
+  )
+    return 0;
+
+  let removed = 0;
+  for (const groupId of ["A", "B"] as const) {
+    const workspace =
+      groupId === state.activeGroupId ? state : state.groups[groupId];
+    const deleted = workspace.positionRules.filter(
+      (rule) => normalizeWeeklyFlightNo(rule.flightNo) === normalized
+    );
+    const referencesRemoved = removeFlightScopedReferences(
+      workspace.settings,
+      normalized
+    );
+    const hasAssignments = workspace.assignments.some(
+      (assignment) =>
+        normalizeWeeklyFlightNo(assignment.flightNo) === normalized
+    );
+    if (deleted.length) {
+      workspace.positionRules = workspace.positionRules.filter(
+        (rule) => normalizeWeeklyFlightNo(rule.flightNo) !== normalized
+      );
+      removed += deleted.length;
+    }
+    if (deleted.length || referencesRemoved || hasAssignments)
+      clearSchedule(workspace);
+    if (groupId === state.activeGroupId) {
+      const activeGroup = state.groups[groupId];
+      activeGroup.positionRules = state.positionRules;
+      activeGroup.settings = state.settings;
+      activeGroup.flights = state.flights;
+      activeGroup.assignments = state.assignments;
+      activeGroup.activeScheduleDate = state.activeScheduleDate;
+      activeGroup.schedulePolicyStale = state.schedulePolicyStale;
+      delete activeGroup.scheduleRuleFingerprint;
+    }
+  }
+  return removed;
 }
 
 export function setWeeklyFlightPlanFlight(
@@ -527,25 +722,7 @@ export function deletePosition(state: AppState, id: string): boolean {
   const before = state.positionRules.length;
   state.positionRules = state.positionRules.filter((item) => item.id !== id);
   if (state.positionRules.length === before) return false;
-  if (deleted)
-    state.settings.teamLeaderGapFillPositionPolicies =
-      removeTeamLeaderGapFillPositionReference(
-        state.settings.teamLeaderGapFillPositionPolicies,
-        deleted
-      );
-  if (deleted)
-    state.settings.mobileSupervisorFillRules =
-      state.settings.mobileSupervisorFillRules.filter(
-        (rule) =>
-          !(
-            rule.sourceFlightNo === deleted.flightNo &&
-            rule.sourcePositionKeyword === deleted.name
-          ) &&
-          !(
-            rule.targetFlightNo === deleted.flightNo &&
-            rule.targetPositionKeyword === deleted.name
-          )
-      );
+  if (deleted) removePositionRuleReferences(state.settings, deleted);
   clearSchedule(state);
   return true;
 }
@@ -698,6 +875,10 @@ export function updateConfigurationField(
     const template = state.templates.find((item) => item.id === id);
     if (!template) return "missing";
     const previousFlightNo = template.flightNo;
+    const previousTime =
+      field === "startTime" || field === "endTime"
+        ? template[field]
+        : undefined;
     if (field === "flightNo" && typeof value === "string") {
       const next = normalizeWeeklyFlightNo(value);
       const normalizedNext = normalizeWeeklyFlightNo(next);
@@ -724,6 +905,12 @@ export function updateConfigurationField(
         renameFlightConfigurationReferences(state, previousFlightNo, value);
         clearSchedule(state);
       }
+      if (
+        (field === "startTime" || field === "endTime") &&
+        typeof value === "string" &&
+        value !== previousTime
+      )
+        synchronizeTemplateTimesToCurrentFlights(state, template);
     }
     return "updated";
   }

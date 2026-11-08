@@ -136,6 +136,28 @@ export class ConfigurationController implements UiCommandController {
         commands.deleteTemplate(command.id);
         this.context.commit("模板已删除");
         return true;
+      case "cleanup-orphaned-flight-rules": {
+        const flightNo = normalizeWeeklyFlightNo(command.flightNo);
+        const hasTemplate = this.context
+          .model()
+          .templates.some(
+            (template) =>
+              normalizeWeeklyFlightNo(template.flightNo) === flightNo
+          );
+        if (
+          hasTemplate ||
+          !this.context.confirm(
+            `确认清理无模板航班 ${flightNo} 的 A、B 两组岗位规则？当前航班和历史不删除，受影响未归档班表会清空并需重新排班。`
+          )
+        )
+          return true;
+        const removed = commands.cleanupOrphanedFlightRules(flightNo);
+        if (removed)
+          this.context.commit(`已清理 ${flightNo} 的 ${removed} 条岗位规则`);
+        else
+          this.context.toast("无模板岗位规则已变更，请刷新后重试", "warning");
+        return true;
+      }
       case "set-weekly-flight-template":
         if (
           commands.setWeeklyFlightPlanFlight(

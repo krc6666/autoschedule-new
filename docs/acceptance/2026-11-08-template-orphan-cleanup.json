@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-08-template-orphan-cleanup",
+  "title": "共享模板与当前航班/岗位配置同步",
+  "startedFrom": "00a4fcf0d1212ef3826de5960942b091547bc45e",
+  "expectation": {
+    "example": "修改共享模板 CX937 的开始/结束时间；A/B 组分别可能已有同号当天航班和已生成班表。另一个场景是删除模板后岗位配置仍有该航班规则。",
+    "expected": "模板时段修改按规范化航班号同步到 A/B 匹配的当天航班，只修改开始/结束时间并保留预定人数；命中且时段实际变化的组清空未归档班表，需重新排班。模板删除后岗位规则保留并标记无模板航班，二次确认后可清理 A/B 该航班规则及岗位引用。",
+    "unchanged": "不自动重排、不沿用旧人员 assignments，不改历史、岗位资质、其他模板字段、未匹配组的当前航班和班表。模板删除不自动删除当天航班；取消清理不修改规则。",
+    "fallback": "某组没有规范化同号当天航班时只保存模板供后续使用，该组当前班表保持；模板仍存在、航班号为空或用户取消清理时不执行清理。"
+  },
+  "testedVersion": "82f23ae42129e017568aa20ec000ddc034018def6b48062baec511ed27a57aac",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "改前提交的独立基线测试失败：模板改到 09:00，当天航班仍为 08:30；改后定向回归通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-08-template-sync-baseline-red.txt",
+          "summary": "提交 00a4fcf 基线失败，期望当天航班 09:00，实际仍为 08:30。",
+          "sha256": "1d089de53b6f51452e32b842959dd3b7dd45a512554837e14281639bf14292e5"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-08-template-sync-focused.txt",
+          "summary": "改后 4 个定向测试文件、44 项全部通过，含 A/B 同步及班表失效回归。",
+          "sha256": "cb9b3972f3f88934c72e3c89121947ee0abcbf57ac9261ecc3f5618f809c27b5"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "模板时段修改同步到规范化航班号匹配的 A/B 当天航班，保留预定人数、备注、岗位规则与历史。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-08-template-sync-focused.txt",
+          "summary": "覆盖模板时段更新、A/B 当前航班数据保留和候选使用新时段。",
+          "sha256": "cb9b3972f3f88934c72e3c89121947ee0abcbf57ac9261ecc3f5618f809c27b5"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "验证当前活动组为 A 和 B、另一组无同号当天航班、模板仍存在时拒绝孤儿清理，以及确认取消不改规则。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-08-template-sync-focused.txt",
+          "summary": "活动 B 投影更新；未匹配组班表保持；模板存在时不清理；清理确认取消保持原规则。",
+          "sha256": "cb9b3972f3f88934c72e3c89121947ee0abcbf57ac9261ecc3f5618f809c27b5"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "实际时段变化后旧 assignments、活动日期和规则指纹被清除，后续必须显式重排；旧人员不会自动留到新时段。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-08-template-sync-focused.txt",
+          "summary": "回归断言 A/B 已排人员安排清空且活动日期失效，模板新时段进入后续候选。",
+          "sha256": "cb9b3972f3f88934c72e3c89121947ee0abcbf57ac9261ecc3f5618f809c27b5"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-08-template-sync-verify.txt",
+          "summary": "全量功能、性能、类型检查及生产构建通过。",
+          "sha256": "263cb5bf66baa769176355280e4e82ae0941ccbcac3b1628ca2f3898b80824ef"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "not_applicable",
+      "reason": "本任务没有新增或放宽排班硬约束及安全守卫；清除旧班表后，下一次排班沿用既有求解和最终安全检查。",
+      "evidence": []
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "修改时段不重排、不改人数/当天其他字段/岗位规则/历史；无匹配组保持原班表。删除模板后的清理保留当前航班和历史，并只清除目标航班引用。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-08-template-sync-focused.txt",
+          "summary": "断言人数、备注、规则、历史保留，未匹配组班表及其他航班规则保持。",
+          "sha256": "cb9b3972f3f88934c72e3c89121947ee0abcbf57ac9261ecc3f5618f809c27b5"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "改后本地页面尚未由 owner 操作核对模板时段、A/B 班表清空、无模板标记及确认清理刷新结果。",
+      "evidence": []
+    }
+  },
+  "answers": {
+    "originalFailure": "隔离改前提交 00a4fcf 后复现：模板开始时间改为 09:00，当天 Flight 仍为 08:30；基线失败见 docs/acceptance/evidence/2026-11-08-template-sync-baseline-red.txt，改后定向用例通过见 template-sync-focused.txt。",
+    "laterChanges": "模板时段同步后旧 assignments 和日期元数据会清除，新的重排仍经过现有安全检查；A/B 活动投影、无匹配回退、清理确认取消和引用清理均有回归，完整 verify 通过。尚需 owner 核对真实页面保存/刷新后的最终显示。",
+    "finalArtifact": "改后真实页面产物尚未取得。自动验证日志为 docs/acceptance/evidence/2026-11-08-template-sync-verify.txt；它不能代替 owner 在本地页面检查 CX937 两组时段、旧班表清空和无模板航班标记/确认清理后的刷新结果。"
+  },
+  "review": {
+    "missedScope": "仍可能有当前设备数据形态未由默认状态覆盖；已检查 A/B 独立 workspace、活动 B 投影、规范化航班号和模板候选消费，真实页面保存与刷新证据待 owner 核对。",
+    "rootCause": "模板、当天航班、岗位规则和已生成 assignments 是分开的事实。模板编辑过去只改共享模板；当天 Flight 继续提供旧时段，Assignment 继续保存旧结果。模板删除按原合同保留岗位规则，而岗位页将规则航班也列出来，因此残留仍可见。",
+    "earlyDetection": "以后改模板生命周期前，先跑共享模板→A/B 当天航班→岗位规则→assignments 传播矩阵；增加一个改前失败的跨状态测试，验证时段变化、删除、刷新恢复及最终页面投影，再改实现。"
+  }
+}

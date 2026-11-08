@@ -5,6 +5,7 @@ import {
   applyFlightPlanReconciliation,
   addAdministrativeStaff,
   addFlightsFromTemplates,
+  cleanupOrphanedFlightRules,
   addStaff,
   copyPositionRules,
   deletePosition,
@@ -15,9 +16,14 @@ import {
   updateConfigurationField,
 } from "../../src/app/configuration-actions";
 import { flightNumbersForDate } from "../../src/domain/flights/weekly-flight-plan";
+import { buildCurrentScheduleFlightCandidates } from "../../src/domain/flights/next-workday-flight-plan";
 import { activeFlightPositions } from "../../src/domain/flights/schedule-position-rules";
 import { buildFlightPlanReconciliation } from "../../src/domain/flights/flight-plan-reconciliation";
 import type { OnlineFlightQueryResult } from "../../src/infrastructure/flight-query";
+
+function normalizeFlightNo(value: string): string {
+  return value.trim().replaceAll(/\s+/g, "").toUpperCase();
+}
 
 describe("configuration actions", () => {
   it("keeps team-leader gap-fill position references synchronized on rename and delete", () => {
@@ -70,6 +76,381 @@ describe("configuration actions", () => {
     expect(flightNumbersForDate(state.weeklyFlightPlans, "2026-08-17")).toEqual(
       []
     );
+  });
+
+  it("syncs template times to matching current flights in both groups and clears their schedules", () => {
+    const state = createDefaultState();
+    const template = state.templates[0]!;
+    const activeFlight = {
+      ...state.flights[0]!,
+      flightNo: ` ${template.flightNo.toLowerCase()} `,
+      bookedPassengers: 87,
+      remark: "当天备注",
+    };
+    const otherGroupFlight = {
+      ...state.flights[0]!,
+      id: "b-flight",
+      flightNo: template.flightNo,
+      bookedPassengers: 54,
+      remark: "B组备注",
+    };
+    state.flights = [activeFlight];
+    state.groups.A.flights = state.flights;
+    state.groups.B.flights = [otherGroupFlight];
+    state.activeScheduleDate = "2026-08-17";
+    state.groups.A.activeScheduleDate = state.activeScheduleDate;
+    state.groups.B.activeScheduleDate = "2026-08-18";
+    const makeAssignment = (
+      id: string,
+      flightId: string,
+      flightNo: string
+    ) => ({
+      id,
+      flightId,
+      flightNo,
+      positionRuleId: null,
+      position: "临时岗位",
+      staffId: null,
+      staffName: "",
+      startTime: "08:30",
+      endTime: "10:30",
+      workHours: 2,
+      fatiguePoints: 0,
+      remark: "",
+      manualRemark: "",
+      status: "manual" as const,
+    });
+    state.assignments = [
+      makeAssignment("a-assignment", activeFlight.id, activeFlight.flightNo),
+    ];
+    state.groups.A.assignments = state.assignments;
+    state.groups.B.assignments = [
+      makeAssignment(
+        "b-assignment",
+        otherGroupFlight.id,
+        otherGroupFlight.flightNo
+      ),
+    ];
+    const history = {
+      id: "history",
+      date: "2026-08-01",
+      flightNo: template.flightNo,
+      position: "H01",
+      staffId: "1",
+      staffName: "人员",
+      startTime: "08:30",
+      endTime: "10:30",
+      workHours: 2,
+      fatiguePoints: 1,
+      remark: "归档时段",
+    };
+    state.history = [history];
+    state.groups.A.history = state.history;
+    const originalRules = structuredClone(state.positionRules);
+    const originalActiveFlight = structuredClone(activeFlight);
+    const originalOtherGroupFlight = structuredClone(otherGroupFlight);
+
+    expect(
+      updateConfigurationField(
+        state,
+        "template",
+        template.id,
+        "startTime",
+        "09:00"
+      )
+    ).toBe("updated");
+    expect(
+      updateConfigurationField(
+        state,
+        "template",
+        template.id,
+        "endTime",
+        "11:00"
+      )
+    ).toBe("updated");
+
+    expect(state.flights[0]).toMatchObject({
+      id: originalActiveFlight.id,
+      flightNo: originalActiveFlight.flightNo,
+      startTime: "09:00",
+      endTime: "11:00",
+      bookedPassengers: 87,
+      remark: "当天备注",
+    });
+    expect(state.groups.B.flights[0]).toMatchObject({
+      id: originalOtherGroupFlight.id,
+      startTime: "09:00",
+      endTime: "11:00",
+      bookedPassengers: 54,
+      remark: "B组备注",
+    });
+    expect(state.assignments).toEqual([]);
+    expect(state.groups.B.assignments).toEqual([]);
+    expect(state.activeScheduleDate).toBeNull();
+    expect(state.groups.B.activeScheduleDate).toBeNull();
+    expect(state.positionRules).toEqual(originalRules);
+    expect(state.history).toEqual([history]);
+    expect(state.templates[0]).toMatchObject({
+      startTime: "09:00",
+      endTime: "11:00",
+    });
+    expect(
+      buildCurrentScheduleFlightCandidates(state.templates, state.flights).find(
+        (candidate) =>
+          normalizeFlightNo(candidate.flightNo) ===
+          normalizeFlightNo(template.flightNo)
+      )
+    ).toMatchObject({
+      startTime: "09:00",
+      endTime: "11:00",
+      bookedPassengers: 87,
+    });
+  });
+
+  it("leaves a group schedule unchanged when that group has no matching current flight", () => {
+    const state = createDefaultState();
+    const template = state.templates[0]!;
+    state.groups.B.activeScheduleDate = "2026-08-18";
+    state.groups.B.assignments = [
+      {
+        id: "b-assignment",
+        flightId: "unrelated-flight",
+        flightNo: "FD573",
+        positionRuleId: null,
+        position: "临时岗位",
+        staffId: null,
+        staffName: "",
+        startTime: "15:25",
+        endTime: "17:25",
+        workHours: 2,
+        fatiguePoints: 0,
+        remark: "",
+        manualRemark: "",
+        status: "manual",
+      },
+    ];
+
+    updateConfigurationField(
+      state,
+      "template",
+      template.id,
+      "startTime",
+      "09:00"
+    );
+
+    expect(state.groups.B.activeScheduleDate).toBe("2026-08-18");
+    expect(state.groups.B.assignments).toHaveLength(1);
+    expect(state.groups.B.flights).toEqual([]);
+  });
+
+  it("updates the active B-group projection when template times change", () => {
+    const state = createDefaultState();
+    const template = state.templates[0]!;
+    const activeFlight = {
+      ...state.flights[0]!,
+      flightNo: template.flightNo,
+      bookedPassengers: 41,
+    };
+    state.activeGroupId = "B";
+    state.flights = [activeFlight];
+    state.groups.B.flights = state.flights;
+    state.activeScheduleDate = "2026-08-18";
+    state.groups.B.activeScheduleDate = state.activeScheduleDate;
+    state.assignments = [
+      {
+        id: "b-assignment",
+        flightId: activeFlight.id,
+        flightNo: activeFlight.flightNo,
+        positionRuleId: null,
+        position: "临时岗位",
+        staffId: null,
+        staffName: "",
+        startTime: "08:30",
+        endTime: "10:30",
+        workHours: 2,
+        fatiguePoints: 0,
+        remark: "",
+        manualRemark: "",
+        status: "manual",
+      },
+    ];
+    state.groups.B.assignments = state.assignments;
+
+    updateConfigurationField(
+      state,
+      "template",
+      template.id,
+      "startTime",
+      "09:00"
+    );
+
+    expect(state.flights[0]).toMatchObject({
+      startTime: "09:00",
+      bookedPassengers: 41,
+    });
+    expect(state.groups.B.flights[0]).toMatchObject({ startTime: "09:00" });
+    expect(state.assignments).toEqual([]);
+    expect(state.groups.B.assignments).toEqual([]);
+    expect(state.activeScheduleDate).toBeNull();
+    expect(state.groups.B.activeScheduleDate).toBeNull();
+  });
+
+  it("cleans an orphaned flight's position rules in both groups without deleting flights or history", () => {
+    const state = createDefaultState();
+    const template = state.templates[0]!;
+    const baseRule = state.positionRules[0]!;
+    const activeRule = {
+      ...baseRule,
+      id: "orphan-a",
+      flightNo: template.flightNo,
+      name: "孤儿A",
+    };
+    const otherRule = {
+      ...baseRule,
+      id: "orphan-b",
+      flightNo: ` ${template.flightNo.toLowerCase()} `,
+      name: "孤儿B",
+    };
+    state.positionRules = [...state.positionRules, activeRule];
+    state.groups.A.positionRules = state.positionRules;
+    state.groups.B.positionRules = [...state.groups.B.positionRules, otherRule];
+    state.settings.teamLeaderGapFillPositionPolicies = [
+      { flightNo: template.flightNo, position: activeRule.name, movable: true },
+      { flightNo: "FD573", position: "H01", movable: false },
+    ];
+    state.settings.latePriorityFlightNumbers = [template.flightNo, "FD573"];
+    state.settings.positionTransitionPolicies = [
+      {
+        id: "orphan-transition",
+        name: "orphan",
+        enabled: true,
+        sourceFlightNo: "FD573",
+        sourcePositions: [],
+        targetFlightNo: template.flightNo,
+        targetPosition: "H01",
+        minimumGapMinutes: 90,
+        mode: "prefer",
+      },
+      {
+        id: "keep-transition",
+        name: "keep",
+        enabled: true,
+        sourceFlightNo: "FD573",
+        sourcePositions: [],
+        targetFlightNo: "FD573",
+        targetPosition: "H01",
+        minimumGapMinutes: 90,
+        mode: "prefer",
+      },
+    ];
+    state.groups.A.settings = state.settings;
+    state.groups.B.settings.mobileSupervisorFillRules = [
+      {
+        id: "orphan-fill",
+        enabled: true,
+        sourceFlightNo: otherRule.flightNo,
+        sourcePositionKeyword: otherRule.name,
+        targetFlightNo: otherRule.flightNo,
+        targetPositionKeyword: otherRule.name,
+        allowAutomatic: true,
+        allowManual: true,
+      },
+      {
+        id: "keep-fill",
+        enabled: true,
+        sourceFlightNo: "FD573",
+        sourcePositionKeyword: "督导",
+        targetFlightNo: "FD573",
+        targetPositionKeyword: "H01",
+        allowAutomatic: true,
+        allowManual: true,
+      },
+    ];
+    state.activeScheduleDate = "2026-08-17";
+    state.groups.A.activeScheduleDate = state.activeScheduleDate;
+    state.groups.B.activeScheduleDate = "2026-08-18";
+    state.assignments = [
+      {
+        id: "assignment-a",
+        flightId: state.flights[0]!.id,
+        flightNo: template.flightNo,
+        positionRuleId: activeRule.id,
+        position: activeRule.name,
+        staffId: null,
+        staffName: "",
+        startTime: "08:00",
+        endTime: "10:00",
+        workHours: 0,
+        fatiguePoints: 1,
+        remark: "",
+        manualRemark: "",
+        status: "unfilled",
+      },
+    ];
+    state.groups.A.assignments = state.assignments;
+    state.groups.B.assignments = [
+      {
+        ...state.assignments[0]!,
+        id: "assignment-b",
+        positionRuleId: otherRule.id,
+      },
+    ];
+    const expectedRemoved =
+      state.groups.A.positionRules.filter(
+        (rule) =>
+          normalizeFlightNo(rule.flightNo) ===
+          normalizeFlightNo(template.flightNo)
+      ).length +
+      state.groups.B.positionRules.filter(
+        (rule) =>
+          normalizeFlightNo(rule.flightNo) ===
+          normalizeFlightNo(template.flightNo)
+      ).length;
+    deleteTemplate(state, template.id);
+
+    expect(cleanupOrphanedFlightRules(state, template.flightNo)).toBe(
+      expectedRemoved
+    );
+    expect(
+      state.groups.A.positionRules.some(
+        (rule) =>
+          normalizeFlightNo(rule.flightNo) ===
+          normalizeFlightNo(template.flightNo)
+      )
+    ).toBe(false);
+    expect(
+      state.groups.B.positionRules.some(
+        (rule) =>
+          normalizeFlightNo(rule.flightNo) ===
+          normalizeFlightNo(template.flightNo)
+      )
+    ).toBe(false);
+    expect(
+      state.flights.some((flight) => flight.flightNo === template.flightNo)
+    ).toBe(true);
+    expect(state.history).toEqual([]);
+    expect(state.activeScheduleDate).toBeNull();
+    expect(state.groups.B.activeScheduleDate).toBeNull();
+    expect(state.settings.teamLeaderGapFillPositionPolicies).toEqual([
+      { flightNo: "FD573", position: "H01", movable: false },
+    ]);
+    expect(state.settings.latePriorityFlightNumbers).toEqual(["FD573"]);
+    expect(
+      state.settings.positionTransitionPolicies.map((rule) => rule.id)
+    ).toEqual(["keep-transition"]);
+    expect(
+      state.groups.B.settings.mobileSupervisorFillRules.map((rule) => rule.id)
+    ).toEqual(["keep-fill"]);
+  });
+
+  it("does not clean a flight when its template still exists", () => {
+    const state = createDefaultState();
+    const template = state.templates[0]!;
+
+    expect(cleanupOrphanedFlightRules(state, template.flightNo)).toBe(0);
+    expect(
+      state.positionRules.some((rule) => rule.flightNo === template.flightNo)
+    ).toBe(true);
   });
 
   it("renames matching position rules together with a flight template", () => {

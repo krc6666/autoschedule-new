@@ -1,0 +1,55 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+stderr | tests/ui/config-view.test.ts
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+
+ ✓ tests/app/configuration-actions.test.ts > configuration actions > keeps team-leader gap-fill position references synchronized on rename and delete 7ms
+ ✓ tests/app/configuration-actions.test.ts > configuration actions > updates only the selected weekday and keeps template references synchronized 3ms
+ ✓ tests/app/configuration-actions.test.ts > configuration actions > syncs template times to matching current flights in both groups and clears their schedules 17ms
+ ✓ tests/app/configuration-actions.test.ts > configuration actions > leaves a group schedule unchanged when that group has no matching current flight 3ms
+ ✓ tests/app/configuration-actions.test.ts > configuration actions > updates the active B-group projection when template times change 1ms
+ ✓ tests/app/configuration-actions.test.ts > configuration actions > cleans an orphaned flight's position rules in both groups without deleting flights or history 2ms
+ ✓ tests/app/configuration-actions.test.ts > configuration actions > does not clean a flight when its template still exists 1ms
+ ✓ tests/app/configuration-actions.test.ts > configuration actions > renames matching position rules together with a flight template 3ms
+ ✓ tests/app/configuration-actions.test.ts > configuration actions > adds new template positions to both groups without sharing rule settings 5ms
+ ✓ tests/app/configuration-actions.test.ts > configuration actions > copies a complete position group and qualifications to another flight 3ms
+ ✓ tests/app/configuration-actions.test.ts > configuration actions > does not overwrite an existing target position group without confirmation 2ms
+ ✓ tests/app/configuration-actions.test.ts > configuration actions > defaults standby qualification by staff type and clears it for administrative support 2ms
+ ✓ tests/app/configuration-actions.test.ts > configuration actions > rejects a staff id that belongs to the other group 3ms
+ ✓ tests/app/configuration-actions.test.ts > configuration actions > allocates new staff ids without colliding with the other group 2ms
+ ✓ tests/app/configuration-actions.test.ts > configuration actions > updates qualifications only in the active group's position rules 2ms
+ ✓ tests/app/configuration-actions.test.ts > configuration actions > applies a flight template and invalidates the active schedule 1ms
+ ✓ tests/app/configuration-actions.test.ts > configuration actions > keeps mobile-supervisor positions automatic and removes a deleted staff member from references 1ms
+ ✓ tests/app/configuration-actions.test.ts > configuration actions > adds selected online-query templates without duplicating or overwriting existing flights 3ms
+ ✓ tests/app/configuration-actions.test.ts > configuration actions > atomically applies selected additions and confirmed removals 3ms
+ ✓ tests/app/configuration-actions.test.ts > configuration actions > does not remove flights when reconciliation removal is blocked 2ms
+ ✓ tests/app/configuration-actions.test.ts > configuration actions > keeps same-flight exclusion flight scope synchronized when a template is renamed 1ms
+ ✓ tests/app/configuration-actions.test.ts > configuration actions > keeps same-flight exclusion people synchronized when a staff id is renamed 2ms
+ ✓ tests/app/configuration-actions.test.ts > configuration actions > removes same-flight exclusions that reference a deleted staff member 2ms
+ ✓ tests/app/configuration-actions.test.ts > configuration actions > keeps cross-flight priority people synchronized on rename and delete 2ms
+ ✓ tests/ui/config-view.test.ts > configuration page > offers a collapsed explicit template choice for an old current flight without guessing a match 36ms
+ ✓ tests/ui/config-view.test.ts > configuration page > keeps people, position rules, templates, and constraints separated 218ms
+ ✓ tests/ui/config-view.test.ts > configuration page > shows the selected weekday preset as checked template rows 13ms
+ ✓ tests/ui/config-view.test.ts > configuration page > shows persisted non-default staff and position selections after remount 138ms
+ ✓ tests/app/configuration-controller.test.ts > configuration controller > does not give a save warning when a configured flight is merely absent from today's plan 18ms
+ ✓ tests/app/configuration-controller.test.ts > configuration controller > warns when saving a supervisor-fill relation whose target lacks the fill role 13ms
+ ✓ tests/app/configuration-controller.test.ts > configuration controller > overwrites the late flight rules with the selected early flight rules 18ms
+ ✓ tests/app/configuration-controller.test.ts > configuration controller > requires confirmation before cleaning orphaned flight rules 6ms
+ ✓ tests/app/configuration-controller.test.ts > configuration controller > persists a staff status change when background rescheduling fails 8ms
+ ✓ tests/app/autoschedule-store.test.ts > autoschedule store > exposes one state owner and commits named commands through Immer 19ms
+ ✓ tests/app/autoschedule-store.test.ts > autoschedule store > returns domain command results without exposing a generic mutable draft 10ms
+ ✓ tests/app/autoschedule-store.test.ts > autoschedule store > tracks changes that still need a configuration export separately from local saving 16ms
+ ✓ tests/app/autoschedule-store.test.ts > autoschedule store > marks a replaced model as needing export while leaving no-op view changes clean 15ms
+ ✓ tests/app/autoschedule-store.test.ts > autoschedule store > adds a flight template while the command is running through Immer 13ms
+ ✓ tests/app/autoschedule-store.test.ts > autoschedule store > adds online-query selections while the command is running through Immer 8ms
+ ✓ tests/app/autoschedule-store.test.ts > autoschedule store > 切换组前后只交换当前组投影，且保存后两组互不串历史 7ms
+ ✓ tests/app/autoschedule-store.test.ts > autoschedule store > replaces imported current-group data into the active workspace projection 8ms
+ ✓ tests/ui/config-view.test.ts > configuration page > shows a regular position's supervisor-fill role 172ms
+ ✓ tests/ui/config-view.test.ts > configuration page > dispatches the selected target when copying a position group 86ms
+ ✓ tests/ui/config-view.test.ts > configuration page > marks a position group whose template was deleted and dispatches explicit cleanup 102ms
+
+ Test Files  4 passed (4)
+      Tests  44 passed (44)
+   Start at  14:24:59
+   Duration  2.07s (transform 3.31s, setup 0ms, import 4.17s, tests 1.01s, environment 547ms)

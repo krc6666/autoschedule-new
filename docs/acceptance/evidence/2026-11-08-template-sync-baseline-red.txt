@@ -1,0 +1,29 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule/.baseline-template-worktree
+
+ × tests/app/template-time-sync-baseline.test.ts > reproduces that changing a template time leaves the current flight unchanged 11ms
+   → expected '08:30' to be '09:00' // Object.is equality
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/app/template-time-sync-baseline.test.ts > reproduces that changing a template time leaves the current flight unchanged
+AssertionError: expected '08:30' to be '09:00' // Object.is equality
+
+Expected: "09:00"
+Received: "08:30"
+
+ ❯ tests/app/template-time-sync-baseline.test.ts:26:39
+     24|   );
+     25|
+     26|   expect(state.flights[0]?.startTime).toBe(nextStartTime);
+       |                                       ^
+     27| });
+     28|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  14:14:16
+   Duration  1.11s (transform 763ms, setup 0ms, import 895ms, tests 12ms, environment 0ms)

@@ -3,6 +3,7 @@ import {
   addFlight,
   addPositions,
   copyPositionRules,
+  cleanupOrphanedFlightRules,
   addStaff,
   addTemplate,
   addTemplateFlight,
@@ -30,6 +31,8 @@ export function createConfigurationCommands(command: StateCommand) {
     addTemplate: () => command(addTemplate),
     deleteTemplate: (id: string) =>
       command((state) => deleteTemplate(state, id)),
+    cleanupOrphanedFlightRules: (flightNo: string) =>
+      command((state) => cleanupOrphanedFlightRules(state, flightNo)),
     renameCurrentFlightToTemplate: (flightId: string, templateId: string) =>
       command((state) =>
         renameCurrentFlightToTemplate(state, flightId, templateId)

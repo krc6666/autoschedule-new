@@ -203,4 +203,33 @@ describe("configuration page", () => {
       targetFlightNo: target,
     });
   });
+
+  it("marks a position group whose template was deleted and dispatches explicit cleanup", async () => {
+    const state = createDefaultState();
+    const template = state.templates[0]!;
+    state.templates = state.templates.filter((item) => item.id !== template.id);
+    const element = await mountElement<
+      HTMLElement & { updateComplete: Promise<unknown> }
+    >("autoschedule-position-rules", { model: state });
+
+    const group = [...element.querySelectorAll(".position-rule-group")].find(
+      (candidate) => candidate.textContent?.includes(template.flightNo)
+    );
+    expect(group?.textContent).toContain("无模板航班");
+    const commands: unknown[] = [];
+    element.addEventListener(UI_COMMAND_EVENT, (event) =>
+      commands.push((event as CustomEvent).detail)
+    );
+    group
+      ?.querySelector<HTMLButtonElement>(
+        '[aria-label="清理无模板航班岗位规则"]'
+      )
+      ?.click();
+    expect(commands).toEqual([
+      {
+        type: "cleanup-orphaned-flight-rules",
+        flightNo: template.flightNo,
+      },
+    ]);
+  });
 });
