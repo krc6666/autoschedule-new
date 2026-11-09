@@ -12,7 +12,7 @@ describe("普通重点集合状态", () => {
     legacy.version = 7;
     delete legacy.ordinaryPriorityFrequencyAdjustments;
     const restored = restorePersistedState(legacy, fallback)!;
-    expect(restored.version).toBe(12);
+    expect(restored.version).toBe(11);
     expect(restored.settings.ordinaryPriorityPositions.length).toBeGreaterThan(
       0
     );

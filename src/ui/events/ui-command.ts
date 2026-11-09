@@ -147,7 +147,6 @@ export type UiCommand =
       selected: boolean;
     }
   | { type: "add-staff"; administrative: boolean }
-  | { type: "add-staff-status-option"; status: string }
   | { type: "delete-staff"; id: string }
   | { type: "add-positions"; flightNo: string; count: number }
   | {

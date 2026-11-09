@@ -1,4 +1,4 @@
-import type { Assignment, PositionRule, Staff } from "../../model";
+import type { Assignment, PositionRule } from "../../model";
 import type { ScheduleGenerationFacts } from "../shared/scheduling-facts";
 import {
   minimumFlightTransitionMessage,
@@ -73,7 +73,6 @@ import {
 } from "../flights/schedule-position-rules";
 import { isDailyPrimaryPosition } from "../rules/daily-primary-position";
 import type { ScheduleFailureDetails } from "../shared/schedule-failure-details";
-import { isStaffAvailable } from "../staff-status";
 
 /**
  * The phase controls which invariants are meaningful for a partial result.
@@ -160,7 +159,6 @@ export interface ScheduleGuardContext {
   ke166SnapshotFacts?: SnapshotRuleFacts;
   scarceQualificationFacts?: SnapshotRuleFacts;
   dutyPositionFacts?: SnapshotRuleFacts;
-  staffStatusFacts?: { state: Pick<ScheduleGenerationFacts, "staff"> };
   sameFlightStaffExclusionFacts?: {
     state: Pick<ScheduleGenerationFacts, "settings" | "staff">;
   };
@@ -1146,34 +1144,6 @@ export function createDutyPositionScheduleGuard(): ScheduleGuard {
   });
 }
 
-export function createStaffStatusScheduleGuard(): ScheduleGuard {
-  return Object.freeze({
-    id: "staff-status",
-    validate: (
-      assignments: readonly Assignment[],
-      context: ScheduleGuardContext
-    ) => {
-      const staff = context.staffStatusFacts?.state.staff;
-      if (!staff) return [];
-      const staffById = new Map(
-        staff.map((person: Staff) => [person.id, person])
-      );
-      return assignments.flatMap((assignment) => {
-        if (!assignment.staffId) return [];
-        const person = staffById.get(assignment.staffId);
-        if (!person || isStaffAvailable(person.status)) return [];
-        return [
-          {
-            ruleId: "staff-status",
-            assignmentId: assignment.id,
-            message: `${person.name}当前状态为${person.status}，不可安排岗位`,
-          },
-        ];
-      });
-    },
-  });
-}
-
 export function createDefaultScheduleGuards(): readonly ScheduleGuard[] {
   return Object.freeze([
     createSameFlightStaffExclusionScheduleGuard(),
@@ -1196,6 +1166,5 @@ export function createDefaultScheduleGuards(): readonly ScheduleGuard[] {
     createKe166SnapshotScheduleGuard(),
     createScarceQualificationScheduleGuard(),
     createDutyPositionScheduleGuard(),
-    createStaffStatusScheduleGuard(),
   ]);
 }

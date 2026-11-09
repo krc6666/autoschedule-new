@@ -4,10 +4,7 @@ import { createDefaultState } from "../../src/defaults";
 import type { Assignment } from "../../src/model";
 import { createScheduleRunFacts } from "../../src/domain/shared/schedule-run-facts";
 import { createScheduleSafetySession } from "../../src/domain/kernel/schedule-safety-session";
-import {
-  createPositionFrequencyScheduleGuard,
-  createStaffStatusScheduleGuard,
-} from "../../src/domain/kernel/schedule-guard";
+import { createPositionFrequencyScheduleGuard } from "../../src/domain/kernel/schedule-guard";
 
 const DATE = "2026-09-24";
 
@@ -52,7 +49,6 @@ describe("schedule safety session", () => {
       "sameDayLateObligationFacts",
       "sameFlightStaffExclusionFacts",
       "scarceQualificationFacts",
-      "staffStatusFacts",
       "strictNextWorkdayRecoveryFacts",
       "warningSink",
       "workloadBalanceFacts",
@@ -80,26 +76,6 @@ describe("schedule safety session", () => {
     }).createCredential(DATE, []);
 
     state.settings.mobileSupervisorCoverageRules[0]!.keyword = "G02";
-    const second = createScheduleSafetySession({
-      phase: "final",
-      state,
-      date: DATE,
-      runFacts: createScheduleRunFacts(state, DATE),
-    }).createCredential(DATE, []);
-
-    expect(second.contextFingerprint).not.toBe(first.contextFingerprint);
-  });
-
-  it("includes active staff status in final credential identity", () => {
-    const state = createDefaultState();
-    const first = createScheduleSafetySession({
-      phase: "final",
-      state,
-      date: DATE,
-      runFacts: createScheduleRunFacts(state, DATE),
-    }).createCredential(DATE, []);
-
-    state.staff[0]!.status = "陪产假";
     const second = createScheduleSafetySession({
       phase: "final",
       state,
@@ -153,45 +129,5 @@ describe("schedule safety session", () => {
     });
 
     expect(() => session.assertAssignmentsSafe([assignment])).not.toThrow();
-  });
-
-  it("rejects a previously legal assignment after staff status changes", () => {
-    const state = createDefaultState();
-    const person = state.staff[0]!;
-    const rule = state.positionRules.find((candidate) =>
-      candidate.qualifiedStaffIds.includes(person.id)
-    )!;
-    const flight = state.flights.find(
-      (candidate) => candidate.flightNo === rule.flightNo
-    )!;
-    const assignment: Assignment = {
-      id: "status-guard-assignment",
-      flightId: flight.id,
-      flightNo: flight.flightNo,
-      positionRuleId: rule.id,
-      position: rule.name,
-      staffId: person.id,
-      staffName: person.name,
-      startTime: flight.startTime,
-      endTime: flight.endTime,
-      workHours: 2,
-      fatiguePoints: rule.fatiguePoints,
-      remark: rule.remark,
-      manualRemark: "",
-      status: "assigned",
-    };
-    const session = createScheduleSafetySession({
-      phase: "final",
-      state,
-      date: DATE,
-      runFacts: createScheduleRunFacts(state, DATE),
-      guards: [createStaffStatusScheduleGuard()],
-    });
-
-    expect(() => session.assertAssignmentsSafe([assignment])).not.toThrow();
-    person.status = "陪产假";
-    expect(() => session.assertAssignmentsSafe([assignment])).toThrow(
-      /当前状态为陪产假/
-    );
   });
 });

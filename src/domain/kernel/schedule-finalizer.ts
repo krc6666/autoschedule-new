@@ -28,10 +28,7 @@ import {
   crossWorkdayReservationWarning,
 } from "../reviews/cross-workday-qualification-reservation";
 import type { AssignmentTask } from "../flights/schedule-tasks";
-import {
-  CALCULATION_INCOMPLETE_NOTE,
-  type DailySchedulePlan,
-} from "./daily-schedule-result";
+import type { DailySchedulePlan } from "./daily-schedule-result";
 import { assertDailyScheduleSafety } from "./daily-schedule-safety";
 import { evaluateAutomaticHardConstraints } from "../rules/built-in-rule-registry";
 import { scheduleOptimizationWarning } from "../reviews/schedule-warning-message";
@@ -200,8 +197,6 @@ export async function finalizeSchedule({
   reportProgress,
   scheduleRunId,
 }: ScheduleFinalizerOptions): Promise<ScheduleResult> {
-  const calculationIncomplete =
-    optimizationQuality === "calculation-incomplete";
   const rejectedSupervisorNotes: string[] = [];
   const pipelineContext: SchedulePipelineContext = {
     solver,
@@ -224,20 +219,13 @@ export async function finalizeSchedule({
       );
     },
   };
-  const postReviewWarnings = calculationIncomplete
-    ? []
-    : await runCoveragePipeline(pipelineContext);
-  if (!calculationIncomplete) {
-    postReviewWarnings.push(
-      ...(await runPostSchedulePipeline(pipelineContext))
-    );
-    for (const message of assignmentDecisionMessages(ledger.snapshot(), {
-      ruleIds: new Set(["position-rotation"]),
-      outcomes: new Set(["fallback"]),
-    })) {
-      if (!postReviewWarnings.includes(message))
-        postReviewWarnings.push(message);
-    }
+  const postReviewWarnings = await runCoveragePipeline(pipelineContext);
+  postReviewWarnings.push(...(await runPostSchedulePipeline(pipelineContext)));
+  for (const message of assignmentDecisionMessages(ledger.snapshot(), {
+    ruleIds: new Set(["position-rotation"]),
+    outcomes: new Set(["fallback"]),
+  })) {
+    if (!postReviewWarnings.includes(message)) postReviewWarnings.push(message);
   }
 
   const assignments = workingAssignments(ledger);
@@ -253,9 +241,7 @@ export async function finalizeSchedule({
       ...makeUnfilled(task.flight, task.rule.name, task.rule),
       status: "unfilled",
       systemNotes: [
-        calculationIncomplete
-          ? CALCULATION_INCOMPLETE_NOTE
-          : "这个岗位没有找到合法安排，已留空；其他合法岗位照常保留。请核对该岗位的人员名单和相关设置。",
+        "这个岗位没有找到合法安排，已留空；其他合法岗位照常保留。请核对该岗位的人员名单和相关设置。",
         ...(isMobileSupervisor(task.flight, task.rule)
           ? rejectedSupervisorNotes
           : []),
@@ -275,28 +261,29 @@ export async function finalizeSchedule({
       halfRestFacts: runFacts.halfRest,
     });
   };
-  if (!calculationIncomplete) {
-    // Recovery explanations live on final rows and must be rebuilt after refills.
-    recoverLocalScheduleIssues(state, assignments, (current) => {
-      assertFinalSafety(current);
-      const balanceOptions = {
-        dutyStaffId: runFacts.currentDutyStaffId,
-        halfRestStaffIds: runFacts.halfRest.activeStaffIds,
-        candidateStaffIds,
-        useFullEligibility: true,
-      };
-      const balance = enforceDailyFlightCountBalance(state, assignments, {
-        ...balanceOptions,
-        lockedAssignmentIds,
-      });
-      if (balance.spread > 1)
-        enforceDailyFlightCountBalance(state, assignments, {
-          ...balanceOptions,
-          allowTransfers: false,
-        });
-      assertFinalSafety(assignments);
+  // Recovery explanations live on the final rows. Rebuilding below must not
+  // keep a stale "left vacant" warning after that vacancy is safely refilled.
+  recoverLocalScheduleIssues(state, assignments, (current) => {
+    assertFinalSafety(current);
+    // First try the original safe transfers/unlocked releases. Only an
+    // impossible locked balance may release a locked automatic group.
+    const balanceOptions = {
+      dutyStaffId: runFacts.currentDutyStaffId,
+      halfRestStaffIds: runFacts.halfRest.activeStaffIds,
+      candidateStaffIds,
+      useFullEligibility: true,
+    };
+    const balance = enforceDailyFlightCountBalance(state, assignments, {
+      ...balanceOptions,
+      lockedAssignmentIds,
     });
-  }
+    if (balance.spread > 1)
+      enforceDailyFlightCountBalance(state, assignments, {
+        ...balanceOptions,
+        allowTransfers: false,
+      });
+    assertFinalSafety(assignments);
+  });
   // A final guard may remove a now-invalid supervisor/counter link after
   // supervisor finalization. Reuse the same configured-fill facts to complete
   // the empty counter with a regular worker; never bypass final safety.
@@ -370,14 +357,13 @@ export async function finalizeSchedule({
     );
   }
   applyPreNoonDecisionNotes(state, assignments);
-  if (!calculationIncomplete)
-    refreshVacancyDiagnostics(
-      state,
-      assignments,
-      automaticTasks,
-      runFacts,
-      vacancyDiagnosticFacts
-    );
+  refreshVacancyDiagnostics(
+    state,
+    assignments,
+    automaticTasks,
+    runFacts,
+    vacancyDiagnosticFacts
+  );
   sortAssignments(assignments, flights, displayRulesByFlight);
   ledger.commit({ type: "replace", assignments });
   const resultAssignments = workingAssignments(ledger);

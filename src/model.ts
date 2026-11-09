@@ -13,7 +13,7 @@ import type {
 } from "./domain/rules/structured-policy-contract";
 import type { LatePriorityFrequencyKind } from "./domain/reviews/late-priority-policy";
 
-export type StaffStatus = string;
+export type StaffStatus = "正常" | "病假" | "休假";
 export type StaffType = "常规" | "行政支援";
 
 export interface Staff {
@@ -217,7 +217,6 @@ export interface SharedScheduleData {
 
 /** Scheduling facts and configuration owned exclusively by one group. */
 export interface GroupWorkspace {
-  staffStatusOptions: StaffStatus[];
   flights: Flight[];
   staff: Staff[];
   positionRules: PositionRule[];
@@ -235,13 +234,11 @@ export interface GroupWorkspace {
 export type GroupWorkspaces = Record<ScheduleGroupId, GroupWorkspace>;
 
 export interface AppState {
-  version: 12;
+  version: 11;
   /** Shared flight planning data and the two isolated group workspaces. */
   shared: SharedScheduleData;
   groups: GroupWorkspaces;
   activeGroupId: ScheduleGroupId;
-  /** Current-group projection of editable staff status labels. */
-  staffStatusOptions: StaffStatus[];
   /**
    * Current-group projection consumed by existing scheduling and UI modules.
    * The store activates it from groups while templates and weekly plans stay shared.

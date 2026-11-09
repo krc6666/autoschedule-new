@@ -33,32 +33,6 @@ function memoryStorage(): Storage {
 }
 
 describe("configuration controller", () => {
-  it("adds a custom leave category and accepts it as the current staff status", async () => {
-    const store = createTestAutoscheduleStore();
-    const coordinator = createTestApplicationCoordinator(store, {
-      preferences,
-    });
-    const person = store.getState().model.staff[0]!;
-
-    await coordinator.handle({
-      type: "add-staff-status-option",
-      status: "陪产假",
-    });
-    await coordinator.handle({
-      type: "update-configuration",
-      entity: "staff",
-      id: person.id,
-      field: "status",
-      value: "陪产假",
-    });
-
-    expect(store.getState().model.staffStatusOptions).toContain("陪产假");
-    expect(
-      store.getState().model.staff.find((item) => item.id === person.id)?.status
-    ).toBe("陪产假");
-    expect(coordinator.view().toast?.message).toBe("人员状态已更新");
-  });
-
   it("does not give a save warning when a configured flight is merely absent from today's plan", async () => {
     const initial = createDefaultState();
     initial.templates = [

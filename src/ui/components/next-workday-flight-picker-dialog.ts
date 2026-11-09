@@ -228,7 +228,6 @@ export class NextWorkdayFlightPickerDialogElement extends LightDomElement {
             >
               <span>${person.name}</span>
               <select
-                ${dynamicSelectValue(statuses[person.id] ?? person.status)}
                 class="form-select form-select-sm w-auto"
                 aria-label="${person.name} 状态"
                 .value=${statuses[person.id] ?? person.status}
@@ -239,9 +238,9 @@ export class NextWorkdayFlightPickerDialogElement extends LightDomElement {
                       .value as StaffStatus
                   )}
               >
-                ${this.model.staffStatusOptions.map(
-                  (status) => html`<option .value=${status}>${status}</option>`
-                )}
+                <option value="正常">正常</option>
+                <option value="病假">病假</option>
+                <option value="休假">休假</option>
               </select>
             </label>`
         )}

@@ -58,26 +58,18 @@ export class StaffPaletteElement extends LightDomElement {
       class="staff-palette-item ${administrative ? "is-admin-support" : ""} ${disabled ? "is-disabled" : ""}"
       draggable=${String(!disabled)}
       title="#${person.id} ${person.status}"
-      @dragstart=${(event: DragEvent) => {
-        if (disabled) event.preventDefault();
-        else this.startDrag(event, person.id);
-      }}
-      @pointerdown=${() => {
-        if (!disabled) this.startPointerDrag(person.id);
-      }}
+      @dragstart=${(event: DragEvent) => this.startDrag(event, person.id)}
+      @pointerdown=${() => this.startPointerDrag(person.id)}
     >
       <i class="bi bi-grip-vertical"></i>
       ${
         administrative
-          ? html`<div class="staff-palette-person">
-                <input
-                  class="staff-palette-name"
-                  .value=${person.name}
-                  aria-label="行政支援人员姓名"
-                  @change=${(event: Event) => dispatchUiCommand(this, { type: "update-configuration", entity: "staff", id: person.id, field: "name", value: (event.currentTarget as HTMLInputElement).value })}
-                />
-                <small class="staff-palette-status">${person.status}</small>
-              </div>
+          ? html`<input
+                class="staff-palette-name"
+                .value=${person.name}
+                aria-label="行政支援人员姓名"
+                @change=${(event: Event) => dispatchUiCommand(this, { type: "update-configuration", entity: "staff", id: person.id, field: "name", value: (event.currentTarget as HTMLInputElement).value })}
+              />
               <button
                 class="btn btn-sm icon-btn"
                 type="button"
@@ -87,10 +79,7 @@ export class StaffPaletteElement extends LightDomElement {
               >
                 <i class="bi bi-x"></i>
               </button>`
-          : html`<span class="staff-palette-person"
-              ><span>${person.name}</span>
-              <small class="staff-palette-status">${person.status}</small></span
-            >`
+          : html`<span>${person.name}</span>`
       }
     </div>`;
   }

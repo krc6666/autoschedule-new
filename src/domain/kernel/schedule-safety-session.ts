@@ -43,7 +43,6 @@ export function createScheduleGuardContext({
 }: Omit<ScheduleSafetySessionOptions, "guards">): ScheduleGuardContext {
   return {
     phase,
-    staffStatusFacts: { state },
     sameFlightStaffExclusionFacts: { state },
     dailyPrimaryPositionFacts: { state },
     halfRestFacts: runFacts.halfRest,

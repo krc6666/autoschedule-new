@@ -222,13 +222,6 @@ export function applyWorkbookImport(
       errors: ["值班轮值工作表存在错误，未写入任何值班轮值数据"],
     };
   }
-  if (importConfig && imported.staffStatusErrors?.length) {
-    return {
-      changedConfig: false,
-      recognized: "",
-      errors: imported.staffStatusErrors,
-    };
-  }
   const importHistory = imported.history !== undefined;
   const historySummary = importHistory
     ? summarizeHistoryImport(state, imported.history ?? [], imported.staff)
@@ -262,8 +255,6 @@ export function applyWorkbookImport(
     state.staff = imported.staff;
     clearUnqualifiedStandbyOverrides(state);
   }
-  if (importConfig && imported.staffStatusOptions !== undefined)
-    state.staffStatusOptions = [...imported.staffStatusOptions];
   if (importConfig && imported.positionRules !== undefined)
     state.positionRules = orderPositionRules(
       imported.positionRules.map((rule) => ({
@@ -379,7 +370,6 @@ export function applyWorkbookImport(
     importConfig &&
     Boolean(
       imported.staff !== undefined ||
-      imported.staffStatusOptions !== undefined ||
       (mode === "all" && imported.flights !== undefined) ||
       (replaceSharedTemplates &&
         (imported.templates !== undefined ||
@@ -398,7 +388,6 @@ export function applyWorkbookImport(
     importConfig &&
       imported.staff !== undefined &&
       `${imported.staff.length} 人`,
-    importConfig && imported.staffStatusOptions !== undefined && "人员状态类别",
     importConfig &&
       mode === "all" &&
       imported.flights !== undefined &&

@@ -45,17 +45,13 @@ import { scheduleRuleFingerprint } from "../domain/rules/schedule-rule-fingerpri
 import { normalizeTime } from "../domain/shared/time";
 import { clearActiveSchedule } from "../domain/kernel/schedule-lifecycle";
 import {
-  DEFAULT_STAFF_STATUS_OPTIONS,
-  normalizeStaffStatusOptions,
-} from "../domain/staff-status";
-import {
   addMissingRuleFlightTemplates,
   addMissingTemplatePositionRules,
 } from "../domain/flights/template-position-rules";
 
 type PersistedSettings = Partial<ScheduleSettings>;
 type PersistedAppState = Record<string, unknown> & {
-  version: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
+  version: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11;
 };
 
 const LATE_PRIORITY_KINDS = new Set([
@@ -153,8 +149,7 @@ function isPersistedState(value: unknown): value is PersistedAppState {
     value.version === 8 ||
     value.version === 9 ||
     value.version === 10 ||
-    value.version === 11 ||
-    value.version === 12
+    value.version === 11
   );
 }
 
@@ -216,6 +211,8 @@ function migrateSettings(
   return normalizeScheduleSettings(migrated, fallback);
 }
 
+const STAFF_STATUSES = new Set<Staff["status"]>(["正常", "病假", "休假"]);
+
 function restoreStaff(value: unknown[]): Staff[] {
   return value.flatMap((item): Staff[] => {
     if (
@@ -223,7 +220,7 @@ function restoreStaff(value: unknown[]): Staff[] {
       typeof item.id !== "string" ||
       typeof item.name !== "string" ||
       typeof item.nightShift !== "boolean" ||
-      typeof item.status !== "string" ||
+      !STAFF_STATUSES.has(item.status as Staff["status"]) ||
       typeof item.remark !== "string"
     )
       return [];
@@ -241,7 +238,7 @@ function restoreStaff(value: unknown[]): Staff[] {
         standbyQualified:
           staffType === "行政支援" ? false : item.standbyQualified !== false,
         nightShift: item.nightShift,
-        status: item.status,
+        status: item.status as Staff["status"],
         remark: item.remark,
       },
     ];
@@ -699,7 +696,6 @@ function emptyGroupWorkspace(
   settings: ScheduleSettings
 ): GroupWorkspace {
   return {
-    staffStatusOptions: [...DEFAULT_STAFF_STATUS_OPTIONS],
     flights: [],
     staff: [],
     positionRules: structuredClone([...positionRules]),
@@ -716,7 +712,6 @@ function emptyGroupWorkspace(
 
 function groupWorkspaceFromState(state: AppState): GroupWorkspace {
   return {
-    staffStatusOptions: [...state.staffStatusOptions],
     flights: structuredClone(state.flights),
     staff: structuredClone(state.staff),
     positionRules: structuredClone(state.positionRules),
@@ -751,18 +746,7 @@ function restoreGroupWorkspace(
   persistedVersion: number
 ): GroupWorkspace {
   if (!isRecord(value)) return structuredClone(fallback);
-  const rawStaffStatuses = Array.isArray(value.staff)
-    ? value.staff.flatMap((item) =>
-        isRecord(item) && typeof item.status === "string" ? [item.status] : []
-      )
-    : [];
-  const staffStatusOptions =
-    persistedVersion >= 12
-      ? normalizeStaffStatusOptions(value.staffStatusOptions, rawStaffStatuses)
-      : normalizeStaffStatusOptions(undefined, rawStaffStatuses);
-  const staff = restoredCollection(value.staff, fallback.staff, (items) =>
-    restoreStaff(items)
-  );
+  const staff = restoredCollection(value.staff, fallback.staff, restoreStaff);
   const flights = restoredCollection(
     value.flights,
     fallback.flights,
@@ -825,7 +809,6 @@ function restoreGroupWorkspace(
     savedRuleFingerprint = undefined;
   }
   return {
-    staffStatusOptions,
     flights,
     staff,
     positionRules,
@@ -857,7 +840,6 @@ function projectActiveGroup(next: AppState): void {
     return projectActiveGroup(next);
   }
   next.flights = active.flights;
-  next.staffStatusOptions = active.staffStatusOptions;
   next.staff = active.staff;
   next.positionRules = active.positionRules;
   next.settings = active.settings;
@@ -895,24 +877,12 @@ export function restorePersistedState(
     restoredCollection(value.history, fallback.history, restoreHistory),
     positionRules
   );
-  const rawStaffStatuses = Array.isArray(value.staff)
-    ? value.staff.flatMap((item) =>
-        isRecord(item) && typeof item.status === "string" ? [item.status] : []
-      )
-    : [];
   const next: AppState = {
-    version: 12,
+    version: 11,
     shared: structuredClone(fallback.shared),
     groups: structuredClone(fallback.groups),
     activeGroupId: "A",
-    staffStatusOptions:
-      value.version >= 12
-        ? normalizeStaffStatusOptions(
-            value.staffStatusOptions,
-            rawStaffStatuses
-          )
-        : normalizeStaffStatusOptions(undefined, rawStaffStatuses),
-    staff: [],
+    staff: restoredCollection(value.staff, fallback.staff, restoreStaff),
     flights: restoredCollection(
       value.flights,
       fallback.flights,
@@ -966,9 +936,6 @@ export function restorePersistedState(
         ? value.updatedAt
         : fallback.updatedAt,
   };
-  next.staff = restoredCollection(value.staff, fallback.staff, (items) =>
-    restoreStaff(items)
-  );
   try {
     const persistedAssignments = Array.isArray(value.assignments)
       ? value.assignments

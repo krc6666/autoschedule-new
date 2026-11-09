@@ -9,7 +9,6 @@ import type {
 import { createDefaultScheduleSettings } from "./domain/rules/schedule-settings";
 import { latePriorityFlightScopeCandidates } from "./domain/statistics/late-priority-flight-scope";
 import { createEmptyWeeklyFlightPlans } from "./domain/flights/weekly-flight-plan";
-import { DEFAULT_STAFF_STATUS_OPTIONS } from "./domain/staff-status";
 import { orderPositionRules } from "./utils";
 import { isPriorityRotationPosition } from "./domain/reviews/position-rotation-policy";
 import { airlineCode } from "./domain/rules/airline-rotation";
@@ -225,7 +224,6 @@ export function createDefaultState(): AppState {
     weeklyFlightPlans: structuredClone(weeklyFlightPlans),
   };
   const groupA: GroupWorkspace = {
-    staffStatusOptions: [...DEFAULT_STAFF_STATUS_OPTIONS],
     flights: structuredClone(flights),
     staff: structuredClone(staff),
     positionRules: structuredClone(positionRules),
@@ -239,7 +237,6 @@ export function createDefaultState(): AppState {
     schedulePolicyStale: false,
   };
   const groupB: GroupWorkspace = {
-    staffStatusOptions: [...DEFAULT_STAFF_STATUS_OPTIONS],
     flights: [],
     staff: [],
     positionRules: structuredClone(positionRules),
@@ -253,11 +250,10 @@ export function createDefaultState(): AppState {
     schedulePolicyStale: false,
   };
   return {
-    version: 12,
+    version: 11,
     shared,
     groups: { A: groupA, B: groupB },
     activeGroupId: "A",
-    staffStatusOptions: groupA.staffStatusOptions,
     staff,
     flights,
     templates: shared.templates,

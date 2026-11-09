@@ -1829,38 +1829,6 @@ autoschedule-schedule-grid {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.staff-palette-person {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 4px;
-  min-width: 0;
-}
-.staff-palette-person > span {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.staff-palette-status {
-  max-width: 45%;
-  min-width: 0;
-  overflow: hidden;
-  flex: 0 0 auto;
-  color: #68737d;
-  font-size: 10px;
-  font-weight: 500;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.staff-palette-name {
-  min-width: 0;
-}
-.staff-status-option-form {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-  margin-left: auto;
-}
 .staff-palette-item.is-disabled {
   opacity: 0.5;
   cursor: not-allowed;

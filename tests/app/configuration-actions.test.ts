@@ -7,7 +7,6 @@ import {
   addFlightsFromTemplates,
   cleanupOrphanedFlightRules,
   addStaff,
-  addStaffStatusOption,
   copyPositionRules,
   deletePosition,
   deleteTemplate,
@@ -27,22 +26,6 @@ function normalizeFlightNo(value: string): string {
 }
 
 describe("configuration actions", () => {
-  it("adds normalized custom staff status options once and rejects empty or built-in values", () => {
-    const state = createDefaultState();
-
-    expect(addStaffStatusOption(state, " 陪产假 ")).toBe("added");
-    expect(state.staffStatusOptions).toContain("陪产假");
-    expect(addStaffStatusOption(state, "陪产假")).toBe("duplicate");
-    expect(addStaffStatusOption(state, "病假")).toBe("duplicate");
-    expect(addStaffStatusOption(state, "   ")).toBe("invalid");
-    expect(state.staffStatusOptions).toEqual([
-      "正常",
-      "病假",
-      "休假",
-      "陪产假",
-    ]);
-  });
-
   it("keeps team-leader gap-fill position references synchronized on rename and delete", () => {
     const state = createDefaultState();
     const rule = state.positionRules[0]!;

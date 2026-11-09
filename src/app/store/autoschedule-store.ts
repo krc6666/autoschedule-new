@@ -60,7 +60,6 @@ function activateSharedProjection(model: AppState): void {
 function reconcileInitialProjection(model: AppState): void {
   const active = model.groups[model.activeGroupId];
   if (!active) return;
-  active.staffStatusOptions = model.staffStatusOptions;
   active.staff = model.staff;
   active.flights = model.flights;
   active.history = model.history;
@@ -84,7 +83,6 @@ function syncActiveGroupProjection(model: AppState): void {
   const group = model.groups[model.activeGroupId];
   if (!group) return;
   group.flights = model.flights;
-  group.staffStatusOptions = model.staffStatusOptions;
   group.staff = model.staff;
   group.history = model.history;
   group.dutyRosterOverrides = model.dutyRosterOverrides;
@@ -111,7 +109,6 @@ function activateGroupProjection(
   model.positionRules = group.positionRules;
   model.settings = group.settings;
   model.flights = group.flights;
-  model.staffStatusOptions = group.staffStatusOptions;
   model.staff = group.staff;
   model.history = group.history;
   model.dutyRosterOverrides = group.dutyRosterOverrides;

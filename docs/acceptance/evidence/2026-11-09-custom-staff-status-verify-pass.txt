@@ -1,8 +1,0 @@
-command: npm.cmd run verify
-exit_code: 0
-typecheck: passed
-functional_tests: 153 files, 1559 tests passed
-performance_tests: 7 files, 19 tests passed
-production_build: passed in 6.59s
-build_notice: Vite externalized node:module for browser compatibility; build completed successfully.
-validation_model: gpt-6.1-sol (command-only verification)

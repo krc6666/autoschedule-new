@@ -40,18 +40,8 @@ function contextFingerprint(context: ScheduleGuardContext): string {
   const scarceQualification = context.scarceQualificationFacts;
   const dutyPosition = context.dutyPositionFacts;
   const sameFlightStaffExclusion = context.sameFlightStaffExclusionFacts;
-  const staffStatus = context.staffStatusFacts;
   return fingerprint({
     phase: context.phase,
-    staffStatusFacts: staffStatus
-      ? staffStatus.state.staff
-          .map((person) => ({
-            id: person.id,
-            name: person.name,
-            status: person.status,
-          }))
-          .sort((left, right) => left.id.localeCompare(right.id))
-      : undefined,
     halfRestFacts: halfRest
       ? {
           requestedStaffIds: [...halfRest.requestedStaffIds],
