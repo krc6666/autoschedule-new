@@ -1,0 +1,25 @@
+Task: 2026-11-09-schedule-timeout-vacancy-fallback
+
+Pre-change failure evidence (main agent command output):
+Command: npm.cmd exec vitest -- run tests/domain/daily-schedule-optimizer.test.ts -t "returns every current position|uses a fully finalized|does not turn solver termination"
+Result: the original optimizer rejected both the no-snapshot timeout and the finalized-safe-checkpoint timeout with "当天排班计算超过允许时间（最长5分钟），请重试"; this established that neither requested fallback existed before implementation. The infeasible and failed termination protections passed.
+
+Focused path verification (main agent command output):
+Command: npm.cmd exec vitest -- run tests/domain/daily-schedule-optimizer.test.ts tests/domain/daily-schedule-safety.test.ts tests/domain/schedule-finalizer-local-recovery.test.ts tests/domain/schedule-checkpoint-queue.test.ts tests/infrastructure/schedule-runner.test.ts tests/infrastructure/schedule-worker-local-vacancy.test.ts tests/infrastructure/schedule-worker-failure.test.ts
+Result: Test Files 7 passed (7); Tests 103 passed (103); exit code 0.
+
+Architecture and optimizer verification (main agent command output):
+Command: npm.cmd exec vitest -- run tests/architecture/daily-schedule-module-seams.test.ts tests/domain/daily-schedule-optimizer.test.ts
+Result: Test Files 2 passed (2); Tests 70 passed (70); exit code 0.
+
+Type check (main agent command output):
+Command: npm.cmd run typecheck
+Result: tsc -b --pretty false; exit code 0.
+
+Full verification (read-only validation agent report, model gpt-6.1-sol):
+Command: npm.cmd run verify
+Result: exit code 0; typecheck passed; 153 feature-test files and 1565 tests passed; 7 performance-test files and 19 tests passed; build passed. Vite emitted the existing node:module browser-compatibility warning.
+
+An earlier full verification after the first implementation failed because daily-schedule-optimizer.ts had 118 lines against the 105-line architecture limit; timeout classification was extracted and the architecture test then passed. The same run had an acceptance-gate subprocess exceed its 5000 ms limit by 373 ms. The final full verification passed without changing that limit.
+
+The owner did not provide a recent real scheduling run or browser evidence. Page-level behavior remains unverified and is not represented here as passed.

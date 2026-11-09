@@ -48,7 +48,34 @@ export interface DailySchedulePlan {
     | "all-objectives-optimal"
     | "fairness-gap-limited"
     | "fairness-time-limited"
-    | "fairness-user-stopped";
+    | "fairness-user-stopped"
+    | "calculation-incomplete";
+}
+
+export const CALCULATION_INCOMPLETE_NOTE =
+  "计算未完成，未能确认这个岗位的安排，当前暂时留空；这不代表没有合格人员，请重新计算。";
+
+export function createCalculationIncompleteDailySchedulePlan(
+  preparation: SchedulePreparation
+): DailySchedulePlan {
+  const assignments = preparation.flights.flatMap((flight) =>
+    (preparation.displayRulesByFlight.get(flight.id) ?? []).map((rule) => {
+      const assignment = makeUnfilled(flight, rule.name, rule);
+      assignment.systemNotes = [CALCULATION_INCOMPLETE_NOTE];
+      if (rule.category === "引导") {
+        assignment.workHours = 0;
+        assignment.fatiguePoints = 0;
+      }
+      return assignment;
+    })
+  );
+  return {
+    assignments,
+    lockedAssignmentIds: new Set(),
+    dailyFlightCountBalanceFallback: false,
+    warnings: [],
+    optimizationQuality: "calculation-incomplete",
+  };
 }
 
 function choiceAssignment(choice: DailyScheduleStaffChoice): Assignment {

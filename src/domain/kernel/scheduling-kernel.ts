@@ -3,7 +3,10 @@ import type { ScheduleGenerationFacts } from "../shared/scheduling-facts";
 import { finalizeMobileSupervisors } from "../assignments/ke166-supervisor-finalizer";
 import { evaluateAutomaticHardConstraints } from "../rules/built-in-rule-registry";
 import type { SolverPort } from "../solver/solver-port";
-import type { DailySchedulePlan } from "./daily-schedule-result";
+import {
+  createCalculationIncompleteDailySchedulePlan,
+  type DailySchedulePlan,
+} from "./daily-schedule-result";
 import { optimizeDailySchedule } from "./daily-schedule-optimizer";
 import { finalizeSchedule } from "./schedule-finalizer";
 import { createScheduleLedger } from "./schedule-ledger";
@@ -21,6 +24,7 @@ import type { ScheduleRunPreferences } from "../shared/schedule-run-preferences"
 import { createId } from "../../utils";
 import { recoverLocalScheduleIssues } from "./schedule-local-recovery";
 import { createScheduleCheckpointQueue } from "./schedule-checkpoint-queue";
+import { ScheduleCalculationTimeoutError } from "./schedule-calculation-timeout";
 
 export type { ScheduleProgressStage } from "./schedule-progress";
 
@@ -61,29 +65,34 @@ async function finalizeDailyPlan({
     warningSink: guardWarnings,
   });
   warnings.push(
-    ...recoverLocalScheduleIssues(state, plan.assignments, (assignments) =>
-      partialSafetySession.assertAssignmentsSafe(assignments)
-    )
+    ...(plan.optimizationQuality === "calculation-incomplete"
+      ? []
+      : recoverLocalScheduleIssues(state, plan.assignments, (assignments) =>
+          partialSafetySession.assertAssignmentsSafe(assignments)
+        ))
   );
   const ledger = createScheduleLedger(plan.assignments, {
     safetySession: partialSafetySession,
   });
   const automaticTaskKeys = new Set(preparation.tasks.map((task) => task.key));
-  for (const flight of preparation.flights) {
-    const displayRules = preparation.displayRulesByFlight.get(flight.id) ?? [];
-    const displayIndex = new Map(
-      displayRules.map((rule, index) => [rule.id, index])
-    );
-    for (const rule of displayRules) {
-      if (automaticTaskKeys.has(`${flight.id}:${rule.id}`)) continue;
-      placePassivePosition({
-        state,
-        ledger,
-        warnings,
-        flight,
-        rule,
-        displayIndex,
-      });
+  if (plan.optimizationQuality !== "calculation-incomplete") {
+    for (const flight of preparation.flights) {
+      const displayRules =
+        preparation.displayRulesByFlight.get(flight.id) ?? [];
+      const displayIndex = new Map(
+        displayRules.map((rule, index) => [rule.id, index])
+      );
+      for (const rule of displayRules) {
+        if (automaticTaskKeys.has(`${flight.id}:${rule.id}`)) continue;
+        placePassivePosition({
+          state,
+          ledger,
+          warnings,
+          flight,
+          rule,
+          displayIndex,
+        });
+      }
     }
   }
 
@@ -155,6 +164,7 @@ export async function generateSchedule(
   reportProgress("optimize", scheduleProgressPercent("optimize"));
 
   const scheduleRunId = createId("schedule-run");
+  let latestSafeResult: ScheduleResult | undefined;
   const checkpoints = createScheduleCheckpointQueue(
     (plan) =>
       finalizeDailyPlan({
@@ -166,22 +176,47 @@ export async function generateSchedule(
         reportProgress: () => undefined,
         scheduleRunId,
       }),
-    (result) => options.onSafeResult?.(result)
+    (result) => {
+      latestSafeResult = result;
+      options.onSafeResult?.(result);
+    }
   );
   const queueCheckpoint = (checkpointPlan: DailySchedulePlan): void => {
     if (!options.onSafeResult || !options.checkpointSolver) return;
     checkpoints.enqueue(checkpointPlan);
   };
   try {
-    const plan = await optimizeDailySchedule({
-      solver: options.solver,
-      state,
-      date,
-      preparation,
-      ...(options.onSafeResult && options.checkpointSolver
-        ? { onRequiredPlan: queueCheckpoint, onImprovedPlan: queueCheckpoint }
-        : {}),
-    });
+    let plan: DailySchedulePlan;
+    try {
+      plan = await optimizeDailySchedule({
+        solver: options.solver,
+        state,
+        date,
+        preparation,
+        ...(options.onSafeResult && options.checkpointSolver
+          ? { onRequiredPlan: queueCheckpoint, onImprovedPlan: queueCheckpoint }
+          : {}),
+      });
+    } catch (error) {
+      if (!(error instanceof ScheduleCalculationTimeoutError)) throw error;
+      checkpoints.close();
+      if (latestSafeResult) {
+        reportProgress("complete", scheduleProgressPercent("complete"));
+        return latestSafeResult;
+      }
+      reportProgress("assign", scheduleProgressPercent("assign"));
+      const result = await finalizeDailyPlan({
+        state,
+        date,
+        solver: options.solver,
+        preparation,
+        plan: createCalculationIncompleteDailySchedulePlan(preparation),
+        reportProgress,
+        scheduleRunId,
+      });
+      reportProgress("complete", scheduleProgressPercent("complete"));
+      return result;
+    }
     checkpoints.discardPending();
     reportProgress("assign", scheduleProgressPercent("assign"));
     const result = await finalizeDailyPlan({

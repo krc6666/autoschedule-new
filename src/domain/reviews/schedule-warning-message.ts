@@ -28,7 +28,10 @@ export function scheduleOptimizationWarning(
     | "fairness-gap-limited"
     | "fairness-time-limited"
     | "fairness-user-stopped"
+    | "calculation-incomplete"
 ): string | null {
+  if (quality === "calculation-incomplete")
+    return "计算未完成：当前所有岗位暂时留空；这不代表无人可排，请检查后重新计算。";
   if (quality === "fairness-user-stopped") return FAIRNESS_USER_STOPPED_WARNING;
   if (quality === "fairness-time-limited") return FAIRNESS_TIME_LIMITED_WARNING;
   if (quality === "fairness-gap-limited") return FAIRNESS_GAP_LIMITED_WARNING;

@@ -8,9 +8,12 @@ import {
   validatedPlanCallback,
   type DailySchedulePlan,
 } from "./daily-schedule-result";
-import { assertTimeLimitedResultIsEligible } from "./daily-schedule-safety";
 import type { SchedulePreparation } from "./schedule-preparation";
 import { dailyScheduleTimeoutMs } from "./daily-schedule-time-budget";
+import {
+  assertDailyScheduleSolveResult,
+  ScheduleCalculationTimeoutError,
+} from "./schedule-calculation-timeout";
 export interface OptimizeDailyScheduleOptions {
   solver: SolverPort;
   state: ScheduleGenerationFacts;
@@ -45,7 +48,9 @@ export async function optimizeDailySchedule({
     };
   const remainingMs = deadline - Date.now();
   if (remainingMs <= 0)
-    throw new Error("当天整体排班计算超过允许时间（最长5分钟），请重试");
+    throw new ScheduleCalculationTimeoutError(
+      "当天整体排班计算超过允许时间（最长5分钟）"
+    );
   const materializePlan = (
     selectedVariableIds: ReadonlySet<string>,
     optimizationQuality: DailySchedulePlan["optimizationQuality"]
@@ -78,20 +83,16 @@ export async function optimizeDailySchedule({
         }
       : undefined
   );
-  if (
-    result.termination !== "optimal" &&
-    result.termination !== "gap-limited-feasible" &&
-    result.termination !== "time-limited-feasible"
-  )
-    throw new Error(
-      dailyScheduleFailureMessage(
-        result.termination,
-        result.termination === "infeasible"
-          ? diagnoseDailyScheduleFailure({ state, preparation, model })
-          : []
-      )
-    );
-  assertTimeLimitedResultIsEligible(model.problem, result);
+  assertDailyScheduleSolveResult(
+    model.problem,
+    result,
+    dailyScheduleFailureMessage(
+      result.termination,
+      result.termination === "infeasible"
+        ? diagnoseDailyScheduleFailure({ state, preparation, model })
+        : []
+    )
+  );
   return materializePlan(
     result.selectedVariableIds,
     result.termination === "gap-limited-feasible"
