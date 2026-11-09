@@ -27,6 +27,10 @@ import {
   replaceTeamLeaderGapFillPositionReference,
 } from "../domain/coverage/team-leader-gap-fill-protection";
 import { synchronizeTemplatePositionRules } from "./template-position-rule-sync";
+import {
+  DEFAULT_STAFF_STATUS_OPTIONS,
+  normalizeStaffStatusOptions,
+} from "../domain/staff-status";
 
 export type ConfigurationValue = string | number | boolean;
 
@@ -573,6 +577,22 @@ export function addStaff(state: AppState): void {
     status: "正常",
     remark: "",
   });
+}
+
+export function addStaffStatusOption(
+  state: AppState,
+  value: string
+): "added" | "duplicate" | "invalid" {
+  const status = normalizeText(value);
+  if (!status) return "invalid";
+  if ((DEFAULT_STAFF_STATUS_OPTIONS as readonly string[]).includes(status))
+    return "duplicate";
+  if (state.staffStatusOptions.includes(status)) return "duplicate";
+  state.staffStatusOptions = normalizeStaffStatusOptions([
+    ...state.staffStatusOptions,
+    status,
+  ]);
+  return "added";
 }
 
 export function addAdministrativeStaff(state: AppState): void {

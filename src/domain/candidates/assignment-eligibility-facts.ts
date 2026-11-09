@@ -11,6 +11,7 @@ import {
   isReusableAssignment,
 } from "../flights/schedule-position-rules";
 import { durationHours, isNightInterval } from "../shared/time";
+import { isStaffAvailable } from "../staff-status";
 
 export interface StaffAssignmentFacts {
   available: boolean;
@@ -79,7 +80,7 @@ export function staffAssignmentFacts(
     state.settings.nightEnd
   );
   return {
-    available: person.status === "正常",
+    available: isStaffAvailable(person.status),
     regularStaff: person.staffType === "常规",
     positionQualified: rule.qualifiedStaffIds.includes(person.id),
     nightAssignment,

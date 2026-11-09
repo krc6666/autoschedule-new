@@ -1,0 +1,12 @@
+
+> autoschedule@1.0.0 test
+> vitest run --exclude tests/performance/** tests/app/configuration-controller.test.ts tests/app/configuration-actions.test.ts tests/domain/assignment-eligibility.test.ts tests/domain/schedule-safety-session.test.ts tests/infrastructure/excel.test.ts tests/infrastructure/storage.test.ts tests/infrastructure/group-state-migration.test.ts tests/ui/config-view.test.ts tests/ui/next-workday-flight-picker-dialog.test.ts tests/ui/schedule-view.test.ts
+
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+
+ Test Files  10 passed (10)
+      Tests  200 passed (200)
+   Start at  21:33:22
+   Duration  27.36s (transform 11.36s, setup 0ms, import 14.83s, tests 34.88s, environment 2.22s)

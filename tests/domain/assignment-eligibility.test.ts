@@ -325,6 +325,12 @@ describe("assignment eligibility diagnostics", () => {
       "staff-unavailable",
     ]);
 
+    person.status = "陪产假" as typeof person.status;
+    expect([automaticCode(), manualCode()]).toEqual([
+      "staff-unavailable",
+      "staff-unavailable",
+    ]);
+
     person.status = "正常";
     rule.qualifiedStaffIds = [];
     expect([automaticCode(), manualCode()]).toEqual([

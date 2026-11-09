@@ -13,12 +13,14 @@ export class ConfigurationController implements UiCommandController {
     switch (command.type) {
       case "update-configuration": {
         if (command.entity === "staff" && command.field === "status") {
-          const status =
-            command.value === "病假"
-              ? "病假"
-              : command.value === "休假"
-                ? "休假"
-                : "正常";
+          if (
+            typeof command.value !== "string" ||
+            !this.context.model().staffStatusOptions.includes(command.value)
+          ) {
+            this.context.toast("人员状态类别无效，未修改", "warning");
+            return true;
+          }
+          const status = command.value;
           const changed = this.context.store
             .getState()
             .schedule.applyStaffStatus(command.id, status);
@@ -176,6 +178,16 @@ export class ConfigurationController implements UiCommandController {
           command.administrative ? "已新增行政支援人员" : "已新增人员"
         );
         return true;
+      case "add-staff-status-option": {
+        const result = commands.addStaffStatusOption(command.status);
+        if (result === "added") this.context.commit("休假类别已添加");
+        else
+          this.context.toast(
+            result === "duplicate" ? "该休假类别已存在" : "请输入休假类别",
+            "warning"
+          );
+        return true;
+      }
       case "delete-staff": {
         const person = this.context
           .model()

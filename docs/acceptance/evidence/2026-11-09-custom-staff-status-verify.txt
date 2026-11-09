@@ -1,0 +1,45 @@
+
+> autoschedule@1.0.0 verify
+> npm run typecheck && npm test && npm run test:performance && npm run build
+
+
+> autoschedule@1.0.0 typecheck
+> tsc -b --pretty false
+
+
+> autoschedule@1.0.0 test
+> vitest run --exclude tests/performance/**
+
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/architecture/acceptance-gate.test.ts (16 tests | 1 failed) 32715ms
+     × rejects unverified final output even when another current task passes 5145ms
+npm.cmd :
+所在位置 行:2 字符: 1
++ npm.cmd run verify 2>&1 | Tee-Object -FilePath docs/acceptance/eviden ...
++ ~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/architecture/acceptance-gate.test.ts > acceptance release gate > rejects unverified final output even when
+ another current task passes
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ tests/architecture/acceptance-gate.test.ts:134:3
+    132|   });
+    133|
+    134|   it("rejects unverified final output even when another current task p…
+       |   ^
+    135|     const root = fixture();
+    136|     const pending = record(root, "pending");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 152 passed (153)
+      Tests  1 failed | 1558 passed (1559)
+   Start at  21:17:04
+   Duration  102.65s (transform 29.23s, setup 0ms, import 72.61s, tests 336.79s, environment 20.46s)

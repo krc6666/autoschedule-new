@@ -162,7 +162,7 @@ describe("state persistence", () => {
 
     const loaded = loadState({ getItem: () => JSON.stringify(legacy) });
 
-    expect(loaded.version).toBe(11);
+    expect(loaded.version).toBe(12);
     expect(loaded.settings.crossFlightPriorityPolicies).toEqual([
       {
         id: "legacy-priority",
@@ -282,11 +282,61 @@ describe("state persistence", () => {
 
   it("falls back to valid defaults for corrupt persisted data", () => {
     const state = loadState({ getItem: () => "not-json" });
-    expect(state.version).toBe(11);
+    expect(state.version).toBe(12);
     expect(state.staff.length).toBeGreaterThan(0);
     expect(
       state.positionRules.some((rule) => rule.category === "机动督导")
     ).toBe(false);
+  });
+
+  it("restores custom staff statuses and migrates old status lists", () => {
+    const state = createDefaultState();
+    state.staff[0]!.status = "陪产假";
+    const extended = state as typeof state & {
+      staffStatusOptions: string[];
+      groups: typeof state.groups & {
+        A: typeof state.groups.A & { staffStatusOptions: string[] };
+        B: typeof state.groups.B & { staffStatusOptions: string[] };
+      };
+    };
+    extended.staffStatusOptions = ["正常", "病假", "休假", "陪产假"];
+    extended.groups.A.staffStatusOptions = [...extended.staffStatusOptions];
+    extended.groups.B.staffStatusOptions = ["正常", "病假", "休假"];
+
+    let value = "";
+    saveState(state, { setItem: (_key, next) => (value = next) });
+    const restored = loadState({ getItem: () => value });
+
+    expect(restored.version).toBe(12);
+    expect(restored.staff[0]!.status).toBe("陪产假");
+    expect((restored as typeof extended).staffStatusOptions).toContain(
+      "陪产假"
+    );
+    expect((restored as typeof extended).groups.B.staffStatusOptions).toEqual([
+      "正常",
+      "病假",
+      "休假",
+    ]);
+  });
+
+  it("recovers an unlisted custom status instead of restoring it as normal", () => {
+    const persisted = JSON.parse(JSON.stringify(createDefaultState()));
+    persisted.staff[0].status = "陪产假";
+    persisted.groups.A.staff[0].status = "陪产假";
+    persisted.groups.B.staff = JSON.parse(JSON.stringify(persisted.staff));
+    persisted.groups.B.staff[0].status = "育儿假";
+    delete persisted.staffStatusOptions;
+    delete persisted.groups.A.staffStatusOptions;
+    delete persisted.groups.B.staffStatusOptions;
+
+    const restored = loadState({ getItem: () => JSON.stringify(persisted) });
+
+    expect(restored.staff[0]!.status).toBe("陪产假");
+    expect(restored.staffStatusOptions).toContain("陪产假");
+    expect(restored.groups.A.staff[0]!.status).toBe("陪产假");
+    expect(restored.groups.A.staffStatusOptions).toContain("陪产假");
+    expect(restored.groups.B.staff[0]!.status).toBe("育儿假");
+    expect(restored.groups.B.staffStatusOptions).toContain("育儿假");
   });
 
   it("initializes the selected late-priority flight scope once and preserves an intentional empty scope", () => {
@@ -484,7 +534,7 @@ describe("state persistence", () => {
 
     const loaded = loadState({ getItem: () => JSON.stringify(legacy) });
 
-    expect(loaded.version).toBe(11);
+    expect(loaded.version).toBe(12);
     expect(
       loaded.positionRules.some((rule) => rule.category === "机动督导")
     ).toBe(false);
@@ -551,7 +601,7 @@ describe("state persistence", () => {
 
     const loaded = loadState({ getItem: () => JSON.stringify(legacy) });
 
-    expect(loaded.version).toBe(11);
+    expect(loaded.version).toBe(12);
     expect(loaded.weeklyFlightPlans).toHaveLength(7);
     expect(
       loaded.weeklyFlightPlans.every((entry) => entry.flightNos.length === 0)

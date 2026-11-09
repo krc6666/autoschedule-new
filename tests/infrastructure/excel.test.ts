@@ -58,6 +58,80 @@ describe("workbook boundary", () => {
     );
     expect(history[0]).not.toContain("系统说明");
   });
+
+  it("round-trips custom staff statuses and exports them with schedule results", () => {
+    const state = createDefaultState();
+    const person = state.staff[0]!;
+    person.status = "陪产假";
+    state.staffStatusOptions = ["正常", "病假", "休假", "陪产假"];
+    const config = buildConfigWorkbook(state);
+    const configRoundTrip = XLSX.read(
+      XLSX.write(config, { type: "array", bookType: "xlsx" }),
+      { type: "array" }
+    );
+    const imported = parseWorkbook(configRoundTrip, state.staff);
+
+    expect(imported.staffStatusOptions).toContain("陪产假");
+    expect(imported.staff?.find((item) => item.id === person.id)?.status).toBe(
+      "陪产假"
+    );
+
+    const resultWorkbook = buildScheduleWorkbook(state, "2026-11-09");
+    const resultRoundTrip = XLSX.read(
+      XLSX.write(resultWorkbook, { type: "array", bookType: "xlsx" }),
+      { type: "array" }
+    );
+    const rows = XLSX.utils.sheet_to_json<unknown[]>(
+      resultRoundTrip.Sheets["人员状态"]!,
+      { header: 1, defval: "" }
+    );
+    expect(rows[0]).toEqual(["人员编号", "姓名", "状态"]);
+    expect(rows).toContainEqual([person.id, person.name, "陪产假"]);
+  });
+
+  it("rejects unknown staff statuses without partially importing configuration", () => {
+    const state = createDefaultState();
+    state.staff[0]!.remark = "现有配置保留";
+    const before = structuredClone(state);
+    const workbook = buildConfigWorkbook(state);
+    const staffRows = XLSX.utils.sheet_to_json<unknown[]>(
+      workbook.Sheets["人员信息"]!,
+      { header: 1, defval: "" }
+    );
+    staffRows[1]![3] = "未登记假期";
+    workbook.Sheets["人员信息"] = XLSX.utils.aoa_to_sheet(staffRows);
+
+    const imported = parseWorkbook(workbook, state.staff);
+    const result = applyWorkbookImport(state, imported, "config");
+
+    expect(imported.staffStatusErrors).toEqual([
+      "人员状态不在类别目录中：未登记假期，配置未写入",
+    ]);
+    expect(result.changedConfig).toBe(false);
+    expect(result.errors).toEqual(imported.staffStatusErrors);
+    expect(state).toEqual(before);
+  });
+
+  it("rejects duplicate custom status categories in configuration workbooks", () => {
+    const state = createDefaultState();
+    const workbook = buildConfigWorkbook(state);
+    const categoryRows = XLSX.utils.sheet_to_json<unknown[]>(
+      workbook.Sheets["人员状态类别"]!,
+      { header: 1, defval: "" }
+    );
+    categoryRows.push(["病假"]);
+    workbook.Sheets["人员状态类别"] = XLSX.utils.aoa_to_sheet(categoryRows);
+
+    const imported = parseWorkbook(workbook, state.staff);
+    const result = applyWorkbookImport(state, imported, "config");
+
+    expect(imported.staffStatusErrors).toContain(
+      "人员状态类别工作表存在重复类别，配置未写入"
+    );
+    expect(result.changedConfig).toBe(false);
+    expect(result.errors).toEqual(imported.staffStatusErrors);
+    expect(state.staffStatusOptions).toEqual(["正常", "病假", "休假"]);
+  });
   it("round-trips current duty and standby roster overrides", () => {
     const state = createDefaultState();
     state.staff[0]!.cxPreflightQualified = true;
@@ -253,8 +327,8 @@ describe("workbook boundary", () => {
     store.getState().switchGroup("B");
 
     const workbook = buildConfigWorkbook(store.getState().model);
-    const staffSheetName = workbook.SheetNames[0]!;
-    const flightSheetName = workbook.SheetNames[1]!;
+    const staffSheetName = "人员信息";
+    const flightSheetName = "航班计划";
     const staffRows = XLSX.utils.sheet_to_json<unknown[]>(
       workbook.Sheets[staffSheetName]!,
       { header: 1 }
@@ -498,7 +572,12 @@ describe("workbook boundary", () => {
     state.assignments = assignments;
     state.activeScheduleDate = "2026-07-18";
     const workbook = buildScheduleWorkbook(state, "2026-07-18");
-    expect(workbook.SheetNames).toHaveLength(3);
+    expect(workbook.SheetNames).toEqual([
+      "保障明细",
+      "排班结果",
+      "人员状态",
+      "人员排班",
+    ]);
     expect(workbook.Sheets[workbook.SheetNames[0]!]!["!ref"]).toBeTruthy();
     expect(workbook.Sheets[workbook.SheetNames[1]!]!["!ref"]).toBeTruthy();
     const machineRows = XLSX.utils.sheet_to_json<unknown[]>(
@@ -978,6 +1057,7 @@ describe("workbook boundary", () => {
     expect(headers).toContain("备勤资质");
     expect(workbook.SheetNames).toEqual(
       expect.arrayContaining([
+        "人员状态类别",
         "每周航班计划",
         "岗位衔接规则",
         "值班岗位优先",
@@ -991,6 +1071,11 @@ describe("workbook boundary", () => {
         "分队长补差保护范围",
       ])
     );
+    const statusRows = XLSX.utils.sheet_to_json<unknown[]>(
+      workbook.Sheets["人员状态类别"]!,
+      { header: 1, raw: false, defval: "" }
+    );
+    expect(statusRows).toEqual([["状态名称"], ["正常"], ["病假"], ["休假"]]);
     const settingCodes = XLSX.utils
       .sheet_to_json<unknown[]>(workbook.Sheets["规则参数"]!, {
         header: 1,

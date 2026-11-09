@@ -16,8 +16,10 @@ import type {
   PositionRule,
   ScheduleSettings,
   Staff,
+  StaffStatus,
   WeeklyFlightPlanEntry,
 } from "../model";
+import { normalizeStaffStatusOptions } from "../domain/staff-status";
 import {
   combinedAssignmentRemark,
   assignmentWarningRemark,
@@ -66,6 +68,8 @@ import {
 } from "./excel-worksheet";
 
 export interface WorkbookImport {
+  staffStatusOptions?: StaffStatus[];
+  staffStatusErrors?: string[];
   staff?: Staff[];
   flights?: Flight[];
   templates?: FlightTemplate[];
@@ -288,6 +292,7 @@ function parseOrdinaryPriorityPositions(workbook: XLSX.WorkBook): {
 
 export interface WorkbookImportOptions {
   legacySchedule?: LegacyScheduleParseOptions;
+  currentStaffStatusOptions?: readonly StaffStatus[];
 }
 
 function sheetHasDataRows(
@@ -306,9 +311,29 @@ function sheetHasDataRows(
     .some((row) => row.some((value) => normalizeText(value)));
 }
 
-function parseStaff(workbook: XLSX.WorkBook): Staff[] | undefined {
+function parseStaffStatusOptions(workbook: XLSX.WorkBook): {
+  options?: StaffStatus[];
+  errors: string[];
+} {
+  const sheetName = findSheet(workbook, ["人员状态类别"]);
+  if (!sheetName) return { errors: [] };
+  const statusOptions = rows(workbook, sheetName)
+    .slice(1)
+    .map((row) => normalizeText(row[0]));
+  const names = statusOptions.filter(Boolean);
+  const errors =
+    new Set(names).size === names.length
+      ? []
+      : ["人员状态类别工作表存在重复类别，配置未写入"];
+  return { options: normalizeStaffStatusOptions(statusOptions), errors };
+}
+
+function parseStaff(
+  workbook: XLSX.WorkBook,
+  allowedStatuses: readonly StaffStatus[]
+): { staff?: Staff[]; errors: string[] } {
   const sheetName = findSheet(workbook, ["人员信息", "员工信息"]);
-  if (!sheetName) return undefined;
+  if (!sheetName) return { errors: [] };
   const data = rows(workbook, sheetName);
   const header = data[0] ?? [];
   const idIndex = headerIndex(header, ["编号", "员工号"], 0);
@@ -341,13 +366,15 @@ function parseStaff(workbook: XLSX.WorkBook): Staff[] | undefined {
       normalizeText(cell).includes(candidate)
     )
   );
-  return data.slice(1).flatMap((row) => {
+  const invalidStatuses = new Set<string>();
+  const staff = data.slice(1).flatMap((row) => {
     const id = normalizeText(row[idIndex]);
     const name = normalizeText(row[nameIndex]);
     if (!id || !name) return [];
     const rawStatus = normalizeText(row[statusIndex]);
-    const status: Staff["status"] =
-      rawStatus === "病假" || rawStatus === "休假" ? rawStatus : "正常";
+    if (rawStatus && !allowedStatuses.includes(rawStatus))
+      invalidStatuses.add(rawStatus);
+    const status: Staff["status"] = rawStatus || "正常";
     const staffType: Staff["staffType"] = normalizeText(
       row[staffTypeIndex]
     ).includes("行政")
@@ -389,6 +416,14 @@ function parseStaff(workbook: XLSX.WorkBook): Staff[] | undefined {
       },
     ];
   });
+  return {
+    staff,
+    errors: invalidStatuses.size
+      ? [
+          `人员状态不在类别目录中：${[...invalidStatuses].join("、")}，配置未写入`,
+        ]
+      : [],
+  };
 }
 
 function parseFlights(workbook: XLSX.WorkBook): Flight[] | undefined {
@@ -728,7 +763,17 @@ export function parseWorkbook(
   currentStaff: Staff[],
   options: WorkbookImportOptions = {}
 ): WorkbookImport {
-  const staff = parseStaff(workbook);
+  const parsedStaffStatusOptions = parseStaffStatusOptions(workbook);
+  const staffStatusOptions = parsedStaffStatusOptions.options;
+  const allowedStatuses =
+    staffStatusOptions ??
+    normalizeStaffStatusOptions(options.currentStaffStatusOptions);
+  const parsedStaff = parseStaff(workbook, allowedStatuses);
+  const staff = parsedStaff.staff;
+  const staffStatusErrors = [
+    ...parsedStaffStatusOptions.errors,
+    ...parsedStaff.errors,
+  ];
   const effectiveStaff = staff !== undefined ? staff : currentStaff;
   const flights = parseFlights(workbook);
   const templates = parseTemplates(workbook);
@@ -752,11 +797,16 @@ export function parseWorkbook(
       ordinaryPriorityPositions: ordinaryPriorityPositions.value,
     };
   }
-  const warnings = [...parsedRules.warnings, ...dutyRoster.warnings];
+  const warnings = [
+    ...parsedRules.warnings,
+    ...dutyRoster.warnings,
+    ...staffStatusErrors,
+  ];
   if (weeklyFlightPlanImport?.status === "invalid")
     warnings.push(weeklyFlightPlanImport.warning);
   const hasStandardSheet = Boolean(
     staff ||
+    staffStatusOptions ||
     flights ||
     templates ||
     weeklyFlightPlanImport ||
@@ -797,6 +847,7 @@ export function parseWorkbook(
     warnings.push("岗位配置工作表没有有效数据");
   if (
     !staff &&
+    !staffStatusOptions &&
     !flights &&
     !templates &&
     !weeklyFlightPlanImport &&
@@ -811,6 +862,8 @@ export function parseWorkbook(
   )
     warnings.push("未识别到受支持的工作表");
   return {
+    ...(staffStatusOptions ? { staffStatusOptions } : {}),
+    ...(staffStatusErrors.length ? { staffStatusErrors } : {}),
     staff,
     flights,
     templates,
@@ -875,6 +928,12 @@ export function buildConfigWorkbook(state: AppState): XLSX.WorkBook {
       ]),
     ],
     [10, 14, 16, 10, 24, 14, 14, 14, 14, 16]
+  );
+  append(
+    workbook,
+    "人员状态类别",
+    [["状态名称"], ...state.staffStatusOptions.map((status) => [status])],
+    [24]
   );
   append(
     workbook,
@@ -1350,6 +1409,15 @@ export function buildScheduleWorkbook(
       ]),
     ],
     [12, 12, 16, 14, 12, 12, 16, 12, 24, 12, 12, 60, 16, 36]
+  );
+  append(
+    workbook,
+    "人员状态",
+    [
+      ["人员编号", "姓名", "状态"],
+      ...state.staff.map((person) => [person.id, person.name, person.status]),
+    ],
+    [16, 20, 18]
   );
   const people = new Map<string, Assignment[]>();
   assignments

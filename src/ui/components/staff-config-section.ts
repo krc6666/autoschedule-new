@@ -37,6 +37,20 @@ export class StaffConfigSectionElement extends LightDomElement {
       </summary>
       <div class="config-collapsible-content">
         <div class="config-collapsible-toolbar">
+          <form
+            class="staff-status-option-form"
+            @submit=${this.addStatusOption}
+          >
+            <input
+              class="form-control form-control-sm"
+              name="staffStatusOption"
+              aria-label="新增休假类别"
+              placeholder="新增休假类别"
+            />
+            <button class="btn btn-outline-secondary btn-sm" type="submit">
+              <i class="bi bi-plus-lg me-1"></i>添加类别
+            </button>
+          </form>
           <button
             class="btn btn-outline-secondary"
             type="button"
@@ -114,7 +128,7 @@ export class StaffConfigSectionElement extends LightDomElement {
                       ${configurationToggle(this, "staff", person.id, "nightShift", person.nightShift, "可上夜班")}
                     </td>
                     <td>
-                      ${configurationSelect(this, "staff", person.id, "status", person.status, "状态", ["正常", "病假", "休假"])}
+                      ${configurationSelect(this, "staff", person.id, "status", person.status, "状态", this.model.staffStatusOptions)}
                     </td>
                     <td>
                       ${configurationInput(this, "staff", person.id, "remark", person.remark, "备注")}
@@ -137,6 +151,20 @@ export class StaffConfigSectionElement extends LightDomElement {
         </div>
       </div>
     </details>`;
+  }
+
+  private addStatusOption(event: SubmitEvent): void {
+    event.preventDefault();
+    const form = event.currentTarget as HTMLFormElement;
+    const input = form.querySelector<HTMLInputElement>(
+      '[name="staffStatusOption"]'
+    );
+    if (!input) return;
+    dispatchUiCommand(this, {
+      type: "add-staff-status-option",
+      status: input.value,
+    });
+    form.reset();
   }
 }
 

@@ -143,6 +143,30 @@ describe("configuration page", () => {
     ).toBe("休假");
   });
 
+  it("shows custom staff statuses in the editable status selector", async () => {
+    const state = createDefaultState();
+    const person = state.staff[0]!;
+    person.status = "陪产假";
+    state.staffStatusOptions = ["正常", "病假", "休假", "陪产假"];
+
+    const element = await mountElement<
+      HTMLElement & { updateComplete: Promise<unknown> }
+    >("autoschedule-config-page", { model: state });
+    const row = [...element.querySelectorAll("tr")].find(
+      (candidate) =>
+        candidate.querySelector<HTMLInputElement>('input[aria-label="编号"]')
+          ?.value === person.id
+    );
+    const status = row?.querySelector<HTMLSelectElement>(
+      'select[aria-label="状态"]'
+    );
+
+    expect(status?.value).toBe("陪产假");
+    expect([...status!.options].map((option) => option.value)).toContain(
+      "陪产假"
+    );
+  });
+
   it("shows a regular position's supervisor-fill role", async () => {
     const state = createDefaultState();
     const positionRule = state.positionRules.find(

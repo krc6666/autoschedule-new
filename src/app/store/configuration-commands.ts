@@ -5,6 +5,7 @@ import {
   copyPositionRules,
   cleanupOrphanedFlightRules,
   addStaff,
+  addStaffStatusOption,
   addTemplate,
   addTemplateFlight,
   applyFlightPlanReconciliation,
@@ -48,6 +49,8 @@ export function createConfigurationCommands(command: StateCommand) {
     addTemplateFlight: (id: string) =>
       command((state) => addTemplateFlight(state, id)),
     addStaff: () => command(addStaff),
+    addStaffStatusOption: (status: string) =>
+      command((state) => addStaffStatusOption(state, status)),
     addAdministrativeStaff: () => command(addAdministrativeStaff),
     deleteStaff: (id: string) => command((state) => deleteStaff(state, id)),
     addPositions: (flightNo: string, count: number) =>

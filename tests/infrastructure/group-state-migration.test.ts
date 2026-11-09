@@ -66,7 +66,7 @@ describe("双组工作区状态迁移", () => {
     const migrated = restorePersistedState(legacy, createDefaultState());
 
     expect(migrated).not.toBeNull();
-    expect(migrated!.version).toBe(11);
+    expect(migrated!.version).toBe(12);
     expect(migrated!.activeGroupId).toBe("A");
     expect(migrated!.groups.A.staff.map((item) => item.id)).toEqual([
       "legacy-a-1",
@@ -89,6 +89,8 @@ describe("双组工作区状态迁移", () => {
 
   it("恢复新版 B 组状态时保留两组各自配置", () => {
     const current = createDefaultState();
+    current.groups.A.staffStatusOptions.push("陪产假");
+    current.groups.B.staffStatusOptions.push("育儿假");
     current.groups.B.staff = [
       {
         id: "b-1",
@@ -122,6 +124,53 @@ describe("双组工作区状态迁移", () => {
     expect(restored!.settings.maxDailyHours).toBe(8.5);
     expect(restored!.groups.A.positionRules[0]!.category).toBe("分流");
     expect(restored!.groups.A.settings.maxDailyHours).toBe(9.5);
+    expect(restored!.staffStatusOptions).toEqual([
+      "正常",
+      "病假",
+      "休假",
+      "育儿假",
+    ]);
+    expect(restored!.groups.A.staffStatusOptions).toContain("陪产假");
+    expect(restored!.groups.B.staffStatusOptions).toContain("育儿假");
+  });
+
+  it("migrates v11 groups to built-in status options without losing staff status", () => {
+    const current = createDefaultState();
+    current.staff[0]!.status = "陪产假";
+    const legacy = structuredClone(current) as unknown as Record<
+      string,
+      unknown
+    >;
+    legacy.version = 11;
+    delete legacy.staffStatusOptions;
+    const groups = legacy.groups as Record<string, Record<string, unknown>>;
+    delete groups.A!.staffStatusOptions;
+    delete groups.B!.staffStatusOptions;
+
+    const restored = restorePersistedState(
+      JSON.parse(JSON.stringify(legacy)),
+      createDefaultState()
+    );
+
+    expect(restored!.version).toBe(12);
+    expect(restored!.staff[0]!.status).toBe("陪产假");
+    expect(restored!.staffStatusOptions).toEqual([
+      "正常",
+      "病假",
+      "休假",
+      "陪产假",
+    ]);
+    expect(restored!.groups.A.staffStatusOptions).toEqual([
+      "正常",
+      "病假",
+      "休假",
+      "陪产假",
+    ]);
+    expect(restored!.groups.B.staffStatusOptions).toEqual([
+      "正常",
+      "病假",
+      "休假",
+    ]);
   });
 
   it("v9 迁移时补齐模板岗位一次并保留之后的组内删除", () => {
@@ -165,7 +214,7 @@ describe("双组工作区状态迁移", () => {
       createDefaultState()
     );
 
-    expect(migrated!.version).toBe(11);
+    expect(migrated!.version).toBe(12);
     expect(migrated!.groups.A.positionRules.map((rule) => rule.name)).toEqual([
       "H1",
       "H2",
@@ -253,7 +302,7 @@ describe("双组工作区状态迁移", () => {
       createDefaultState()
     );
 
-    expect(migrated!.version).toBe(11);
+    expect(migrated!.version).toBe(12);
     expect(migrated!.templates.map((template) => template.flightNo)).toEqual([
       "CX937",
       "FD573",

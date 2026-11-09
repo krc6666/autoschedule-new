@@ -21,12 +21,13 @@ it.each([
   "generate-schedule",
   "open-reschedule-flight-picker",
   "archive-next-duty-day",
-] as const)("%s的实际准备窗口显示已保存的休假和病假状态", async (open) => {
+] as const)("%s的实际准备窗口显示自定义休假类别", async (open) => {
   const model = createDefaultState();
+  model.staffStatusOptions.push("陪产假");
   model.staff = model.staff.slice(0, 3).map((person, index) => ({
     ...person,
     name: ["甲", "乙", "丙"][index]!,
-    status: index === 0 ? "休假" : index === 1 ? "病假" : "正常",
+    status: index === 0 ? "陪产假" : index === 1 ? "病假" : "正常",
   }));
   model.activeScheduleDate = "2026-08-15";
   const flight = model.flights[0]!;
@@ -70,7 +71,7 @@ it.each([
   expect(
     element.querySelector<HTMLSelectElement>('select[aria-label="甲 状态"]')
       ?.value
-  ).toBe("休假");
+  ).toBe("陪产假");
   expect(
     element.querySelector<HTMLSelectElement>('select[aria-label="乙 状态"]')
       ?.value

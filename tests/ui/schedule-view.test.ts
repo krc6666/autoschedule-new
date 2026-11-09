@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
@@ -17,6 +17,56 @@ import "../../src/ui/components/schedule-page";
 import { mountElement, settleLit } from "./lit-test-helpers";
 
 describe("schedule page", () => {
+  it("shows custom unavailable status beside the staff name and disables dragging", async () => {
+    const state = createDefaultState();
+    const person = state.staff[0]!;
+    const flight = state.flights[0]!;
+    const rule = state.positionRules.find(
+      (candidate) => candidate.flightNo === flight.flightNo
+    )!;
+    state.staffStatusOptions.push("陪产假");
+    person.status = "陪产假";
+    state.assignments = [
+      {
+        id: "custom-status-visible",
+        flightId: flight.id,
+        flightNo: flight.flightNo,
+        positionRuleId: rule.id,
+        position: rule.name,
+        staffId: person.id,
+        staffName: person.name,
+        startTime: flight.startTime,
+        endTime: flight.endTime,
+        workHours: 2,
+        fatiguePoints: rule.fatiguePoints,
+        remark: rule.remark,
+        manualRemark: "",
+        status: "assigned",
+      },
+    ];
+
+    const element = await mountElement<
+      HTMLElement & { updateComplete: Promise<unknown> }
+    >("autoschedule-schedule-page", {
+      model: state,
+      date: "2026-11-09",
+      zoom: 1,
+      loadSortField: "totalFatigue",
+      loadSortDirection: "desc",
+    });
+    const palette = element.querySelector("autoschedule-staff-palette");
+    const item = [
+      ...(palette?.querySelectorAll<HTMLElement>(".staff-palette-item") ?? []),
+    ].find((candidate) => candidate.textContent?.includes(person.name));
+
+    expect(item?.textContent).toContain("陪产假");
+    expect(item?.getAttribute("draggable")).toBe("false");
+    const pointerDrag = vi.fn();
+    item?.addEventListener("autoschedule-pointer-drag-start", pointerDrag);
+    item?.dispatchEvent(new Event("pointerdown", { bubbles: true }));
+    expect(pointerDrag).not.toHaveBeenCalled();
+  });
+
   it("keeps vacant person cells free of explanations and usable for manual filling", async () => {
     const state = createDefaultState();
     const flight = state.flights[0]!;

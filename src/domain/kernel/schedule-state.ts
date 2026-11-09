@@ -1,6 +1,7 @@
 import type { Assignment, Staff, StaffStatus } from "../../model";
 import type { StaffAssignmentFacts } from "../shared/scheduling-facts";
 import { clearSupervisorFillLink } from "../coverage/supervisor-fill-facts";
+import { isStaffAvailable } from "../staff-status";
 
 function linkedStaff(
   state: StaffAssignmentFacts,
@@ -18,7 +19,7 @@ export function assignmentUsesUnavailableStaff(
   assignment: Assignment
 ): boolean {
   const person = linkedStaff(state, assignment);
-  return Boolean(person && person.status !== "正常");
+  return Boolean(person && !isStaffAvailable(person.status));
 }
 
 export function removeUnavailableStaffAssignments(
