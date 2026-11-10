@@ -9,6 +9,7 @@ import {
 } from "../domain/flights/schedule-position-rules";
 import type { Assignment } from "../model";
 import { isClearedCountRecord } from "../domain/statistics/manual-count-evidence";
+import { additionalAttendanceByAssignment } from "../domain/statistics/attendance-intervals";
 
 export interface HistoricalScheduleDraft {
   flights: AppState["flights"];
@@ -131,6 +132,7 @@ export function currentScheduleHistory(
   date: string,
   options: { includeUnavailableStaff?: boolean } = {}
 ): HistoryRecord[] {
+  const attendance = additionalAttendanceByAssignment(state.assignments);
   const records: HistoryRecord[] = state.assignments
     .filter(
       (item) =>
@@ -152,6 +154,9 @@ export function currentScheduleHistory(
       staffName: item.staffName,
       startTime: item.startTime,
       endTime: item.endTime,
+      ...(attendance.has(item.id)
+        ? { attendanceIntervals: attendance.get(item.id) }
+        : {}),
       flightCutoffTime:
         state.flights.find((flight) => flight.id === item.flightId)?.endTime ??
         item.endTime,

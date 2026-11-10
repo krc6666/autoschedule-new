@@ -6,6 +6,7 @@ import {
   BUILTIN_STAFF_STATUSES,
   normalizeLeaveTypes,
 } from "../domain/staff-status";
+import { normalizeAttendanceIntervals } from "../domain/statistics/attendance-intervals";
 import type {
   AppState,
   Assignment,
@@ -445,6 +446,9 @@ function restoreHistory(value: unknown[]): HistoryRecord[] {
       typeof item.flightCutoffTime === "string"
         ? normalizeTime(item.flightCutoffTime)
         : "";
+    const attendanceIntervals = normalizeAttendanceIntervals(
+      item.attendanceIntervals
+    );
     return [
       {
         id: item.id,
@@ -456,6 +460,7 @@ function restoreHistory(value: unknown[]): HistoryRecord[] {
         startTime: item.startTime,
         endTime: item.endTime,
         ...(flightCutoffTime ? { flightCutoffTime } : {}),
+        ...(attendanceIntervals ? { attendanceIntervals } : {}),
         workHours: item.workHours,
         fatiguePoints: item.fatiguePoints,
         remark: item.remark,

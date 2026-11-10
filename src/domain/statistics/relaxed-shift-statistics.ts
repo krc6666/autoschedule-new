@@ -12,6 +12,8 @@ interface ActualTask {
   startTime: string;
   endTime: string;
   flightCutoffTime: string;
+  attendanceIntervals?: HistoryRecord["attendanceIntervals"];
+  countedForEarlyDeparture: boolean;
 }
 
 export interface EarlyDepartureEvent {
@@ -63,7 +65,8 @@ function operationalInterval(
 function fromAssignment(
   date: string,
   assignment: Assignment,
-  flightCutoffTime: string
+  flightCutoffTime: string,
+  countedForEarlyDeparture: boolean
 ): ActualTask | null {
   if (
     assignment.status !== "assigned" ||
@@ -80,6 +83,7 @@ function fromAssignment(
     startTime: assignment.startTime,
     endTime: assignment.endTime,
     flightCutoffTime,
+    countedForEarlyDeparture,
   };
 }
 
@@ -101,13 +105,15 @@ function fromHistory(record: HistoryRecord): ActualTask | null {
     startTime: record.startTime,
     endTime: record.endTime,
     flightCutoffTime: record.flightCutoffTime || record.endTime,
+    attendanceIntervals: record.attendanceIntervals,
+    countedForEarlyDeparture: true,
   };
 }
 
 function uniqueTasks(tasks: ActualTask[]): ActualTask[] {
   const seen = new Set<string>();
   return tasks.filter((task) => {
-    const key = `${task.date}\u0000${task.staffId}\u0000${task.flightNo}\u0000${task.startTime}\u0000${task.endTime}`;
+    const key = `${task.date}\u0000${task.staffId}\u0000${task.flightNo}\u0000${task.startTime}\u0000${task.endTime}\u0000${task.countedForEarlyDeparture}`;
     if (seen.has(key)) return false;
     seen.add(key);
     return true;
@@ -130,17 +136,21 @@ function dutyStaffIdForDate(
 }
 
 function overlapsWindow(
-  task: ActualTask,
+  task: { startTime: string; endTime: string },
   startTime: string,
   endTime: string,
   nightEnd: string
 ): boolean {
   const interval = operationalInterval(task.startTime, task.endTime, nightEnd);
-  const start = timeToMinutes(startTime);
-  let end = timeToMinutes(endTime);
-  if (!interval || ![start, end].every(Number.isFinite)) return false;
-  if (end <= start) end += 1440;
-  return interval[0] < end && interval[1] > start;
+  const window = operationalInterval(startTime, endTime, nightEnd);
+  if (
+    !interval ||
+    !window ||
+    task.startTime === task.endTime ||
+    startTime === endTime
+  )
+    return false;
+  return interval[0] < window[1] && interval[1] > window[0];
 }
 
 export function buildMonthlyRelaxedShiftStatistics(
@@ -158,13 +168,13 @@ export function buildMonthlyRelaxedShiftStatistics(
     .filter((task): task is ActualTask => Boolean(task));
   const activeTasks = activeDate
     ? state.assignments
-        .filter((assignment) => isCountedWorkloadAssignment(state, assignment))
         .map((assignment) =>
           fromAssignment(
             activeDate,
             assignment,
             state.flights.find((flight) => flight.id === assignment.flightId)
-              ?.endTime ?? assignment.endTime
+              ?.endTime ?? assignment.endTime,
+            isCountedWorkloadAssignment(state, assignment)
           )
         )
         .filter((task): task is ActualTask => Boolean(task))
@@ -193,6 +203,26 @@ export function buildMonthlyRelaxedShiftStatistics(
 
   for (const taskDate of dates) {
     const dailyTasks = tasks.filter((task) => task.date === taskDate);
+    const inAfternoon = (task: { startTime: string; endTime: string }) =>
+      overlapsWindow(
+        task,
+        state.settings.afternoonRestStartTime,
+        state.settings.afternoonRestEndTime,
+        state.settings.nightEnd
+      );
+    // A complete historical record is evidence; today's templates are not.
+    const hasAfternoonFlight =
+      taskDate === activeDate
+        ? (state.flights.length ? state.flights : activeTasks).some(inAfternoon)
+        : historyTasks.some(
+            (task) =>
+              task.date === taskDate &&
+              (inAfternoon({
+                startTime: task.startTime,
+                endTime: task.flightCutoffTime,
+              }) ||
+                (task.attendanceIntervals ?? []).some(inAfternoon))
+          );
     const participatingStaffIds = [
       ...new Set(dailyTasks.map((task) => task.staffId)),
     ];
@@ -203,7 +233,10 @@ export function buildMonthlyRelaxedShiftStatistics(
     );
     for (const staffId of participatingStaffIds) {
       const staffTasks = dailyTasks.filter((task) => task.staffId === staffId);
-      const lastTask = [...staffTasks].sort((left, right) => {
+      const earlyTasks = staffTasks.filter(
+        (task) => task.countedForEarlyDeparture
+      );
+      const lastTask = [...earlyTasks].sort((left, right) => {
         const leftInterval = operationalInterval(
           left.startTime,
           left.endTime,
@@ -223,7 +256,7 @@ export function buildMonthlyRelaxedShiftStatistics(
             state.settings.nightEnd
           )?.[1]
         : undefined;
-      const hasLateCutoffFlight = staffTasks.some((task) => {
+      const hasLateCutoffFlight = earlyTasks.some((task) => {
         const interval = operationalInterval(
           task.startTime,
           task.flightCutoffTime,
@@ -248,13 +281,11 @@ export function buildMonthlyRelaxedShiftStatistics(
         earlyByStaff.set(staffId, events);
       }
       if (
-        !staffTasks.some((task) =>
-          overlapsWindow(
-            task,
-            state.settings.afternoonRestStartTime,
-            state.settings.afternoonRestEndTime,
-            state.settings.nightEnd
-          )
+        hasAfternoonFlight &&
+        !staffTasks.some(
+          (task) =>
+            inAfternoon(task) ||
+            (task.attendanceIntervals ?? []).some(inAfternoon)
         )
       ) {
         const restDates = afternoonByStaff.get(staffId) ?? [];

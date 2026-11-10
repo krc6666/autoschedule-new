@@ -1,0 +1,24 @@
+{
+  "entry": "http://127.0.0.1:5173/",
+  "isolatedAnonymousContext": true,
+  "cases": [
+    {
+      "pmStart": "19:00",
+      "names": []
+    },
+    {
+      "pmStart": "17:30",
+      "names": ["P1"]
+    }
+  ],
+  "defaultCollapsed": true,
+  "persisted": {
+    "morningStatsStartTime": "07:00",
+    "morningStatsEndTime": "11:00",
+    "afternoonRestStartTime": "13:00",
+    "afternoonRestEndTime": "17:00",
+    "eveningStatsStartTime": "19:00",
+    "eveningStatsEndTime": "05:00"
+  },
+  "pageErrors": []
+}

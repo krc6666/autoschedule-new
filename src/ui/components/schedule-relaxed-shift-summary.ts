@@ -54,6 +54,9 @@ export class ScheduleRelaxedShiftSummaryElement extends LightDomElement {
           <h4 id="schedule-afternoon-rest-title">
             <i class="bi bi-sun"></i>下午无航班人员
           </h4>
+          <p class="small text-muted">
+            ${this.model.settings.afternoonRestStartTime}—${this.model.settings.afternoonRestEndTime}，当天有航班且个人无岗位重叠才计次
+          </p>
           <div class="schedule-relaxed-shift-list">
             ${
               statistics.currentAfternoonRest.length

@@ -83,7 +83,7 @@ describe("qualification warning statistics diagnostic", () => {
       expect(ordinary.effectiveCount).toBe(1);
       expect(late.categories.送资料.qualified).toBe(false);
       expect(late.categories.送资料.effectiveCount).toBe(1);
-      expect(relaxed.afternoonRestDates).toEqual([date]);
+      expect(relaxed.afternoonRestDates).toEqual([]); // Only a late flight exists that day.
       expect(relaxed.earlyDepartures).toHaveLength(0); // TR121 ends after 23:00.
       expect(flights.flightCount).toBe(1);
       expect(
@@ -103,7 +103,7 @@ describe("qualification warning statistics diagnostic", () => {
           flightCount: flights.flightCount,
         })
       );
-      // Independently check a morning schedule: both relaxed statistics should count it.
+      // A morning-only day counts early departure, without inventing an afternoon flight.
       flight.startTime = "08:00";
       flight.endTime = "10:00";
       state.flights.forEach((f) => {
@@ -123,7 +123,7 @@ describe("qualification warning statistics diagnostic", () => {
         (r) => r.staff.id === person.id
       )!;
       expect(morning.earlyDepartures).toHaveLength(1);
-      expect(morning.afternoonRestDates).toEqual([date]);
+      expect(morning.afternoonRestDates).toEqual([]);
       console.log(
         JSON.stringify({
           source,

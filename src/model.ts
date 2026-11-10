@@ -95,6 +95,8 @@ export interface HistoryRecord extends ManualCountEvidence {
   endTime: string;
   /** Original scheduled end of the source flight, before an early release. */
   flightCutoffTime?: string;
+  /** Actual presence from reused roles, without adding workload history. */
+  attendanceIntervals?: Array<{ startTime: string; endTime: string }>;
   workHours: number;
   fatiguePoints: number;
   remark: string;
@@ -206,8 +208,12 @@ export interface ScheduleSettings {
   crossFlightPriorityPolicies: CrossFlightPriorityPolicy[];
   teamLeaderGapFillPositionPolicies: TeamLeaderGapFillPositionPolicy[];
   earlyDepartureCutoffTime: string;
+  morningStatsStartTime: string;
+  morningStatsEndTime: string;
   afternoonRestStartTime: string;
   afternoonRestEndTime: string;
+  eveningStatsStartTime: string;
+  eveningStatsEndTime: string;
   workloadBalanceEnabled: boolean;
   dailyFlightCountBalanceExemptHalfRest: boolean;
   dailyFlightCountBalanceExemptTeamLeaders: boolean;

@@ -1,0 +1,1 @@
+PASS: 22 original sheets retained, all original cell values unchanged after removing four new settings and one new optional attendance column.

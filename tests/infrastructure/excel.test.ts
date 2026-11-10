@@ -991,6 +991,11 @@ describe("workbook boundary", () => {
         "分队长补差保护范围",
       ])
     );
+    expect(
+      XLSX.utils.sheet_to_json<unknown[]>(workbook.Sheets["历史排班"]!, {
+        header: 1,
+      })[0]
+    ).toContain("出勤时段");
     const settingCodes = XLSX.utils
       .sheet_to_json<unknown[]>(workbook.Sheets["规则参数"]!, {
         header: 1,

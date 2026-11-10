@@ -1,0 +1,260 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/domain/afternoon-attendance.test.ts (13 tests | 3 failed) 43ms
+     × does not count anyone when the whole afternoon has no flights, in current and complete history 14ms
+     × counts guide presence without adding load history, preserving it through archive, storage and XLSX 2ms
+     × owns all six editable times and preserves invalid intervals and older defaults 6ms
+npm.cmd : 
+所在位置 行:2 字符: 1
++ npm.cmd exec vitest -- run tests/domain/afternoon-attendance.test.ts  ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/domain/afternoon-attendance.test.ts > afternoon attendance contract > does not count anyone when the whole
+ afternoon has no flights, in current and complete history
+AssertionError: expected [ 1, 1, +0, +0 ] to deeply equal [ +0, +0, +0, +0 ]
+
+- Expected
++ Received
+
+  [
+-   0,
+-   0,
++   1,
++   1,
+    0,
+    0,
+  ]
+
+ ❯ tests/domain/afternoon-attendance.test.ts:42:22
+     40|     add("AM", 0, "08:00", "10:00");
+     41|     add("PM", 1, "19:00", "21:00");
+     42|     expect(counts()).toEqual([0, 0, 0, 0]);
+       |                      ^
+     43|     state.history = currentScheduleHistory(state, date);
+     44|     state.assignments = [];
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  tests/domain/afternoon-attendance.test.ts > afternoon attendance contract > counts guide presence without adding
+ load history, preserving it through archive, storage and XLSX
+AssertionError: expected [ 1, +0, +0, +0 ] to deeply equal [ +0, +0, +0, +0 ]
+
+- Expected
++ Received
+
+  [
+-   0,
++   1,
+    0,
+    0,
+    0,
+  ]
+
+ ❯ tests/domain/afternoon-attendance.test.ts:94:22
+     92|     });
+     93|     state.assignments.push({ ...source, id: "guide", positionRuleId: "…
+     94|     expect(counts()).toEqual([0, 0, 0, 0]);
+       |                      ^
+     95|     const earlyBefore = statistics(state, date).rows[0]!.earlyDepartur…
+     96|     state.history = currentScheduleHistory(state, date);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  tests/domain/afternoon-attendance.test.ts > afternoon attendance contract > owns all six editable times and pres
+erves invalid intervals and older defaults
+AssertionError: expected { maxDailyHours: 12, …(42) } to match object { Object (morningStatsStartTime, morningStatsEndT
+ime, ...) }
+(43 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "eveningStatsEndTime": "06:00",
+-   "eveningStatsStartTime": "18:00",
+-   "morningStatsEndTime": "12:00",
+-   "morningStatsStartTime": "06:00",
++   "adminSupportEnabled": false,
++   "afternoonRestEndTime": "18:00",
++   "afternoonRestStartTime": "12:00",
++   "consecutiveDayPenalty": 5,
++   "crossFlightPriorityPolicies": [],
++   "crossWorkdayQualificationReservations": [],
++   "dailyFlightCountBalanceExemptHalfRest": true,
++   "dailyFlightCountBalanceExemptTeamLeaders": true,
++   "dailyPrimaryPositionUniqueEnabled": true,
++   "dutyFatiguePoints": 12,
++   "dutyPositionPriorities": [
++     {
++       "enabled": true,
++       "flightNo": "TR121",
++       "id": "duty-priority-tr121-h02",
++       "positionKeyword": "H02",
++     },
++     {
++       "enabled": true,
++       "flightNo": "TW616",
++       "id": "duty-priority-tw616-one",
++       "positionKeyword": "一号",
++     },
++   ],
++   "earlyDepartureCutoffTime": "12:00",
++   "highLoadFatigueThreshold": 4,
++   "highLoadProtectionEnabled": true,
++   "highLoadRecoveryMinutes": 360,
++   "historyWindowDays": 7,
++   "latePriorityFlightNumbers": [],
++   "lateShiftEndTime": "23:00",
++   "lateShiftRecoveryEnabled": true,
++   "lateShiftRecoveryPositionRules": [
++     {
++       "enabled": true,
++       "flightNo": "",
++       "id": "late-recovery-supervisor",
++       "keyword": "督导",
++       "matchField": "position",
++       "nextWorkdayCutoffTime": "",
++     },
++     {
++       "enabled": true,
++       "flightNo": "",
++       "id": "late-recovery-one",
++       "keyword": "一号",
++       "matchField": "remark",
++       "nextWorkdayCutoffTime": "",
++     },
++     {
++       "enabled": true,
++       "flightNo": "",
++       "id": "late-recovery-declaration",
++       "keyword": "申报",
++       "matchField": "remark",
++       "nextWorkdayCutoffTime": "",
++     },
++     {
++       "enabled": true,
++       "flightNo": "",
++       "id": "late-recovery-delivery",
++       "keyword": "送资料",
++       "matchField": "remark",
++       "nextWorkdayCutoffTime": "",
++     },
++   ],
+
++   "maxDailyHours": 12,
++   "maxTodayFatigueDifference": 4,
++   "maxWorkHoursDifference": 2,
++   "minimumRegularTransitionMinutes": 90,
++   "mobileSupervisorCoverageRules": [
++     {
++       "enabled": true,
++       "flightNo": "",
++       "id": "supervisor-forbid-one",
++       "keyword": "一号",
++       "matchField": "remark",
++       "mode": "forbid",
++     },
++     {
++       "enabled": true,
++       "flightNo": "",
++       "id": "supervisor-forbid-declare",
++       "keyword": "申报",
++       "matchField": "remark",
++       "mode": "forbid",
++     },
++     {
++       "enabled": true,
++       "flightNo": "",
++       "id": "supervisor-forbid-check",
++       "keyword": "排查",
++       "matchField": "remark",
++       "mode": "forbid",
++     },
++   ],
++   "mobileSupervisorFillRules": [
++     {
++       "allowAutomatic": true,
++       "allowManual": true,
++       "enabled": true,
++       "id": "ke166-h05-supervisor-fill",
++       "requiresConfirmation": true,
++       "sourceFlightNo": "KE166",
++       "sourcePositionKeyword": "督导",
++       "targetFlightNo": "KE166",
++       "targetPositionKeyword": "H05",
++     },
++   ],
++   "nextWorkdayRecoveryMode": "prefer",
++   "nextWorkdayRecoveryTargets": [
++     {
++       "enabled": true,
++       "flightNo": "CX937",
++       "id": "recovery-target-cx937-one",
++       "positionKeyword": "一号",
++     },
++     {
++       "enabled": true,
++       "flightNo": "CX937",
++       "id": "recovery-target-cx937-control",
++       "positionKeyword": "控制",
++     },
++     {
++       "enabled": true,
++       "flightNo": "KE166",
++       "id": "recovery-target-ke166-one",
++       "positionKeyword": "一号",
++     },
++   ],
++   "nightEnd": "06:00",
++   "nightStart": "22:00",
++   "ordinaryPriorityPositions": [],
++   "positionRotationEnabled": true,
++   "positionTransitionPolicies": [
++     {
++       "enabled": true,
++       "id": "transition-cx931-tr121-h02",
++       "minimumGapMinutes": 180,
++       "mode": "prefer",
++       "name": "TR121 H02 准备保护",
++       "sourceFlightNo": "CX931",
++       "sourcePositions": [
++         "督导",
++         "G20",
++         "G19",
++       ],
++       "targetFlightNo": "TR121",
++       "targetPosition": "H02",
++     },
++   ],
++   "remarkedPositionHighLoad": true,
+ Test Files  1 failed (1)
+      Tests  3 failed | 10 passed (13)
+   Start at  17:40:21
+   Duration  1.51s (transform 920ms, setup 0ms, import 1.19s, tests 43ms, environment 0ms)
+
++   "rollingLoadMaxFatigue": 8,
++   "rollingLoadProtectionEnabled": true,
++   "rollingLoadWindowMinutes": 360,
++   "sameDayCrossFlightPriorityEnabled": true,
++   "sameFlightStaffExclusions": [],
++   "teamLeaderConcurrentSupervisionMaxOverlapMinutes": 30,
++   "teamLeaderGapFillPositionPolicies": [],
++   "tr121H02CooldownWorkdays": 3,
++   "workloadBalanceEnabled": true,
+  }
+
+ ❯ tests/domain/afternoon-attendance.test.ts:141:22
+    139|   it("owns all six editable times and preserves invalid intervals and …
+    140|     const defaults = normalizeScheduleSettings({});
+    141|     expect(defaults).toMatchObject({ morningStatsStartTime: "06:00", m…
+       |                      ^
+    142|     const settings = applyScheduleSettingsPatch(defaults, {
+    143|       morningStatsStartTime: "07:00", morningStatsEndTime: "11:00",
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+

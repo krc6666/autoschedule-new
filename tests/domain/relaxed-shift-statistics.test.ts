@@ -268,7 +268,8 @@ describe("monthly relaxed shift statistics", () => {
     expect(row.earlyDepartures).toEqual([
       { date: "2026-07-16", flightNo: "EARLY", cutoffTime: "10:00" },
     ]);
-    expect(row.afternoonRestDates).toEqual(["2026-07-16", "2026-07-18"]);
+    // No afternoon flight is recorded on the archived date; the active day has planned flights.
+    expect(row.afternoonRestDates).toEqual(["2026-07-18"]);
   });
 
   it("does not treat a late-priority-only history import as a complete afternoon record", () => {
@@ -299,9 +300,10 @@ describe("monthly relaxed shift statistics", () => {
     expect(row.earlyDepartures).toEqual([]);
   });
 
-  it("keeps complete history eligible for relaxed-shift statistics", () => {
+  it("keeps complete morning history eligible for early departure without inventing afternoon flights", () => {
     const state = createDefaultState();
     const person = state.staff[0]!;
+    person.dutyQualified = false;
     state.staff = [person];
     state.history = [
       {
@@ -323,6 +325,7 @@ describe("monthly relaxed shift statistics", () => {
     const row = buildMonthlyRelaxedShiftStatistics(state, "2026-07-18")
       .rows[0]!;
 
-    expect(row.afternoonRestDates).toEqual(["2026-07-17"]);
+    expect(row.afternoonRestDates).toEqual([]);
+    expect(row.earlyDepartures).toHaveLength(1);
   });
 });

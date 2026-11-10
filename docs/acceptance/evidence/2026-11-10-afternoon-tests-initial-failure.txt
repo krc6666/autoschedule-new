@@ -1,0 +1,68 @@
+
+> autoschedule@1.0.0 test
+> vitest run --exclude tests/performance/**
+
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/architecture/acceptance-gate.test.ts (16 tests | 1 failed) 45004ms
+     × keeps completed historical records while requiring current-version evidence 5788ms
+ ❯ tests/app/qualification-statistics-probe.test.ts (3 tests | 3 failed) 70ms
+     × counts actual unqualified H05 work in current 41ms
+     × counts actual unqualified H05 work in history 10ms
+     × counts actual unqualified H05 work in history-edit 17ms
+npm.cmd : 
+所在位置 行:2 字符: 1
++ npm.cmd test *> docs/acceptance/evidence/2026-11-10-afternoon-tests.t ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/app/qualification-statistics-probe.test.ts > qualification warning statistics diagnostic > counts actual u
+nqualified H05 work in current
+ FAIL  tests/app/qualification-statistics-probe.test.ts > qualification warning statistics diagnostic > counts actual u
+nqualified H05 work in history
+ FAIL  tests/app/qualification-statistics-probe.test.ts > qualification warning statistics diagnostic > counts actual u
+nqualified H05 work in history-edit
+AssertionError: expected [] to deeply equal [ '2026-10-29' ]
+
+- Expected
++ Received
+
+- [
+-   "2026-10-29",
+- ]
++ []
+
+ ❯ tests/app/qualification-statistics-probe.test.ts:86:42
+     84|       expect(late.categories.送资料.qualified).toBe(false);
+     85|       expect(late.categories.送资料.effectiveCount).toBe(1);
+     86|       expect(relaxed.afternoonRestDates).toEqual([date]);
+       |                                          ^
+     87|       expect(relaxed.earlyDepartures).toHaveLength(0); // TR121 ends a…
+     88|       expect(flights.flightCount).toBe(1);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  tests/architecture/acceptance-gate.test.ts > acceptance release gate > keeps completed historical records while 
+requiring current-version evidence
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ tests/architecture/acceptance-gate.test.ts:253:3
+    251|   });
+    252|
+    253|   it("keeps completed historical records while requiring current-versi…
+       |   ^
+    254|     const root = fixture();
+    255|     save(root, record(root, "previous"));
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+
+ Test Files  2 failed | 157 passed (159)
+      Tests  4 failed | 1599 passed (1603)
+   Start at  17:49:30
+   Duration  97.33s (transform 24.65s, setup 0ms, import 71.98s, tests 346.58s, environment 20.72s)
+

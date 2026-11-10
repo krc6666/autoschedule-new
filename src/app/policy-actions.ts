@@ -69,8 +69,12 @@ export interface SchedulePolicyInput {
   maxTodayFatigueDifference: number;
   dutyFatiguePoints: number;
   earlyDepartureCutoffTime: string;
+  morningStatsStartTime?: string;
+  morningStatsEndTime?: string;
   afternoonRestStartTime: string;
   afternoonRestEndTime: string;
+  eveningStatsStartTime?: string;
+  eveningStatsEndTime?: string;
 }
 
 function replacePolicyValue<T, K extends keyof T>(

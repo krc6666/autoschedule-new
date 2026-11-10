@@ -8,6 +8,54 @@ import "../../src/ui/components/policy-page";
 import { mountElement, settleLit } from "./lit-test-helpers";
 
 describe("rules page", () => {
+  it("edits all three statistics windows in one compact section and rejects an empty window", async () => {
+    const state = createDefaultState();
+    const element = await mountElement<
+      HTMLElement & { updateComplete: Promise<unknown> }
+    >("autoschedule-policy-page", { model: state });
+    const section = element.querySelector<HTMLDetailsElement>(
+      "details[data-statistics-periods]"
+    );
+    expect(section).not.toBeNull();
+    expect(section!.open).toBe(false);
+    const values = {
+      morningStatsStartTime: "07:00",
+      morningStatsEndTime: "11:00",
+      afternoonRestStartTime: "13:00",
+      afternoonRestEndTime: "17:00",
+      eveningStatsStartTime: "19:00",
+      eveningStatsEndTime: "05:00",
+    };
+    for (const [key, value] of Object.entries(values)) {
+      const input = section!.querySelector<HTMLInputElement>(
+        `input[data-policy-setting="${key}"]`
+      )!;
+      input.value = value;
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+    await settleLit();
+    let command: CustomEvent | undefined;
+    element.addEventListener("autoschedule-command", (event) => {
+      command = event as CustomEvent;
+    });
+    const button = element.querySelector<HTMLButtonElement>(
+      "autoschedule-policy-settings button.btn-primary"
+    )!;
+    button.click();
+    expect(command?.detail).toMatchObject({
+      type: "apply-policy",
+      input: values,
+    });
+    expect(state.settings.afternoonRestStartTime).toBe("12:00");
+    const start = section!.querySelector<HTMLInputElement>(
+      'input[data-policy-setting="afternoonRestStartTime"]'
+    )!;
+    start.value = "17:00";
+    start.dispatchEvent(new Event("input", { bubbles: true }));
+    await settleLit();
+    expect(section!.textContent).toContain("开始和结束不能相同");
+    expect(button.disabled).toBe(true);
+  });
   function tw616FillState() {
     const state = createDefaultState();
     state.templates.push({

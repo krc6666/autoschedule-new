@@ -1,0 +1,36 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+npm.cmd : stderr | tests/ui/schedule-policy-view.test.ts
+所在位置 行:2 字符: 1
++ npm.cmd exec vitest -- run tests/ui/schedule-policy-view.test.ts -t " ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (stderr | tests/...cy-view.test.ts:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+
+ ❯ tests/ui/schedule-policy-view.test.ts (19 tests | 1 failed | 18 skipped) 116ms
+     × edits all three statistics windows in one compact section and rejects an empty window 114ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/ui/schedule-policy-view.test.ts > rules page > edits all three statistics windows in one compact section a
+nd rejects an empty window
+AssertionError: expected null not to be null
+ ❯ tests/ui/schedule-policy-view.test.ts:15:25
+     13|     const element = await mountElement<HTMLElement & { updateComplete:…
+     14|     const section = element.querySelector<HTMLDetailsElement>("details…
+     15|     expect(section).not.toBeNull();
+       |                         ^
+     16|     expect(section!.open).toBe(false);
+     17|     const values = {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 18 skipped (19)
+   Start at  17:43:36
+   Duration  1.76s (transform 908ms, setup 0ms, import 1.06s, tests 116ms, environment 364ms)
+

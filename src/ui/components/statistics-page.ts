@@ -78,7 +78,7 @@ export class StatisticsPageElement extends LightDomElement {
           <strong>今日下午无航班</strong
           ><small
             >${this.model.settings.afternoonRestStartTime}-${this.model.settings.afternoonRestEndTime}
-            无航班重叠，值班和备勤照常计入</small
+            当天该时段有航班，个人无已排岗位重叠才计次；值班和备勤照常计入</small
           >
           <div>
             ${statistics.currentAfternoonRest.length ? statistics.currentAfternoonRest.map((item) => html`<span><strong>${item.staffName}</strong> <em>本月 ${item.monthlyCount} 次</em></span>`) : html`<span class="is-empty">今日没有下午无航班人员</span>`}

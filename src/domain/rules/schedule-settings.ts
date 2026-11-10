@@ -240,6 +240,34 @@ export const SCHEDULE_SETTING_DEFINITIONS: readonly ScheduleSettingDefinition[] 
       defaultValue: "18:00",
     },
     {
+      key: "morningStatsStartTime",
+      label: "上午统计开始",
+      type: "time",
+      description: "统计时段定义，不改变半休或值班规则",
+      defaultValue: "06:00",
+    },
+    {
+      key: "morningStatsEndTime",
+      label: "上午统计结束",
+      type: "time",
+      description: "统计时段定义，不改变半休或值班规则",
+      defaultValue: "12:00",
+    },
+    {
+      key: "eveningStatsStartTime",
+      label: "晚上统计开始",
+      type: "time",
+      description: "统计时段定义，不改变夜班资格规则",
+      defaultValue: "18:00",
+    },
+    {
+      key: "eveningStatsEndTime",
+      label: "晚上统计结束",
+      type: "time",
+      description: "结束早于开始表示跨午夜",
+      defaultValue: "06:00",
+    },
+    {
       key: "workloadBalanceEnabled",
       label: "启用工时疲劳均衡",
       type: "boolean",
@@ -281,6 +309,16 @@ export const SCHEDULE_SETTING_DEFINITIONS: readonly ScheduleSettingDefinition[] 
   ] as const;
 
 const CLOCK_PATTERN = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
+
+export const STATISTICS_TIME_WINDOWS = [
+  { label: "上午", start: "morningStatsStartTime", end: "morningStatsEndTime" },
+  {
+    label: "下午",
+    start: "afternoonRestStartTime",
+    end: "afternoonRestEndTime",
+  },
+  { label: "晚上", start: "eveningStatsStartTime", end: "eveningStatsEndTime" },
+] as const;
 
 function scalarDefaults(): Omit<
   ScheduleSettings,
@@ -355,6 +393,12 @@ export function normalizeScheduleSettings(
     typeof input.adminSupportEnabled === "boolean"
       ? input.adminSupportEnabled
       : fallback.adminSupportEnabled;
+  for (const { start, end } of STATISTICS_TIME_WINDOWS) {
+    if (result[start] === result[end]) {
+      result[start] = fallback[start];
+      result[end] = fallback[end];
+    }
+  }
   result.latePriorityFlightNumbers = normalizeLatePriorityFlightNumbers(
     Array.isArray(input.latePriorityFlightNumbers)
       ? input.latePriorityFlightNumbers

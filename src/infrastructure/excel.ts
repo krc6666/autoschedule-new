@@ -1,6 +1,10 @@
 import { migrateLegacySupervisorFillConfiguration } from "../domain/coverage/supervisor-fill-configuration";
 import * as XLSX from "xlsx-js-style";
 import {
+  additionalAttendanceByAssignment,
+  normalizeAttendanceIntervals,
+} from "../domain/statistics/attendance-intervals";
+import {
   parseManualCountEvidence,
   serializeManualCountEvidence,
 } from "./manual-count-evidence";
@@ -686,9 +690,22 @@ function parseHistory(
   const coverageIndex = headerIndex(header, ["历史覆盖范围"], -1);
   const gapFillIndex = headerIndex(header, ["分队长补差"], -1);
   const evidenceIndex = headerIndex(header, ["人工调整证据"], -1);
+  const attendanceIndex = headerIndex(header, ["出勤时段"], -1);
   return data.slice(1).flatMap((row) => {
     const date = normalizeText(row[dateIndex]).slice(0, 10);
     const staffName = normalizeText(row[nameIndex]);
+    let attendanceIntervals: HistoryRecord["attendanceIntervals"];
+    try {
+      attendanceIntervals = normalizeAttendanceIntervals(
+        JSON.parse(
+          attendanceIndex >= 0
+            ? normalizeText(row[attendanceIndex]) || "null"
+            : "null"
+        )
+      );
+    } catch {
+      /* Optional attendance metadata must not discard the load record. */
+    }
     const position = normalizePosition(row[positionIndex]);
     const evidence = parseManualCountEvidence(
       evidenceIndex >= 0 ? normalizeText(row[evidenceIndex]) : ""
@@ -741,6 +758,7 @@ function parseHistory(
         startTime,
         endTime,
         ...(flightCutoffTime ? { flightCutoffTime } : {}),
+        ...(attendanceIntervals ? { attendanceIntervals } : {}),
         workHours: hours,
         fatiguePoints:
           normalizeText(rawFatigue) !== "" && Number.isFinite(parsedFatigue)
@@ -1111,6 +1129,7 @@ export function buildConfigWorkbook(state: AppState): XLSX.WorkBook {
         "分队长补差",
         "航班截载时间",
         "人工调整证据",
+        "出勤时段",
       ],
       ...state.history.map((record) => [
         record.id,
@@ -1128,6 +1147,9 @@ export function buildConfigWorkbook(state: AppState): XLSX.WorkBook {
         record.teamLeaderGapFill ? "是" : "否",
         record.flightCutoffTime ?? record.endTime,
         serializeManualCountEvidence(record),
+        record.attendanceIntervals
+          ? JSON.stringify(record.attendanceIntervals)
+          : "",
       ]),
     ],
     [18, 12, 12, 18, 16, 14, 12, 12, 16, 12, 32, 20, 14, 12, 36]
@@ -1142,6 +1164,7 @@ export function buildScheduleWorkbook(
 ): XLSX.WorkBook {
   const workbook = XLSX.utils.book_new();
   const assignments = state.assignments;
+  const attendance = additionalAttendanceByAssignment(assignments);
   const sameDayWarningsByAssignment =
     state.settings.sameDayCrossFlightPriorityEnabled === false
       ? new Map<string, readonly { code: string; message: string }[]>()
@@ -1374,6 +1397,7 @@ export function buildScheduleWorkbook(
         "系统说明",
         "人员编号",
         "人工调整证据",
+        "出勤时段",
       ],
       ...assignments.map((item) => [
         date,
@@ -1404,6 +1428,7 @@ export function buildScheduleWorkbook(
             manualRemark: item.manualRemark,
           },
         }),
+        attendance.has(item.id) ? JSON.stringify(attendance.get(item.id)) : "",
       ]),
     ],
     [12, 12, 16, 14, 12, 12, 16, 12, 24, 12, 12, 60, 16, 36]

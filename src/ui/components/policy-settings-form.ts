@@ -12,6 +12,7 @@ import {
   diagnoseScalarPolicySetting,
 } from "../../domain/rules/policy-configuration-diagnostics";
 import { renderPolicyDiagnostics } from "./policy-diagnostic";
+import { STATISTICS_TIME_WINDOWS } from "../../domain/rules/schedule-settings";
 
 const POLICY_FIELDS: readonly (keyof SchedulePolicyInput)[] = [
   "maxDailyHours",
@@ -38,8 +39,12 @@ const POLICY_FIELDS: readonly (keyof SchedulePolicyInput)[] = [
   "maxTodayFatigueDifference",
   "dutyFatiguePoints",
   "earlyDepartureCutoffTime",
+  "morningStatsStartTime",
+  "morningStatsEndTime",
   "afternoonRestStartTime",
   "afternoonRestEndTime",
+  "eveningStatsStartTime",
+  "eveningStatsEndTime",
 ];
 
 const POLICY_SETTING_SEARCH_TEXT = [
@@ -86,6 +91,11 @@ const POLICY_SETTING_SEARCH_TEXT = [
   "提前下班截载节点",
   "下午统计开始",
   "下午统计结束",
+  "统计时段设置",
+  "上午统计开始",
+  "上午统计结束",
+  "晚上统计开始",
+  "晚上统计结束",
   "保存规则",
 ] as const;
 
@@ -154,11 +164,32 @@ export class PolicySettingsFormElement extends LightDomElement {
             ${this.number("maxTodayFatigueDifference", "最大当日疲劳差", 0, 100, 0.5)}
             ${this.number("dutyFatiguePoints", "值班疲劳点", 0, 100, 0.5)}
             ${this.time("earlyDepartureCutoffTime", "提前下班截载节点")}
-            ${this.time("afternoonRestStartTime", "下午统计开始")}
-            ${this.time("afternoonRestEndTime", "下午统计结束")}
           </div>
+          <details data-statistics-periods class="mt-3">
+            <summary>统计时段设置（上午／下午／晚上）</summary>
+            <p class="small text-muted mt-2">
+              仅定义统计时段，不改变半休、值班或夜班资格。当前计次使用下午时段，上午和晚上可预先维护。结束早于开始表示跨午夜。
+            </p>
+            <p class="small text-muted">
+              当天下午有航班时才计次；个人任何已排岗位与下午时段重叠就算上班，包含引导和督导补位。全天无排班人员不计。
+            </p>
+            <div class="schedule-policy-controls">
+              ${STATISTICS_TIME_WINDOWS.map(
+                ({ label, start, end }) => html`
+                  ${this.time(start, `${label}统计开始`)}
+                  ${this.time(end, `${label}统计结束`)}
+                  ${this.draft[start] === this.draft[end] ? html`<p role="alert">${label}开始和结束不能相同，请调整后保存。</p>` : nothing}
+                `
+              )}
+            </div>
+          </details>
           <div class="d-flex justify-content-end mt-3">
-            <button class="btn btn-primary" type="button" @click=${this.save}>
+            <button
+              class="btn btn-primary"
+              type="button"
+              ?disabled=${STATISTICS_TIME_WINDOWS.some(({ start, end }) => this.draft[start] === this.draft[end])}
+              @click=${this.save}
+            >
               <i class="bi bi-check2-circle me-2"></i>保存规则
             </button>
           </div>
@@ -222,6 +253,7 @@ export class PolicySettingsFormElement extends LightDomElement {
         >${label}<input
           class="form-control"
           type="time"
+          data-policy-setting=${field}
           .value=${String(this.draft[field])}
           @input=${(event: Event) => this.updateDraft(field, (event.currentTarget as HTMLInputElement).value as never)} /></label
       >${this.settingDiagnostics(field, label)}

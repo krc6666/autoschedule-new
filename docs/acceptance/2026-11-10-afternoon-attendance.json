@@ -1,0 +1,157 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-10-afternoon-attendance",
+  "title": "可维护统计时段与下午无航班计次前提",
+  "startedFrom": "553d9d2c37e13a92868b64b7f4623f0f1dc6abae",
+  "expectation": {
+    "example": "下午12:00—18:00；全队无下午航班时所有人0次；有下午航班时，上午参加排班而下午无岗位者1次，11:00—14:00或17:30—19:00有岗位者0次，12:00结束或18:00开始不算重叠。",
+    "expected": "上午/下午/晚上分别手动维护起止时间，刷新及配置Excel往返保持；下午按最终实际岗位时段重叠判断，含引导/督导复用，按人员日期去重；两页面同源；完整历史可重算，部分历史不冒充全天。",
+    "unchanged": "提前下班、工时疲劳、引导不新增负荷历史、半休、值班、夜班资格、求解排序、组隔离及全天无排班排除不变；不新增上午/晚上无航班计次。",
+    "fallback": "非法时间或相同起止保留原区间；旧历史缺出勤信息按已保存时段保守计算，不从当前模板猜过去；历史没有完整当天航班资料时不猜未保存的下午航班。"
+  },
+  "testedVersion": "ad9aaf4b7700b1d3232bb6ca1b475d19bfa104905e299995de42b8d850e02638",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "与owner确认的最小业务例子一致；改前保留3项领域/配置及1项页面失败，改后通过。",
+      "evidence": [
+        {
+          "summary": "改前13项中3项失败：无下午航班误计、引导出勤丢失、缺少可维护时段默认值。其余重叠与边界基线通过。",
+          "path": "docs/acceptance/evidence/2026-11-10-afternoon-red.txt",
+          "sha256": "ad214b4bcb6df972bd8092c0eed36812c6692ed8aa566155cf98fa07a9ab6521"
+        },
+        {
+          "summary": "改前UI缺少三段统计时间的集中维护入口。",
+          "path": "docs/acceptance/evidence/2026-11-10-afternoon-ui-red.txt",
+          "sha256": "2c56e444b36b9cbb93481506fa5cee6a25c2944a9a4c1bd1b59285b910e53561"
+        },
+        {
+          "summary": "改后5文件89项通过，含个人正时长重叠、无下午航班、引导归档/恢复/真实XLSX字节往返、时间保存与两页面独立期望名单。",
+          "path": "docs/acceptance/evidence/2026-11-10-afternoon-focused.txt",
+          "sha256": "779346f7e6ccd13405abaf284c8b12110d39a5dbfada0b0775f3ce8c578f7e0c"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "下午有航班才统计；个人任意正时长岗位重叠即不计缺勤，每人每日去重，全天未排班不计。",
+      "evidence": [
+        {
+          "summary": "改后5文件89项通过，含个人正时长重叠、无下午航班、引导归档/恢复/真实XLSX字节往返、时间保存与两页面独立期望名单。",
+          "path": "docs/acceptance/evidence/2026-11-10-afternoon-focused.txt",
+          "sha256": "779346f7e6ccd13405abaf284c8b12110d39a5dbfada0b0775f3ce8c578f7e0c"
+        },
+        {
+          "summary": "最终完整功能159文件1603项通过，npm.cmd test退出0。",
+          "path": "docs/acceptance/evidence/2026-11-10-afternoon-tests.txt",
+          "sha256": "8933c6f8a68f2c85a45e4bcd5d5acf35cfce428016382f77ea2f028f3f0a91a3"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "覆盖完整历史、部分历史排除、跨午夜、非法附加数据、缺字段默认、归档与存储及XLSX往返；保留原数据模板。",
+      "evidence": [
+        {
+          "summary": "改后5文件89项通过，含个人正时长重叠、无下午航班、引导归档/恢复/真实XLSX字节往返、时间保存与两页面独立期望名单。",
+          "path": "docs/acceptance/evidence/2026-11-10-afternoon-focused.txt",
+          "sha256": "779346f7e6ccd13405abaf284c8b12110d39a5dbfada0b0775f3ce8c578f7e0c"
+        },
+        {
+          "summary": "从Git HEAD原始模板逐表独立核对22张原表：仅追加4个参数及出勤时段列，原单元格值保持。",
+          "path": "docs/acceptance/evidence/2026-11-10-afternoon-template-audit.txt",
+          "sha256": "c0937ff04716426198fc9cc1645604fb38921b3bbb791e5654df4dece19aa4e0"
+        },
+        {
+          "summary": "最终完整功能159文件1603项通过，npm.cmd test退出0。",
+          "path": "docs/acceptance/evidence/2026-11-10-afternoon-tests.txt",
+          "sha256": "8933c6f8a68f2c85a45e4bcd5d5acf35cfce428016382f77ea2f028f3f0a91a3"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "只读最终assigned事实；测试模拟人员清空与重复岗位后重新投影，归档后引导出勤仍保留，未通过统计改写班表。",
+      "evidence": [
+        {
+          "summary": "改后5文件89项通过，含个人正时长重叠、无下午航班、引导归档/恢复/真实XLSX字节往返、时间保存与两页面独立期望名单。",
+          "path": "docs/acceptance/evidence/2026-11-10-afternoon-focused.txt",
+          "sha256": "779346f7e6ccd13405abaf284c8b12110d39a5dbfada0b0775f3ce8c578f7e0c"
+        },
+        {
+          "summary": "最终完整功能159文件1603项通过，npm.cmd test退出0。",
+          "path": "docs/acceptance/evidence/2026-11-10-afternoon-tests.txt",
+          "sha256": "8933c6f8a68f2c85a45e4bcd5d5acf35cfce428016382f77ea2f028f3f0a91a3"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "not_applicable",
+      "reason": "本次不新增排班硬约束或安全写入，只读统计无需新守卫；原自动/人工安全路径通过完整功能回归。",
+      "evidence": [
+        {
+          "summary": "最终完整功能159文件1603项通过，npm.cmd test退出0。",
+          "path": "docs/acceptance/evidence/2026-11-10-afternoon-tests.txt",
+          "sha256": "8933c6f8a68f2c85a45e4bcd5d5acf35cfce428016382f77ea2f028f3f0a91a3"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "提前下班仍消费原负荷事实；新增出勤元信息不增加引导工时/疲劳/历史行，半休/夜班/值班/求解未修改。",
+      "evidence": [
+        {
+          "summary": "改后5文件89项通过，含个人正时长重叠、无下午航班、引导归档/恢复/真实XLSX字节往返、时间保存与两页面独立期望名单。",
+          "path": "docs/acceptance/evidence/2026-11-10-afternoon-focused.txt",
+          "sha256": "779346f7e6ccd13405abaf284c8b12110d39a5dbfada0b0775f3ce8c578f7e0c"
+        },
+        {
+          "summary": "最终完整功能159文件1603项通过，npm.cmd test退出0。",
+          "path": "docs/acceptance/evidence/2026-11-10-afternoon-tests.txt",
+          "sha256": "8933c6f8a68f2c85a45e4bcd5d5acf35cfce428016382f77ea2f028f3f0a91a3"
+        },
+        {
+          "summary": "npm.cmd run typecheck通过，退出0。",
+          "path": "docs/acceptance/evidence/2026-11-10-afternoon-typecheck.txt",
+          "sha256": "f0e27738b34b12050a8cbb339eca3ab588d2bc04dcafa20fbcb7f519d17e79aa"
+        },
+        {
+          "summary": "生产构建退出0；保留既有HiGHS node:module浏览器外置提示。",
+          "path": "docs/acceptance/evidence/2026-11-10-afternoon-build.txt",
+          "sha256": "80be9e02e54983a5872fc74f9ffd4b2a5e77ccf245737b4623169ed3cae7dfee"
+        },
+        {
+          "summary": "从Git HEAD原始模板逐表独立核对22张原表：仅追加4个参数及出勤时段列，原单元格值保持。",
+          "path": "docs/acceptance/evidence/2026-11-10-afternoon-template-audit.txt",
+          "sha256": "c0937ff04716426198fc9cc1645604fb38921b3bbb791e5654df4dece19aa4e0"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "verified",
+      "reason": "owner授权自行完成；在隔离匿名Chrome运行真实页面与存储恢复，独立预期名单和六字段持久化均通过；不冒充owner私有现场。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-afternoon-browser.json",
+          "summary": "隔离Chrome真实入口匿名验证：全队无下午航班0人、17:30重叠者不计、全天未排者排除、六字段保存刷新保持、默认收起且无页面异常。",
+          "sha256": "6271c7e9d66cc77fa053359fae34673284e9e6aff53d25613b537daac421ab06"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-afternoon-verify.txt",
+          "summary": "npm.cmd run verify退出0：159功能文件1603项、7性能文件19项、类型检查与生产构建通过。",
+          "sha256": "3a8d9c4c732bfefd73c1e94c90d3898f062c6972d7721050a1f8e000efad26e2"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "改前red/UI-red日志捕获缺失的全队航班前提、引导出勤及三段入口；改后focused89项和完整1603项通过。",
+    "laterChanges": "任何人工或后置改派最终会改变assigned事实；领域统计每次读取最终结果，模拟清空/重复岗位回归及归档、恢复、XLSX往返确认不沿用旧名单。统计不参与求解、守卫或班表写入。",
+    "finalArtifact": "本次真实入口匿名证据为afternoon-browser.json，验证无下午航班、正时长重叠、全天未排与规则保存刷新；afternoon-verify.txt记录最终完整门禁退出0。"
+  },
+  "review": {
+    "missedScope": "核对UI、最终岗位、归档、localStorage、配置及排班Excel、模板和提前下班；独立Chrome匿名场景通过。未重放owner私有班表，旧历史缺失事实不补猜；上午/晚上仅维护定义。未单独运行真实Worker计算，本次未改求解。",
+    "rootCause": "将个人无任务等同下午无航班待遇，缺少全队有航班前提；同时复用负荷过滤器，把零工时引导的实际出勤排除，归档还不保存这部分出勤。",
+    "earlyDetection": "确认统计需求时先交叉列出全天运营/个人出勤/负荷三种事实，用全队无下午、边界重叠和零工时复用建立失败测试，再检查归档及存储Excel闭环；编码后立即回读UTF8文档，防止管道损坏中文。"
+  }
+}
