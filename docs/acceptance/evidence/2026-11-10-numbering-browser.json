@@ -1,0 +1,147 @@
+{
+  "entry": "http://127.0.0.1:5173/",
+  "isolatedAnonymousContext": true,
+  "desc": [
+    {
+      "id": "probe-0",
+      "number": "1",
+      "count": "1"
+    },
+    {
+      "id": "probe-1",
+      "number": "2",
+      "count": "1"
+    },
+    {
+      "id": "probe-2",
+      "number": "3",
+      "count": "0"
+    }
+  ],
+  "asc": [
+    {
+      "id": "probe-2",
+      "number": "1",
+      "count": "0"
+    },
+    {
+      "id": "probe-0",
+      "number": "2",
+      "count": "1"
+    },
+    {
+      "id": "probe-1",
+      "number": "3",
+      "count": "1"
+    }
+  ],
+  "checks": [
+    {
+      "width": 1440,
+      "palette": [
+        {
+          "text": "1",
+          "inside": true,
+          "width": 19.40625,
+          "unclipped": true
+        },
+        {
+          "text": "2",
+          "inside": true,
+          "width": 19.40625,
+          "unclipped": true
+        },
+        {
+          "text": "3",
+          "inside": true,
+          "width": 19.40625,
+          "unclipped": true
+        },
+        {
+          "text": "4",
+          "inside": true,
+          "width": 19.40625,
+          "unclipped": true
+        },
+        {
+          "text": "5",
+          "inside": true,
+          "width": 19.40625,
+          "unclipped": true
+        }
+      ],
+      "rows": [
+        {
+          "id": "probe-2",
+          "number": "1",
+          "count": "0"
+        },
+        {
+          "id": "probe-0",
+          "number": "2",
+          "count": "1"
+        },
+        {
+          "id": "probe-1",
+          "number": "3",
+          "count": "1"
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "palette": [
+        {
+          "text": "1",
+          "inside": true,
+          "width": 19.40625,
+          "unclipped": true
+        },
+        {
+          "text": "2",
+          "inside": true,
+          "width": 19.40625,
+          "unclipped": true
+        },
+        {
+          "text": "3",
+          "inside": true,
+          "width": 19.40625,
+          "unclipped": true
+        },
+        {
+          "text": "4",
+          "inside": true,
+          "width": 19.40625,
+          "unclipped": true
+        },
+        {
+          "text": "5",
+          "inside": true,
+          "width": 19.40625,
+          "unclipped": true
+        }
+      ],
+      "rows": [
+        {
+          "id": "probe-2",
+          "number": "1",
+          "count": "0"
+        },
+        {
+          "id": "probe-0",
+          "number": "2",
+          "count": "1"
+        },
+        {
+          "id": "probe-1",
+          "number": "3",
+          "count": "1"
+        }
+      ]
+    }
+  ],
+  "zeroFlightWarning": "P3",
+  "reloadPalette": ["1", "2", "3", "4", "5"],
+  "pageErrors": []
+}

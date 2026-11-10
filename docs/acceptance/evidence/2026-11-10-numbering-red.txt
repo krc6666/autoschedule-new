@@ -1,0 +1,75 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+npm.cmd : stderr | tests/ui/staff-list-numbering.test.ts
+所在位置 行:3 字符: 1
++ npm.cmd exec vitest -- run tests/ui/staff-list-numbering.test.ts 2>&1 ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (stderr | tests/...mbering.test.ts:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+
+ ❯ tests/ui/staff-list-numbering.test.ts (3 tests | 2 failed) 46ms
+     × numbers the visible palette continuously, includes leave and follows roster changes 28ms
+     × renumbers daily rows after sorting and retains the zero-flight warning 11ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/ui/staff-list-numbering.test.ts > schedule personnel numbering > numbers the visible palette continuously,
+ includes leave and follows roster changes
+AssertionError: expected [] to deeply equal [ '1', '2', '3', '4' ]
+
+- Expected
++ Received
+
+- [
+-   "1",
+-   "2",
+-   "3",
+-   "4",
+- ]
++ []
+
+ ❯ tests/ui/staff-list-numbering.test.ts:29:55
+     27|     const state = fixture();
+     28|     const element = await mountElement<HTMLElement & { model: AppState…
+     29|     expect(numbers(element, ".staff-palette-number")).toEqual(["1", "2…
+       |                                                       ^
+     30|     expect(element.querySelectorAll('.staff-palette-item[draggable="fa…
+     31|     expect(element.querySelector<HTMLInputElement>(".staff-palette-nam…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/ui/staff-list-numbering.test.ts > schedule personnel numbering > renumbers daily rows after sorting and re
+tains the zero-flight warning
+AssertionError: expected [ { id: 'staff-12', …(2) }, …(1) ] to deeply equal [ { id: 'staff-12', …(2) }, …(1) ]
+
+- Expected
++ Received
+
+  [
+    {
+      "count": "1",
+      "id": "staff-12",
+-     "number": "1",
++     "number": undefined,
+    },
+    {
+      "count": "0",
+      "id": "staff-10",
+-     "number": "2",
++     "number": undefined,
+    },
+  ]
+
+ ❯ tests/ui/staff-list-numbering.test.ts:66:20
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 1 passed (3)
+   Start at  18:12:08
+   Duration  904ms (transform 256ms, setup 0ms, import 312ms, tests 46ms, environment 351ms)

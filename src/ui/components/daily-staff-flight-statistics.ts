@@ -116,6 +116,7 @@ export class DailyStaffFlightStatisticsElement extends LightDomElement {
       <table class="daily-staff-flight-table">
         <thead>
           <tr>
+            <th scope="col" class="daily-staff-flight-number">序号</th>
             <th scope="col">人员</th>
             <th scope="col">航班数</th>
             <th scope="col">承担航班</th>
@@ -123,11 +124,12 @@ export class DailyStaffFlightStatisticsElement extends LightDomElement {
         </thead>
         <tbody>
           ${this.sortedRows(statistics).map(
-            (row) =>
+            (row, index) =>
               html`<tr
                 class="daily-staff-flight-row"
                 data-staff-id=${row.staffId}
               >
+                <td class="daily-staff-flight-number">${index + 1}</td>
                 <th scope="row">${row.staffName}</th>
                 <td class="daily-staff-flight-count">${row.flightCount}</td>
                 <td>

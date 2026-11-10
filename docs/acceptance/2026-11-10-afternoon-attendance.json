@@ -9,7 +9,7 @@
     "unchanged": "提前下班、工时疲劳、引导不新增负荷历史、半休、值班、夜班资格、求解排序、组隔离及全天无排班排除不变；不新增上午/晚上无航班计次。",
     "fallback": "非法时间或相同起止保留原区间；旧历史缺出勤信息按已保存时段保守计算，不从当前模板猜过去；历史没有完整当天航班资料时不猜未保存的下午航班。"
   },
-  "testedVersion": "ad9aaf4b7700b1d3232bb6ca1b475d19bfa104905e299995de42b8d850e02638",
+  "testedVersion": "0fa4d798a2119cd90317fa3ea7d2cfbc9eb88dfd33b40fd6deda8df3573269c3",
   "checks": {
     "reproduction": {
       "status": "verified",
@@ -133,13 +133,13 @@
       "evidence": [
         {
           "path": "docs/acceptance/evidence/2026-11-10-afternoon-browser.json",
-          "summary": "隔离Chrome真实入口匿名验证：全队无下午航班0人、17:30重叠者不计、全天未排者排除、六字段保存刷新保持、默认收起且无页面异常。",
-          "sha256": "6271c7e9d66cc77fa053359fae34673284e9e6aff53d25613b537daac421ab06"
+          "summary": "本次最终版本重新运行隔离Chrome匿名真实入口：全队无下午航班无人计次、17:30重叠人员不计、六字段保存刷新、默认收起且无页面异常。",
+          "sha256": "76cb48ec8922a19372319016267543da78f7e1c1e0ad1b825976e847a2fbe34e"
         },
         {
-          "path": "docs/acceptance/evidence/2026-11-10-afternoon-verify.txt",
-          "summary": "npm.cmd run verify退出0：159功能文件1603项、7性能文件19项、类型检查与生产构建通过。",
-          "sha256": "3a8d9c4c732bfefd73c1e94c90d3898f062c6972d7721050a1f8e000efad26e2"
+          "path": "docs/acceptance/evidence/2026-11-10-numbering-verify.txt",
+          "summary": "完整npm.cmd run verify退出0，160功能文件1606项、7性能文件19项、类型检查与生产构建通过。",
+          "sha256": "a408c6392e461f2ecf305f673a1d387c4f2aa733d818886d0cf1f15e6b416100"
         }
       ]
     }
@@ -147,7 +147,7 @@
   "answers": {
     "originalFailure": "改前red/UI-red日志捕获缺失的全队航班前提、引导出勤及三段入口；改后focused89项和完整1603项通过。",
     "laterChanges": "任何人工或后置改派最终会改变assigned事实；领域统计每次读取最终结果，模拟清空/重复岗位回归及归档、恢复、XLSX往返确认不沿用旧名单。统计不参与求解、守卫或班表写入。",
-    "finalArtifact": "本次真实入口匿名证据为afternoon-browser.json，验证无下午航班、正时长重叠、全天未排与规则保存刷新；afternoon-verify.txt记录最终完整门禁退出0。"
+    "finalArtifact": "本次最终版本重新运行的afternoon-browser.json核对名单与六字段保存刷新；numbering-verify.txt完整门禁包含下午统计及名单编号，退出0。"
   },
   "review": {
     "missedScope": "核对UI、最终岗位、归档、localStorage、配置及排班Excel、模板和提前下班；独立Chrome匿名场景通过。未重放owner私有班表，旧历史缺失事实不补猜；上午/晚上仅维护定义。未单独运行真实Worker计算，本次未改求解。",

@@ -26,7 +26,7 @@ export class StaffPaletteElement extends LightDomElement {
           >
         </div>
         <div class="staff-palette-list">
-          ${regular.map((person) => this.person(person, false))}
+          ${regular.map((person, index) => this.person(person, false, index + 1))}
         </div>
       </div>
       ${
@@ -45,7 +45,7 @@ export class StaffPaletteElement extends LightDomElement {
                 </button>
               </div>
               <div class="staff-palette-list">
-                ${administrative.length ? administrative.map((person) => this.person(person, true)) : html`<div class="staff-palette-empty">暂无人员</div>`}
+                ${administrative.length ? administrative.map((person, index) => this.person(person, true, regular.length + index + 1)) : html`<div class="staff-palette-empty">暂无人员</div>`}
               </div>
             </div>`
           : null
@@ -53,7 +53,7 @@ export class StaffPaletteElement extends LightDomElement {
     </aside>`;
   }
 
-  private person(person: Staff, administrative: boolean) {
+  private person(person: Staff, administrative: boolean, number: number) {
     const disabled = person.status !== "正常";
     return html`<div
       class="staff-palette-item ${administrative ? "is-admin-support" : ""} ${disabled ? "is-disabled" : ""}"
@@ -63,6 +63,9 @@ export class StaffPaletteElement extends LightDomElement {
       @pointerdown=${() => this.startPointerDrag(person.id)}
     >
       <i class="bi bi-grip-vertical"></i>
+      <span class="staff-palette-number" aria-label=${`序号 ${number}`}
+        >${number}</span
+      >
       ${
         administrative
           ? html`<input

@@ -1,0 +1,172 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-10-staff-list-numbering",
+  "title": "班表两处人员名单显示连续序号",
+  "startedFrom": "26422520eead9db01a5fbdbe64cc5a4fca381cab",
+  "expectation": {
+    "example": "左侧常规P1、休假P2、P3及行政支援P4依次1—4；下方P3有1航班、P1为0航班，默认P3/P1编号1/2，升序改为P1/P3编号1/2。",
+    "expected": "两名单按各自当前显示顺序从1连续编号，名单和排序变化后更新；0航班仍可见且保留全天未排警示。",
+    "unchanged": "不改人员ID、拖动命令、资格状态、名单范围、排序规则、统计计数、排班结果、持久化或Excel。",
+    "fallback": "序号仅由当前渲染索引计算，无持久化、迁移或业务状态；空名单不显示虚构行，原空态保留。"
+  },
+  "testedVersion": "0fa4d798a2119cd90317fa3ea7d2cfbc9eb88dfd33b40fd6deda8df3573269c3",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "改前序号缺失，两项红测捕获；改后25项和真实页面通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-numbering-red.txt",
+          "summary": "改前3项中2项因缺少人员名单序号失败；真实人员ID拖动基线通过。",
+          "sha256": "5ee0d03c442afdb49e65eee47df45c5f7bd2c00dc6794799e5bc1e2591d4ad44"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-numbering-focused.txt",
+          "summary": "两文件25项通过：连续编号、休假/admin可见范围、名单更新、三种排序、0航班及两种拖动真实身份；既有班表组件回归通过。",
+          "sha256": "85221151926f1ea269fa337d00b59286fac24c031c9e439e99fa48c63512741f"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "显示序号只读当前序列索引，从1连续；未改人员事实源或排序。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-numbering-focused.txt",
+          "summary": "两文件25项通过：连续编号、休假/admin可见范围、名单更新、三种排序、0航班及两种拖动真实身份；既有班表组件回归通过。",
+          "sha256": "85221151926f1ea269fa337d00b59286fac24c031c9e439e99fa48c63512741f"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-numbering-browser.json",
+          "summary": "隔离Chrome匿名真实入口：左侧1—5含休假/admin，下方按实际排序1—3，0航班P3警示保留，1440/390px无序号裁切，刷新正常、无页面异常。",
+          "sha256": "0470f599d0468fcd693f0c0b8fd9f0201a7ef1eb02df81414dc877c10d0b4986"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "覆盖休假、行政支援开关、名单切换、升降序/原序和0航班；匿名桌面/窄屏及刷新通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-numbering-focused.txt",
+          "summary": "两文件25项通过：连续编号、休假/admin可见范围、名单更新、三种排序、0航班及两种拖动真实身份；既有班表组件回归通过。",
+          "sha256": "85221151926f1ea269fa337d00b59286fac24c031c9e439e99fa48c63512741f"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-numbering-browser.json",
+          "summary": "隔离Chrome匿名真实入口：左侧1—5含休假/admin，下方按实际排序1—3，0航班P3警示保留，1440/390px无序号裁切，刷新正常、无页面异常。",
+          "sha256": "0470f599d0468fcd693f0c0b8fd9f0201a7ef1eb02df81414dc877c10d0b4986"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-numbering-palette-1440.png",
+          "summary": "1440px匿名真实页面截图：左侧常规/休假及行政支援连续编号；窄屏表格保留既有横向滚动。",
+          "sha256": "2d7091e9c7bcd64c93d5c0d28630ab6cb447c561d6536f984e4c7159340a5270"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-numbering-daily-1440.png",
+          "summary": "1440px匿名真实页面截图：人员当日航班、序号和0航班警示；窄屏表格保留既有横向滚动。",
+          "sha256": "e58687686caec4ea6d3f0a7adebc87eba09174610e07dcca6386557645d91d7a"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-numbering-palette-390.png",
+          "summary": "390px匿名真实页面截图：左侧常规/休假及行政支援连续编号；窄屏表格保留既有横向滚动。",
+          "sha256": "5675a1f328097b3103b3397be3d4ea65d85766a9d74883b9d7ed6387685abf9a"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-numbering-daily-390.png",
+          "summary": "390px匿名真实页面截图：人员当日航班、序号和0航班警示；窄屏表格保留既有横向滚动。",
+          "sha256": "9de5ac2c8e715e10fa7a85e753efc5b723c7954119d7f37794196eaa96e84243"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "名单增减及排序是会改变行位置的后续路径，回归验证每次渲染重排序号；没有排班结果写入。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-numbering-focused.txt",
+          "summary": "两文件25项通过：连续编号、休假/admin可见范围、名单更新、三种排序、0航班及两种拖动真实身份；既有班表组件回归通过。",
+          "sha256": "85221151926f1ea269fa337d00b59286fac24c031c9e439e99fa48c63512741f"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-numbering-browser.json",
+          "summary": "隔离Chrome匿名真实入口：左侧1—5含休假/admin，下方按实际排序1—3，0航班P3警示保留，1440/390px无序号裁切，刷新正常、无页面异常。",
+          "sha256": "0470f599d0468fcd693f0c0b8fd9f0201a7ef1eb02df81414dc877c10d0b4986"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "not_applicable",
+      "reason": "仅UI行序号，无排班硬约束、写入路径或新增持久化字段，不增加domain守卫；既有完整门禁通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-numbering-verify.txt",
+          "summary": "完整npm.cmd run verify退出0，160功能文件1606项、7性能文件19项、类型检查与生产构建通过。",
+          "sha256": "a408c6392e461f2ecf305f673a1d387c4f2aa733d818886d0cf1f15e6b416100"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "两种拖动仍携带真实人员ID，资格/名单范围和0航班警示不变；完整回归通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-numbering-focused.txt",
+          "summary": "两文件25项通过：连续编号、休假/admin可见范围、名单更新、三种排序、0航班及两种拖动真实身份；既有班表组件回归通过。",
+          "sha256": "85221151926f1ea269fa337d00b59286fac24c031c9e439e99fa48c63512741f"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-numbering-verify.txt",
+          "summary": "完整npm.cmd run verify退出0，160功能文件1606项、7性能文件19项、类型检查与生产构建通过。",
+          "sha256": "a408c6392e461f2ecf305f673a1d387c4f2aa733d818886d0cf1f15e6b416100"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "verified",
+      "reason": "独立Chrome实际访问5173匿名数据，核对两处编号与排序、未排人员警示及两视口；未访问owner浏览器。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-numbering-browser.json",
+          "summary": "隔离Chrome匿名真实入口：左侧1—5含休假/admin，下方按实际排序1—3，0航班P3警示保留，1440/390px无序号裁切，刷新正常、无页面异常。",
+          "sha256": "0470f599d0468fcd693f0c0b8fd9f0201a7ef1eb02df81414dc877c10d0b4986"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-numbering-palette-1440.png",
+          "summary": "1440px匿名真实页面截图：左侧常规/休假及行政支援连续编号；窄屏表格保留既有横向滚动。",
+          "sha256": "2d7091e9c7bcd64c93d5c0d28630ab6cb447c561d6536f984e4c7159340a5270"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-numbering-daily-1440.png",
+          "summary": "1440px匿名真实页面截图：人员当日航班、序号和0航班警示；窄屏表格保留既有横向滚动。",
+          "sha256": "e58687686caec4ea6d3f0a7adebc87eba09174610e07dcca6386557645d91d7a"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-numbering-palette-390.png",
+          "summary": "390px匿名真实页面截图：左侧常规/休假及行政支援连续编号；窄屏表格保留既有横向滚动。",
+          "sha256": "5675a1f328097b3103b3397be3d4ea65d85766a9d74883b9d7ed6387685abf9a"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-numbering-daily-390.png",
+          "summary": "390px匿名真实页面截图：人员当日航班、序号和0航班警示；窄屏表格保留既有横向滚动。",
+          "sha256": "9de5ac2c8e715e10fa7a85e753efc5b723c7954119d7f37794196eaa96e84243"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-numbering-verify.txt",
+          "summary": "完整npm.cmd run verify退出0，160功能文件1606项、7性能文件19项、类型检查与生产构建通过。",
+          "sha256": "a408c6392e461f2ecf305f673a1d387c4f2aa733d818886d0cf1f15e6b416100"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "numbering-red.txt记录缺少序号的2项失败，focused25项及browser证据证明修正。",
+    "laterChanges": "名单增减与排序后会改变行位置，测试模拟这些变化并核对序号重排，同时反证拖动仍使用真实ID；编号不进入排班后置流程或持久化。",
+    "finalArtifact": "numbering-browser.json及四张匿名真实入口截图核对1440/390px；numbering-verify.txt为最终完整门禁。"
+  },
+  "review": {
+    "missedScope": "只给当前存在的两处名单加显示序号；保留各自人员范围，因此同一人两处数字不保证相同。核对休假/admin、0航班、排序、名单更新、刷新和窄屏；未重放owner私有班表。无导出/存储字段变化，无需新迁移或Excel合同。",
+    "rootCause": "人员列表缺少行位置显示，需用展示索引辅助核对；不能借序号改变人员身份或把两处不同范围的名单强制关联。",
+    "earlyDetection": "需求确认时区分显示序号与人员ID，先用休假/admin和0航班混合名单验证范围，再用排序/名单变化及两种拖动建立回归；页面检查同时覆盖窄屏。"
+  }
+}

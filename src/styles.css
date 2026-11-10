@@ -1802,7 +1802,7 @@ autoschedule-schedule-grid {
 }
 .staff-palette-item {
   display: grid;
-  grid-template-columns: 11px minmax(0, 1fr);
+  grid-template-columns: 11px 3ch minmax(0, 1fr);
   align-items: center;
   gap: 2px;
   min-height: 24px;
@@ -1829,12 +1829,17 @@ autoschedule-schedule-grid {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.staff-palette-number {
+  color: var(--as-muted);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
 .staff-palette-item.is-disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 .staff-palette-item.is-admin-support {
-  grid-template-columns: 11px minmax(0, 1fr) 20px;
+  grid-template-columns: 11px 3ch minmax(0, 1fr) 20px;
   border-color: #c9dcec;
   background: #eef6fc;
   color: #244f73;
@@ -2669,6 +2674,12 @@ autoschedule-previous-schedule-comparison {
   font-size: 14px;
   font-variant-numeric: tabular-nums;
   font-weight: 700;
+  text-align: center !important;
+}
+.daily-staff-flight-number {
+  width: 55px;
+  color: var(--as-muted);
+  font-variant-numeric: tabular-nums;
   text-align: center !important;
 }
 .daily-staff-flight-message {
