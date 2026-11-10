@@ -130,7 +130,7 @@ export class OverviewPageElement extends LightDomElement {
               @click=${() =>
                 dispatchUiCommand(this, {
                   type: "navigate",
-                  section: "schedule",
+                  section: "statistics",
                 })}
             >
               查看全部

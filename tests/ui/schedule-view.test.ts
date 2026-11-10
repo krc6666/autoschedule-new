@@ -50,8 +50,6 @@ describe("schedule page", () => {
       model: state,
       date: "2026-10-15",
       zoom: 1,
-      loadSortField: "totalFatigue",
-      loadSortDirection: "desc",
     });
     await element.querySelector<
       HTMLElement & { updateComplete: Promise<unknown> }
@@ -155,8 +153,6 @@ describe("schedule page", () => {
       model: state,
       date: "2026-08-01",
       zoom: 1,
-      loadSortField: "totalFatigue",
-      loadSortDirection: "desc",
     });
     const grid = element.querySelector<
       HTMLElement & { updateComplete: Promise<unknown> }
@@ -256,8 +252,6 @@ describe("schedule page", () => {
       model: state,
       date: "2026-08-01",
       zoom: 1,
-      loadSortField: "totalFatigue",
-      loadSortDirection: "desc",
     });
     const grid = element.querySelector<
       HTMLElement & { updateComplete: Promise<unknown> }
@@ -313,8 +307,6 @@ describe("schedule page", () => {
       model: state,
       date: "2026-08-01",
       zoom: 1,
-      loadSortField: "totalFatigue",
-      loadSortDirection: "desc",
       restoredScheduleNotice: true,
     });
 
@@ -371,8 +363,6 @@ describe("schedule page", () => {
       model: state,
       date: "2026-08-03",
       zoom: 1,
-      loadSortField: "totalFatigue",
-      loadSortDirection: "desc",
       halfRestStaffIds: [],
       halfRestModes: {},
     });
@@ -443,8 +433,6 @@ describe("schedule page", () => {
       model: state,
       date: "2026-08-03",
       zoom: 1,
-      loadSortField: "totalFatigue",
-      loadSortDirection: "desc",
       halfRestStaffIds: [],
     });
     element.addEventListener(UI_COMMAND_EVENT, (event) => {
@@ -512,8 +500,6 @@ describe("schedule page", () => {
       model: state,
       date: "2026-08-03",
       zoom: 1,
-      loadSortField: "totalFatigue",
-      loadSortDirection: "desc",
       halfRestStaffIds: [],
     });
 
@@ -647,8 +633,6 @@ describe("schedule page", () => {
       model: state,
       date: "2026-07-20",
       zoom: 1,
-      loadSortField: "totalFatigue",
-      loadSortDirection: "desc",
     });
     const comparisonButton = [...element.querySelectorAll("button")].find(
       (button) => button.textContent?.includes("对比上一班")
@@ -703,8 +687,6 @@ describe("schedule page", () => {
       model: state,
       date: "2026-07-20",
       zoom: 1,
-      loadSortField: "totalFatigue",
-      loadSortDirection: "desc",
     });
     const unavailableButton = [...element.querySelectorAll("button")].find(
       (button) => button.textContent?.includes("暂无上一班记录")
@@ -847,8 +829,6 @@ describe("schedule page", () => {
       model: state,
       date: "2026-07-18",
       zoom: 1,
-      loadSortField: "totalFatigue",
-      loadSortDirection: "desc",
     });
     const summary = element.querySelector(".schedule-relaxed-shift-summary");
     const text = summary?.textContent ?? "";
@@ -953,8 +933,6 @@ describe("schedule page", () => {
       model: state,
       date: "2026-09-13",
       zoom: 1,
-      loadSortField: "totalFatigue",
-      loadSortDirection: "desc",
     });
     const statistics = element.querySelector(
       "autoschedule-daily-staff-flight-statistics"
@@ -1055,8 +1033,6 @@ describe("schedule page", () => {
       model: state,
       date: "2026-09-13",
       zoom: 1,
-      loadSortField: "totalFatigue",
-      loadSortDirection: "desc",
     });
     const statistics = element.querySelector(
       "autoschedule-daily-staff-flight-statistics"
@@ -1188,8 +1164,6 @@ describe("schedule page", () => {
       model: state,
       date: "2026-07-18",
       zoom: 1,
-      loadSortField: "totalFatigue",
-      loadSortDirection: "desc",
     });
 
     expect(
@@ -1207,7 +1181,7 @@ describe("schedule page", () => {
     ).not.toContain("is-early-departure-last");
   });
 
-  it("renders the complete toolbar, aligned grid, remarks, duty summary, feedback, and load controls", async () => {
+  it("renders the complete schedule workspace while keeping fatigue statistics on the statistics page", async () => {
     const state = createDefaultState();
     state.assignments = (
       await generateSchedule(state, "2026-07-18")
@@ -1219,8 +1193,6 @@ describe("schedule page", () => {
       model: state,
       date: "2026-07-18",
       zoom: 1,
-      loadSortField: "totalFatigue",
-      loadSortDirection: "desc",
     });
     const text = element.textContent ?? "";
 
@@ -1254,10 +1226,10 @@ describe("schedule page", () => {
     expect(text).toContain("航班衔接");
     expect(
       element.querySelector('select[aria-label="负荷排序字段"]')
-    ).not.toBeNull();
+    ).toBeNull();
     expect(
       element.querySelector('select[aria-label="负荷排序方向"]')
-    ).not.toBeNull();
+    ).toBeNull();
     const workspace = element.querySelector(".schedule-workspace");
     const palette = workspace?.querySelector(
       ":scope > autoschedule-staff-palette"
@@ -1318,8 +1290,6 @@ describe("schedule page", () => {
       model: state,
       date: "2026-07-18",
       zoom: 1.5,
-      loadSortField: "totalFatigue",
-      loadSortDirection: "desc",
     });
 
     expect(element.textContent).toContain(
@@ -1408,8 +1378,6 @@ describe("schedule page", () => {
       model: state,
       date: "2026-07-18",
       zoom: 1,
-      loadSortField: "totalFatigue",
-      loadSortDirection: "desc",
     });
 
     const icon = element.querySelector(".schedule-manual-warning-icon");
@@ -1583,8 +1551,6 @@ describe("schedule page", () => {
       model: state,
       date: "2026-08-01",
       zoom: 1,
-      loadSortField: "totalFatigue",
-      loadSortDirection: "desc",
     });
     const grid = element.querySelector<
       HTMLElement & { updateComplete: Promise<unknown> }

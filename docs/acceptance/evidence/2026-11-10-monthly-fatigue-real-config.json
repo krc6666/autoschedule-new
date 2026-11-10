@@ -1,0 +1,37 @@
+{
+  "inputSha256": "ab4f1e0d29a5222a388ca017ce89a56cf52e8f5f8fe34df14f54ed13e4e049f3",
+  "source": "Actual workbook fully imported into isolated memory; original and browser storage unchanged.",
+  "historyRecords": 1283,
+  "checks": [
+    {
+      "month": "2026-08",
+      "latestDate": "2026-08-30",
+      "savedRecords": 33,
+      "listedPeople": 18,
+      "totalFatigue": 118,
+      "perPersonIndependentCheck": "passed",
+      "pointsFingerprint": "41bfe0a78c3b35d2badf70d04186abbcc317c59fafd8d2833b70aad475e4d779"
+    },
+    {
+      "month": "2026-09",
+      "latestDate": "2026-09-29",
+      "savedRecords": 575,
+      "listedPeople": 18,
+      "totalFatigue": 2186.5,
+      "perPersonIndependentCheck": "passed",
+      "pointsFingerprint": "9ab344d48398a4a5b3e18dca7b4883c218f2ab629369a2fbce53aba7139d58fc"
+    },
+    {
+      "month": "2026-10",
+      "latestDate": "2026-10-31",
+      "savedRecords": 675,
+      "listedPeople": 18,
+      "totalFatigue": 2496.9,
+      "perPersonIndependentCheck": "passed",
+      "pointsFingerprint": "102c7ddae57dbb4f087fa7100b7857c668ff4f4658d929328e8b137c43911cfa"
+    }
+  ],
+  "emptyMonth": "all zero",
+  "mutationCheck": "unchanged",
+  "caveat": "Node data proof only. No browser or real UI acceptance. Missing historical tasks are not guessed."
+}

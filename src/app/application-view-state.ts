@@ -134,9 +134,6 @@ export interface ApplicationViewState {
   section: AppSection;
   date: string;
   zoom: number;
-  loadSortField:
-    "workHours" | "todayFatigue" | "historyFatigue" | "totalFatigue";
-  loadSortDirection: "asc" | "desc";
   halfRestStaffIds: string[];
   halfRestModes: Record<string, HalfRestMode>;
   historyEditDate?: string | null;

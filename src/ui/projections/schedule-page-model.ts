@@ -1,5 +1,3 @@
-import { dutyFatigueByStaff } from "../../domain/duty-roster/roster";
-import { buildStaffLoads } from "../../domain/statistics/fatigue";
 import { currentEarlyDepartureLastAssignmentIds } from "../../domain/statistics/relaxed-shift-statistics";
 import { buildScheduleFeedback } from "../../domain/feedback/schedule-feedback";
 import {
@@ -8,18 +6,11 @@ import {
   guideSourceStaff,
   isFixedBottomPosition,
 } from "../../domain/flights/schedule-position-rules";
-import { countedWorkloadAssignments } from "../../domain/shared/workload-accounting";
 import { availableStaffForManualAssignment } from "../../domain/candidates/assignment-eligibility";
 import { timeConflictAssignmentIds } from "../../domain/assignments/assignment-time-conflicts";
 import type { AppState, Assignment, Staff } from "../../model";
 
-export type LoadSortField =
-  "workHours" | "todayFatigue" | "historyFatigue" | "totalFatigue";
-export type LoadSortDirection = "asc" | "desc";
-
 export interface SchedulePageOptions {
-  field: LoadSortField;
-  direction: LoadSortDirection;
   zoom: number;
   halfRestStaffIds?: readonly string[];
 }
@@ -125,27 +116,12 @@ export function buildSchedulePageModel(
     state,
     flights
   );
-  const loads = buildStaffLoads(
-    state.staff.filter((person) => person.staffType !== "行政支援"),
-    countedWorkloadAssignments(state),
-    state.history,
-    date,
-    state.settings,
-    dutyFatigueByStaff(state, date)
-  ).sort((left, right) => {
-    const result = left[options.field] - right[options.field];
-    return (
-      (options.direction === "asc" ? result : -result) ||
-      left.staff.name.localeCompare(right.staff.name, "zh-CN")
-    );
-  });
   return {
     groups,
     earlyDepartureLastAssignmentIds: currentEarlyDepartureLastAssignmentIds(
       state,
       date
     ),
-    loads,
     feedback: buildScheduleFeedback(state, date, {
       halfRestStaffIds: options.halfRestStaffIds,
     }),

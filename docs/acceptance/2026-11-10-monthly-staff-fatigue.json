@@ -1,0 +1,157 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-10-monthly-staff-fatigue",
+  "title": "人员疲劳移到统计页，按自然月累计岗位疲劳",
+  "startedFrom": "5674429e0d78de29e2fb131b95700b0b584c803f",
+  "expectation": {
+    "example": "owner截图确认把排班页人员疲劳移到统计页，只看当日岗位疲劳和月份累计；9月30点、10月到最新班表8点分别保留，新月从0累计。默认跟随现实日期月份而非右上角排班日期。",
+    "expected": "统计页提供独立月份选择，默认现实自然月，可切回其他月份；按当月实际保存的疲劳点和同月当前有效班表累计到该月最新班表，当前班表替代同日历史且只算一次。当日栏注明右上角所选日期。保留常规人员（含当前病休的历史事实），显示0，支持两项疲劳排序。排班页移除原疲劳表及过时的排序命令/状态。",
+    "unchanged": "不改排班规则、历史窗口疲劳和连续日惩罚，不把新月累计接入求解；沿既有负荷口径排除行政人员和当前引导重复负荷，保留值班额外疲劳及历史已保存点数，0不回退工时。无新增持久化字段，不改历史记录或源Excel，其他统计月份选择独立。",
+    "fallback": "无该月记录显示0，不删除其他月份；无当前有效班表不按右上角日期借用其他日assignments或生成轮值点数。月份输入清空恢复现实月份，无效月份不写入；没有页面验收证据时保持未验收，不能用自动测试替代。"
+  },
+  "testedVersion": "4499e823d8f904e1b52d6d9956576c3c00c9cef067339cb19d7dde5c6d39e6d8",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "改前新月累计模块不存在而导入失败，统计页两项UI测试因缺月份控件失败；后补总览导航测试失败1项，证明入口仍指向旧页面。改后79项定向通过。不是用户现场计算错误复现，而是新需求的红测。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-monthly-fatigue-red.txt",
+          "summary": "2项UI失败及月累计模块缺失的导入失败。",
+          "sha256": "603ebd7f6d50a20592a9b488dc2dd08b255e1e7e9b56fbceb6ef407fa1973823"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-monthly-fatigue-overview-red.txt",
+          "summary": "总览疲劳入口仍指向schedule，期望statistics失败1项。",
+          "sha256": "a154031aaa87d13604ace42d78144f428d218641fe410687d6ce97d2a7cf4fda"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-monthly-fatigue-focused.txt",
+          "summary": "9文件79项定向通过，退出0；含新统计、历史窗口、归档、人工调整及三个页面消费者。",
+          "sha256": "763aea54582f8a8f0b4ca0352b3eb0c33ee65631706bf45821f94d9cd77146fc"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "当日按标注工作日读取，月份默认现实自然月并独立切换，累计所选月份所有已保存点数到最新班表；当前同日替代历史。实际配置8月118点、9月2186.5点、10月2496.9点（18人合计），逐人独立核对相等。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-monthly-fatigue-focused.txt",
+          "summary": "9文件79项定向通过，退出0；含新统计、历史窗口、归档、人工调整及三个页面消费者。",
+          "sha256": "763aea54582f8a8f0b4ca0352b3eb0c33ee65631706bf45821f94d9cd77146fc"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-monthly-fatigue-real-config.json",
+          "summary": "真实配置1283行历史、18名常规人员，8/9/10月逐人独立累计核对通过；空月0且输入不变，非浏览器证据。",
+          "sha256": "610b0896d331854ff9fe3122acda79628cf7ef878ba02be29d9b1fe4570a44cf"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "覆盖跨年/跨月、月内比所选工作日更晚的历史、空月/0点/清空默认、当前日期不匹配、当前病休旧事实、自建假名、引导复用/行政排除、值班点数和分队长、3000行小数累计及实际A/B Store切换。选月不改变其他统计月份或发出保存/求解命令。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-monthly-fatigue-focused.txt",
+          "summary": "9文件79项定向通过，退出0；含新统计、历史窗口、归档、人工调整及三个页面消费者。",
+          "sha256": "763aea54582f8a8f0b4ca0352b3eb0c33ee65631706bf45821f94d9cd77146fc"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-monthly-fatigue-real-config.json",
+          "summary": "真实配置1283行历史、18名常规人员，8/9/10月逐人独立累计核对通过；空月0且输入不变，非浏览器证据。",
+          "sha256": "610b0896d331854ff9fe3122acda79628cf7ef878ba02be29d9b1fe4570a44cf"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "生产人工换人和清空动作之后按最终承担人重算；归档前后、重复保存后值班与岗位点数只计一次，清空基准不计负荷。调用原saveState/loadState的序列化恢复与实际XLSX字节导出读回导入后数值一致。测试使用隔离内存Storage接口，没有操作owner浏览器。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-monthly-fatigue-focused.txt",
+          "summary": "9文件79项定向通过，退出0；含新统计、历史窗口、归档、人工调整及三个页面消费者。",
+          "sha256": "763aea54582f8a8f0b4ca0352b3eb0c33ee65631706bf45821f94d9cd77146fc"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "本次只读展示投影，不新增排班规则或守卫。反向断言选月/排序/投影不会改写assignments、历史、设置及原historyFatigue结果；全量原有安全/凭证与排班测试保持通过。原负荷过滤和历史计分文件无差异，新月累计没有接入求解目标。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-monthly-fatigue-focused.txt",
+          "summary": "9文件79项定向通过，退出0；含新统计、历史窗口、归档、人工调整及三个页面消费者。",
+          "sha256": "763aea54582f8a8f0b4ca0352b3eb0c33ee65631706bf45821f94d9cd77146fc"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-monthly-fatigue-functional.txt",
+          "summary": "npm.cmd test退出0：166文件1662项通过。",
+          "sha256": "ecfc4d1171d29269f37a1965923610748530aa63956cc3a536c72a779a15292d"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "原排班历史窗口、连续日惩罚和求解保留；没有新增持久化字段/Excel表或迁移。初次分层验证1662项功能、类型检查和生产构建通过；owner授权commit后，完整npm.cmd run verify退出0，1662项功能、19项性能、类型检查及构建通过。测试夹具的最后格式整理只调整空白，提交钩子继续执行类型及功能复核。保留HiGHS依赖Node模块外置提示，真实页面仍未验收。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-monthly-fatigue-typecheck.txt",
+          "summary": "npm.cmd run typecheck退出0。",
+          "sha256": "4b3f7cf1ed06cba39ee3b0608990fffcf42e1ff315949a5353a62ce478a2683c"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-monthly-fatigue-functional.txt",
+          "summary": "npm.cmd test退出0：166文件1662项通过。",
+          "sha256": "ecfc4d1171d29269f37a1965923610748530aa63956cc3a536c72a779a15292d"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-monthly-fatigue-build.txt",
+          "summary": "npm.cmd run build退出0，生产资源已生成。",
+          "sha256": "6fc02ba739b33b0a9650d26f0d56bd75eb3616970149415e59dcfd0494ef067a"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-monthly-fatigue-real-config.json",
+          "summary": "真实配置1283行历史、18名常规人员，8/9/10月逐人独立累计核对通过；空月0且输入不变，非浏览器证据。",
+          "sha256": "610b0896d331854ff9fe3122acda79628cf7ef878ba02be29d9b1fe4570a44cf"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-monthly-fatigue-final-ui.txt",
+          "summary": "模板缩进格式化后2文件25项UI测试退出0，随后生产构建退出0。",
+          "sha256": "dfc1723b8b392f10dde7cc5b97ad651b1790543465e9d233af193ede1040dde2"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-monthly-fatigue-verify.txt",
+          "summary": "owner授权开发提交后完整npm.cmd run verify退出0：1662项功能、19项性能、类型检查和生产构建通过。",
+          "sha256": "eef9eebed3ad4bcca77369b12a13cacda3dc308981e216cdbec387f8a8d7652d"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "实现和自动数据核对已完成，但尚无owner刷新后实际页面证据；未授权agent自行打开浏览器。需要真实页面核对统计页位置、现实默认月份、切月/排序、当前及归档点数和窄屏布局。Node UI测试及真实配置隔离月累计不能替代浏览器验收，任务保持未验收；owner已授权本次开发提交，未push或发布。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-monthly-fatigue-real-config.json",
+          "summary": "真实配置1283行历史、18名常规人员，8/9/10月逐人独立累计核对通过；空月0且输入不变，非浏览器证据。",
+          "sha256": "610b0896d331854ff9fe3122acda79628cf7ef878ba02be29d9b1fe4570a44cf"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-monthly-fatigue-focused.txt",
+          "summary": "9文件79项定向通过，退出0；含新统计、历史窗口、归档、人工调整及三个页面消费者。",
+          "sha256": "763aea54582f8a8f0b4ca0352b3eb0c33ee65631706bf45821f94d9cd77146fc"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "monthly-fatigue-red记录新需求两项UI失败与缺少累计模块；overview-red记录旧入口导航失败。focused的79项和functional的1662项最终通过。",
+    "laterChanges": "归档、重复保存、人工换人/清空、当前同日历史覆盖、切组、存储恢复和Excel读回都可能改坏累计；app及UI回归沿真实公共动作核对最终数值，选月排序不能改写状态。生产浏览器页面仍未验收。",
+    "finalArtifact": "real-config.json记录本次真实配置1283行历史中18人逐月独立累计及指纹；focused记录序列化/实际XLSX字节和UI命令回归，build是本次生产资源输出。尚缺实际页面最终产物，不宣称业务验收完成。"
+  },
+  "review": {
+    "missedScope": "沿statistics挂载、schedule旧投影/命令/全局状态、overview查看全部及相关夹具排查，补导航红测。已覆盖跨月/跨年、清空/病休/值班/引导/行政边界与往返；真实页面及窄屏视觉仍未验证。总览旧疲劳摘要保留其原口径，只改查看全部目的地。",
+    "rootCause": "用户需要自然月实际岗位点数，而旧表使用近期历史窗口加惩罚；只搬组件或把旧总疲劳改名都会错误。月累计须独立从已保存事实编译，同时整日替换当前历史，不能重复归档或按0点回退工时。",
+    "earlyDetection": "统计口径变更前用跨月记录、现实日期与工作日期不一致、同日归档与当前草稿组成失败例；在传播矩阵列出挂载、快捷入口、命令和存储消费者。实现后按原始fatiguePoints独立逐人累加，并核对归档/换人/清空/字节往返；末尾真实页面证据缺失就保持未验收。"
+  }
+}

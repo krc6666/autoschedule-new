@@ -249,12 +249,6 @@ export class ScheduleController implements UiCommandController {
         this.context.updateView({ zoom });
         return true;
       }
-      case "set-load-sort":
-        this.context.updateView({
-          loadSortField: command.field,
-          loadSortDirection: command.direction,
-        });
-        return true;
       default:
         return false;
     }

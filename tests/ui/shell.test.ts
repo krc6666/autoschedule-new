@@ -12,8 +12,6 @@ const view: ApplicationViewState = {
   section: "policy",
   date: "2026-07-18",
   zoom: 1,
-  loadSortField: "totalFatigue",
-  loadSortDirection: "desc",
   halfRestStaffIds: [],
   halfRestModes: {},
   dialog: null,

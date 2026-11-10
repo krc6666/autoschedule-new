@@ -13,6 +13,7 @@ import { buildMonthlyRelaxedShiftStatistics } from "../../domain/statistics/rela
 import type { AppState } from "../../model";
 import { LightDomElement } from "./light-dom-element";
 import "./duty-roster-details";
+import "./staff-load-table";
 import { dispatchUiCommand } from "../events/ui-command";
 import {
   buildOrdinaryPriorityStatistics,
@@ -36,6 +37,10 @@ export class StatisticsPageElement extends LightDomElement {
 
   protected override render() {
     return html`
+      <autoschedule-staff-load-table
+        .model=${this.model}
+        .date=${this.date}
+      ></autoschedule-staff-load-table>
       <autoschedule-duty-roster-details
         .model=${this.model}
         .date=${this.date}

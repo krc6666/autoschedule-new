@@ -2,11 +2,7 @@ import { html } from "lit";
 
 import type { AppState } from "../../model";
 import type { HalfRestMode } from "../../domain/shared/schedule-run-preferences";
-import {
-  buildSchedulePageModel,
-  type LoadSortDirection,
-  type LoadSortField,
-} from "../projections/schedule-page-model";
+import { buildSchedulePageModel } from "../projections/schedule-page-model";
 import { buildPreviousArchivedScheduleView } from "../projections/archived-schedule-view";
 import { dispatchUiCommand } from "../events/ui-command";
 import { LightDomElement } from "./light-dom-element";
@@ -17,7 +13,6 @@ import "./schedule-grid";
 import "./previous-schedule-comparison";
 import "./schedule-relaxed-shift-summary";
 import "./schedule-toolbar";
-import "./staff-load-table";
 import "./staff-palette";
 import "./half-rest-selector";
 
@@ -31,8 +26,6 @@ export class SchedulePageElement extends LightDomElement {
     model: { attribute: false },
     date: { type: String },
     zoom: { type: Number },
-    loadSortField: { type: String },
-    loadSortDirection: { type: String },
     halfRestStaffIds: { attribute: false },
     halfRestModes: { attribute: false },
     historyEditDate: { attribute: false },
@@ -41,8 +34,6 @@ export class SchedulePageElement extends LightDomElement {
   model!: AppState;
   date = "";
   zoom = 1;
-  loadSortField: LoadSortField = "totalFatigue";
-  loadSortDirection: LoadSortDirection = "desc";
   halfRestStaffIds: string[] = [];
   halfRestModes: Record<string, HalfRestMode> = {};
   historyEditDate: string | null = null;
@@ -71,8 +62,6 @@ export class SchedulePageElement extends LightDomElement {
       </section>`;
     }
     const view = buildSchedulePageModel(this.model, this.date, {
-      field: this.loadSortField,
-      direction: this.loadSortDirection,
       zoom: this.zoom,
       halfRestStaffIds: this.halfRestStaffIds,
     });
@@ -135,11 +124,6 @@ export class SchedulePageElement extends LightDomElement {
         .view=${view}
         .date=${this.date}
       ></autoschedule-schedule-feedback>
-      <autoschedule-staff-load-table
-        .view=${view}
-        .field=${this.loadSortField}
-        .direction=${this.loadSortDirection}
-      ></autoschedule-staff-load-table>
     `;
   }
 

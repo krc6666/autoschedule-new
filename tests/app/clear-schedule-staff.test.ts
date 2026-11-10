@@ -148,8 +148,6 @@ describe("红叉清空全部人员", () => {
         model: coordinator.model(),
         date,
         zoom: 1,
-        loadSortField: "totalFatigue",
-        loadSortDirection: "desc",
       }
     );
     let handled: Promise<void> | undefined;

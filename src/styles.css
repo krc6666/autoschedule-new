@@ -2708,6 +2708,13 @@ autoschedule-previous-schedule-comparison {
   width: auto;
   min-width: 112px;
 }
+.staff-fatigue-statistics .section-heading,
+.staff-fatigue-statistics .load-sort-controls {
+  flex-wrap: wrap;
+}
+.staff-fatigue-statistics .load-sort-controls {
+  margin-top: 0;
+}
 .schedule-feedback {
   margin-top: 8px;
 }
