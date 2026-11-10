@@ -1,0 +1,56 @@
+
+> autoschedule@1.0.0 test
+> vitest run --exclude tests/performance/**
+
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+npm.cmd : stderr | tests/ui/staff-list-numbering.test.ts
+所在位置 行:2 字符: 1
++ npm.cmd test *> docs/acceptance/evidence/2026-11-10-daily-flight-all- ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (stderr | tests/...mbering.test.ts:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+
+ ❯ tests/ui/staff-list-numbering.test.ts (3 tests | 1 failed) 106ms
+     × renumbers daily rows after sorting and retains the zero-flight warning 43ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/ui/staff-list-numbering.test.ts > schedule personnel numbering > renumbers daily rows after sorting and re
+tains the zero-flight warning
+AssertionError: expected [ { id: 'staff-12', …(2) }, …(2) ] to deeply equal [ { id: 'staff-12', …(2) }, …(1) ]
+
+- Expected
++ Received
+
+@@ -7,6 +7,11 @@
+    {
+      "count": "0",
+      "id": "staff-10",
+      "number": "2",
+    },
++   {
++     "count": "0",
++     "id": "staff-11",
++     "number": "3",
++   },
+  ]
+
+ ❯ tests/ui/staff-list-numbering.test.ts:117:20
+    115|         })
+    116|       );
+    117|     expect(rows()).toEqual([
+       |                    ^
+    118|       { id: "staff-12", number: "1", count: "1" },
+
+    119|       { id: "staff-10", number: "2", count: "0" },
+ Test Files  1 failed | 165 passed (166)
+      Tests  1 failed | 1666 passed (1667)
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+   Start at  22:11:20
+   Duration  92.30s (transform 20.85s, setup 0ms, import 72.84s, tests 302.09s, environment 21.96s)

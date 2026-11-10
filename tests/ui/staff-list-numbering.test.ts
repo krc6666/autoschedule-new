@@ -117,10 +117,19 @@ describe("schedule personnel numbering", () => {
     expect(rows()).toEqual([
       { id: "staff-12", number: "1", count: "1" },
       { id: "staff-10", number: "2", count: "0" },
+      { id: "staff-11", number: "3", count: "0" },
     ]);
+    expect(
+      element
+        .querySelector('[data-staff-id="staff-11"] th')
+        ?.textContent?.trim()
+    ).toBe("P2（休假）");
     expect(
       element.querySelector(".daily-staff-flight-unassigned")?.textContent
     ).toContain("P1");
+    expect(
+      element.querySelector(".daily-staff-flight-unassigned")?.textContent
+    ).not.toContain("P2");
     const select = element.querySelector("select")!;
     for (const mode of ["asc", "original"]) {
       select.value = mode;
@@ -128,7 +137,8 @@ describe("schedule personnel numbering", () => {
       await settleLit();
       expect(rows()).toEqual([
         { id: "staff-10", number: "1", count: "0" },
-        { id: "staff-12", number: "2", count: "1" },
+        { id: "staff-11", number: "2", count: "0" },
+        { id: "staff-12", number: "3", count: "1" },
       ]);
     }
     element.model = { ...state, staff: [state.staff[2]!] };

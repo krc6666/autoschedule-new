@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-10-daily-flight-all-regular",
+  "title": "人员当日航班列出全部常规人员及具体假别",
+  "startedFrom": "249ba4f6a5b9b46e1db312284a29e1431400ef50",
+  "expectation": {
+    "example": "owner确认只列当前组全部常规人员；正常有航班、正常零航班、病假、普通休假和自建飞行假都列出，行政支援不列。",
+    "expected": "姓名后括号注明当前具体假别；零航班显示0及未安排，保留排序、连续序号。完整历史保留实际承担航班，不因今日病休删除；人数和航班总数独立核对。",
+    "unchanged": "只读显示，不改排班候选、状态安全限制、均衡规则、assignments、历史、存储或Excel；病休零航班不进入漏排警告，正常零航班仍提醒。",
+    "fallback": "缺失类别沿staffStatusLabel显示休假（类别缺失），停用类别保留名称；没有完整班表或只有末班重点部分历史仍明确提示，不猜全天或过去假别。"
+  },
+  "testedVersion": "57ee41030178a590da2a80acd78bfe025c9c664a146fa5635a82f79e22960e0a",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "改前4项失败准确捕获当前和历史病休名单被过滤、历史航班消失以及UI行数不足；改后4文件40项全部通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-daily-flight-all-regular-red.txt",
+          "summary": "4项目标行为失败，26项原行为通过。",
+          "sha256": "dd932065e79943115d58e131892cf29ddf88ff14ace14f64b49ff7db75e5c095"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-daily-flight-all-regular-focused.txt",
+          "summary": "改后domain、UI、人工实际航班与双组隔离4文件40项通过。",
+          "sha256": "5fd98202a7f682b5325ce2eaea1d5f8b19ee05a1ca2056a6e0e3a9f93d599937"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "当前完整班表列出全部常规人员、病休/自建具体假名、正常与病休零航班，行政排除；按匿名夹具独立预期7人/1人有航班/6人零航班/仅1名正常人员漏排核对，UI另核对5行与4人零航班。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-daily-flight-all-regular-focused.txt",
+          "summary": "当前班表、假别及汇总回归通过，统计前后输入不变。",
+          "sha256": "5fd98202a7f682b5325ce2eaea1d5f8b19ee05a1ca2056a6e0e3a9f93d599937"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "完整历史同样列齐人员且保留今日病休人员过去实际承担的航班；普通/停用/缺失假别、整表空岗、无完整记录及末班部分历史均有断言。无记录继续提示，不伪造已确认的零航班事实。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-daily-flight-all-regular-focused.txt",
+          "summary": "完整历史、部分历史、全空岗及缺失记录边界通过。",
+          "sha256": "5fd98202a7f682b5325ce2eaea1d5f8b19ee05a1ca2056a6e0e3a9f93d599937"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "显示后切升序/原顺序、切到历史，再变更人员病假与假别名称并停用；名单、连续编号及名称同步更新，漏排警告只含正常零航班者；全程不发命令、不改源班表及历史。不是新增硬约束，无排班后置写入。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-daily-flight-all-regular-focused.txt",
+          "summary": "UI状态更新、三种排序与查询不改变输入回归通过。",
+          "sha256": "5fd98202a7f682b5325ce2eaea1d5f8b19ee05a1ca2056a6e0e3a9f93d599937"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "not_applicable",
+      "reason": "仅扩大最终班表的只读展示名单，无新增硬约束或候选写入，不修改安全守卫、凭证、求解、补缺、恢复、轮岗或人工调整；输入不变由domain和UI断言证明。",
+      "evidence": []
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "最终类型检查、166文件1667项全量功能测试及生产构建退出0，涵盖既有自动排班状态安全、人工调整、完整历史、双组隔离、Excel/localStorage及Worker相关回归。owner随后授权commit，完整npm.cmd run verify退出0，额外通过7文件19项性能检查；无新边界字段，无需新迁移或往返合同。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-daily-flight-all-regular-gates.txt",
+          "summary": "最终typecheck、全量1667项功能与build均成功。",
+          "sha256": "5809681fc7b6d092b2eb65c9e057091935fcacc0274bd96342c437ec89212646"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-daily-flight-all-regular-verify.txt",
+          "summary": "提交前完整verify退出0：1667项功能、19项性能、类型检查及构建通过。",
+          "sha256": "142c76028ffcdb21666c420c42caf505916bf900f969cda25c705d8eec669844"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "verified",
+      "reason": "owner按刷新后核对问题回复全部符合，确认真实页面已列齐全部常规、姓名后具体假别、无航班显示0及未安排、病休不误报；组件实际渲染另外覆盖排序、编号、查询和状态变更。人工未提供逐行数值与日期，不扩大为所有历史日期或窄屏的人工验收。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-daily-flight-all-regular-owner.txt",
+          "summary": "owner真实页面四项确认原文及所验源码指纹。",
+          "sha256": "19b9cb8ac8c8429bc88b55960f3f816eda1e2c13b1ecbb8f461fbc44cf61e78f"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-daily-flight-all-regular-gates.txt",
+          "summary": "最终全量功能与生产构建成功。",
+          "sha256": "5809681fc7b6d092b2eb65c9e057091935fcacc0274bd96342c437ec89212646"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "red.txt保存改前4项失败：当前/历史仅2人而预期7人、病休历史航班消失及UI仅2行而预期5行；focused.txt保存改后40项通过。",
+    "laterChanges": "当前/历史来源切换、排序、人员状态及假别改名可能令名单或警告失真；UI回归执行这些实际组件交互并核对连续编号与输入不变。既有编号测试随新范围同步纳入全量门禁。",
+    "finalArtifact": "owner.txt记录刷新真实页面后全部符合的原文，绑定当前domain/UI源码SHA256；自动组件交互断言补充排序、编号、历史查询及状态更新，gates.txt记录最终1667项功能及构建成功。"
+  },
+  "review": {
+    "missedScope": "已查当前与完整历史、汇总、警告、三种排序、连续编号、停用/缺失假别与UI模型更新；首次全量还发现既有编号回归仍期待排除休假，已补齐其新名单及休假不报警断言。owner真实页面确认四项要求；未单独人工核对全部历史日期及窄屏外观。",
+    "rootCause": "统计投影把正常排班候选的人员状态条件用于展示名单，导致病休人员和过去实际航班被删除；展示没有消费已有假别事实。",
+    "earlyDetection": "名单范围确认时就分别列全体显示人员、实际承担航班人员和需要漏排提醒人员，改前用病休零航班与病休实际历史两类失败测试固定；同时搜索组件的所有编号/排序消费者。"
+  }
+}

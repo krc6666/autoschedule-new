@@ -1,0 +1,10 @@
+2026-11-10 owner真实页面验收（会话确认）
+
+核对问题：请刷新排班页，核对“人员当日航班”：是否已列齐常规人员，病休姓名后注明具体假别，无航班显示0和“未安排”，且病休人员没有被提示漏排？
+owner原文答复：全部符合
+
+范围：owner操作当前页面并确认上述四项；agent没有自行打开浏览器。
+未提供日期、截图或逐行数值，不能据此声称特定日期人数、窄屏外观或所有历史日期均人工验收；历史/排序/编号等由本次自动测试另外覆盖。
+源码版本记录于2026-11-10T22:15:46+08:00，均为当前本地文件SHA256原字节：
+src/domain/statistics/daily-staff-flight-statistics.ts 174ebd0b19b44855b4697d871ecbae2cc806c2e3393ab4a26f32501572db56ba
+src/ui/components/daily-staff-flight-statistics.ts 59eebd840c86d279c165a7dc7e05109f149f3de04055c016fa1c4d57cde608ae

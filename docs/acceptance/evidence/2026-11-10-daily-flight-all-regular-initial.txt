@@ -1,0 +1,45 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+npm.cmd : stderr | tests/ui/schedule-view.test.ts
+所在位置 行:2 字符: 1
++ npm.cmd exec vitest -- run tests/domain/daily-staff-flight-statistics ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (stderr | tests/ui/schedule-view.test.ts:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+
+ ❯ tests/ui/schedule-view.test.ts (23 tests | 1 failed) 22558ms
+     × shows all regular staff with leave labels, zero flights and continuous numbering while keeping leave out of alerts 18ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/ui/schedule-view.test.ts > schedule page > shows all regular staff with leave labels, zero flights and con
+tinuous numbering while keeping leave out of alerts
+AssertionError: expected '\n                  测试病休（病假）\n       …' to be '测试病休（病假）' // Object.is equality
+
+- Expected
++ Received
+
+- 测试病休（病假）
++
++                   测试病休（病假）
++
+
+ ❯ checkRows tests/ui/schedule-view.test.ts:1135:54
+    1133|         ["idle", "测试未排"],
+    1134|       ]) {
+    1135|         const row = element.querySelector(`[data-staff-id="${id}"]`)!;
+       |                                                      ^
+    1136|         expect(row.querySelector("th")?.textContent?.trim()).toBe(labe…
+    1137|         expect(
+ ❯ tests/ui/schedule-view.test.ts:1154:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 3 passed (4)
+      Tests  1 failed | 39 passed (40)
+   Start at  22:09:14
+   Duration  25.73s (transform 5.03s, setup 0ms, import 6.13s, tests 22.74s, environment 644ms)

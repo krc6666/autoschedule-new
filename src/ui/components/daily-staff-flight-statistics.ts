@@ -35,7 +35,9 @@ export class DailyStaffFlightStatisticsElement extends LightDomElement {
       <div class="daily-staff-flight-head">
         <div>
           <h3>人员当日航班</h3>
-          <span>仅显示常规人员，同一航班只统计一次</span>
+          <span
+            >全部常规人员（含病休），同一航班只统计一次；假别按当前人员状态显示</span
+          >
         </div>
         <label>
           <span>查询工作日</span>
@@ -68,7 +70,8 @@ export class DailyStaffFlightStatisticsElement extends LightDomElement {
             </div>`
           : statistics.source === "current" || statistics.source === "history"
             ? html`<div class="daily-staff-flight-complete" role="status">
-                <i class="bi bi-check-circle-fill"></i>所有常规人员均已安排航班
+                <i class="bi bi-check-circle-fill"></i
+                >所有正常常规人员均已安排航班
               </div>`
             : null
       }
@@ -130,7 +133,9 @@ export class DailyStaffFlightStatisticsElement extends LightDomElement {
                 data-staff-id=${row.staffId}
               >
                 <td class="daily-staff-flight-number">${index + 1}</td>
-                <th scope="row">${row.staffName}</th>
+                <th scope="row">
+                  ${row.staffName}${row.leaveLabel ? `（${row.leaveLabel}）` : ""}
+                </th>
                 <td class="daily-staff-flight-count">${row.flightCount}</td>
                 <td>
                   ${

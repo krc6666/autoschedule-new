@@ -1,9 +1,12 @@
+import type { LeaveType } from "../../model";
 import type { SchedulingFacts } from "../shared/scheduling-facts";
+import { staffStatusLabel } from "../staff-status";
 import { groupStaffFlightsByNormalizedNumber } from "./staff-flight-count";
 
 export interface DailyStaffFlightRow {
   staffId: string;
   staffName: string;
+  leaveLabel?: string;
   flightNumbers: string[];
   flightCount: number;
 }
@@ -26,13 +29,18 @@ interface StaffFlightEntry {
   startTime: string;
 }
 
+type DailyStaffFlightFacts = Pick<
+  SchedulingFacts,
+  "staff" | "assignments" | "activeScheduleDate" | "history"
+> & { leaveTypes: readonly LeaveType[] };
+
 function rowsFromEntries(
-  state: Pick<SchedulingFacts, "staff">,
+  state: Pick<DailyStaffFlightFacts, "staff" | "leaveTypes">,
   entries: readonly StaffFlightEntry[],
   includeEmpty = false
 ): DailyStaffFlightRow[] {
   const regularStaff = state.staff.filter(
-    (person) => person.staffType === "常规" && person.status === "正常"
+    (person) => person.staffType === "常规"
   );
   const regularStaffIds = new Set(regularStaff.map((person) => person.id));
   const flightsByStaffId =
@@ -60,6 +68,9 @@ function rowsFromEntries(
       {
         staffId: person.id,
         staffName: person.name,
+        ...(person.status !== "正常"
+          ? { leaveLabel: staffStatusLabel(person, state.leaveTypes) }
+          : {}),
         flightNumbers,
         flightCount: flightNumbers.length,
       },
@@ -68,14 +79,11 @@ function rowsFromEntries(
 }
 
 export function buildDailyStaffFlightStatistics(
-  state: Pick<
-    SchedulingFacts,
-    "staff" | "assignments" | "activeScheduleDate" | "history"
-  >,
+  state: DailyStaffFlightFacts,
   date: string
 ): DailyStaffFlightStatistics {
   const regularStaffCount = state.staff.filter(
-    (person) => person.staffType === "常规" && person.status === "正常"
+    (person) => person.staffType === "常规"
   ).length;
   let source: DailyStaffFlightStatistics["source"] = "none";
   let rows: DailyStaffFlightRow[] = [];

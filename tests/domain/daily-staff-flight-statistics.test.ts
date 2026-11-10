@@ -190,35 +190,118 @@ describe("daily staff flight statistics", () => {
     expect(result.unassignedStaffNames).toEqual([first!.name]);
   });
 
-  it("does not count sick or leave staff as expected working staff", () => {
+  it.each(["current", "history"] as const)(
+    "lists every regular person with their current leave label from %s without warning about leave",
+    (source) => {
+      const state = createDefaultState();
+      const regular = state.staff.find(
+        (person) => person.staffType === "常规"
+      )!;
+      const sick = {
+        ...regular,
+        id: "sick",
+        name: "病假人员",
+        status: "病假" as const,
+      };
+      const leave = {
+        ...regular,
+        id: "leave",
+        name: "休假人员",
+        status: "休假" as const,
+      };
+      const idle = { ...regular, id: "idle", name: "未安排人员" };
+      state.leaveTypes = [
+        { id: "flight-leave", name: "飞行假", enabled: true },
+        { id: "old-leave", name: "旧假别", enabled: false },
+      ];
+      state.staff = [
+        regular,
+        idle,
+        sick,
+        leave,
+        { ...leave, id: "custom", leaveTypeId: "flight-leave" },
+        { ...leave, id: "disabled", leaveTypeId: "old-leave" },
+        { ...leave, id: "missing", leaveTypeId: "missing" },
+        { ...regular, id: "admin", staffType: "行政支援" },
+      ];
+      if (source === "current") {
+        state.activeScheduleDate = "2026-09-13";
+        state.assignments = [
+          assignment("regular", regular.id, regular.name, "CX931", "G01"),
+        ];
+      } else {
+        state.history = [
+          historyRecord(
+            "regular",
+            "2026-09-13",
+            regular.id,
+            regular.name,
+            "CX931",
+            "complete"
+          ),
+        ];
+      }
+      const before = structuredClone(state);
+
+      const result = buildDailyStaffFlightStatistics(state, "2026-09-13");
+
+      expect(result.assignedStaffCount).toBe(1);
+      expect(result.staffCount).toBe(7);
+      expect(result.unassignedStaffCount).toBe(6);
+      expect(result.unassignedStaffNames).toEqual([idle.name]);
+      expect(result.allRows.map((row) => row.flightCount)).toEqual([
+        1, 0, 0, 0, 0, 0, 0,
+      ]);
+      expect(result.allRows.map((row) => row.leaveLabel)).toEqual([
+        undefined,
+        undefined,
+        "病假",
+        "休假",
+        "飞行假",
+        "旧假别",
+        "休假（类别缺失）",
+      ]);
+      expect(result.rows.map((row) => row.staffName)).toEqual([regular.name]);
+      expect(result.totalFlightCount).toBe(1);
+      expect(state).toEqual(before);
+    }
+  );
+
+  it("keeps actual historical flights even when the person is currently on leave", () => {
     const state = createDefaultState();
-    const regular = state.staff.find((person) => person.staffType === "常规")!;
-    const sick = {
-      ...regular,
-      id: "sick",
-      name: "病假人员",
-      status: "病假" as const,
-    };
-    const leave = {
-      ...regular,
-      id: "leave",
-      name: "休假人员",
-      status: "休假" as const,
-    };
-    state.staff = [regular, sick, leave];
-    state.activeScheduleDate = "2026-09-13";
-    state.assignments = [
-      assignment("regular", regular.id, regular.name, "CX931", "G01"),
-      assignment("sick", sick.id, sick.name, "TR121", "G01"),
+    const person = state.staff.find((row) => row.staffType === "常规")!;
+    state.staff = [{ ...person, status: "病假" }];
+    state.history = [
+      historyRecord(
+        "one",
+        "2026-09-11",
+        person.id,
+        person.name,
+        "CX931",
+        "complete"
+      ),
+      historyRecord(
+        "duplicate",
+        "2026-09-11",
+        person.id,
+        person.name,
+        " cx931 "
+      ),
     ];
-
-    const result = buildDailyStaffFlightStatistics(state, "2026-09-13");
-
+    const result = buildDailyStaffFlightStatistics(state, "2026-09-11");
+    expect(result.rows).toMatchObject([
+      {
+        staffId: person.id,
+        flightCount: 1,
+        flightNumbers: ["CX931"],
+        leaveLabel: "病假",
+      },
+    ]);
+    expect(result.staffCount).toBe(1);
     expect(result.assignedStaffCount).toBe(1);
+    expect(result.totalFlightCount).toBe(1);
     expect(result.unassignedStaffCount).toBe(0);
     expect(result.unassignedStaffNames).toEqual([]);
-    expect(result.allRows.map((row) => row.flightCount)).toEqual([1]);
-    expect(result.rows.map((row) => row.staffName)).toEqual([regular.name]);
   });
 
   it("does not present late-priority-only history as a complete daily result", () => {
@@ -244,6 +327,46 @@ describe("daily staff flight statistics", () => {
     expect(result.totalFlightCount).toBe(0);
     expect(result.assignedStaffCount).toBe(0);
     expect(result.unassignedStaffCount).toBe(0);
+    expect(result.unassignedStaffNames).toEqual([]);
+  });
+
+  it("keeps every regular person when the entire current table is unassigned", () => {
+    const state = createDefaultState();
+    const regular = state.staff.find((person) => person.staffType === "常规")!;
+    state.staff = [
+      regular,
+      { ...regular, id: "sick", status: "病假" },
+      { ...regular, id: "leave", status: "休假" },
+    ];
+    state.activeScheduleDate = "2026-09-13";
+    state.assignments = [
+      {
+        ...assignment("empty", "", "", "CX931", "G01"),
+        staffId: null,
+        status: "unfilled",
+      },
+    ];
+    const result = buildDailyStaffFlightStatistics(state, "2026-09-13");
+    expect(result.allRows.map((row) => row.staffId)).toEqual([
+      regular.id,
+      "sick",
+      "leave",
+    ]);
+    expect(result.allRows.map((row) => row.flightCount)).toEqual([0, 0, 0]);
+    expect(result.staffCount).toBe(3);
+    expect(result.unassignedStaffCount).toBe(3);
+    expect(result.unassignedStaffNames).toEqual([regular.name]);
+    expect(result.assignedStaffCount).toBe(0);
+    expect(result.totalFlightCount).toBe(0);
+  });
+
+  it("does not invent complete zero-flight facts when the workday has no records", () => {
+    const state = createDefaultState();
+    state.history = [];
+    state.assignments = [];
+    const result = buildDailyStaffFlightStatistics(state, "2026-09-13");
+    expect(result.source).toBe("none");
+    expect(result.allRows).toEqual([]);
     expect(result.unassignedStaffNames).toEqual([]);
   });
 });

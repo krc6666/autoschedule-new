@@ -1061,6 +1061,146 @@ describe("schedule page", () => {
     expect(rows()).toEqual([third!.id, second!.id, first!.id]);
   });
 
+  it("shows all regular staff with leave labels, zero flights and continuous numbering while keeping leave out of alerts", async () => {
+    const state = createDefaultState();
+    const regular = state.staff.find((person) => person.staffType === "常规")!;
+    state.leaveTypes = [{ id: "flight-leave", name: "飞行假", enabled: true }];
+    state.staff = [
+      regular,
+      { ...regular, id: "sick", name: "测试病休", status: "病假" },
+      { ...regular, id: "leave", name: "测试休假", status: "休假" },
+      {
+        ...regular,
+        id: "custom",
+        name: "测试自建",
+        status: "休假",
+        leaveTypeId: "flight-leave",
+      },
+      { ...regular, id: "idle", name: "测试未排" },
+      { ...regular, id: "admin", name: "测试行政", staffType: "行政支援" },
+    ];
+    state.activeScheduleDate = "2026-09-13";
+    state.assignments = [
+      {
+        id: "all-regular",
+        flightId: "cx",
+        flightNo: "CX931",
+        positionRuleId: null,
+        position: "G01",
+        staffId: regular.id,
+        staffName: regular.name,
+        startTime: "08:00",
+        endTime: "10:00",
+        workHours: 2,
+        fatiguePoints: 1,
+        remark: "",
+        manualRemark: "",
+        status: "assigned",
+      },
+    ];
+    state.history = [
+      {
+        ...state.assignments[0]!,
+        staffId: regular.id,
+        id: "past",
+        date: "2026-09-11",
+        historyCoverage: "complete",
+      },
+    ];
+    const before = structuredClone(state);
+    const commands: unknown[] = [];
+    const element = await mountElement<
+      HTMLElement & { model: typeof state; updateComplete: Promise<unknown> }
+    >("autoschedule-daily-staff-flight-statistics", {
+      model: state,
+      date: "2026-09-13",
+    });
+    element.addEventListener(UI_COMMAND_EVENT, (event) =>
+      commands.push((event as UiCommandEvent).detail)
+    );
+    const rows = () => [
+      ...element.querySelectorAll<HTMLElement>(".daily-staff-flight-row"),
+    ];
+    const checkRows = () => {
+      expect(rows()).toHaveLength(5);
+      expect(rows().map((row) => row.querySelector("td")?.textContent)).toEqual(
+        ["1", "2", "3", "4", "5"]
+      );
+      for (const [id, label] of [
+        ["sick", "测试病休（病假）"],
+        ["leave", "测试休假（休假）"],
+        ["custom", "测试自建（飞行假）"],
+        ["idle", "测试未排"],
+      ]) {
+        const row = element.querySelector(`[data-staff-id="${id}"]`)!;
+        expect(row.querySelector("th")?.textContent?.trim()).toBe(label);
+        expect(
+          row.querySelector(".daily-staff-flight-count")?.textContent
+        ).toBe("0");
+        expect(row.textContent).toContain("未安排");
+      }
+      expect(element.textContent).not.toContain("测试行政");
+      expect(
+        element.querySelector(".daily-staff-flight-summary")?.textContent
+      ).toContain("人员总数 5");
+      expect(
+        element.querySelector(".daily-staff-flight-summary")?.textContent
+      ).toContain("4 人未安排");
+      const warning = element.querySelector(
+        ".daily-staff-flight-unassigned"
+      )?.textContent;
+      expect(warning).toContain("测试未排");
+      expect(warning).not.toMatch(/测试病休|测试休假|测试自建/);
+    };
+    checkRows();
+    const sort = element.querySelector<HTMLSelectElement>(
+      'select[aria-label="人员航班排序"]'
+    )!;
+    sort.value = "asc";
+    sort.dispatchEvent(new Event("change"));
+    await settleLit();
+    expect(rows().at(-1)?.dataset.staffId).toBe(regular.id);
+    checkRows();
+    sort.value = "original";
+    sort.dispatchEvent(new Event("change"));
+    await settleLit();
+    expect(rows().map((row) => row.dataset.staffId)).toEqual([
+      regular.id,
+      "sick",
+      "leave",
+      "custom",
+      "idle",
+    ]);
+    const date = element.querySelector<HTMLInputElement>(
+      'input[aria-label="人员航班查询日期"]'
+    )!;
+    date.value = "2026-09-11";
+    date.dispatchEvent(new Event("change"));
+    await settleLit();
+    checkRows();
+    element.model = {
+      ...state,
+      staff: state.staff.map((person) =>
+        person.id === "idle" ? { ...person, status: "病假" as const } : person
+      ),
+      leaveTypes: [{ id: "flight-leave", name: "新飞行假", enabled: false }],
+    };
+    await settleLit();
+    expect(rows()).toHaveLength(5);
+    expect(
+      element.querySelector('[data-staff-id="custom"] th')?.textContent?.trim()
+    ).toBe("测试自建（新飞行假）");
+    expect(
+      element.querySelector('[data-staff-id="idle"] th')?.textContent?.trim()
+    ).toBe("测试未排（病假）");
+    expect(element.querySelector(".daily-staff-flight-unassigned")).toBeNull();
+    expect(
+      element.querySelector(".daily-staff-flight-complete")?.textContent
+    ).toContain("所有正常常规人员均已安排航班");
+    expect(state).toEqual(before);
+    expect(commands).toEqual([]);
+  });
+
   it("highlights only the last schedule cell for today's early-departure staff", async () => {
     const state = createDefaultState();
     const [earlyPerson, afternoonFreePerson, regularPerson] = state.staff
