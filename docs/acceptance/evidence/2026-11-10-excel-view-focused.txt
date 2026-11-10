@@ -1,0 +1,11 @@
+Capture note: PowerShell emitted UTF-16; an initial UTF-8 normalization lost non-ASCII characters.
+Only fully recoverable ASCII log lines are retained below. Pass/fail counts and exitCode were also observed in live tool output.
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+
+ Test Files  3 passed (3)
+      Tests  59 passed (59)
+   Start at  19:55:22
+   Duration  10.32s (transform 2.49s, setup 0ms, import 3.54s, tests 8.77s, environment 0ms)
+
+exitCode=0

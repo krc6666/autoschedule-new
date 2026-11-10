@@ -1,0 +1,114 @@
+{
+  "entry": "http://127.0.0.1:5173/",
+  "anonymousIsolatedContext": true,
+  "downloadName": "保障明细_2026-11-12.xlsx",
+  "file": "docs/acceptance/evidence/2026-11-10-excel-view-sample.xlsx",
+  "zoom": 86,
+  "columns": 13,
+  "roster": [
+    {
+      "address": "L3",
+      "name": "P01",
+      "fill": "D9E2F3"
+    },
+    {
+      "address": "M3",
+      "name": "P10",
+      "fill": "D9E2F3"
+    },
+    {
+      "address": "L4",
+      "name": "P02",
+      "fill": "C6EFCE"
+    },
+    {
+      "address": "M4",
+      "name": "P11",
+      "fill": "D9E2F3"
+    },
+    {
+      "address": "L5",
+      "name": "P03",
+      "fill": "D9E2F3"
+    },
+    {
+      "address": "M5",
+      "name": "P12",
+      "fill": "D9E2F3"
+    },
+    {
+      "address": "L6",
+      "name": "P04（病假）",
+      "fill": "D9E2F3"
+    },
+    {
+      "address": "M6",
+      "name": "P13",
+      "fill": "D9E2F3"
+    },
+    {
+      "address": "L7",
+      "name": "P05",
+      "fill": "D9E2F3"
+    },
+    {
+      "address": "M7",
+      "name": "P14",
+      "fill": "D9E2F3"
+    },
+    {
+      "address": "L8",
+      "name": "P06",
+      "fill": "D9E2F3"
+    },
+    {
+      "address": "M8",
+      "name": "P15",
+      "fill": "D9E2F3"
+    },
+    {
+      "address": "L9",
+      "name": "P07",
+      "fill": "D9E2F3"
+    },
+    {
+      "address": "M9",
+      "name": "P16",
+      "fill": "D9E2F3"
+    },
+    {
+      "address": "L10",
+      "name": "P08",
+      "fill": "D9E2F3"
+    },
+    {
+      "address": "M10",
+      "name": "P17（飞行假）",
+      "fill": "D9E2F3"
+    },
+    {
+      "address": "L11",
+      "name": "P09",
+      "fill": "D9E2F3"
+    },
+    {
+      "address": "M11",
+      "name": "P18（飞行假）",
+      "fill": "D9E2F3"
+    }
+  ],
+  "unscaledPixels": {
+    "width": 1109,
+    "height": 714.6666666666667
+  },
+  "openedPixels": {
+    "width": 953.74,
+    "height": 614.6133333333335
+  },
+  "targetWorkspace": {
+    "width": 1280,
+    "height": 650
+  },
+  "pageErrors": [],
+  "nativeOfficeOpened": false
+}

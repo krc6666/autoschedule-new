@@ -1,0 +1,11 @@
+{
+  "source": "docs/acceptance/evidence/2026-11-10-excel-view-sample.xlsx",
+  "reader": "openpyxl independent OOXML reader",
+  "nativeOfficeOpened": false,
+  "columns": 13,
+  "rows": 18,
+  "zoomScale": 86,
+  "topLeftCell": "A1",
+  "rosterColumns": ["L", "M"],
+  "numberingColumn": false
+}

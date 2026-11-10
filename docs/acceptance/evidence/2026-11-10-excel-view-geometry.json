@@ -1,0 +1,15 @@
+{
+  "renderer": "openpyxl + Chromium at stored zoom; not native WPS/Excel",
+  "viewport": {
+    "width": 1366,
+    "height": 760
+  },
+  "table": {
+    "width": 1169.4375,
+    "height": 633.546875,
+    "right": 1185.4375,
+    "bottom": 649.546875
+  },
+  "checkedCells": 204,
+  "clippedCells": []
+}

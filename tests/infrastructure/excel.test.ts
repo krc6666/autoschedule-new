@@ -544,10 +544,8 @@ describe("workbook boundary", () => {
         .every((value) => value === "")
     ).toBe(true);
     expect(
-      detailRows[guideRow - 2]
-        ?.slice(0, flightColumns)
-        .every((value) => value === "")
-    ).toBe(true);
+      workbook.Sheets["保障明细"]!["!rows"]![guideRow - 1]!.hpt
+    ).toBeLessThanOrEqual(26);
   }, 30_000);
 
   it("groups early departures by airline code in the schedule summary", () => {

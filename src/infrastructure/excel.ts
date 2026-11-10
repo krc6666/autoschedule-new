@@ -1,5 +1,6 @@
 import { migrateLegacySupervisorFillConfiguration } from "../domain/coverage/supervisor-fill-configuration";
 import * as XLSX from "xlsx-js-style";
+import { workbookBytes } from "./workbook-bytes";
 import {
   additionalAttendanceByAssignment,
   normalizeAttendanceIntervals,
@@ -1273,11 +1274,7 @@ export function buildScheduleWorkbook(
 }
 
 export function writeWorkbook(workbook: XLSX.WorkBook, fileName: string): void {
-  const bytes = XLSX.write(workbook, {
-    bookType: "xlsx",
-    type: "array",
-    compression: true,
-  });
+  const bytes = workbookBytes(workbook);
   downloadBlob(
     new Blob([bytes], {
       type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",

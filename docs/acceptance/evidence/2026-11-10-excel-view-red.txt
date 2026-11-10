@@ -1,0 +1,73 @@
+Capture note: PowerShell emitted UTF-16; an initial UTF-8 normalization lost non-ASCII characters.
+Only fully recoverable ASCII log lines are retained below. Pass/fail counts and exitCode were also observed in live tool output.
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ o' tests/infrastructure/workbook-view.test.ts (4 tests | 3 failed) 183ms
+ o' tests/infrastructure/schedule-print-layout.test.ts (9 tests | 1 failed) 94ms
+npm.cmd :
++ & npm.cmd exec vitest -- run tests/infrastructure/schedule-print-layo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+
+ FAIL  tests/infrastructure/schedule-print-layout.test.ts > schedule print layout > ends at the two name columns withou
+t a roster numbering column
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ o' tests/infrastructure/schedule-print-layout.test.ts:65:65
+     64|     ]!;
+       |                                                                 ^
+     66|     expect(XLSX.utils.decode_range(ws["!ref"]!).e.c).toBe(12);
+     67|     const title = ws["!merges"]!.find((m) => m.s.c === 11 && m.s.r ===&
+
+
+ FAIL  tests/infrastructure/workbook-view.test.ts > downloaded workbook default view > fits the five-flight roster and
+bottom summary in the normal workspace using the actual downloaded bytes
+AssertionError: expected NaN to be greater than or equal to 0.5
+ o' tests/infrastructure/workbook-view.test.ts:49:19
+     47|     const { bytes, zip } = await exported(wb);
+     48|     const ratio = zoom(xml(zip)) / 100;
+     49|     expect(ratio).toBeGreaterThanOrEqual(0.5);
+       |                   ^
+     50|     expect(ratio).toBeLessThanOrEqual(1);
+     51|     const ws = XLSX.read(bytes, { type: "array", cellStyles: true }).S&
+
+
+ FAIL  tests/infrastructure/workbook-view.test.ts > downloaded workbook default view > recomputes zoom for wider or tal
+ler final tables and preserves readable lower bounds
+AssertionError: expected NaN to be less than NaN
+ o' tests/infrastructure/workbook-view.test.ts:63:18
+     61|     const wide = zoom(xml((await exported(fixture(8))).zip));
+     62|     const tall = zoom(xml((await exported(fixture(5, 45))).zip));
+     63|     expect(wide).toBeLessThan(regular);
+       |                  ^
+     64|     expect(tall).toBe(50);
+     65|     expect(zoom(xml((await exported(fixture(1, 1))).zip))).toBe(100);
+
+
+ FAIL  tests/infrastructure/workbook-view.test.ts > downloaded workbook default view > changes only the target sheet vi
+ew inside the archive, including when it is not the first sheet
+AssertionError: expected NaN to be greater than or equal to 50
+ o' tests/infrastructure/workbook-view.test.ts:72:31
+     70|     const before = XLSX.CFB.read(new Uint8Array(XLSX.write(wb, { type:&
+     71|     const { zip } = await exported(wb);
+     72|     expect(zoom(xml(zip, 2))).toBeGreaterThanOrEqual(50);
+       |                               ^
+     73|     expect(xml(zip, 1)).not.toContain("zoomScale");
+     74|     for (let i = 0; i < before.FullPaths.length; i++) {
+
+
+
+ Test Files  2 failed (2)
+      Tests  4 failed | 9 passed (13)
+   Start at  19:53:00
+   Duration  1.46s (transform 1.15s, setup 0ms, import 1.65s, tests 278ms, environment 0ms)
+
+exitCode=1

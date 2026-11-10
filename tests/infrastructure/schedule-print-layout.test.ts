@@ -58,6 +58,15 @@ const find = (sheet: XLSX.WorkSheet, value: string) =>
   cellEntries(sheet).find(([, cell]) => cell.v === value)!;
 
 describe("schedule print layout", () => {
+  it("ends at the two name columns without a roster numbering column", () => {
+    const ws = buildScheduleWorkbook(fixture(18, 5), "2026-11-10").Sheets[
+      "保障明细"
+    ]!;
+    expect(cellEntries(ws).some(([, cell]) => cell.v === "序号")).toBe(false);
+    expect(XLSX.utils.decode_range(ws["!ref"]!).e.c).toBe(12);
+    const title = ws["!merges"]!.find((m) => m.s.c === 11 && m.s.r === 0)!;
+    expect(title.e.c).toBe(12);
+  });
   it("updates only the exported projection after manual edits and keeps half-rest tied to identity", () => {
     const state = fixture();
     state.staff[1]!.name = "更改后的姓名";

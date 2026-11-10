@@ -47,21 +47,21 @@ export function buildSchedulePrintSheet(
   const normalRows = Math.max(0, ...normal.map((g) => g.length));
   const flightColumns = Math.max(4, groups.length * 2);
   const rosterStart = flightColumns + 1;
-  const totalColumns = rosterStart + 3;
+  const totalColumns = rosterStart + 2;
   const staff = state.staff.filter((p) => p.staffType === "常规");
   const rosterRows = Math.ceil(staff.length / 2);
   const halfRestIds = new Set(
     halfRestSelectionForDate(state, date).halfRestStaffIds
   );
   const greenCells = new Set<string>();
-  const guideRow = normalRows + 4;
+  const guideRow = normalRows + 3;
   const summaryStart = Math.max(guideRow, rosterRows + 1) + 2;
   const matrix: string[][] = Array.from({ length: summaryStart + 3 }, () =>
     Array(totalColumns).fill("")
   );
   const merges: XLSX.Range[] = [
     { s: { r: 0, c: 0 }, e: { r: 0, c: flightColumns - 1 } },
-    { s: { r: 0, c: rosterStart }, e: { r: 0, c: rosterStart + 2 } },
+    { s: { r: 0, c: rosterStart }, e: { r: 0, c: rosterStart + 1 } },
     {
       s: { r: summaryStart + 2, c: 1 },
       e: { r: summaryStart + 2, c: flightColumns - 1 },
@@ -74,7 +74,6 @@ export function buildSchedulePrintSheet(
   matrix[0]![rosterStart] = "人员名单";
   matrix[1]![rosterStart] = "人员";
   matrix[1]![rosterStart + 1] = "人员";
-  matrix[1]![rosterStart + 2] = "序号";
   if (!groups.length) matrix[1]![0] = "暂无航班";
   groups.forEach((g, index) => {
     const flight = state.flights.find((f) => f.flightNo === g.flightNo);
@@ -116,8 +115,6 @@ export function buildSchedulePrintSheet(
         : `${p.name}（${staffStatusLabel(p, state.leaveTypes)}）`;
     if (halfRestIds.has(p.id)) greenCells.add(XLSX.utils.encode_cell({ r, c }));
   });
-  for (let row = 0; row < rosterRows; row++)
-    matrix[row + 2]![rosterStart + 2] = String(row + 1);
   const duty = getDutyRosterForDate(state, date);
   const name = (id: string | null) =>
     state.staff.find((p) => p.id === id)?.name ?? "未安排";
@@ -146,10 +143,9 @@ export function buildSchedulePrintSheet(
       .join("\n") || "无";
 
   const widths = Array.from({ length: totalColumns }, (_, c) => {
-    if (c === flightColumns) return 3;
-    if (c === rosterStart + 2) return 6;
-    const min = c >= rosterStart ? 18 : c % 2 === 0 ? 16 : 24;
-    const max = c >= rosterStart ? 34 : c % 2 === 0 ? 28 : 42;
+    if (c === flightColumns) return 2;
+    const min = c >= rosterStart ? 14 : c % 2 === 0 ? 10 : 16;
+    const max = c >= rosterStart ? 28 : c % 2 === 0 ? 20 : 32;
     const texts = matrix.slice(1, summaryStart).map((row) => row[c]!);
     return Math.min(
       max,
@@ -166,6 +162,7 @@ export function buildSchedulePrintSheet(
   worksheet["!merges"] = merges;
   const border = { style: "thin", color: { rgb: "808080" } };
   const heights = matrix.map((row, r) => {
+    if (!row.some(Boolean)) return { hpt: 10 };
     let height = r === 0 ? 30 : 26;
     row.forEach((text, c) => {
       const merge = merges.find((m) => m.s.r === r && m.s.c === c);

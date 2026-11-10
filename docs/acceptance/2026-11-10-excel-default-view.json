@@ -1,0 +1,151 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-10-excel-default-view",
+  "title": "Excel名单删除序号并保存默认全表缩放",
+  "startedFrom": "3eee685d64ebb25969c81ad4d82753bdc4b13aee",
+  "expectation": {
+    "example": "owner的WPS截图：5航班、18名常规人员，55%时看全；右侧两列姓名加多余序号列。",
+    "expected": "名单仅保留两列姓名；压紧多余宽度和空白，默认缩放按最终尺寸计算，常见1280×650工作区尽量看全。完整文字和绿底、具体假名保留。",
+    "unchanged": "不改排班规则、人员选择、岗位、负荷、页面编号、HTML/PNG、原结果数据表、半休保存和Excel读取合同。",
+    "fallback": "缩放限制50%—100%，极大表允许滚动，不裁字或删岗位来强行塞入屏幕；没有保障明细的工作簿不改视图。无原生软件验证则明确报告。"
+  },
+  "testedVersion": "3e5fe3eceb581317ec455226612b76c02bd9627db4f0159cf91f903a9609bb3c",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "owner截图证明右侧多余序号与手调55%的现象；改前4项失败：1项序号和3项实际下载字节无缩放。改后定向通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-excel-view-red.txt",
+          "summary": "改前4项失败、9项不变基线通过，缺失实际zoomScale。",
+          "sha256": "897d1a1705330cce8121094534a8137abe8e9e9845456323b30a221c43186502"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-excel-view-focused.txt",
+          "summary": "3文件59项定向通过，最终Blob中的缩放/列范围、大小场景、非首表、其他XML逐项不变和既有Excel往返。",
+          "sha256": "50a7bb67aa2ab210749822d77db535b363cfc9b372f5c4aaa2142f2ee7eaef88"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "5航班18人真实导出名单仅L/M两列，顶部/右侧/下方完整；默认86%，比固定手调55%更易阅读。绿底及假名保留。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-excel-view-browser.json",
+          "summary": "隔离Chrome真实导出5航班18人，默认86%、两列姓名、绿底及具体假名正确，无页面异常。",
+          "sha256": "dfdd834b1fcbaf8030ef3226ccb8288c5e33a0a3aa9d0772dd7e349dfbde743c"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-excel-view-sample.xlsx",
+          "summary": "本次页面点击导出的匿名5航班18人最终Excel文件。",
+          "sha256": "c237d3d13a674b6d5dbf6121b67099f2677c6a7d6413b88ef2809f5ad72c5719"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-excel-view-independent.json",
+          "summary": "openpyxl独立读取实际下载文件：13列、18行、zoomScale86、A1起点，无序号列。",
+          "sha256": "020d5293c11ddde5af9725820705eda3fae7897cf7d1236f0afb3af70fe14aa6"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-excel-view-geometry.json",
+          "summary": "openpyxl+Chromium按保存缩放核对204格无截字；整表右边1185.44、底部649.55像素。非原生WPS。",
+          "sha256": "14962d85826b9487bd2aab1ebe76d162a827d29662fbc560d732a54a89ed5b20"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "覆盖空表/奇偶人员/多航班；1航班2人最高100%、8航班更小、45岗位保持最低50%；没有保障明细时保持原写出路径；保障明细不在首表时仍准确写入目标XML。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-excel-view-focused.txt",
+          "summary": "3文件59项定向通过，最终Blob中的缩放/列范围、大小场景、非首表、其他XML逐项不变和既有Excel往返。",
+          "sha256": "50a7bb67aa2ab210749822d77db535b363cfc9b372f5c4aaa2142f2ee7eaef88"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "最终写出阶段才把缩放写入OOXML。归档包逐项对比证明只变保障明细sheetView，单元格、样式、合并和其他表XML保持；既有人工改名/假名及长备注回归通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-excel-view-focused.txt",
+          "summary": "3文件59项定向通过，最终Blob中的缩放/列范围、大小场景、非首表、其他XML逐项不变和既有Excel往返。",
+          "sha256": "50a7bb67aa2ab210749822d77db535b363cfc9b372f5c4aaa2142f2ee7eaef88"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-excel-view-sample.xlsx",
+          "summary": "本次页面点击导出的匿名5航班18人最终Excel文件。",
+          "sha256": "c237d3d13a674b6d5dbf6121b67099f2677c6a7d6413b88ef2809f5ad72c5719"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "not_applicable",
+      "reason": "无排班规则或assignments写入，不新增硬约束或安全守卫。视图只消费已生成单元格宽高；完整verify继续覆盖原安全及架构。",
+      "evidence": []
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "保留原人员范围、半休绿色、假名、长备注、机器可读表、配置往返及页面编号。没有新业务数据字段，原半休保存合同不变；完整检查通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-excel-view-focused.txt",
+          "summary": "3文件59项定向通过，最终Blob中的缩放/列范围、大小场景、非首表、其他XML逐项不变和既有Excel往返。",
+          "sha256": "50a7bb67aa2ab210749822d77db535b363cfc9b372f5c4aaa2142f2ee7eaef88"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-excel-view-verify.txt",
+          "summary": "完整npm.cmd run verify退出0；功能、性能、类型检查与生产构建通过，具体数量见日志。",
+          "sha256": "da13064fa434a4449ae1cf7f9a80ac966bfb57f9863ebbd8e2676657ae9d32ea"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "verified",
+      "reason": "sample.xlsx为本次实际页面下载；openpyxl独立确认缩放及列，预览204格无截字且包含所有区域。未重新在原生WPS打开新文件，未重放owner私有班表，也不保证任意屏幕/超大规模一屏展示。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-excel-view-sample.xlsx",
+          "summary": "本次页面点击导出的匿名5航班18人最终Excel文件。",
+          "sha256": "c237d3d13a674b6d5dbf6121b67099f2677c6a7d6413b88ef2809f5ad72c5719"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-excel-view-browser.json",
+          "summary": "隔离Chrome真实导出5航班18人，默认86%、两列姓名、绿底及具体假名正确，无页面异常。",
+          "sha256": "dfdd834b1fcbaf8030ef3226ccb8288c5e33a0a3aa9d0772dd7e349dfbde743c"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-excel-view-independent.json",
+          "summary": "openpyxl独立读取实际下载文件：13列、18行、zoomScale86、A1起点，无序号列。",
+          "sha256": "020d5293c11ddde5af9725820705eda3fae7897cf7d1236f0afb3af70fe14aa6"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-excel-view-geometry.json",
+          "summary": "openpyxl+Chromium按保存缩放核对204格无截字；整表右边1185.44、底部649.55像素。非原生WPS。",
+          "sha256": "14962d85826b9487bd2aab1ebe76d162a827d29662fbc560d732a54a89ed5b20"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-excel-view-preview.png",
+          "summary": "在1366×760视口按文件保存缩放生成的匿名预览，非原生WPS截图。",
+          "sha256": "1d0d058c5ee93cd74f4044652ba42c3a49f61736670177ce3738f108ffb3b8ae"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-excel-view-verify.txt",
+          "summary": "完整npm.cmd run verify退出0；功能、性能、类型检查与生产构建通过，具体数量见日志。",
+          "sha256": "da13064fa434a4449ae1cf7f9a80ac966bfb57f9863ebbd8e2676657ae9d32ea"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "owner的WPS截图及red.txt证明多余序号和无默认缩放；focused.txt证明修复后的真实下载Blob通过，browser.json及independent.json确认新文件实际含86%视图。",
+    "laterChanges": "XLSX.write是会丢掉内存缩放的后置流程，已在字节写出点处理；workbook-view回归按每份归档XML对照非视图内容不变，并验证目标不在首表及其他导出保持原路径。",
+    "finalArtifact": "sample.xlsx是本次真实页面下载；browser.json、independent.json、geometry.json与preview.png证明两列名单、保存86%比例及整表范围；verify.txt记录最后实现检查。尚无新文件原生WPS打开证据。"
+  },
+  "review": {
+    "missedScope": "检查名单删除、半休绿底/假名/完整备注、大小表及序号不影响页面、配置写出和非首表。没有新文件原生WPS打开证据；设备窗口和DPI不同或大到触及50%下限仍可能要滚动，未声称绝对自适应任何屏幕。PowerShell的UTF-16日志曾误按UTF-8处理，保留可恢复ASCII行并明确注释；数量与退出码同时由工具实时输出核对。",
+    "rootCause": "前版最小列宽、空白行和名单额外序号增加尺寸；仅核对文字和单元格，漏了打开视图。库支持读取zoom但不写出，必须在最终ZIP中设置sheetView而非无效内存属性。",
+    "earlyDetection": "导出功能设计先同时检查内容、尺寸、默认打开视图三条路径；以最终下载Blob解压检查zoomScale，并在常见工作区独立预览整表。对其他XML逐项不变，避免视图修复影响数据和样式。"
+  }
+}
