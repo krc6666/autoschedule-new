@@ -27,6 +27,7 @@ import {
   replaceTeamLeaderGapFillPositionReference,
 } from "../domain/coverage/team-leader-gap-fill-protection";
 import { synchronizeTemplatePositionRules } from "./template-position-rule-sync";
+import { applyStaffStatusChange } from "../domain/kernel/schedule-state";
 
 export type ConfigurationValue = string | number | boolean;
 
@@ -917,6 +918,11 @@ export function updateConfigurationField(
   if (entity === "staff") {
     const person = state.staff.find((item) => item.id === id);
     if (!person) return "missing";
+    if (field === "status") {
+      if (!applyStaffStatusChange(state, id, String(value))) return "missing";
+      clearSchedule(state);
+      return "updated";
+    }
     if (field === "name") {
       const nextName = normalizeText(value) || person.name;
       person.name = nextName;

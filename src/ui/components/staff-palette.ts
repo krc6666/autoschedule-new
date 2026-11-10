@@ -1,6 +1,7 @@
 import { html } from "lit";
 
 import type { AppState, Staff } from "../../model";
+import { staffStatusLabel } from "../../domain/staff-status";
 import { dispatchUiCommand } from "../events/ui-command";
 import { LightDomElement } from "./light-dom-element";
 
@@ -57,7 +58,7 @@ export class StaffPaletteElement extends LightDomElement {
     return html`<div
       class="staff-palette-item ${administrative ? "is-admin-support" : ""} ${disabled ? "is-disabled" : ""}"
       draggable=${String(!disabled)}
-      title="#${person.id} ${person.status}"
+      title="#${person.id} ${staffStatusLabel(person, this.model.leaveTypes)}"
       @dragstart=${(event: DragEvent) => this.startDrag(event, person.id)}
       @pointerdown=${() => this.startPointerDrag(person.id)}
     >

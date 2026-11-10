@@ -12,7 +12,7 @@ import type {
   AppSection,
   IsoWeekday,
   ScheduleGroupId,
-  StaffStatus,
+  StaffStatusSelection,
 } from "../model";
 import type { ManualSwapAnalysis } from "../domain/reviews/manual-swap-analysis";
 import type { FlightSelectionCandidate } from "../domain/flights/next-workday-flight-plan";
@@ -35,7 +35,7 @@ export type ApplicationDialog =
       groupId: ScheduleGroupId;
       candidates: FlightSelectionCandidate[];
       selectedIds: string[];
-      staffStatuses: Record<string, StaffStatus>;
+      staffStatuses: Record<string, StaffStatusSelection>;
       dutyRoster?: DutyRosterAssignment;
     }
   | {
@@ -45,7 +45,7 @@ export type ApplicationDialog =
       groupId: ScheduleGroupId;
       candidates: FlightSelectionCandidate[];
       selectedIds: string[];
-      staffStatuses?: Record<string, StaffStatus>;
+      staffStatuses?: Record<string, StaffStatusSelection>;
       dutyRoster?: DutyRosterAssignment;
     }
   | {
@@ -57,7 +57,7 @@ export type ApplicationDialog =
       weekday: IsoWeekday;
       candidates: FlightSelectionCandidate[];
       selectedIds: string[];
-      staffStatuses: Record<string, StaffStatus>;
+      staffStatuses: Record<string, StaffStatusSelection>;
       dutyRoster?: DutyRosterAssignment;
     }
   | { kind: "qualification"; positionRuleId: string }

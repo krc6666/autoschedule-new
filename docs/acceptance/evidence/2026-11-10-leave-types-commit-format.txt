@@ -1,0 +1,23 @@
+{
+  "purpose": "提交前格式化后核对代码与owner已验页面版本的行为不变；不冒充再次页面操作",
+  "baselineSnapshot": "8dfd6ed",
+  "ownerComponentHashMatchesSnapshot": true,
+  "previousComponentSha256": "39f4742c905a2e3c941b08c5a30d9b57878eaffdf34e2043bd6c0fe9b645d6a4",
+  "formattedComponentSha256": "9b8dd601144fd6a8144aefc2a9560e033c185024f63946a5223d6aba0673ec08",
+  "command": "git diff --ignore-all-space --exit-code 8dfd6ed -- src tests",
+  "exitCode": 1,
+  "output": "diff --git a/tests/app/leave-type-scheduling.test.ts b/tests/app/leave-type-scheduling.test.ts\nindex 2093f4e..24da57c 100644\n--- a/tests/app/leave-type-scheduling.test.ts\n+++ b/tests/app/leave-type-scheduling.test.ts\n@@ -41,9 +41,7 @@ const entries = [\n function scenario() {\n   const state = createDefaultState();\n   state.leaveTypes = [{ id: \"flight-leave\", name: \"飞行假\", enabled: true }];\n-  state.staff = state.staff\n-    .slice(0, 2)\n-    .map((person, index) => ({\n+  state.staff = state.staff.slice(0, 2).map((person, index) => ({\n     ...person,\n     id: `example-${index}`,\n     name: `示例${index}`,\n",
+  "limitation": "此检查只证明源码和测试去除空白后无差异；完整verify单独重跑。",
+  "lineComparisonExplanation": "git按行比较，测试的链式调用合并行仍产生差异；补充全文删除空白后的逐文件字节比较。",
+  "whitespaceComparison": [
+    {
+      "file": "src/ui/components/leave-types-section.ts",
+      "equalWithoutWhitespace": true
+    },
+    {
+      "file": "tests/app/leave-type-scheduling.test.ts",
+      "equalWithoutWhitespace": true
+    }
+  ],
+  "pass": true
+}

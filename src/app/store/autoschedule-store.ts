@@ -61,6 +61,7 @@ function reconcileInitialProjection(model: AppState): void {
   const active = model.groups[model.activeGroupId];
   if (!active) return;
   active.staff = model.staff;
+  active.leaveTypes = model.leaveTypes;
   active.flights = model.flights;
   active.history = model.history;
   active.dutyRosterOverrides = model.dutyRosterOverrides;
@@ -84,6 +85,7 @@ function syncActiveGroupProjection(model: AppState): void {
   if (!group) return;
   group.flights = model.flights;
   group.staff = model.staff;
+  group.leaveTypes = model.leaveTypes;
   group.history = model.history;
   group.dutyRosterOverrides = model.dutyRosterOverrides;
   group.latePriorityFrequencyAdjustments =
@@ -110,6 +112,7 @@ function activateGroupProjection(
   model.settings = group.settings;
   model.flights = group.flights;
   model.staff = group.staff;
+  model.leaveTypes = group.leaveTypes;
   model.history = group.history;
   model.dutyRosterOverrides = group.dutyRosterOverrides;
   model.latePriorityFrequencyAdjustments =

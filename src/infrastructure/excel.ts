@@ -16,6 +16,7 @@ import type {
   PositionRule,
   ScheduleSettings,
   Staff,
+  LeaveType,
   WeeklyFlightPlanEntry,
 } from "../model";
 import {
@@ -64,8 +65,14 @@ import {
   rows,
   sheet,
 } from "./excel-worksheet";
+import { appendLeaveTypes, parseLeaveTypes } from "./leave-types-excel";
+import {
+  BUILTIN_STAFF_STATUSES,
+  staffStatusLabel,
+} from "../domain/staff-status";
 
 export interface WorkbookImport {
+  leaveTypes?: LeaveType[];
   staff?: Staff[];
   flights?: Flight[];
   templates?: FlightTemplate[];
@@ -287,6 +294,7 @@ function parseOrdinaryPriorityPositions(workbook: XLSX.WorkBook): {
 }
 
 export interface WorkbookImportOptions {
+  leaveTypes?: readonly LeaveType[];
   legacySchedule?: LegacyScheduleParseOptions;
 }
 
@@ -306,7 +314,11 @@ function sheetHasDataRows(
     .some((row) => row.some((value) => normalizeText(value)));
 }
 
-function parseStaff(workbook: XLSX.WorkBook): Staff[] | undefined {
+function parseStaff(
+  workbook: XLSX.WorkBook,
+  leaveTypes: readonly LeaveType[],
+  warnings: string[]
+): Staff[] | undefined {
   const sheetName = findSheet(workbook, ["人员信息", "员工信息"]);
   if (!sheetName) return undefined;
   const data = rows(workbook, sheetName);
@@ -315,6 +327,9 @@ function parseStaff(workbook: XLSX.WorkBook): Staff[] | undefined {
   const nameIndex = headerIndex(header, ["姓名"], 1);
   const nightIndex = headerIndex(header, ["夜班"], 2);
   const statusIndex = headerIndex(header, ["状态"], 3);
+  const leaveIdIndex = header.findIndex(
+    (cell) => normalizeText(cell) === "休假类别编号"
+  );
   const remarkIndex = headerIndex(header, ["备注"], 4);
   const staffTypeIndex = headerIndex(
     header,
@@ -341,13 +356,26 @@ function parseStaff(workbook: XLSX.WorkBook): Staff[] | undefined {
       normalizeText(cell).includes(candidate)
     )
   );
-  return data.slice(1).flatMap((row) => {
+  return data.slice(1).flatMap((row, rowIndex) => {
     const id = normalizeText(row[idIndex]);
     const name = normalizeText(row[nameIndex]);
     if (!id || !name) return [];
     const rawStatus = normalizeText(row[statusIndex]);
+    const leaveId = leaveIdIndex >= 0 ? normalizeText(row[leaveIdIndex]) : "";
+    const leaveType = leaveId
+      ? leaveTypes.find((type) => type.id === leaveId)
+      : leaveTypes.find((type) => type.name === rawStatus);
+    const builtin = BUILTIN_STAFF_STATUSES.find(
+      (status) => status === rawStatus
+    );
     const status: Staff["status"] =
-      rawStatus === "病假" || rawStatus === "休假" ? rawStatus : "正常";
+      leaveId || leaveType
+        ? "休假"
+        : (builtin ?? (rawStatus ? "休假" : "正常"));
+    if ((leaveId && !leaveType) || (rawStatus && !builtin && !leaveType))
+      warnings.push(
+        `人员信息第${rowIndex + 2}行：无法识别休假类别“${rawStatus || leaveId}”，保留人员并按休假处理，请核对类别`
+      );
     const staffType: Staff["staffType"] = normalizeText(
       row[staffTypeIndex]
     ).includes("行政")
@@ -385,6 +413,9 @@ function parseStaff(workbook: XLSX.WorkBook): Staff[] | undefined {
           normalizeText(row[nightIndex]).toLowerCase()
         ),
         status,
+        ...(leaveType || leaveId
+          ? { leaveTypeId: leaveType?.id ?? leaveId }
+          : {}),
         remark: normalizeText(row[remarkIndex]),
       },
     ];
@@ -728,7 +759,13 @@ export function parseWorkbook(
   currentStaff: Staff[],
   options: WorkbookImportOptions = {}
 ): WorkbookImport {
-  const staff = parseStaff(workbook);
+  const parsedLeaveTypes = parseLeaveTypes(workbook);
+  const staffWarnings: string[] = [];
+  const staff = parseStaff(
+    workbook,
+    parsedLeaveTypes.types ?? options.leaveTypes ?? [],
+    staffWarnings
+  );
   const effectiveStaff = staff !== undefined ? staff : currentStaff;
   const flights = parseFlights(workbook);
   const templates = parseTemplates(workbook);
@@ -752,10 +789,16 @@ export function parseWorkbook(
       ordinaryPriorityPositions: ordinaryPriorityPositions.value,
     };
   }
-  const warnings = [...parsedRules.warnings, ...dutyRoster.warnings];
+  const warnings = [
+    ...parsedRules.warnings,
+    ...dutyRoster.warnings,
+    ...parsedLeaveTypes.warnings,
+    ...staffWarnings,
+  ];
   if (weeklyFlightPlanImport?.status === "invalid")
     warnings.push(weeklyFlightPlanImport.warning);
   const hasStandardSheet = Boolean(
+    workbook.SheetNames.some((name) => name.includes("休假类别")) ||
     staff ||
     flights ||
     templates ||
@@ -797,6 +840,7 @@ export function parseWorkbook(
     warnings.push("岗位配置工作表没有有效数据");
   if (
     !staff &&
+    !workbook.SheetNames.some((name) => name.includes("休假类别")) &&
     !flights &&
     !templates &&
     !weeklyFlightPlanImport &&
@@ -811,6 +855,7 @@ export function parseWorkbook(
   )
     warnings.push("未识别到受支持的工作表");
   return {
+    leaveTypes: parsedLeaveTypes.types,
     staff,
     flights,
     templates,
@@ -860,21 +905,23 @@ export function buildConfigWorkbook(state: AppState): XLSX.WorkBook {
         "值班资质",
         "备勤资质",
         "是否为分队长",
+        "休假类别编号",
       ],
       ...state.staff.map((person) => [
         person.id,
         person.name,
         person.nightShift ? "是" : "否",
-        person.status,
+        staffStatusLabel(person, state.leaveTypes),
         person.remark,
         person.staffType,
         person.cxPreflightQualified ? "是" : "否",
         person.dutyQualified ? "是" : "否",
         person.standbyQualified ? "是" : "否",
         person.teamLeader ? "是" : "否",
+        person.leaveTypeId ?? "",
       ]),
     ],
-    [10, 14, 16, 10, 24, 14, 14, 14, 14, 16]
+    [10, 14, 16, 16, 24, 14, 14, 14, 14, 16, 30]
   );
   append(
     workbook,
@@ -1076,6 +1123,7 @@ export function buildConfigWorkbook(state: AppState): XLSX.WorkBook {
     ],
     [18, 12, 12, 18, 16, 14, 12, 12, 16, 12, 32, 20, 14, 12, 36]
   );
+  appendLeaveTypes(workbook, state.leaveTypes);
   return workbook;
 }
 

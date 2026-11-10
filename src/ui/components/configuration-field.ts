@@ -74,7 +74,7 @@ export function configurationSelect(
   field: string,
   value: string,
   label: string,
-  options: readonly string[]
+  options: readonly (string | { value: string; label: string })[]
 ) {
   return html`<select
     ${dynamicSelectValue(value)}
@@ -91,7 +91,12 @@ export function configurationSelect(
       })}
   >
     ${options.map(
-      (option) => html`<option .value=${option}>${option}</option>`
+      (option) =>
+        html`<option
+          .value=${typeof option === "string" ? option : option.value}
+        >
+          ${typeof option === "string" ? option : option.label}
+        </option>`
     )}
   </select>`;
 }

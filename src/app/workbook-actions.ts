@@ -222,6 +222,21 @@ export function applyWorkbookImport(
       errors: ["值班轮值工作表存在错误，未写入任何值班轮值数据"],
     };
   }
+  if (importConfig && imported.leaveTypes !== undefined) {
+    const ids = new Set(imported.leaveTypes.map((type) => type.id));
+    const missingReferences = (imported.staff ?? state.staff).filter(
+      (person) => person.leaveTypeId && !ids.has(person.leaveTypeId)
+    );
+    if (missingReferences.length)
+      return {
+        changedConfig: false,
+        recognized: "",
+        rejected: missingReferences.length,
+        errors: [
+          "休假类别表缺少人员正在使用的类别编号，本次配置未写入；请补齐类别或先修改人员状态",
+        ],
+      };
+  }
   const importHistory = imported.history !== undefined;
   const historySummary = importHistory
     ? summarizeHistoryImport(state, imported.history ?? [], imported.staff)
@@ -251,6 +266,8 @@ export function applyWorkbookImport(
         ],
       };
   }
+  if (importConfig && imported.leaveTypes !== undefined)
+    state.leaveTypes = structuredClone(imported.leaveTypes);
   if (importConfig && imported.staff !== undefined) {
     state.staff = imported.staff;
     clearUnqualifiedStandbyOverrides(state);
@@ -370,6 +387,7 @@ export function applyWorkbookImport(
     importConfig &&
     Boolean(
       imported.staff !== undefined ||
+      imported.leaveTypes !== undefined ||
       (mode === "all" && imported.flights !== undefined) ||
       (replaceSharedTemplates &&
         (imported.templates !== undefined ||
@@ -385,6 +403,9 @@ export function applyWorkbookImport(
     clearActiveSchedule(state);
   }
   const recognized = [
+    importConfig &&
+      imported.leaveTypes !== undefined &&
+      `${imported.leaveTypes.length} 个休假类别`,
     importConfig &&
       imported.staff !== undefined &&
       `${imported.staff.length} 人`,

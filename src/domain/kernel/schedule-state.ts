@@ -1,4 +1,5 @@
-import type { Assignment, Staff, StaffStatus } from "../../model";
+import type { Assignment, Staff, LeaveType } from "../../model";
+import { setStaffStatus } from "../staff-status";
 import type { StaffAssignmentFacts } from "../shared/scheduling-facts";
 import { clearSupervisorFillLink } from "../coverage/supervisor-fill-facts";
 
@@ -46,13 +47,13 @@ export function removeUnavailableStaffAssignments(
 }
 
 export function applyStaffStatusChange(
-  state: StaffAssignmentFacts,
+  state: StaffAssignmentFacts & { leaveTypes?: readonly LeaveType[] },
   staffId: string,
-  status: StaffStatus
+  status: string
 ): boolean {
   const person = state.staff.find((item) => item.id === staffId);
   if (!person) return false;
-  person.status = status;
+  if (!setStaffStatus(person, status, state.leaveTypes ?? [])) return false;
   removeUnavailableStaffAssignments(state);
   return true;
 }

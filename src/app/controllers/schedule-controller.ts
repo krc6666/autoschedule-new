@@ -1,3 +1,4 @@
+import { setStaffStatus, staffStatusValue } from "../../domain/staff-status";
 import { currentScheduleHistory } from "../history-actions";
 import { installArchivedNextWorkdaySchedule } from "../schedule-actions";
 import { addIsoDays } from "../../domain/shared/time";
@@ -27,7 +28,11 @@ import {
   type DutyRosterAssignment,
   type DutyRosterSlot,
 } from "../../domain/duty-roster/roster";
-import type { AppState, ScheduleResult, StaffStatus } from "../../model";
+import type {
+  AppState,
+  ScheduleResult,
+  StaffStatusSelection,
+} from "../../model";
 import { presentScheduleFailure } from "../schedule-failure-presentation";
 
 export class ScheduleController implements UiCommandController {
@@ -326,10 +331,24 @@ export class ScheduleController implements UiCommandController {
     }
   }
 
-  private currentStaffStatuses(): Record<string, StaffStatus> {
+  private currentStaffStatuses(): Record<string, StaffStatusSelection> {
     return Object.fromEntries(
-      this.context.model().staff.map((person) => [person.id, person.status])
+      this.context
+        .model()
+        .staff.map((person) => [person.id, staffStatusValue(person)])
     );
+  }
+
+  private canSelectStaffStatus(
+    staffId: string,
+    status: StaffStatusSelection
+  ): boolean {
+    const state = this.context.model();
+    const person = state.staff.find((item) => item.id === staffId);
+    if (person && setStaffStatus({ ...person }, status, state.leaveTypes))
+      return true;
+    this.context.toast("请选择可用的人员状态或休假类别", "warning");
+    return false;
   }
 
   private updatePreflightAdministrativeMode(enabled: boolean): void {
@@ -354,7 +373,7 @@ export class ScheduleController implements UiCommandController {
 
   private dutyRosterForDialog(
     date: string,
-    staffStatuses: Record<string, StaffStatus>
+    staffStatuses: Record<string, StaffStatusSelection>
   ): DutyRosterAssignment {
     const temporaryState = structuredClone(this.context.model());
     this.applyPreflightStaffStatuses(temporaryState, staffStatuses);
@@ -424,7 +443,7 @@ export class ScheduleController implements UiCommandController {
 
   private applyPreflightStaffStatuses(
     state: AppState,
-    statuses: Record<string, StaffStatus>
+    statuses: Record<string, StaffStatusSelection>
   ): void {
     state.staff.forEach((person) => {
       const status = statuses[person.id];
@@ -731,10 +750,11 @@ export class ScheduleController implements UiCommandController {
 
   private updateSchedulePreflightStaffStatus(
     staffId: string,
-    status: StaffStatus
+    status: StaffStatusSelection
   ): void {
     const dialog = this.context.view().dialog;
     if (dialog?.kind !== "schedule-preflight") return;
+    if (!this.canSelectStaffStatus(staffId, status)) return;
     if (!this.context.model().staff.some((person) => person.id === staffId))
       return;
     const statuses = { ...dialog.staffStatuses, [staffId]: status };
@@ -751,10 +771,11 @@ export class ScheduleController implements UiCommandController {
 
   private updateRescheduleStaffStatus(
     staffId: string,
-    status: StaffStatus
+    status: StaffStatusSelection
   ): void {
     const dialog = this.context.view().dialog;
     if (dialog?.kind !== "reschedule-flight-picker") return;
+    if (!this.canSelectStaffStatus(staffId, status)) return;
     if (!this.context.model().staff.some((person) => person.id === staffId))
       return;
     const statuses = {
@@ -1031,10 +1052,11 @@ export class ScheduleController implements UiCommandController {
 
   private updateNextWorkdayStaffStatus(
     staffId: string,
-    status: StaffStatus
+    status: StaffStatusSelection
   ): void {
     const dialog = this.context.view().dialog;
     if (dialog?.kind !== "next-workday-flight-picker") return;
+    if (!this.canSelectStaffStatus(staffId, status)) return;
     if (!this.context.model().staff.some((person) => person.id === staffId))
       return;
     const statuses = { ...dialog.staffStatuses, [staffId]: status };

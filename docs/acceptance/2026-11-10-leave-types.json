@@ -1,0 +1,182 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-10-leave-types",
+  "title": "人员配置可维护休假类别并在全部人员状态选择中使用",
+  "startedFrom": "7003771c85b342b0d33577290c9916424ab86f58",
+  "expectation": {
+    "example": "owner确认入口在配置页人员信息附近。默认只显示管理休假类别小按钮，点击原处展开，再点收起。当前组手动新增飞行假，在人员状态中选中该名称，保存刷新后仍显示飞行假。",
+    "expected": "新增、改名、启停和未使用类别删除；配置页和生成/重排/归档后天准备窗口均可选已启用类别；已选停用类别保留；localStorage和配置Excel往返恢复类别及选择。 类别管理默认收起为小按钮，点击原处展开/收起，管理动作后保持展开，收起不修改人员选择。",
+    "unchanged": "正常、病假、休假三种排班含义保持，所有自建类别使用休假硬限制；A/B组隔离，历史实际承担与次数不改写，新增或停用类别不改变人员当前状态。",
+    "fallback": "空白、重名、无效选择拒绝且保留原值；使用中的类别只能停用不能删除；导入未知假别或损坏引用明确提示并保留休假限制，不能静默恢复正常或丢失人员。收起不提交业务命令；owner已确认实际页面按钮展开/收起及状态选择正常。"
+  },
+  "testedVersion": "841835eb1bad74156a500e97d88433b59bf0188254b2a3fe0de9b95d153d51e4",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "旧UI没有新增入口，非法改名残留输入，直接展开的管理区缺少小按钮；均有先失败、修改后通过的真实执行日志。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-leave-types-red-ui.txt",
+          "summary": "新增入口缺失导致UI测试失败。",
+          "sha256": "70fef9e467b1d76a825c1bda14bc2296ca26a9c77e1deaa3b44ac5f445896052"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-leave-types-rename-red.txt",
+          "summary": "非法改名后输入显示未保存名称的失败回归。",
+          "sha256": "b3c58abf69b8d61751653f97098d5ee3bfaa1f4c0774ee83d8a1af9e996b3392"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-leave-types-collapse-red.txt",
+          "summary": "折叠回归在旧组件找不到details，1项失败、3项通过。",
+          "sha256": "cbfed433f53e49ca82ef2561971335f204ff06ec9e45bdf6c86116b19a0ea452"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-leave-types-collapse-focused.txt",
+          "summary": "最终3个定向文件16项通过：页面新增/选择及折叠、三准备窗口、类别动作、双组/存储/XLSX往返和最终安全反向测试。",
+          "sha256": "925264b84a265222e10d54df6f4b4f81eb3e6c0ccfddb6382c971c3c80e734a0"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-leave-types-commit-format.txt",
+          "summary": "owner验收时组件哈希与格式化前快照一致；提交前源码和测试全文去除空白后逐文件相同。按行比较报告的测试换行差异也完整保留。",
+          "sha256": "d5f6b4651aa58ad19f9ed5dbc81fc97468cee49607ba74b3c14bfb17709d61f4"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "配置页实际类型化命令新增飞行假后option可选，选择后规范状态为休假，非法改名恢复旧输入；默认收起、点击展开/收起且不派发业务命令。owner确认实际页面正常。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-leave-types-collapse-focused.txt",
+          "summary": "最终3个定向文件16项通过：页面新增/选择及折叠、三准备窗口、类别动作、双组/存储/XLSX往返和最终安全反向测试。",
+          "sha256": "925264b84a265222e10d54df6f4b4f81eb3e6c0ccfddb6382c971c3c80e734a0"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-leave-types-owner-page.txt",
+          "summary": "owner实际本地页面确认新增选择可用，折叠调整后确认按钮展开/收起与状态选择均正常；记录人工证据边界和组件哈希。",
+          "sha256": "d2179e6f5f5ac16b430bd46aee8b50c95c5088f57599b478797f6885cb45c750"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-leave-types-commit-format.txt",
+          "summary": "owner验收时组件哈希与格式化前快照一致；提交前源码和测试全文去除空白后逐文件相同。按行比较报告的测试换行差异也完整保留。",
+          "sha256": "d5f6b4651aa58ad19f9ed5dbc81fc97468cee49607ba74b3c14bfb17709d61f4"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "生成、重排、归档后天三个窗口分别验证控件选项、已停用选择保留和真实内核提交/草稿取消；另验双组切换/保存恢复、旧数据/损坏引用、XLSX字节往返、缺表保留及非法表/悬空引用拒绝。此名称配置不新增求解搜索分支；全量性能另通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-leave-types-collapse-focused.txt",
+          "summary": "最终3个定向文件16项通过：页面新增/选择及折叠、三准备窗口、类别动作、双组/存储/XLSX往返和最终安全反向测试。",
+          "sha256": "925264b84a265222e10d54df6f4b4f81eb3e6c0ccfddb6382c971c3c80e734a0"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-leave-types-commit-verify.txt",
+          "summary": "提交前格式化稳定后的npm.cmd run verify退出0：156个功能文件1562项、7个性能文件19项、类型检查和生产构建通过。",
+          "sha256": "023a4106825745c05471bc04246d6721da5c3a297a3c20abace93d853f2aeb6b"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-leave-types-commit-format.txt",
+          "summary": "owner验收时组件哈希与格式化前快照一致；提交前源码和测试全文去除空白后逐文件相同。按行比较报告的测试换行差异也完整保留。",
+          "sha256": "d5f6b4651aa58ad19f9ed5dbc81fc97468cee49607ba74b3c14bfb17709d61f4"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "先生成合法排班，再尝试在人工岗位、岗位频率复核、连续轮岗和晚撤恢复中安排飞行假人员，现有统一安全检查拒绝；类别改名/启停不改变规范休假状态。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-leave-types-collapse-focused.txt",
+          "summary": "最终3个定向文件16项通过：页面新增/选择及折叠、三准备窗口、类别动作、双组/存储/XLSX往返和最终安全反向测试。",
+          "sha256": "925264b84a265222e10d54df6f4b4f81eb3e6c0ccfddb6382c971c3c80e734a0"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-leave-types-commit-format.txt",
+          "summary": "owner验收时组件哈希与格式化前快照一致；提交前源码和测试全文去除空白后逐文件相同。按行比较报告的测试换行差异也完整保留。",
+          "sha256": "d5f6b4651aa58ad19f9ed5dbc81fc97468cee49607ba74b3c14bfb17709d61f4"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "真实assertDailyScheduleSafety拒绝被篡改成飞行假人员的最终assignments，恢复正常后同一岗位可通过；三个计算入口实际结果不含飞行假人员且另一正常人员保留岗位。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-leave-types-collapse-focused.txt",
+          "summary": "最终3个定向文件16项通过：页面新增/选择及折叠、三准备窗口、类别动作、双组/存储/XLSX往返和最终安全反向测试。",
+          "sha256": "925264b84a265222e10d54df6f4b4f81eb3e6c0ccfddb6382c971c3c80e734a0"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-leave-types-commit-format.txt",
+          "summary": "owner验收时组件哈希与格式化前快照一致；提交前源码和测试全文去除空白后逐文件相同。按行比较报告的测试换行差异也完整保留。",
+          "sha256": "d5f6b4651aa58ad19f9ed5dbc81fc97468cee49607ba74b3c14bfb17709d61f4"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "正常/病假/休假限制、组隔离、取消草稿、原模板单元格和人员状态保持；最终完整功能、性能、类型和构建通过。折叠仅为组件原生details，无新存储或排班状态。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-leave-types-commit-verify.txt",
+          "summary": "提交前格式化稳定后的npm.cmd run verify退出0：156个功能文件1562项、7个性能文件19项、类型检查和生产构建通过。",
+          "sha256": "023a4106825745c05471bc04246d6721da5c3a297a3c20abace93d853f2aeb6b"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-leave-types-collapse-focused.txt",
+          "summary": "最终3个定向文件16项通过：页面新增/选择及折叠、三准备窗口、类别动作、双组/存储/XLSX往返和最终安全反向测试。",
+          "sha256": "925264b84a265222e10d54df6f4b4f81eb3e6c0ccfddb6382c971c3c80e734a0"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-leave-types-template.txt",
+          "summary": "配置模板原21表的单元格和人员状态未改，新增空类别表及人员关联列；文件SHA256独立核对。",
+          "sha256": "3a5273c2301b7b54d40c7ade64f205550e32aa65339ede57fbc0ed2e9a73a825"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-leave-types-commit-format.txt",
+          "summary": "owner验收时组件哈希与格式化前快照一致；提交前源码和测试全文去除空白后逐文件相同。按行比较报告的测试换行差异也完整保留。",
+          "sha256": "d5f6b4651aa58ad19f9ed5dbc81fc97468cee49607ba74b3c14bfb17709d61f4"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "verified",
+      "reason": "owner在本地真实页面确认新增选择以及默认按钮原处展开/收起均正常；最终版本通过完整verify和定向回归。Excel界面、移动端视口与真实Worker运行没有单独人工证据，未将自动XLSX/内核验证冒充这些人工场景。 提交前格式化只改空白，原owner实际页面反馈的版本用组件哈希与逐文件空白核对衔接；稳定格式后的完整门禁已重新通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-leave-types-owner-page.txt",
+          "summary": "owner实际本地页面确认新增选择可用，折叠调整后确认按钮展开/收起与状态选择均正常；记录人工证据边界和组件哈希。",
+          "sha256": "d2179e6f5f5ac16b430bd46aee8b50c95c5088f57599b478797f6885cb45c750"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-leave-types-collapse-focused.txt",
+          "summary": "最终3个定向文件16项通过：页面新增/选择及折叠、三准备窗口、类别动作、双组/存储/XLSX往返和最终安全反向测试。",
+          "sha256": "925264b84a265222e10d54df6f4b4f81eb3e6c0ccfddb6382c971c3c80e734a0"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-leave-types-commit-verify.txt",
+          "summary": "提交前格式化稳定后的npm.cmd run verify退出0：156个功能文件1562项、7个性能文件19项、类型检查和生产构建通过。",
+          "sha256": "023a4106825745c05471bc04246d6721da5c3a297a3c20abace93d853f2aeb6b"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-leave-types-commit-format.txt",
+          "summary": "owner验收时组件哈希与格式化前快照一致；提交前源码和测试全文去除空白后逐文件相同。按行比较报告的测试换行差异也完整保留。",
+          "sha256": "d5f6b4651aa58ad19f9ed5dbc81fc97468cee49607ba74b3c14bfb17709d61f4"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "新增入口缺失、非法改名残留、折叠入口缺失分别由red-ui、rename-red、collapse-red失败日志捕获；collapse-focused最终16项通过。",
+    "laterChanges": "风险在三个准备窗口草稿、Store组投影、恢复、Excel及后置重新分配。collapse-focused覆盖三个入口的真实内核/取消、双组/恢复/二进制往返及人工/三类后置/最终安全反向回归；折叠在新增重渲染后仍展开，收起不改选择。",
+    "finalArtifact": "owner-page保存两轮实际反馈和最终组件哈希，owner确认展开收起和状态选择正常；collapse-verify为最终1562项功能、19项性能、类型检查与生产构建通过的输出。未commit、push、部署或发布。 owner随后授权commit；本次提交前又通过commit-verify并以commit-format证明与已验页面的代码仅有空白差异。"
+  },
+  "review": {
+    "missedScope": "核对新增字段的默认/组投影/恢复/Excel/准备窗口/人员侧栏和规范状态消费者；修复追加工作表顺序与非法改名显示遗漏。初版未考虑低频管理的空间成本，已按owner反馈折叠并获确认。没有单独人工验证Excel界面、移动端视口及真实Worker运行；本任务未改变Worker实现。",
+    "rootCause": "人员状态的业务含义与显示名称原先绑死三项，单改下拉框会在恢复/Excel等路径丢失。用稳定类别编号关联并保留原休假语义解决；初版管理区一直展开，导致低频操作占用人员配置空间。",
+    "earlyDetection": "按history中双组配置、三入口草稿及航班均衡后置事故，在字段设计时先列传播矩阵，UI命令验到实际option，存储/Excel做往返，合法班表再尝试后置改坏并验最终守卫；页面首次展示时核对低频区域默认空间并由owner确认。 提交前先让格式化收敛，再跑验证和绑定版本，避免钩子改动使记录过期。"
+  }
+}

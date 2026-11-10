@@ -11,18 +11,37 @@ export class ConfigurationController implements UiCommandController {
   async handle(command: UiCommand): Promise<boolean> {
     const commands = this.context.store.getState().configuration;
     switch (command.type) {
+      case "add-leave-type":
+      case "update-leave-type":
+      case "delete-leave-type": {
+        if (
+          command.type === "delete-leave-type" &&
+          !this.context.confirm("删除这个未使用的休假类别？")
+        )
+          return true;
+        const result =
+          command.type === "add-leave-type"
+            ? commands.addLeaveType(command.name)
+            : command.type === "update-leave-type"
+              ? commands.updateLeaveType(command.id, command.patch)
+              : commands.deleteLeaveType(command.id);
+        if (!result.ok) this.context.toast(result.error, "warning");
+        else this.context.commit("休假类别已更新");
+        return true;
+      }
       case "update-configuration": {
         if (command.entity === "staff" && command.field === "status") {
-          const status =
-            command.value === "病假"
-              ? "病假"
-              : command.value === "休假"
-                ? "休假"
-                : "正常";
+          const status = String(command.value);
           const changed = this.context.store
             .getState()
             .schedule.applyStaffStatus(command.id, status);
-          if (!changed) return true;
+          if (!changed) {
+            this.context.toast(
+              "人员状态未更新，请选择可用的状态或休假类别",
+              "warning"
+            );
+            return true;
+          }
           const activeDate = this.context.model().activeScheduleDate;
           if (!activeDate) {
             this.context.commit("人员状态已更新");

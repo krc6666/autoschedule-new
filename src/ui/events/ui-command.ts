@@ -5,13 +5,20 @@ import type {
   AppSection,
   IsoWeekday,
   ScheduleGroupId,
-  StaffStatus,
+  StaffStatusSelection,
 } from "../../model";
 import type { HalfRestMode } from "../../domain/shared/schedule-run-preferences";
 
 export type EditableValue = string | number | boolean;
 
 export type UiCommand =
+  | { type: "add-leave-type"; name: string }
+  | {
+      type: "update-leave-type";
+      id: string;
+      patch: { name?: string; enabled?: boolean };
+    }
+  | { type: "delete-leave-type"; id: string }
   | { type: "navigate"; section: AppSection }
   | { type: "change-date"; date: string }
   | { type: "switch-group"; groupId: ScheduleGroupId }
@@ -74,7 +81,7 @@ export type UiCommand =
   | {
       type: "update-schedule-preflight-staff-status";
       staffId: string;
-      status: StaffStatus;
+      status: StaffStatusSelection;
     }
   | {
       type: "update-schedule-preflight-duty-roster";
@@ -103,7 +110,7 @@ export type UiCommand =
   | {
       type: "update-reschedule-flight-picker-staff-status";
       staffId: string;
-      status: StaffStatus;
+      status: StaffStatusSelection;
     }
   | {
       type: "update-reschedule-flight-picker-duty-roster";
@@ -242,7 +249,7 @@ export type UiCommand =
   | {
       type: "update-next-workday-flight-picker-staff-status";
       staffId: string;
-      status: StaffStatus;
+      status: StaffStatusSelection;
     }
   | {
       type: "update-next-workday-flight-picker-duty-roster";

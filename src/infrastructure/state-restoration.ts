@@ -2,6 +2,10 @@ import { normalizeSupervisorAssignments } from "../domain/assignments/schedule-a
 import { restoreManualCountEvidence } from "./manual-count-evidence";
 import { normalizeScheduleSettings } from "../domain/rules/schedule-settings";
 import { removeUnavailableStaffAssignments } from "../domain/kernel/schedule-state";
+import {
+  BUILTIN_STAFF_STATUSES,
+  normalizeLeaveTypes,
+} from "../domain/staff-status";
 import type {
   AppState,
   Assignment,
@@ -211,7 +215,32 @@ function migrateSettings(
   return normalizeScheduleSettings(migrated, fallback);
 }
 
-const STAFF_STATUSES = new Set<Staff["status"]>(["正常", "病假", "休假"]);
+const STAFF_STATUSES = new Set<Staff["status"]>(BUILTIN_STAFF_STATUSES);
+
+function restoreLeaveTypes(
+  value: unknown,
+  staff: readonly Staff[],
+  issues: StateRestorationIssue[]
+): AppState["leaveTypes"] {
+  const types = normalizeLeaveTypes(value);
+  if (
+    value !== undefined &&
+    (!Array.isArray(value) || types.length !== value.length)
+  )
+    issues.push({
+      collection: "leaveTypes",
+      reason: "部分休假类别数据无效，未恢复这些类别；原人员休假限制保留",
+    });
+  const ids = new Set(types.map((item) => item.id));
+  for (const person of staff) {
+    if (person.leaveTypeId && !ids.has(person.leaveTypeId))
+      issues.push({
+        collection: "staff",
+        reason: "人员引用的休假类别缺失，已保留人员及休假限制，请重新选择类别",
+      });
+  }
+  return types;
+}
 
 function restoreStaff(value: unknown[]): Staff[] {
   return value.flatMap((item): Staff[] => {
@@ -238,7 +267,13 @@ function restoreStaff(value: unknown[]): Staff[] {
         standbyQualified:
           staffType === "行政支援" ? false : item.standbyQualified !== false,
         nightShift: item.nightShift,
-        status: item.status as Staff["status"],
+        status:
+          typeof item.leaveTypeId === "string" && item.leaveTypeId
+            ? "休假"
+            : (item.status as Staff["status"]),
+        ...(typeof item.leaveTypeId === "string" && item.leaveTypeId
+          ? { leaveTypeId: item.leaveTypeId }
+          : {}),
         remark: item.remark,
       },
     ];
@@ -696,6 +731,7 @@ function emptyGroupWorkspace(
   settings: ScheduleSettings
 ): GroupWorkspace {
   return {
+    leaveTypes: [],
     flights: [],
     staff: [],
     positionRules: structuredClone([...positionRules]),
@@ -712,6 +748,7 @@ function emptyGroupWorkspace(
 
 function groupWorkspaceFromState(state: AppState): GroupWorkspace {
   return {
+    leaveTypes: structuredClone(state.leaveTypes),
     flights: structuredClone(state.flights),
     staff: structuredClone(state.staff),
     positionRules: structuredClone(state.positionRules),
@@ -747,6 +784,7 @@ function restoreGroupWorkspace(
 ): GroupWorkspace {
   if (!isRecord(value)) return structuredClone(fallback);
   const staff = restoredCollection(value.staff, fallback.staff, restoreStaff);
+  const leaveTypes = restoreLeaveTypes(value.leaveTypes, staff, issues);
   const flights = restoredCollection(
     value.flights,
     fallback.flights,
@@ -771,6 +809,7 @@ function restoreGroupWorkspace(
   );
   const workspaceState = {
     ...base,
+    leaveTypes,
     flights,
     staff,
     positionRules,
@@ -809,6 +848,7 @@ function restoreGroupWorkspace(
     savedRuleFingerprint = undefined;
   }
   return {
+    leaveTypes,
     flights,
     staff,
     positionRules,
@@ -841,6 +881,7 @@ function projectActiveGroup(next: AppState): void {
   }
   next.flights = active.flights;
   next.staff = active.staff;
+  next.leaveTypes = active.leaveTypes;
   next.positionRules = active.positionRules;
   next.settings = active.settings;
   next.history = active.history;
@@ -882,6 +923,7 @@ export function restorePersistedState(
     shared: structuredClone(fallback.shared),
     groups: structuredClone(fallback.groups),
     activeGroupId: "A",
+    leaveTypes: [],
     staff: restoredCollection(value.staff, fallback.staff, restoreStaff),
     flights: restoredCollection(
       value.flights,
@@ -936,6 +978,7 @@ export function restorePersistedState(
         ? value.updatedAt
         : fallback.updatedAt,
   };
+  next.leaveTypes = restoreLeaveTypes(value.leaveTypes, next.staff, issues);
   try {
     const persistedAssignments = Array.isArray(value.assignments)
       ? value.assignments

@@ -52,6 +52,7 @@ export async function prepareWorkbookImport(
   }
   const { importWorkbook } = await import("../infrastructure/excel");
   const imported = await importWorkbook(file, state.staff, {
+    leaveTypes: state.leaveTypes,
     legacySchedule: {
       targetDate: dutyRosterReferenceDate,
       latePriorityOnly: true,

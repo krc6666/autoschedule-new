@@ -7,7 +7,7 @@ import {
 } from "../schedule-actions";
 import { installGeneratedSchedule } from "../../domain/kernel/schedule-lifecycle";
 import { applyStaffStatusChange } from "../../domain/kernel/schedule-state";
-import type { ScheduleResult, StaffStatus } from "../../model";
+import type { ScheduleResult } from "../../model";
 import type { StateCommand } from "./store-command";
 import {
   applyTeamLeaderGapFillPreview,
@@ -51,7 +51,7 @@ export function createScheduleCommands(command: StateCommand) {
       ),
     deleteTemporary: (id: string) =>
       command((state) => deleteTemporaryAssignment(state, id)),
-    applyStaffStatus: (id: string, status: StaffStatus) =>
+    applyStaffStatus: (id: string, status: string) =>
       command((state) => applyStaffStatusChange(state, id, status)),
     applyTeamLeaderGapFill: (preview: TeamLeaderGapFillPreview) =>
       command((state) => {

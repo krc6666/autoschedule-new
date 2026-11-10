@@ -1,0 +1,7 @@
+﻿{
+    "htmlStatus":  200,
+    "entryScriptPresent":  true,
+    "leaveModuleStatus":  200,
+    "categoryElementRegistered":  true,
+    "method":  "HTTP source smoke only; no browser or user data accessed; ASCII module markers avoid HTTP charset guessing"
+}

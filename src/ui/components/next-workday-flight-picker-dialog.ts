@@ -1,7 +1,11 @@
 import { html } from "lit";
 
 import type { ApplicationDialog } from "../../app/application-view-state";
-import type { AppState, StaffStatus } from "../../model";
+import type { AppState, StaffStatusSelection } from "../../model";
+import {
+  staffStatusOptions,
+  staffStatusValue,
+} from "../../domain/staff-status";
 import type { DutyRosterSlot } from "../../domain/duty-roster/roster";
 import { dispatchUiCommand } from "../events/ui-command";
 import { LightDomElement } from "./light-dom-element";
@@ -213,7 +217,7 @@ export class NextWorkdayFlightPickerDialogElement extends LightDomElement {
     const statuses =
       this.dialog.staffStatuses ??
       Object.fromEntries(
-        this.model.staff.map((person) => [person.id, person.status])
+        this.model.staff.map((person) => [person.id, staffStatusValue(person)])
       );
     return html`<section class="mt-4" aria-label="人员状态确认">
       <h3 class="h6 mb-2">确认休假人员</h3>
@@ -230,17 +234,16 @@ export class NextWorkdayFlightPickerDialogElement extends LightDomElement {
               <select
                 class="form-select form-select-sm w-auto"
                 aria-label="${person.name} 状态"
-                .value=${statuses[person.id] ?? person.status}
+                ${dynamicSelectValue(statuses[person.id] ?? staffStatusValue(person))}
+                .value=${statuses[person.id] ?? staffStatusValue(person)}
                 @change=${(event: Event) =>
                   this.updateStaffStatus(
                     person.id,
                     (event.currentTarget as HTMLSelectElement)
-                      .value as StaffStatus
+                      .value as StaffStatusSelection
                   )}
               >
-                <option value="正常">正常</option>
-                <option value="病假">病假</option>
-                <option value="休假">休假</option>
+                ${staffStatusOptions(this.model.leaveTypes, statuses[person.id] ?? staffStatusValue(person)).map((option) => html`<option value=${option.value}>${option.label}</option>`)}
               </select>
             </label>`
         )}
@@ -248,7 +251,10 @@ export class NextWorkdayFlightPickerDialogElement extends LightDomElement {
     </section>`;
   }
 
-  private updateStaffStatus(staffId: string, status: StaffStatus): void {
+  private updateStaffStatus(
+    staffId: string,
+    status: StaffStatusSelection
+  ): void {
     dispatchUiCommand(this, {
       type:
         this.dialog.kind === "schedule-preflight"

@@ -224,6 +224,7 @@ export function createDefaultState(): AppState {
     weeklyFlightPlans: structuredClone(weeklyFlightPlans),
   };
   const groupA: GroupWorkspace = {
+    leaveTypes: [],
     flights: structuredClone(flights),
     staff: structuredClone(staff),
     positionRules: structuredClone(positionRules),
@@ -237,6 +238,7 @@ export function createDefaultState(): AppState {
     schedulePolicyStale: false,
   };
   const groupB: GroupWorkspace = {
+    leaveTypes: [],
     flights: [],
     staff: [],
     positionRules: structuredClone(positionRules),
@@ -254,6 +256,7 @@ export function createDefaultState(): AppState {
     shared,
     groups: { A: groupA, B: groupB },
     activeGroupId: "A",
+    leaveTypes: groupA.leaveTypes,
     staff,
     flights,
     templates: shared.templates,

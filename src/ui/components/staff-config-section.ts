@@ -1,6 +1,11 @@
 import { html } from "lit";
 
 import type { AppState } from "../../model";
+import {
+  staffStatusOptions,
+  staffStatusValue,
+} from "../../domain/staff-status";
+import "./leave-types-section";
 import { dispatchUiCommand } from "../events/ui-command";
 import {
   configurationInput,
@@ -36,6 +41,9 @@ export class StaffConfigSectionElement extends LightDomElement {
         ><i class="bi bi-chevron-down"></i>
       </summary>
       <div class="config-collapsible-content">
+        <autoschedule-leave-types
+          .model=${this.model}
+        ></autoschedule-leave-types>
         <div class="config-collapsible-toolbar">
           <button
             class="btn btn-outline-secondary"
@@ -114,7 +122,7 @@ export class StaffConfigSectionElement extends LightDomElement {
                       ${configurationToggle(this, "staff", person.id, "nightShift", person.nightShift, "可上夜班")}
                     </td>
                     <td>
-                      ${configurationSelect(this, "staff", person.id, "status", person.status, "状态", ["正常", "病假", "休假"])}
+                      ${configurationSelect(this, "staff", person.id, "status", staffStatusValue(person), "状态", staffStatusOptions(this.model.leaveTypes, staffStatusValue(person)))}
                     </td>
                     <td>
                       ${configurationInput(this, "staff", person.id, "remark", person.remark, "备注")}

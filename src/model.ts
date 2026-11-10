@@ -14,6 +14,12 @@ import type {
 import type { LatePriorityFrequencyKind } from "./domain/reviews/late-priority-policy";
 
 export type StaffStatus = "正常" | "病假" | "休假";
+export type StaffStatusSelection = StaffStatus | `leave:${string}`;
+export interface LeaveType {
+  id: string;
+  name: string;
+  enabled: boolean;
+}
 export type StaffType = "常规" | "行政支援";
 
 export interface Staff {
@@ -26,6 +32,7 @@ export interface Staff {
   standbyQualified: boolean;
   nightShift: boolean;
   status: StaffStatus;
+  leaveTypeId?: string;
   remark: string;
 }
 
@@ -217,6 +224,7 @@ export interface SharedScheduleData {
 
 /** Scheduling facts and configuration owned exclusively by one group. */
 export interface GroupWorkspace {
+  leaveTypes: LeaveType[];
   flights: Flight[];
   staff: Staff[];
   positionRules: PositionRule[];
@@ -239,6 +247,7 @@ export interface AppState {
   shared: SharedScheduleData;
   groups: GroupWorkspaces;
   activeGroupId: ScheduleGroupId;
+  leaveTypes: LeaveType[];
   /**
    * Current-group projection consumed by existing scheduling and UI modules.
    * The store activates it from groups while templates and weekly plans stay shared.

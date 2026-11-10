@@ -23,9 +23,23 @@ import type { FlightPlanReconciliation } from "../../domain/flights/flight-plan-
 import type { ConfigurationValue } from "../configuration-actions";
 import type { IsoWeekday } from "../../model";
 import type { StateCommand } from "./store-command";
+import {
+  addLeaveType,
+  updateLeaveType,
+  deleteLeaveType,
+} from "../leave-type-actions";
+import type { LeaveType } from "../../model";
 
 export function createConfigurationCommands(command: StateCommand) {
   return {
+    addLeaveType: (name: string) =>
+      command((state) => addLeaveType(state, name)),
+    updateLeaveType: (
+      id: string,
+      patch: Partial<Pick<LeaveType, "name" | "enabled">>
+    ) => command((state) => updateLeaveType(state, id, patch)),
+    deleteLeaveType: (id: string) =>
+      command((state) => deleteLeaveType(state, id)),
     addFlight: () => command(addFlight),
     deleteFlight: (id: string) => command((state) => deleteFlight(state, id)),
     addTemplate: () => command(addTemplate),
