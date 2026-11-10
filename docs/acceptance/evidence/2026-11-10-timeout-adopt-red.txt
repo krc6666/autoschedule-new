@@ -1,0 +1,88 @@
+命令：npm.cmd exec vitest -- run tests/infrastructure/schedule-runner.test.ts tests/app/stop-and-adopt.test.ts
+修改前退出码：1
+ ❯ tests/infrastructure/schedule-runner.test.ts (22 tests | 3 failed) 10016ms
+     × ends at ten minutes without extending the deadline for progress 13ms
+     × automatically adopts the latest nonempty result including explained vacancies 5ms
+     × honors the deadline before processing a late message when the timer is delayed 9ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 12 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/app/stop-and-adopt.test.ts > 停止结果完整链路：'generate-schedule' > timeout-adopt
+ FAIL  tests/app/stop-and-adopt.test.ts > 停止结果完整链路：'generate-schedule' > timeout-empty
+ FAIL  tests/app/stop-and-adopt.test.ts > 停止结果完整链路：'generate-schedule' > timeout-tampered
+ FAIL  tests/app/stop-and-adopt.test.ts > 停止结果完整链路：'open-reschedule-flight-picker' > timeout-adopt
+ FAIL  tests/app/stop-and-adopt.test.ts > 停止结果完整链路：'open-reschedule-flight-picker' > timeout-empty
+ FAIL  tests/app/stop-and-adopt.test.ts > 停止结果完整链路：'open-reschedule-flight-picker' > timeout-tampered
+ FAIL  tests/app/stop-and-adopt.test.ts > 停止结果完整链路：'archive-next-duty-day' > timeout-adopt
+ FAIL  tests/app/stop-and-adopt.test.ts > 停止结果完整链路：'archive-next-duty-day' > timeout-empty
+ FAIL  tests/app/stop-and-adopt.test.ts > 停止结果完整链路：'archive-next-duty-day' > timeout-tampered
+AssertionError: expected "vi.fn()" to be called once, but got 0 times
+ ❯ tests/app/stop-and-adopt.test.ts:210:34
+    208|       if (automatic) {
+    209|         await vi.advanceTimersByTimeAsync(600_000);
+    210|         expect(worker.terminate).toHaveBeenCalledOnce();
+       |                                  ^
+    211|       } else await coordinator.handle({
+    212|         type:
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/12]⎯
+
+ FAIL  tests/infrastructure/schedule-runner.test.ts > background schedule runner > ends at ten minutes without extending the deadline for progress
+AssertionError: expected "vi.fn()" to be called once, but got 0 times
+ ❯ tests/infrastructure/schedule-runner.test.ts:53:30
+     51|     worker.emit({ type: "progress", stage: "optimize", percent: 15 });
+     52|     await vi.advanceTimersByTimeAsync(1);
+     53|     expect(worker.terminate).toHaveBeenCalledOnce();
+       |                              ^
+     54|     await expect(run.result).resolves.toEqual({
+     55|       kind: "stopped-without-result",
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/12]⎯
+
+ FAIL  tests/infrastructure/schedule-runner.test.ts > background schedule runner > automatically adopts the latest nonempty result including explained vacancies
+AssertionError: expected "vi.fn()" to be called once, but got 0 times
+ ❯ tests/infrastructure/schedule-runner.test.ts:84:30
+     82|     worker.emit({ type: "safe-result", result: latest });
+     83|     await vi.advanceTimersByTimeAsync(10_000);
+     84|     expect(worker.terminate).toHaveBeenCalledOnce();
+       |                              ^
+     85|     await expect(run.result).resolves.toEqual({ kind: "stopped-with-re…
+     86|     worker.emit({ type: "result", result: first });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/12]⎯
+
+ FAIL  tests/infrastructure/schedule-runner.test.ts > background schedule runner > honors the deadline before processing a late message when the timer is delayed
+AssertionError: expected { kind: 'completed', result: { …(3) } } to deeply equal { kind: 'stopped-with-result', …(2) }
+
+- Expected
++ Received
+
+  {
+-   "kind": "stopped-with-result",
++   "kind": "completed",
+    "result": {
+      "assignments": [],
+      "unfilledCount": 0,
+      "warnings": [
+-       "latest",
++       "too late",
+      ],
+    },
+-   "stopReason": "time-limit",
+  }
+
+ ❯ tests/infrastructure/schedule-runner.test.ts:98:28
+     96|     vi.setSystemTime(Date.now() + 600_000);
+     97|     worker.emit({ type: "result", result: { ...latest, warnings: ["too…
+     98|     await expect(run.result).resolves.toEqual({ kind: "stopped-with-re…
+       |                            ^
+     99|     expect(worker.terminate).toHaveBeenCalledOnce();
+    100|     expect(vi.getTimerCount()).toBe(0);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/12]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  12 failed | 31 passed (43)
+   Start at  20:48:15
+   Duration  11.74s (transform 2.51s, setup 0ms, import 3.03s, tests 11.41s, environment 0ms)

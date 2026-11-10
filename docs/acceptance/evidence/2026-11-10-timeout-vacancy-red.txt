@@ -1,0 +1,35 @@
+命令：npm.cmd exec vitest -- run tests/app/stop-and-adopt.test.ts -t timeout-vacancy
+退出码：1
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/app/stop-and-adopt.test.ts (26 tests | 3 failed | 23 skipped) 263ms
+     × timeout-vacancy 112ms
+     × timeout-vacancy 82ms
+     × timeout-vacancy 67ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/app/stop-and-adopt.test.ts > 停止结果完整链路：'generate-schedule' > timeout-vacancy
+ FAIL  tests/app/stop-and-adopt.test.ts > 停止结果完整链路：'open-reschedule-flight-picker' > timeout-vacancy
+ FAIL  tests/app/stop-and-adopt.test.ts > 停止结果完整链路：'archive-next-duty-day' > timeout-vacancy
+AssertionError: expected '班表已生成，以下 1 个岗位未排上人：' to contain '10分钟'
+
+Expected: "10分钟"
+Received: "班表已生成，以下 1 个岗位未排上人："
+
+ ❯ tests/app/stop-and-adopt.test.ts:241:66
+    239|           expect(coordinator.model().assignments[1]!.systemNotes).toCo…
+    240|         } else expect(coordinator.view().toast?.message).toContain("采用…
+    241|         if (automatic) expect(coordinator.view().toast?.message).toCon…
+       |                                                                  ^
+    242|         expect(setItem).toHaveBeenCalledOnce();
+    243|         expect(persistence.load().assignments).toEqual(latest!.assignm…
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ Test Files  1 failed (1)
+      Tests  3 failed | 23 skipped (26)
+   Start at  20:57:28
+   Duration  2.08s (transform 1.38s, setup 0ms, import 1.61s, tests 263ms, environment 0ms)

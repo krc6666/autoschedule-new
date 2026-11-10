@@ -4,6 +4,7 @@ import type {
 } from "../application-context";
 import type { UiCommand } from "../../ui/events/ui-command";
 import { normalizeWeeklyFlightNo } from "../../domain/flights/weekly-flight-plan";
+import { scheduleRunStopMessage } from "../schedule-run-controller";
 
 export class ConfigurationController implements UiCommandController {
   constructor(private readonly context: ApplicationContext) {}
@@ -54,17 +55,25 @@ export class ConfigurationController implements UiCommandController {
               activeDate
             );
             if (outcome.kind === "stopped-without-result") {
-              this.context.commit("人员状态已更新，排班重算已停止");
+              this.context.commit(
+                scheduleRunStopMessage(
+                  outcome,
+                  "人员状态已更新，排班重算已停止"
+                )
+              );
               return true;
             }
             const result = outcome.result;
             this.context.store.getState().schedule.install(activeDate, result);
             this.context.commit(
-              outcome.kind === "stopped-with-result"
-                ? "人员状态已更新，已采用最近一份完整安全方案"
-                : result.unfilledCount
-                  ? `人员状态已更新，当前排班已重新计算，${result.unfilledCount} 个岗位待补位`
-                  : "人员状态已更新，当前排班已重新计算"
+              scheduleRunStopMessage(
+                outcome,
+                outcome.kind === "stopped-with-result"
+                  ? "人员状态已更新，已采用最近一份完整安全方案"
+                  : result.unfilledCount
+                    ? `人员状态已更新，当前排班已重新计算，${result.unfilledCount} 个岗位待补位`
+                    : "人员状态已更新，当前排班已重新计算"
+              )
             );
           } catch (error) {
             this.context.toast(

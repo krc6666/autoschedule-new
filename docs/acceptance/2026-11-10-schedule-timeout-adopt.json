@@ -1,0 +1,152 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-10-schedule-timeout-adopt",
+  "title": "排班满10分钟自动采用最近完整安全班表",
+  "startedFrom": "e0fa895dbe1fb50def065d33b2608baf0e4ff5e2",
+  "expectation": {
+    "example": "owner在提前检查后确认：整次排班最长等10分钟，结束等待时采用截至当时已经算完且检查通过的班表；不能因为后续优化未完成丢弃整表，同时必须验证班表正确。",
+    "expected": "同一后台任务先收到安全班表甲、再乙，满600000毫秒自动终止后台并沿原安装路径采用乙；允许已有说明的局部空岗。生成、重新排班、归档后天、模式切换和状态触发重算共用同一时限；归档后天同时归档本班、切日、保存模式和人员草稿，迟到消息不覆盖。",
+    "unchanged": "不改岗位规则、人员状态/资质/夜班/冲突/工时、150/300秒整体求解预算、局部搜索预算、快照完整后置和最终凭证验证、手动停止、正常完成及程序错误处理。没有新设置或持久化字段，不修改原Excel。",
+    "fallback": "到10分钟没有可用新快照时沿停止不采用路径保留原班表和草稿；安装凭证被篡改仍拒绝并保留旧状态；后台错误不冒充超时或安全结果。无Worker主线程回退无法抢占同步计算，只能在事件循环恢复时结算并屏蔽迟到结果，须如实报告。"
+  },
+  "testedVersion": "2fb1ded783a3f1c124df4a8b61e717d87e5ecc4ca5f83d426610f43bdb5a7939",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "原实现受控后台在600000毫秒仍不结束，首轮12项失败、31项通过；新增三入口真实空岗回执断言又发现3项失败。修复后最终6文件144项定向通过，包含截止前1毫秒、自动采用/无快照/不续期和空岗说明。均为自动测试，不是页面10分钟实测。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-timeout-adopt-red.txt",
+          "summary": "首次改前失败输出：12失败31通过。",
+          "sha256": "bda294ad4717f21b201201dc106eed823f2a1ac083c3693c8b393ee6965ae9e4"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-timeout-vacancy-red.txt",
+          "summary": "黄色空岗提醒覆盖10分钟说明，三入口断言失败。",
+          "sha256": "692d2c99780ef5759f9b8892c988ee9da54e5b8a43b8623949eb2005a8520e43"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-timeout-focused.txt",
+          "summary": "最终定向6文件144项通过，退出0。",
+          "sha256": "99bb5ea0c30e6652a8f72fa797eee7167a10c69160d17f475f09e8b3c394a865"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "正常完成与手动停止语义保持；真实用户配置在隔离内存完整导入后运行真实内核约12.1秒，56岗位52安排4空缺，安全重验通过。全量163文件1649项功能通过，范围含Worker/solver和app路径。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-timeout-functional.txt",
+          "summary": "npm.cmd test，163文件1649项通过，退出0。",
+          "sha256": "877421300e7d6f4c8de032027646f77c52fe9223f9ff2c309abd6cbeae4d1c4d"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-timeout-adopt-real-config.json",
+          "summary": "实际配置隔离计算与独立安排计数，原文件SHA256及结果指纹已记录。",
+          "sha256": "1afbd21d94d32a16e0830da1dc4c483c8ff4a0b38258c3c70710b55e3264a10c"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "自动测试覆盖生成/重排/归档后天三入口，模式切换和状态重算；自动采用/没有快照/凭证篡改/含有原因空岗，下一次运行及主线程回退迟到回调。归档日期、模式草稿、另一组和周计划保留。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-timeout-focused.txt",
+          "summary": "6文件144项涵盖所有五处calculate消费者及其原提交链。",
+          "sha256": "99bb5ea0c30e6652a8f72fa797eee7167a10c69160d17f475f09e8b3c394a865"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "安全结果先完成原后置再发布，本次不改领域管线；自动测试先发布两版合法非空结果，采用最新版，再投递旧消息不得覆盖。三入口Store安装及保存恢复、后天归档原子提交保持；真实计算结果安装后assignments一致，实际Excel字节读回56行。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-timeout-focused.txt",
+          "summary": "迟到消息、保存恢复、日期/模式/草稿和局部空岗回归通过。",
+          "sha256": "99bb5ea0c30e6652a8f72fa797eee7167a10c69160d17f475f09e8b3c394a865"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-timeout-adopt-real-config.json",
+          "summary": "真实结果受控超时采用、安装完全一致及XLSX字节读回。",
+          "sha256": "1afbd21d94d32a16e0830da1dc4c483c8ff4a0b38258c3c70710b55e3264a10c"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "自动采用仍走原最终安全凭证安装；先生成合法凭证再篡改结果的三入口回归均拒绝并保持旧状态。实际配置最终守卫与daily safety重验通过，休假安排0、编号柜台资质错误0、最大合计工时6小时小于12小时。凭证未绕过或重签。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-timeout-focused.txt",
+          "summary": "三入口timeout-tampered等反向回归及原安全安装通过。",
+          "sha256": "99bb5ea0c30e6652a8f72fa797eee7167a10c69160d17f475f09e8b3c394a865"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-timeout-adopt-real-config.json",
+          "summary": "真实配置结果安全重验和独立人员/资质/工时核对。",
+          "sha256": "1afbd21d94d32a16e0830da1dc4c483c8ff4a0b38258c3c70710b55e3264a10c"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "未修改领域规则、模型预算、配置字段或原Excel。真实配置选定字段指纹与改前相同。初次分层验证各命令分开执行；owner授权commit后，完整npm.cmd run verify退出0，功能1649项、性能19项、类型检查和生产构建通过。性能样本在当前Windows本机、既有Vite服务运行环境测试，不能据一次通过宣称整体加速。构建包含Worker/WASM并有依赖的Node模块浏览器外置提示，尚无本次浏览器运行证据。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-timeout-typecheck.txt",
+          "summary": "npm.cmd run typecheck退出0。",
+          "sha256": "4b3f7cf1ed06cba39ee3b0608990fffcf42e1ff315949a5353a62ce478a2683c"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-timeout-functional.txt",
+          "summary": "完整功能163文件1649项退出0。",
+          "sha256": "877421300e7d6f4c8de032027646f77c52fe9223f9ff2c309abd6cbeae4d1c4d"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-timeout-performance.txt",
+          "summary": "npm.cmd run test:performance，7文件19项退出0。",
+          "sha256": "295bc10e0a847c3c645e0cbf69f4aa2543bdc1263287b17a5d5ab670a7a7d4c2"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-timeout-build.txt",
+          "summary": "npm.cmd run build退出0，生成Worker/WASM等产物。",
+          "sha256": "607103d044da5d29e331a65ced267f98bb0f08aa3a43911d32fab32e74bda445"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-timeout-adopt-real-config.json",
+          "summary": "选定结果字段指纹与改前一致，未修改私有原配置。",
+          "sha256": "1afbd21d94d32a16e0830da1dc4c483c8ff4a0b38258c3c70710b55e3264a10c"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-timeout-verify.txt",
+          "summary": "owner授权commit后的完整npm.cmd run verify退出0，1649功能、19性能、类型检查与生产构建通过。",
+          "sha256": "e0e7ce4618efaa154d5c44472c53bdf6cfdd2ff140fc1a4c1033fc53e38b47fd"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "尚未获得owner实际页面操作后的结果，未授权agent自行浏览器复现，保持未验收。当前只有真实配置隔离内核结果、受控600000毫秒后台延迟采用与Excel字节读回；不能替代真实浏览器10分钟、实际Worker/WASM运行和页面最终班表/刷新核对。owner已授权本次开发提交，未push或发布。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-timeout-adopt-real-config.json",
+          "summary": "部分最终产物证据：隔离内存安装与56行导出一致，明确非浏览器实测。",
+          "sha256": "1afbd21d94d32a16e0830da1dc4c483c8ff4a0b38258c3c70710b55e3264a10c"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "改前timeout-adopt-red的12项失败证明无限等候；timeout-vacancy-red的3项失败证明后续空岗提示覆盖结束原因。最终timeout-focused的144项和timeout-functional的1649项均通过。",
+    "laterChanges": "Worker迟到消息、下一次运行、主线程回退迟到回调、安装凭证、黄色空岗提醒、Store保存恢复和后天归档均可能影响最终结果；定向自动回归逐项覆盖，篡改凭证拒绝，真实配置安装和XLSX读回一致。页面入口仍未验收。",
+    "finalArtifact": "timeout-adopt-real-config.json记录实际配置隔离计算的56岗位/52安排/4空缺、安全核对、与改前相同的选定字段指纹、受控10分钟采用、安装一致及56行XLSX读回。尚无本次实际页面最终产物，不能声明业务验收通过。"
+  },
+  "review": {
+    "missedScope": "已沿五处calculate消费者核对自动采用、无快照、凭证拒绝及三入口空岗提示，并补齐模式切换/人员状态重算与回退迟到回调。真实浏览器未验证；无Worker同步执行不能准点抢占，已写入合同；原Excel斜杠拆名导致4空缺、重复计算性能问题仍未修。",
+    "rootCause": "外层runner没有覆盖整次任务的总期限，150/300秒只是模型预算，不能保证后台失联或后置流程结束；后续空岗toast又会覆盖统一的自动截止回执。缺陷不是人员安全检查过严，不能靠放松规则解决。",
+    "earlyDetection": "运行机制变更前列出所有outcome消费者，先用不回消息的受控Worker、599999/600000边界和两版非空安全班表写失败测试；安装后再投递旧消息/篡改凭证/发空岗提示，逐项检查最终保存结果。交付前以真实配置独立核对安排、空岗、状态/资格/工时及真实页面，页面证据缺失就保持未验收。"
+  }
+}

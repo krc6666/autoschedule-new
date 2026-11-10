@@ -1,0 +1,7 @@
+Captured final output from exec session 12288; exit_code 0.
+Command: npm.cmd exec vitest -- run tests/infrastructure/schedule-runner.test.ts tests/app/stop-and-adopt.test.ts tests/app/schedule-run-controller.test.ts tests/app/preflight-admin-mode.test.ts tests/app/schedule-preflight.test.ts tests/app/configuration-controller.test.ts
+
+ Test Files  6 passed (6)
+      Tests  144 passed (144)
+   Start at  20:58:25
+   Duration  12.02s (transform 6.72s, setup 0ms, import 9.34s, tests 13.98s, environment 1ms)

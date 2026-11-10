@@ -1,11 +1,15 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { createDefaultState } from "../../src/defaults";
+import type { ScheduleResult } from "../../src/model";
 import { createTestAutoscheduleStore } from "../helpers/application";
 import { runScheduleInBackground } from "../../src/infrastructure/schedule-runner";
 import type { ScheduleWorkerResponse } from "../../src/infrastructure/schedule-worker-protocol";
 
-afterEach(() => vi.unstubAllGlobals());
+afterEach(() => {
+  vi.unstubAllGlobals();
+  vi.useRealTimers();
+});
 
 class ControlledWorker {
   static instances: ControlledWorker[] = [];
@@ -37,6 +41,181 @@ function createRun(halfRestStaffIds: string[] = []) {
 }
 
 describe("background schedule runner", () => {
+  it("ends at ten minutes without extending the deadline for progress", async () => {
+    vi.useFakeTimers();
+    const { run, worker } = createRun();
+    const ended = vi.fn();
+    void run.result.then(ended);
+    await vi.advanceTimersByTimeAsync(599_999);
+    expect(ended).not.toHaveBeenCalled();
+    worker.emit({ type: "progress", stage: "optimize", percent: 15 });
+    await vi.advanceTimersByTimeAsync(1);
+    expect(worker.terminate).toHaveBeenCalledOnce();
+    await expect(run.result).resolves.toEqual({
+      kind: "stopped-without-result",
+      stopReason: "time-limit",
+    });
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it("automatically adopts the latest nonempty result including explained vacancies", async () => {
+    vi.useFakeTimers();
+    const { run, worker } = createRun();
+    const state = createDefaultState();
+    const flight = state.flights[0]!;
+    const person = state.staff[0]!;
+    const assignment = {
+      id: "latest-assigned",
+      flightId: flight.id,
+      flightNo: flight.flightNo,
+      positionRuleId: state.positionRules[0]!.id,
+      position: "G01",
+      staffId: person.id,
+      staffName: person.name,
+      startTime: "08:00",
+      endTime: "10:00",
+      workHours: 2,
+      fatiguePoints: 2,
+      remark: "",
+      manualRemark: "",
+      status: "assigned" as const,
+    };
+    const first: ScheduleResult = {
+      assignments: [{ ...assignment, id: "first" }],
+      warnings: [],
+      unfilledCount: 0,
+    };
+    const latest: ScheduleResult = {
+      assignments: [
+        assignment,
+        {
+          ...assignment,
+          id: "vacancy",
+          position: "G02",
+          staffId: null,
+          staffName: "",
+          status: "unfilled",
+          workHours: 0,
+          fatiguePoints: 0,
+          systemNotes: ["没有其他具备资质且空闲的人员"],
+        },
+      ],
+      warnings: ["G02待补位"],
+      unfilledCount: 1,
+    };
+    worker.emit({ type: "safe-result", result: first });
+    await vi.advanceTimersByTimeAsync(590_000);
+    worker.emit({ type: "safe-result", result: latest });
+    await vi.advanceTimersByTimeAsync(10_000);
+    expect(worker.terminate).toHaveBeenCalledOnce();
+    await expect(run.result).resolves.toEqual({
+      kind: "stopped-with-result",
+      stopReason: "time-limit",
+      result: latest,
+    });
+    worker.emit({ type: "result", result: first });
+    await expect(run.result).resolves.toMatchObject({ result: latest });
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it("honors the deadline before processing a late message when the timer is delayed", async () => {
+    vi.useFakeTimers();
+    const { run, worker } = createRun();
+    const latest = { assignments: [], warnings: ["latest"], unfilledCount: 0 };
+    worker.emit({ type: "safe-result", result: latest });
+    vi.setSystemTime(Date.now() + 600_000);
+    worker.emit({
+      type: "result",
+      result: { ...latest, warnings: ["too late"] },
+    });
+    await expect(run.result).resolves.toEqual({
+      kind: "stopped-with-result",
+      stopReason: "time-limit",
+      result: latest,
+    });
+    expect(worker.terminate).toHaveBeenCalledOnce();
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it("ignores late main-thread fallback work after automatically adopting a safe result", async () => {
+    const kernel = await import("../../src/domain/kernel/scheduling-kernel");
+    vi.useFakeTimers();
+    vi.stubGlobal("Worker", undefined);
+    let complete!: () => void;
+    const gate = new Promise<void>((resolve) => {
+      complete = resolve;
+    });
+    const safe = { assignments: [], warnings: ["safe"], unfilledCount: 0 };
+    const late = { ...safe, warnings: ["late"] };
+    const progress = vi.fn();
+    const available = vi.fn();
+    const generate = vi
+      .spyOn(kernel, "generateSchedule")
+      .mockImplementation(async (_state, _date, options) => {
+        options.onSafeResult?.(safe);
+        await gate;
+        options.onProgress?.("complete", 100);
+        options.onSafeResult?.(late);
+        return late;
+      });
+    try {
+      const run = runScheduleInBackground(
+        createDefaultState(),
+        "2026-11-10",
+        progress,
+        available
+      );
+      await vi.waitFor(() => expect(generate).toHaveBeenCalledOnce());
+      await vi.advanceTimersByTimeAsync(600_000);
+      await expect(run.result).resolves.toEqual({
+        kind: "stopped-with-result",
+        stopReason: "time-limit",
+        result: safe,
+      });
+      complete();
+      await vi.waitFor(() =>
+        expect(generate.mock.results[0]!.value).resolves.toEqual(late)
+      );
+      expect(progress).not.toHaveBeenCalled();
+      expect(available).toHaveBeenCalledOnce();
+      await expect(run.result).resolves.toMatchObject({ result: safe });
+      expect(vi.getTimerCount()).toBe(0);
+    } finally {
+      complete();
+      generate.mockRestore();
+    }
+  });
+
+  it.each(["completed", "discard", "adopt", "error", "guard"] as const)(
+    "cleans the overall timer after %s and does not affect a subsequent run",
+    async (mode) => {
+      vi.useFakeTimers();
+      const { run, worker } = createRun();
+      const outcome = run.result.catch(() => undefined);
+      const result = { assignments: [], warnings: [], unfilledCount: 0 };
+      if (mode === "completed") worker.emit({ type: "result", result });
+      else if (mode === "discard") run.stopWithoutResult();
+      else if (mode === "adopt") {
+        worker.emit({ type: "safe-result", result });
+        run.stopWithLatestResult();
+      } else
+        worker.emit({
+          type: "error",
+          message: "failed",
+          ...(mode === "guard"
+            ? { violations: [{ ruleId: "qualification", message: "invalid" }] }
+            : {}),
+        });
+      await outcome;
+      expect(vi.getTimerCount()).toBe(0);
+      const next = createRun();
+      await vi.advanceTimersByTimeAsync(599_999);
+      expect(next.worker.terminate).not.toHaveBeenCalled();
+      next.run.stopWithoutResult();
+      expect(vi.getTimerCount()).toBe(0);
+    }
+  );
+
   it.each([true, false])(
     "preserves guard evidence with details=%s across a serialized worker message",
     async (withDetails) => {

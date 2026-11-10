@@ -1,0 +1,23 @@
+{
+  "inputSha256": "ab4f1e0d29a5222a388ca017ce89a56cf52e8f5f8fe34df14f54ed13e4e049f3",
+  "date": "2026-11-04",
+  "scenario": "Full isolated import replacing shared templates; file six flights, zero passenger counts, administrative mode off, no half-rest; P labels only.",
+  "elapsedMs": 12112.6527,
+  "positions": 56,
+  "assigned": 52,
+  "vacancies": 4,
+  "unavailableStaffAssigned": 0,
+  "invalidNumberedRoleQualifications": 0,
+  "maximumSummedWorkHours": 6,
+  "configuredMaximum": 12,
+  "finalSafetyRecheck": "passed",
+  "dailySafetyRecheck": "passed",
+  "selectedFieldSignature": "74a1220f7eb4d444f341732ba70930491243809ab4b7589fafb1f71b1a9628ff",
+  "baselineSelectedFieldSignature": "74a1220f7eb4d444f341732ba70930491243809ab4b7589fafb1f71b1a9628ff",
+  "timeout": "600000ms synthetic Worker delay after actual kernel computation; not browser timing",
+  "outcome": "stopped-with-result",
+  "storedAssignmentsEqual": true,
+  "exportedResultRows": 56,
+  "exportSha256": "1744fbc4d502f0413af8129e5485862e0158815242a9136d3ea3fca749096d6e",
+  "caveat": "Four original vacancies caused by slash role parsing remain; this task changes waiting only. No real browser or private state replay."
+}

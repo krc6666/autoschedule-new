@@ -35,6 +35,8 @@ import type {
   StaffStatusSelection,
 } from "../../model";
 import { presentScheduleFailure } from "../schedule-failure-presentation";
+import { scheduleRunStopMessage } from "../schedule-run-controller";
+import type { ScheduleRunOutcome } from "../../infrastructure/schedule-runner";
 
 export class ScheduleController implements UiCommandController {
   constructor(private readonly context: ApplicationContext) {}
@@ -269,26 +271,36 @@ export class ScheduleController implements UiCommandController {
         }
       );
       if (outcome.kind === "stopped-without-result") {
-        this.context.toast("排班已停止，原班表保持不变", "warning");
+        this.context.toast(
+          scheduleRunStopMessage(outcome, "排班已停止，原班表保持不变"),
+          "warning"
+        );
         return;
       }
       const result = outcome.result;
       this.context.store.getState().schedule.install(date, result);
       this.context.updateView({ section: "schedule" });
       this.context.commit(
-        outcome.kind === "stopped-with-result"
-          ? "排班已停止，并采用最近一份完整安全方案"
-          : result.unfilledCount
-            ? `排班已生成，${result.unfilledCount} 个常规岗位待补位`
-            : "排班已生成"
+        scheduleRunStopMessage(
+          outcome,
+          outcome.kind === "stopped-with-result"
+            ? "排班已停止，并采用最近一份完整安全方案"
+            : result.unfilledCount
+              ? `排班已生成，${result.unfilledCount} 个常规岗位待补位`
+              : "排班已生成"
+        )
       );
-      this.reportScheduleWarnings(result, date);
+      this.reportScheduleWarnings(result, date, outcome);
     } catch (error) {
       this.showScheduleFailure(error, date, "排班生成");
     }
   }
 
-  private reportScheduleWarnings(result: ScheduleResult, date: string): void {
+  private reportScheduleWarnings(
+    result: ScheduleResult,
+    date: string,
+    outcome: ScheduleRunOutcome
+  ): void {
     const vacancies = result.assignments.filter(
       (assignment) => assignment.status === "unfilled"
     );
@@ -299,7 +311,10 @@ export class ScheduleController implements UiCommandController {
         reasons: [...(assignment.systemNotes ?? [])],
       }));
       this.context.toast(
-        `班表已生成，以下 ${vacancies.length} 个岗位未排上人：`,
+        scheduleRunStopMessage(
+          outcome,
+          `班表已生成，以下 ${vacancies.length} 个岗位未排上人：`
+        ),
         "warning"
       );
       const toast = this.context.view().toast;
@@ -825,20 +840,26 @@ export class ScheduleController implements UiCommandController {
         }
       );
       if (outcome.kind === "stopped-without-result") {
-        this.context.toast("排班已停止，原班表保持不变", "warning");
+        this.context.toast(
+          scheduleRunStopMessage(outcome, "排班已停止，原班表保持不变"),
+          "warning"
+        );
         return;
       }
       installGeneratedSchedule(temporaryState, dialog.date, outcome.result);
       this.context.store.getState().replaceModel(temporaryState);
       this.context.updateView({ section: "schedule" });
       this.context.commit(
-        outcome.kind === "stopped-with-result"
-          ? "排班已停止，并采用最近一份完整安全方案"
-          : outcome.result.unfilledCount
-            ? `排班已生成，${outcome.result.unfilledCount} 个常规岗位待补位`
-            : "排班已生成"
+        scheduleRunStopMessage(
+          outcome,
+          outcome.kind === "stopped-with-result"
+            ? "排班已停止，并采用最近一份完整安全方案"
+            : outcome.result.unfilledCount
+              ? `排班已生成，${outcome.result.unfilledCount} 个常规岗位待补位`
+              : "排班已生成"
+        )
       );
-      this.reportScheduleWarnings(outcome.result, dialog.date);
+      this.reportScheduleWarnings(outcome.result, dialog.date, outcome);
     } catch (error) {
       this.showScheduleFailure(error, dialog.date, "排班生成");
     }
@@ -954,20 +975,26 @@ export class ScheduleController implements UiCommandController {
         }
       );
       if (outcome.kind === "stopped-without-result") {
-        this.context.toast("排班已停止，原航班和班表保持不变", "warning");
+        this.context.toast(
+          scheduleRunStopMessage(outcome, "排班已停止，原航班和班表保持不变"),
+          "warning"
+        );
         return;
       }
       installGeneratedSchedule(temporaryState, date, outcome.result);
       this.context.store.getState().replaceModel(temporaryState);
       this.context.updateView({ section: "schedule" });
       this.context.commit(
-        outcome.kind === "stopped-with-result"
-          ? "已采用最近一份完整安全方案，航班与班表已更新"
-          : outcome.result.unfilledCount
-            ? `重新排班完成，${outcome.result.unfilledCount} 个常规岗位待补位`
-            : "重新排班完成"
+        scheduleRunStopMessage(
+          outcome,
+          outcome.kind === "stopped-with-result"
+            ? "已采用最近一份完整安全方案，航班与班表已更新"
+            : outcome.result.unfilledCount
+              ? `重新排班完成，${outcome.result.unfilledCount} 个常规岗位待补位`
+              : "重新排班完成"
+        )
       );
-      this.reportScheduleWarnings(outcome.result, date);
+      this.reportScheduleWarnings(outcome.result, date, outcome);
     } catch (error) {
       this.showScheduleFailure(error, date, "重新排班");
     }
@@ -1125,7 +1152,10 @@ export class ScheduleController implements UiCommandController {
         halfRestSelectionForDate(temporaryState, nextDate)
       );
       if (outcome.kind === "stopped-without-result") {
-        this.context.toast("排班已停止，原班表保持不变", "warning");
+        this.context.toast(
+          scheduleRunStopMessage(outcome, "排班已停止，原班表保持不变"),
+          "warning"
+        );
         return;
       }
       installArchivedNextWorkdaySchedule(
@@ -1143,13 +1173,16 @@ export class ScheduleController implements UiCommandController {
         section: "schedule",
       });
       this.context.commit(
-        outcome.kind === "stopped-with-result"
-          ? "已归档本班，并采用后天最近一份完整安全方案"
-          : outcome.result.unfilledCount
-            ? `后天排班已生成，${outcome.result.unfilledCount} 个常规岗位待补位`
-            : "后天排班已生成"
+        scheduleRunStopMessage(
+          outcome,
+          outcome.kind === "stopped-with-result"
+            ? "已归档本班，并采用后天最近一份完整安全方案"
+            : outcome.result.unfilledCount
+              ? `后天排班已生成，${outcome.result.unfilledCount} 个常规岗位待补位`
+              : "后天排班已生成"
+        )
       );
-      this.reportScheduleWarnings(outcome.result, nextDate);
+      this.reportScheduleWarnings(outcome.result, nextDate, outcome);
     } catch (error) {
       this.showScheduleFailure(error, nextDate, "后天排班生成");
     }

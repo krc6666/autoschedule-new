@@ -1,12 +1,23 @@
 import type { ScheduleProgressStage } from "../domain/kernel/schedule-progress";
 import {
   runScheduleInBackground,
+  SCHEDULE_RUN_TIMEOUT_MS,
   type ActiveScheduleRun,
   type ScheduleProgressListener,
   type ScheduleRunOutcome,
 } from "../infrastructure/schedule-runner";
 import type { AppState } from "../model";
 import type { ScheduleRunPreferences } from "../domain/shared/schedule-run-preferences";
+
+export function scheduleRunStopMessage(
+  outcome: ScheduleRunOutcome,
+  manualMessage: string
+): string {
+  if (outcome.kind === "completed" || outcome.stopReason !== "time-limit")
+    return manualMessage;
+  const minutes = SCHEDULE_RUN_TIMEOUT_MS / 60_000;
+  return `本次计算已达到${minutes}分钟。${manualMessage}`;
+}
 
 export type ScheduleRunFinishOutcome =
   "completed" | "failed" | "stopped-without-result" | "stopped-with-result";
