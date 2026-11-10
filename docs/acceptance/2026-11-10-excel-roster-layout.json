@@ -1,0 +1,161 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-10-excel-roster-layout",
+  "title": "Excel班表上方航班、右侧双列名单与半休绿底",
+  "startedFrom": "8c24eccac265f377e1745192bd7780e79f1ecc49",
+  "expectation": {
+    "example": "4航班在上方左侧，18名常规人员分两列9行在右；选择半休的正常人员姓名格绿色且无半休文字；飞行假人员显示姓名（飞行假），轮值等在主表与名单下方。",
+    "expected": "导出后长岗位/备注/假名完整显示，无需手调列宽行高；人员奇数和多航班自动扩展；半休选择随当前组日期保存，刷新/历史导出不丢已知标记。",
+    "unchanged": "不改任何排班资格、优先级、岗位结果、工时疲劳、历史负荷或半休时段；正常/休假名称复用现有配置；不修改HTML/PNG导出版式。",
+    "fallback": "旧数据缺半休选择不猜，配置缺表保留、损坏表保留旧标记；日期/组严格隔离；没有人员或航班保持合理空态，不造人员或岗位。"
+  },
+  "testedVersion": "c767e3a1bc89b13a0ef7a2c275a567dc3c8abe5f9b5ca2ba553e1a244e30d5e4",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "改前布局、半休绿底与保存恢复缺失由7项失败回归证明；改后对应回归和消费者通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-excel-layout-red.txt",
+          "summary": "修改前7项目标行为测试失败。",
+          "sha256": "4dcd789a9d059dbb70de70d2f723f0e3a38f8715b381c6abc10b9385b1029a14"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-excel-layout-focused.txt",
+          "summary": "最终定向9文件203项通过，含布局、实际XLSX字节、持久化、三计算入口和后续修改。",
+          "sha256": "13590c601108bb07cfd76ff20c5afb803a3cb267fb7891a3b9c4c15f6901d591"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "4航班18人真实页面导出：主表在上、名单在右，P02/P10姓名绿底，无半休文字；病假/飞行假/停用但在用年休假名称与配置一致。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-excel-layout-browser.json",
+          "summary": "隔离匿名Chrome真实入口选择两人半休、刷新保留、点击导出；18人名单和具体假名、绿底、下方汇总正确，无页面异常。",
+          "sha256": "0b3109b5bd2038f07fbb68299308261665091410864fc0e1ac68aa574d64eb71"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-excel-layout-sample.xlsx",
+          "summary": "页面实际下载的18人4航班匿名Excel；非owner私有班表。",
+          "sha256": "8d3bf9201250127d80596464518b070cfaa7bfd8fb844c1daad0b850328e9c5f"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-excel-layout-focused.txt",
+          "summary": "最终定向9文件203项通过，含布局、实际XLSX字节、持久化、三计算入口和后续修改。",
+          "sha256": "13590c601108bb07cfd76ff20c5afb803a3cb267fb7891a3b9c4c15f6901d591"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "自动覆盖0/1/18/31人员、0/1/8/6航班，奇数名单、旧状态缺字段、旧文件缺表、损坏表保留、A/B日期隔离及配置/历史往返；模板仅追加空表。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-excel-layout-focused.txt",
+          "summary": "最终定向9文件203项通过，含布局、实际XLSX字节、持久化、三计算入口和后续修改。",
+          "sha256": "13590c601108bb07cfd76ff20c5afb803a3cb267fb7891a3b9c4c15f6901d591"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-excel-layout-template.json",
+          "summary": "模板22张旧表单元格值保持，仅新增第23张半休选择空表。",
+          "sha256": "fc2034991e53de5f1726cc11bc17ad58ad12a226861b84369555855dad985f76"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "人工改派、改姓名及假名后重新导出读取最终事实；半休按ID及日期，不按工作时间猜。刷新、历史编辑取消及三计算入口读取各自目标日期；长备注与合并汇总尺寸独立检查。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-excel-layout-focused.txt",
+          "summary": "最终定向9文件203项通过，含布局、实际XLSX字节、持久化、三计算入口和后续修改。",
+          "sha256": "13590c601108bb07cfd76ff20c5afb803a3cb267fb7891a3b9c4c15f6901d591"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-excel-layout-browser.json",
+          "summary": "隔离匿名Chrome真实入口选择两人半休、刷新保留、点击导出；18人名单和具体假名、绿底、下方汇总正确，无页面异常。",
+          "sha256": "0b3109b5bd2038f07fbb68299308261665091410864fc0e1ac68aa574d64eb71"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-excel-layout-geometry.json",
+          "summary": "openpyxl读取真实文件后由Chromium核对157格，无截字；不是原生Excel/WPS。",
+          "sha256": "a761c42176a9670eff1f4bc9f49cdf9a6cfd5ac11820a3c30d32bbaebb299717"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "not_applicable",
+      "reason": "本次不增加或修改排班硬约束、求解或最终守卫；仅将既有半休选择按日期持久化，并通过原ScheduleRunPreferences交给原计算链路。原安全与架构检查由完整verify覆盖。",
+      "evidence": []
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "打印模块只生成只读投影，测试断言不修改源state；原排班结果列、历史负荷与HTML/PNG版式保持。完整功能、安全、架构、性能与构建通过；首轮架构边界失败已修复，CLI超时未放宽。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-excel-layout-focused.txt",
+          "summary": "最终定向9文件203项通过，含布局、实际XLSX字节、持久化、三计算入口和后续修改。",
+          "sha256": "13590c601108bb07cfd76ff20c5afb803a3cb267fb7891a3b9c4c15f6901d591"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-excel-layout-verify.txt",
+          "summary": "完整npm.cmd run verify退出0：162文件1621项功能、7文件19项性能、类型检查及生产构建通过。",
+          "sha256": "8687a13fc88b08f986693913db8e834b2d1301f0e4556f24ff2f29365b57f6fc"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-excel-layout-initial-verify.txt",
+          "summary": "首轮发现domain依赖AppState及两项验收CLI超过5秒；保留失败记录。",
+          "sha256": "e8f98110d250d6df3e04736b414ad96c71cbb07c893b01f67e100686b76e94f2"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-excel-layout-gate-rerun.txt",
+          "summary": "修正domain接口后架构与验收CLI单独17项通过，未调整超时。",
+          "sha256": "e8b06b1f1e7bdd5bb4c2ed42d6680026109fba3f85f77b106ab8d11e1cacdf54"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "verified",
+      "reason": "真实入口下载文件已独立核对原文、绿底、名单、汇总及尺寸，并预览157格无截字。当前机器未找到可用原生Excel/WPS，未验证原生软件显示或owner私有班表。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-excel-layout-sample.xlsx",
+          "summary": "页面实际下载的18人4航班匿名Excel；非owner私有班表。",
+          "sha256": "8d3bf9201250127d80596464518b070cfaa7bfd8fb844c1daad0b850328e9c5f"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-excel-layout-browser.json",
+          "summary": "隔离匿名Chrome真实入口选择两人半休、刷新保留、点击导出；18人名单和具体假名、绿底、下方汇总正确，无页面异常。",
+          "sha256": "0b3109b5bd2038f07fbb68299308261665091410864fc0e1ac68aa574d64eb71"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-excel-layout-geometry.json",
+          "summary": "openpyxl读取真实文件后由Chromium核对157格，无截字；不是原生Excel/WPS。",
+          "sha256": "a761c42176a9670eff1f4bc9f49cdf9a6cfd5ac11820a3c30d32bbaebb299717"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-excel-layout-preview.png",
+          "summary": "真实下载XLSX经openpyxl与Chromium生成的版式预览。",
+          "sha256": "94aeb5233695b15caf311da7f0dab98cf2599b529a27254708514147cbf559d9"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-excel-layout-verify.txt",
+          "summary": "完整npm.cmd run verify退出0：162文件1621项功能、7文件19项性能、类型检查及生产构建通过。",
+          "sha256": "8687a13fc88b08f986693913db8e834b2d1301f0e4556f24ff2f29365b57f6fc"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "red.txt保存改前7项失败，focused.txt保存改后203项通过；原固定顶部汇总、无右侧名单、半休临时状态不保存均有对应回归。",
+    "laterChanges": "后续人工改派/改名/改假名、组日期切换、历史编辑及计算可能改变输入；focused.txt覆盖最终重新导出、持久化隔离和三计算入口，browser.json证明刷新保留，geometry.json独立核对最终文件。",
+    "finalArtifact": "sample.xlsx是本次匿名页面真实点击导出的最终产物；browser.json核对绿底及假名，geometry.json及preview.png独立核对尺寸和版式。verify.txt记录当前实现完整检查成功；不宣称原生Excel/WPS验证。"
+  },
+  "review": {
+    "missedScope": "核对多人/多航班/空态、旧数据、配置及历史往返、归档后天入口和后续人工修改。没有原生Excel/WPS打开证据，也未重放owner私有文件；不猜旧半休，不扩展HTML/PNG或排班规则。",
+    "rootCause": "原打印布局在Excel入口固定顶部汇总和行高，缺完整人员名单；半休只在临时view，无法可靠为刷新/历史导出提供标记。新增domain模块曾误依赖AppState，完整架构检查发现后缩小接口；CLI超时单独及完整复跑通过。",
+    "earlyDetection": "设计导出前先列打印布局和字段事实来源，半休保存先填写默认值/Store/日期组投影/恢复/Excel/历史/计算入口传播矩阵；先运行失败测试，再核对真实下载字节、独立尺寸和预览，原生软件未验如实记录。"
+  }
+}

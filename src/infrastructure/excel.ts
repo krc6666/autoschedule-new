@@ -25,7 +25,6 @@ import type {
   WeeklyFlightPlanEntry,
 } from "../model";
 import {
-  combinedAssignmentRemark,
   assignmentWarningRemark,
   createId,
   downloadBlob,
@@ -33,17 +32,7 @@ import {
   orderPositionRules,
   splitList,
 } from "../utils";
-import {
-  addIsoDays,
-  durationHours,
-  normalizeTime,
-} from "../domain/shared/time";
-import { getDutyRosterForDate } from "../domain/duty-roster/roster";
-import { buildMonthlyRelaxedShiftStatistics } from "../domain/statistics/relaxed-shift-statistics";
-import {
-  isFixedBottomPosition,
-  isGuideAssignment,
-} from "../domain/flights/schedule-position-rules";
+import { durationHours, normalizeTime } from "../domain/shared/time";
 import { mergeLatePriorityFrequencyAdjustments } from "../domain/statistics/late-priority-frequency-adjustment";
 import { mergeOrdinaryPriorityFrequencyAdjustments } from "../domain/statistics/ordinary-priority-frequency-adjustment";
 import { normalizeOrdinaryPriorityPositions } from "../domain/reviews/position-rotation-policy";
@@ -68,15 +57,21 @@ import {
   headerIndex,
   normalizePosition,
   rows,
-  sheet,
 } from "./excel-worksheet";
 import { appendLeaveTypes, parseLeaveTypes } from "./leave-types-excel";
+import {
+  appendHalfRestSelections,
+  parseHalfRestSelections,
+} from "./half-rest-selections-excel";
+import type { HalfRestSelection } from "../model";
+import { buildSchedulePrintSheet } from "./schedule-print-sheet";
 import {
   BUILTIN_STAFF_STATUSES,
   staffStatusLabel,
 } from "../domain/staff-status";
 
 export interface WorkbookImport {
+  halfRestSelections?: HalfRestSelection[];
   leaveTypes?: LeaveType[];
   staff?: Staff[];
   flights?: Flight[];
@@ -810,6 +805,7 @@ export function parseWorkbook(
     parseOrdinaryPriorityFrequencyAdjustments(workbook);
   const ordinaryPriorityPositions = parseOrdinaryPriorityPositions(workbook);
   const dutyRoster = parseDutyRosterOverrides(workbook, effectiveStaff);
+  const halfRest = parseHalfRestSelections(workbook);
   if (ordinaryPriorityPositions.present) {
     parsedRules.settings = {
       ...(parsedRules.settings ?? {}),
@@ -817,6 +813,7 @@ export function parseWorkbook(
     };
   }
   const warnings = [
+    ...halfRest.warnings,
     ...parsedRules.warnings,
     ...dutyRoster.warnings,
     ...parsedLeaveTypes.warnings,
@@ -825,6 +822,7 @@ export function parseWorkbook(
   if (weeklyFlightPlanImport?.status === "invalid")
     warnings.push(weeklyFlightPlanImport.warning);
   const hasStandardSheet = Boolean(
+    workbook.Sheets["半休选择"] ||
     workbook.SheetNames.some((name) => name.includes("休假类别")) ||
     staff ||
     flights ||
@@ -897,6 +895,7 @@ export function parseWorkbook(
     latePriorityFrequencyAdjustments,
     ordinaryPriorityFrequencyAdjustments,
     dutyRosterOverrides: dutyRoster.value,
+    halfRestSelections: halfRest.value,
     dutyRosterInvalid: dutyRoster.warnings.length > 0,
     warnings,
   };
@@ -1155,6 +1154,7 @@ export function buildConfigWorkbook(state: AppState): XLSX.WorkBook {
     [18, 12, 12, 18, 16, 14, 12, 12, 16, 12, 32, 20, 14, 12, 36]
   );
   appendLeaveTypes(workbook, state.leaveTypes);
+  appendHalfRestSelections(workbook, state.halfRestSelections ?? []);
   return workbook;
 }
 
@@ -1172,212 +1172,11 @@ export function buildScheduleWorkbook(
           assignments,
           state.positionRules
         );
-  const flights = [...new Set(assignments.map((item) => item.flightNo))];
-  const grouped = flights.map((flightNo) =>
-    assignments.filter((item) => item.flightNo === flightNo)
+  XLSX.utils.book_append_sheet(
+    workbook,
+    buildSchedulePrintSheet(state, date),
+    "保障明细"
   );
-  const isGuideExportAssignment = (item: Assignment): boolean =>
-    isGuideAssignment(state, item) || isFixedBottomPosition(item.position);
-  const normalGroups = grouped.map((items) =>
-    items.filter((item) => !isGuideExportAssignment(item))
-  );
-  const guideGroups = grouped.map((items) =>
-    items.filter(isGuideExportAssignment)
-  );
-  const maxPositions = Math.max(
-    0,
-    ...normalGroups.map((items) => items.length)
-  );
-  const totalColumns = Math.max(4, flights.length * 2);
-  const roster = getDutyRosterForDate(state, date);
-  const staffName = (staffId: string | null): string =>
-    staffId
-      ? (state.staff.find((person) => person.id === staffId)?.name ?? "未安排")
-      : "未安排";
-  const standbyDate = addIsoDays(date, 1);
-  const relaxed = buildMonthlyRelaxedShiftStatistics(state, date);
-  const airlineCode = (flightNo: string): string =>
-    /^[A-Za-z]{2}/.exec(flightNo)?.[0].toUpperCase() ?? "其他";
-  const earlyDepartureText = (() => {
-    const byAirline = new Map<string, string[]>();
-    for (const item of relaxed.currentEarlyDepartures) {
-      const code = airlineCode(item.flightNo);
-      const names = byAirline.get(code) ?? [];
-      if (!names.includes(item.staffName)) names.push(item.staffName);
-      byAirline.set(code, names);
-    }
-    return (
-      [...byAirline.entries()]
-        .map(([code, names]) => `${code}：${names.join("、")}`)
-        .join("\n") || "无"
-    );
-  })();
-  const earlyDepartureRowHeight = Math.max(
-    34,
-    18 * earlyDepartureText.split("\n").length
-  );
-  const summaryRows: unknown[][] = [
-    [`${date} 航班保障排班`, ...Array(totalColumns - 1).fill("")],
-    [
-      "CX航前人员",
-      staffName(roster.cxPreflightStaffId),
-      "24小时值班人员",
-      staffName(roster.dutyStaffId),
-      ...Array(Math.max(0, totalColumns - 4)).fill(""),
-    ],
-    [
-      `次日备勤一（${standbyDate}）`,
-      staffName(roster.standbyStaffIds[0]),
-      `次日备勤二（${standbyDate}）`,
-      staffName(roster.standbyStaffIds[1]),
-      ...Array(Math.max(0, totalColumns - 4)).fill(""),
-    ],
-    [
-      "提前下班",
-      earlyDepartureText,
-      ...Array(Math.max(0, totalColumns - 2)).fill(""),
-    ],
-    Array(totalColumns).fill(""),
-  ];
-  const matrixHeader: unknown[] =
-    [
-      flights.flatMap((flightNo, index) => {
-        const first = grouped[index]?.[0];
-        const flightRemark = state.flights
-          .find((flight) => flight.flightNo === flightNo)
-          ?.remark.trim();
-        return [
-          `${date}\n岗位`,
-          [
-            flightNo,
-            flightRemark,
-            `${first?.startTime ?? ""}-${first?.endTime ?? ""}`,
-          ]
-            .filter(Boolean)
-            .join("\n"),
-        ];
-      }),
-    ][0] ?? [];
-  const matrix: unknown[][] = [...summaryRows, matrixHeader];
-  for (let row = 0; row < maxPositions; row += 1) {
-    matrix.push(
-      normalGroups.flatMap((items) => {
-        const item = items[row];
-        if (!item) return ["", ""];
-        const remark = combinedAssignmentRemark(item.remark, item.manualRemark);
-        const staff =
-          item.staffName || (item.status === "manual" ? "" : "待补位");
-        return [item.position, [staff, remark].filter(Boolean).join("\n")];
-      })
-    );
-  }
-  matrix.push(Array(totalColumns).fill(""));
-  matrix.push(Array(totalColumns).fill(""));
-  matrix.push(
-    guideGroups.flatMap((items) => {
-      const names = [
-        ...new Set(
-          items
-            .map(
-              (item) =>
-                item.staffName || (item.status === "manual" ? "" : "待补位")
-            )
-            .filter(Boolean)
-        ),
-      ];
-      return names.length
-        ? ["引导人员", names.join("、")]
-        : ["引导人员", "未安排"];
-    })
-  );
-  const matrixSheet = sheet(
-    matrix,
-    Array.from({ length: totalColumns }, (_, index) =>
-      index % 2 === 0 ? 20 : 22
-    )
-  );
-  const range = XLSX.utils.decode_range(matrixSheet["!ref"] ?? "A1");
-  for (let row = range.s.r; row <= range.e.r; row += 1) {
-    for (let column = range.s.c; column <= range.e.c; column += 1) {
-      const address = XLSX.utils.encode_cell({ r: row, c: column });
-      const cell = matrixSheet[address];
-      if (!cell) continue;
-      const matrixHeaderRow = summaryRows.length;
-      const isTitle = row === 0;
-      const isSummary = row > 0 && row < summaryRows.length - 1;
-      const isSummaryLabel = isSummary && (column === 0 || column === 2);
-      const isGuideRow = row === matrixHeaderRow + maxPositions + 3;
-      const isBlankGuideSpacer =
-        row > matrixHeaderRow + maxPositions &&
-        row < matrixHeaderRow + maxPositions + 3;
-      cell.s = {
-        font: {
-          bold:
-            isTitle ||
-            row === matrixHeaderRow ||
-            column % 2 === 0 ||
-            isSummaryLabel ||
-            isGuideRow,
-          color: {
-            rgb: isTitle || row === matrixHeaderRow ? "FFFFFF" : "1F2328",
-          },
-          sz: isTitle ? 14 : isGuideRow ? 11 : 10,
-        },
-        fill: {
-          fgColor: {
-            rgb:
-              isTitle || row === matrixHeaderRow
-                ? "B4232D"
-                : isSummaryLabel
-                  ? "F3F4F6"
-                  : isGuideRow
-                    ? "EAF4F1"
-                    : isBlankGuideSpacer
-                      ? "FFFFFF"
-                      : column % 2 === 0
-                        ? "F3F4F6"
-                        : "FFFFFF",
-          },
-        },
-        alignment: { vertical: "center", horizontal: "center", wrapText: true },
-        border: {
-          top: {
-            style: isBlankGuideSpacer ? undefined : "thin",
-            color: { rgb: "D8DEE4" },
-          },
-          bottom: {
-            style: isBlankGuideSpacer ? undefined : "thin",
-            color: { rgb: "D8DEE4" },
-          },
-          left: {
-            style: isBlankGuideSpacer ? undefined : "thin",
-            color: { rgb: "D8DEE4" },
-          },
-          right: {
-            style: isBlankGuideSpacer ? undefined : "thin",
-            color: { rgb: "D8DEE4" },
-          },
-        },
-      };
-    }
-  }
-  matrixSheet["!rows"] = [
-    { hpt: 30 },
-    { hpt: 22 },
-    { hpt: 22 },
-    { hpt: earlyDepartureRowHeight },
-    { hpt: 10 },
-    { hpt: 42 },
-    ...Array.from({ length: maxPositions }, () => ({ hpt: 26 })),
-    { hpt: 10 },
-    { hpt: 10 },
-    { hpt: 28 },
-  ];
-  matrixSheet["!merges"] = [
-    { s: { r: 0, c: 0 }, e: { r: 0, c: totalColumns - 1 } },
-    { s: { r: 3, c: 1 }, e: { r: 3, c: totalColumns - 1 } },
-  ];
-  XLSX.utils.book_append_sheet(workbook, matrixSheet, "保障明细");
   append(
     workbook,
     "排班结果",
@@ -1465,6 +1264,10 @@ export function buildScheduleWorkbook(
       ),
     ],
     [12, 14, 12, 18, 12, 12, 16]
+  );
+  appendHalfRestSelections(
+    workbook,
+    (state.halfRestSelections ?? []).filter((row) => row.date === date)
   );
   return workbook;
 }

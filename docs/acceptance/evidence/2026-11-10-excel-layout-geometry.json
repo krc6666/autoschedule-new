@@ -1,0 +1,6 @@
+{
+  "source": "actual downloaded XLSX",
+  "renderer": "openpyxl + Chromium; not native Excel or WPS",
+  "clippedCells": [],
+  "checkedCells": 157
+}

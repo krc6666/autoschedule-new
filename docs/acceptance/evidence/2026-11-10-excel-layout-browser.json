@@ -1,0 +1,104 @@
+{
+  "entry": "http://127.0.0.1:5173/",
+  "anonymousIsolatedContext": true,
+  "downloadName": "保障明细_2026-11-10.xlsx",
+  "file": "docs/acceptance/evidence/2026-11-10-excel-layout-sample.xlsx",
+  "roster": [
+    {
+      "address": "J3",
+      "name": "P01",
+      "fill": "D9E2F3"
+    },
+    {
+      "address": "K3",
+      "name": "P10",
+      "fill": "C6EFCE"
+    },
+    {
+      "address": "J4",
+      "name": "P02",
+      "fill": "C6EFCE"
+    },
+    {
+      "address": "K4",
+      "name": "P11",
+      "fill": "D9E2F3"
+    },
+    {
+      "address": "J5",
+      "name": "P03",
+      "fill": "D9E2F3"
+    },
+    {
+      "address": "K5",
+      "name": "P12",
+      "fill": "D9E2F3"
+    },
+    {
+      "address": "J6",
+      "name": "P04（病假）",
+      "fill": "D9E2F3"
+    },
+    {
+      "address": "K6",
+      "name": "P13",
+      "fill": "D9E2F3"
+    },
+    {
+      "address": "J7",
+      "name": "P05",
+      "fill": "D9E2F3"
+    },
+    {
+      "address": "K7",
+      "name": "P14",
+      "fill": "D9E2F3"
+    },
+    {
+      "address": "J8",
+      "name": "P06",
+      "fill": "D9E2F3"
+    },
+    {
+      "address": "K8",
+      "name": "P15",
+      "fill": "D9E2F3"
+    },
+    {
+      "address": "J9",
+      "name": "P07",
+      "fill": "D9E2F3"
+    },
+    {
+      "address": "K9",
+      "name": "P16",
+      "fill": "D9E2F3"
+    },
+    {
+      "address": "J10",
+      "name": "P08",
+      "fill": "D9E2F3"
+    },
+    {
+      "address": "K10",
+      "name": "P17（飞行假）",
+      "fill": "D9E2F3"
+    },
+    {
+      "address": "J11",
+      "name": "P09",
+      "fill": "D9E2F3"
+    },
+    {
+      "address": "K11",
+      "name": "P18（年休假）",
+      "fill": "D9E2F3"
+    }
+  ],
+  "summaryAddress": "A13",
+  "firstFlightHeader": "FL100\n到岗08:00\n08:00-10:00",
+  "rowHeights": [30, 58, 122, 26, 26, 26, 26, 26, 26, 26, 26, 26, 42, 42, 26],
+  "columnWidths": [16, 42, 16, 24, 16, 24, 16, 24, 3, 18, 18, 6],
+  "restoredSelection": ["P02", "P10"],
+  "pageErrors": []
+}

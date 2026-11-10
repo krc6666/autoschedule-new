@@ -1,0 +1,121 @@
+﻿
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/infrastructure/schedule-print-layout.test.ts (7 tests | 6 failed) 91ms
+     × puts flights first, a complete two-column roster on the right and summaries below 16ms
+     × keeps green fills and full remarks in the actual XLSX bytes without half-rest labels 42ms
+     × keeps every roster member exactly once with 1 people and 1 flights 10ms
+     × keeps every roster member exactly once with 18 people and 8 flights 3ms
+     × keeps every roster member exactly once with 31 people and 6 flights 4ms
+     × round-trips dated selections through config and preserves them when an old or broken table is imported 13ms
+ ❯ tests/app/half-rest-selection-persistence.test.ts (1 test | 1 failed) 24ms
+     × survives actual save/restore, group/date switches and an explicit clear 23ms
+npm.cmd :
+所在位置 行:2 字符: 1
++ npm.cmd exec vitest -- run tests/infrastructure/schedule-print-layout ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 7 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/app/half-rest-selection-persistence.test.ts > dated half-rest selection > survives actual save/restore, gr
+oup/date switches and an explicit clear
+AssertionError: expected [] to deeply equal [ '1' ]
+
+- Expected
++ Received
+
+- [
+-   "1",
+- ]
++ []
+
+ ❯ tests/app/half-rest-selection-persistence.test.ts:19:45
+     17|     const restored = loadState({ getItem: () => saved });
+     18|     const resumed = createTestApplicationCoordinator(createTestAutosch…
+     19|     expect(resumed.view().halfRestStaffIds).toEqual([id]);
+       |                                             ^
+     20|     expect(resumed.view().halfRestModes).toEqual({ [id]: "late-start" …
+     21|     await resumed.handle({ type: "change-date", date: "2026-11-12" });…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/7]⎯
+
+ FAIL  tests/infrastructure/schedule-print-layout.test.ts > schedule print layout > puts flights first, a complete two-
+column roster on the right and summaries below
+AssertionError: expected 5 to be less than 2
+ ❯ tests/infrastructure/schedule-print-layout.test.ts:28:55
+     26|     const ws = buildScheduleWorkbook(state, "2026-11-10").Sheets["保障明细…
+     27|     const flightHeader = cellEntries(ws).find(([, c]) => String(c.v).s…
+     28|     expect(XLSX.utils.decode_cell(flightHeader[0]).r).toBeLessThan(2);
+       |                                                       ^
+     29|     const roster = ["人员0", "人员1", "人员2（飞行假）", "人员3", "人员4"].map(name =…
+     30|     expect(roster.every(Boolean)).toBe(true);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/7]⎯
+
+ FAIL  tests/infrastructure/schedule-print-layout.test.ts > schedule print layout > keeps green fills and full remarks
+in the actual XLSX bytes without half-rest labels
+TypeError: Cannot read properties of undefined (reading 'fgColor')
+ ❯ tests/infrastructure/schedule-print-layout.test.ts:43:67
+     41|     const read = XLSX.read(XLSX.write(wb, { type: "array", bookType: "…
+     42|     const ws = read.Sheets["保障明细"]!;
+     43|     for (const name of ["人员1", "人员3"]) expect(find(ws, name)[1].s.fill…
+       |                                                                   ^
+     44|     expect(find(ws, "人员2（飞行假）")[1].s.fill.fgColor.rgb).not.toBe("C6EFC…
+     45|     expect(cellEntries(ws).some(([, c]) => String(c.v).includes("半休"))…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/7]⎯
+
+ FAIL  tests/infrastructure/schedule-print-layout.test.ts > schedule print layout > keeps every roster member exactly o
+nce with 1 people and 1 flights
+ FAIL  tests/infrastructure/schedule-print-layout.test.ts > schedule print layout > keeps every roster member exactly o
+nce with 18 people and 8 flights
+ FAIL  tests/infrastructure/schedule-print-layout.test.ts > schedule print layout > keeps every roster member exactly o
+nce with 31 people and 6 flights
+AssertionError: expected [] to have a length of 1 but got +0
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ tests/infrastructure/schedule-print-layout.test.ts:60:192
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/7]⎯
+
+ FAIL  tests/infrastructure/schedule-print-layout.test.ts > schedule print layout > round-trips dated selections throug
+h config and preserves them when an old or broken table is imported
+AssertionError: expected undefined to deeply equal [ { date: '2026-11-10', …(1) } ]
+
+- Expected:
+[
+  {
+    "date": "2026-11-10",
+    "modes": {
+      "p1": "early-finish",
+      "p3": "late-start",
+    },
+  },
+]
+
++ Received:
+undefined
+
+ ❯ tests/infrastructure/schedule-print-layout.test.ts:66:69
+     64|     const state = fixture();
+     65|     const workbook = buildConfigWorkbook(state);
+     66|     expect(parseWorkbook(workbook, state.staff).halfRestSelections).to…
+       |                                                                     ^
+     67|     const fresh = fixture(); fresh.halfRestSelections = [];
+     68|     applyWorkbookImport(fresh, parseWorkbook(workbook, fresh.staff), "…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/7]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  7 failed | 1 passed (8)
+   Start at  19:16:03
+   Duration  1.55s (transform 1.59s, setup 0ms, import 2.16s, tests 115ms, environment 0ms)

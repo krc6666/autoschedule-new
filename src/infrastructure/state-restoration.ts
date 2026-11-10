@@ -7,6 +7,7 @@ import {
   normalizeLeaveTypes,
 } from "../domain/staff-status";
 import { normalizeAttendanceIntervals } from "../domain/statistics/attendance-intervals";
+import { normalizeHalfRestSelections } from "../domain/records/half-rest-selections";
 import type {
   AppState,
   Assignment,
@@ -738,6 +739,7 @@ function emptyGroupWorkspace(
   settings: ScheduleSettings
 ): GroupWorkspace {
   return {
+    halfRestSelections: [],
     leaveTypes: [],
     flights: [],
     staff: [],
@@ -755,6 +757,7 @@ function emptyGroupWorkspace(
 
 function groupWorkspaceFromState(state: AppState): GroupWorkspace {
   return {
+    halfRestSelections: structuredClone(state.halfRestSelections ?? []),
     leaveTypes: structuredClone(state.leaveTypes),
     flights: structuredClone(state.flights),
     staff: structuredClone(state.staff),
@@ -865,6 +868,7 @@ function restoreGroupWorkspace(
   }
   return {
     leaveTypes,
+    halfRestSelections: normalizeHalfRestSelections(value.halfRestSelections),
     flights,
     staff,
     positionRules,
@@ -897,6 +901,7 @@ function projectActiveGroup(next: AppState): void {
   }
   next.flights = active.flights;
   next.staff = active.staff;
+  next.halfRestSelections = active.halfRestSelections;
   next.leaveTypes = active.leaveTypes;
   next.positionRules = active.positionRules;
   next.settings = active.settings;
@@ -970,6 +975,7 @@ export function restorePersistedState(
         value.ordinaryPriorityFrequencyAdjustments
       ),
     assignments: [],
+    halfRestSelections: normalizeHalfRestSelections(value.halfRestSelections),
     activeScheduleDate:
       value.activeScheduleDate === null ||
       typeof value.activeScheduleDate === "string"

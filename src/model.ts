@@ -229,8 +229,17 @@ export interface SharedScheduleData {
   weeklyFlightPlans: WeeklyFlightPlanEntry[];
 }
 
+export interface HalfRestSelection {
+  date: string;
+  modes: Record<
+    string,
+    import("./domain/shared/schedule-run-preferences").HalfRestMode
+  >;
+}
+
 /** Scheduling facts and configuration owned exclusively by one group. */
 export interface GroupWorkspace {
+  halfRestSelections: HalfRestSelection[];
   leaveTypes: LeaveType[];
   flights: Flight[];
   staff: Staff[];
@@ -249,6 +258,7 @@ export interface GroupWorkspace {
 export type GroupWorkspaces = Record<ScheduleGroupId, GroupWorkspace>;
 
 export interface AppState {
+  halfRestSelections: HalfRestSelection[];
   version: 12;
   /** Shared flight planning data and the two isolated group workspaces. */
   shared: SharedScheduleData;

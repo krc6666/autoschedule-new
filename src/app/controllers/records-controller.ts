@@ -67,8 +67,6 @@ export class RecordsController implements UiCommandController {
           section: "schedule",
           date: command.date,
           historyEditDate: command.date,
-          halfRestStaffIds: [],
-          halfRestModes: {},
         });
         if (draft.warnings.length)
           this.context.toast(draft.warnings.join("；"), "warning");

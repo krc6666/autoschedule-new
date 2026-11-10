@@ -9,6 +9,8 @@ import { installGeneratedSchedule } from "../../domain/kernel/schedule-lifecycle
 import { applyStaffStatusChange } from "../../domain/kernel/schedule-state";
 import type { ScheduleResult } from "../../model";
 import type { StateCommand } from "./store-command";
+import { setHalfRestSelection } from "../../domain/records/half-rest-selections";
+import type { HalfRestMode } from "../../domain/shared/schedule-run-preferences";
 import {
   applyTeamLeaderGapFillPreview,
   type TeamLeaderGapFillPreview,
@@ -16,6 +18,11 @@ import {
 
 export function createScheduleCommands(command: StateCommand) {
   return {
+    setHalfRest: (
+      date: string,
+      staffIds: readonly string[],
+      modes?: Readonly<Record<string, HalfRestMode>>
+    ) => command((state) => setHalfRestSelection(state, date, staffIds, modes)),
     install: (date: string, result: ScheduleResult) =>
       command((state) => installGeneratedSchedule(state, date, result)),
     clearStaff: () => command(clearScheduleStaff),

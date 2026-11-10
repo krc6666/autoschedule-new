@@ -1623,7 +1623,8 @@ describe("next workday flight picker workflow", () => {
         ],
         assignments: [],
       }),
-      "2026-08-17"
+      "2026-08-17",
+      { halfRestStaffIds: [], halfRestModes: {} }
     );
     expect(coordinator.model().flights.map((item) => item.flightNo)).toEqual([
       "KE166",

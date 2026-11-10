@@ -1,5 +1,6 @@
 import { setStaffStatus, staffStatusValue } from "../../domain/staff-status";
 import { currentScheduleHistory } from "../history-actions";
+import { halfRestSelectionForDate } from "../../domain/records/half-rest-selections";
 import { installArchivedNextWorkdaySchedule } from "../schedule-actions";
 import { addIsoDays } from "../../domain/shared/time";
 import type { UiCommand } from "../../ui/events/ui-command";
@@ -110,27 +111,15 @@ export class ScheduleController implements UiCommandController {
         await this.confirmRescheduleFlightPicker(command.selectedIds);
         return true;
       case "set-half-rest-staff": {
-        const allowedIds = new Set(
-          this.context
-            .model()
-            .staff.filter(
-              (person) =>
-                person.status === "正常" && person.staffType === "常规"
-            )
-            .map((person) => person.id)
-        );
-        this.context.updateView({
-          halfRestStaffIds: [
-            ...new Set(
-              command.staffIds.filter((staffId) => allowedIds.has(staffId))
-            ),
-          ],
-          halfRestModes: Object.fromEntries(
-            Object.entries(command.modes ?? {}).filter(([staffId]) =>
-              allowedIds.has(staffId)
-            )
-          ),
-        });
+        this.context.store
+          .getState()
+          .schedule.setHalfRest(
+            this.context.view().date,
+            command.staffIds,
+            command.modes
+          );
+        this.context.commit();
+        this.context.updateView({});
         return true;
       }
       case "stop-schedule-without-result":
@@ -1132,7 +1121,8 @@ export class ScheduleController implements UiCommandController {
     try {
       const outcome = await this.context.scheduleRunner.calculate(
         temporaryState,
-        nextDate
+        nextDate,
+        halfRestSelectionForDate(temporaryState, nextDate)
       );
       if (outcome.kind === "stopped-without-result") {
         this.context.toast("排班已停止，原班表保持不变", "warning");
@@ -1151,8 +1141,6 @@ export class ScheduleController implements UiCommandController {
       this.context.updateView({
         date: nextDate,
         section: "schedule",
-        halfRestStaffIds: [],
-        halfRestModes: {},
       });
       this.context.commit(
         outcome.kind === "stopped-with-result"

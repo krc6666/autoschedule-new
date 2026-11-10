@@ -18,6 +18,7 @@ import { plannedScheduleProgress } from "../domain/kernel/schedule-pipeline";
 import { todayIso } from "../utils";
 import type { ApplicationPreferences } from "./application-preferences";
 import { isStorageQuotaExceeded } from "../infrastructure/storage";
+import { halfRestSelectionForDate } from "../domain/records/half-rest-selections";
 
 export interface ApplicationCoordinatorOptions {
   preferences: ApplicationPreferences;
@@ -181,11 +182,14 @@ export class ApplicationCoordinator implements ApplicationContext {
   }
 
   start(): void {
-    this.options.onViewChange?.(this.currentView);
+    this.options.onViewChange?.(this.view());
   }
 
   view(): ApplicationViewState {
-    return this.currentView;
+    return {
+      ...this.currentView,
+      ...halfRestSelectionForDate(this.model(), this.currentView.date),
+    };
   }
 
   model() {
@@ -194,7 +198,7 @@ export class ApplicationCoordinator implements ApplicationContext {
 
   updateView(patch: Partial<ApplicationViewState>): void {
     this.currentView = { ...this.currentView, ...patch };
-    this.options.onViewChange?.(this.currentView);
+    this.options.onViewChange?.(this.view());
   }
 
   commit(message?: string): void {
@@ -277,8 +281,6 @@ export class ApplicationCoordinator implements ApplicationContext {
         this.preferences.saveScheduleDate(command.date);
         this.updateView({
           date: command.date,
-          halfRestStaffIds: [],
-          halfRestModes: {},
           historyEditDate: null,
         });
         return true;
@@ -293,8 +295,6 @@ export class ApplicationCoordinator implements ApplicationContext {
         this.store.getState().switchGroup(command.groupId);
         this.commit(`已切换到${command.groupId}组`);
         this.updateView({
-          halfRestStaffIds: [],
-          halfRestModes: {},
           historyEditDate: null,
           restoredScheduleNotice: false,
         });

@@ -10,6 +10,7 @@ import { applyScheduleSettingsPatch } from "../domain/rules/schedule-settings";
 import { clearActiveSchedule } from "../domain/kernel/schedule-lifecycle";
 import type { AppState, HistoryRecord } from "../model";
 import { createId, orderPositionRules } from "../utils";
+import { normalizeHalfRestSelections } from "../domain/records/half-rest-selections";
 import {
   createEmptyWeeklyFlightPlans,
   normalizeWeeklyFlightNo,
@@ -337,6 +338,21 @@ export function applyWorkbookImport(
   if (importConfig && imported.dutyRosterOverrides !== undefined)
     state.dutyRosterOverrides = structuredClone(imported.dutyRosterOverrides);
   if (
+    imported.halfRestSelections !== undefined &&
+    (importConfig || importHistory)
+  ) {
+    const incoming = normalizeHalfRestSelections(imported.halfRestSelections);
+    const dates = new Set(incoming.map((row) => row.date));
+    state.halfRestSelections = importConfig
+      ? incoming
+      : normalizeHalfRestSelections([
+          ...(state.halfRestSelections ?? []).filter(
+            (row) => !dates.has(row.date)
+          ),
+          ...incoming,
+        ]);
+  }
+  if (
     importConfig &&
     replaceSharedTemplates &&
     imported.flights !== undefined &&
@@ -418,6 +434,8 @@ export function applyWorkbookImport(
     clearActiveSchedule(state);
   }
   const recognized = [
+    imported.halfRestSelections !== undefined &&
+      `${imported.halfRestSelections.length} 个工作日半休标记`,
     importConfig &&
       imported.leaveTypes !== undefined &&
       `${imported.leaveTypes.length} 个休假类别`,

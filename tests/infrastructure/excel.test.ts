@@ -498,7 +498,12 @@ describe("workbook boundary", () => {
     state.assignments = assignments;
     state.activeScheduleDate = "2026-07-18";
     const workbook = buildScheduleWorkbook(state, "2026-07-18");
-    expect(workbook.SheetNames).toHaveLength(3);
+    expect(workbook.SheetNames).toEqual([
+      "保障明细",
+      "排班结果",
+      "人员排班",
+      "半休选择",
+    ]);
     expect(workbook.Sheets[workbook.SheetNames[0]!]!["!ref"]).toBeTruthy();
     expect(workbook.Sheets[workbook.SheetNames[1]!]!["!ref"]).toBeTruthy();
     const machineRows = XLSX.utils.sheet_to_json<unknown[]>(
@@ -532,8 +537,17 @@ describe("workbook boundary", () => {
     expect(flightHeader).toBeTruthy();
     const guideRow = detailRows.findIndex((row) => row.includes("引导人员"));
     expect(guideRow).toBeGreaterThan(2);
-    expect(detailRows[guideRow - 1]?.every((value) => value === "")).toBe(true);
-    expect(detailRows[guideRow - 2]?.every((value) => value === "")).toBe(true);
+    const flightColumns = new Set(assignments.map((a) => a.flightNo)).size * 2;
+    expect(
+      detailRows[guideRow - 1]
+        ?.slice(0, flightColumns)
+        .every((value) => value === "")
+    ).toBe(true);
+    expect(
+      detailRows[guideRow - 2]
+        ?.slice(0, flightColumns)
+        .every((value) => value === "")
+    ).toBe(true);
   }, 30_000);
 
   it("groups early departures by airline code in the schedule summary", () => {
