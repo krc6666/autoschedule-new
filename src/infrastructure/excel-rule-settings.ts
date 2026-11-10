@@ -405,14 +405,24 @@ function parseSupervisorFillRules(
       const sourcePositionKeyword = cell(row, header, ["来源岗位关键词"], 3);
       const targetFlightNo = cell(row, header, ["目标航班"], 4).toUpperCase();
       const targetPositionKeyword = cell(row, header, ["目标岗位关键词"], 5);
+      const confirmationColumn = headerIndex(header, ["待确认"], -1);
+      const requiresConfirmation =
+        confirmationColumn < 0
+          ? undefined
+          : parseBoolean(row[confirmationColumn]);
       const errors = [
         enabled === undefined ? "启用值必须填写是或否" : "",
-        !sourceFlightNo ? "来源航班不能为空" : "",
-        !sourcePositionKeyword ? "来源岗位关键词不能为空" : "",
+        !sourceFlightNo && !requiresConfirmation ? "来源航班不能为空" : "",
+        !sourcePositionKeyword && !requiresConfirmation
+          ? "来源岗位关键词不能为空"
+          : "",
         !targetFlightNo ? "目标航班不能为空" : "",
         !targetPositionKeyword ? "目标岗位关键词不能为空" : "",
         allowAutomatic === undefined ? "允许自动补位必须填写是或否" : "",
         allowManual === undefined ? "允许人工补位必须填写是或否" : "",
+        confirmationColumn >= 0 && requiresConfirmation === undefined
+          ? "待确认必须填写是或否"
+          : "",
       ].filter(Boolean);
       if (
         errors.length ||
@@ -432,6 +442,9 @@ function parseSupervisorFillRules(
           targetPositionKeyword,
           allowAutomatic,
           allowManual,
+          ...(requiresConfirmation !== undefined
+            ? { requiresConfirmation }
+            : {}),
         },
       };
     }
@@ -874,6 +887,7 @@ export function appendScheduleRuleSheets(
         "目标岗位关键词",
         "允许自动补位",
         "允许人工补位",
+        "待确认",
       ],
       ...state.settings.mobileSupervisorFillRules.map((rule) => [
         rule.id,
@@ -884,9 +898,10 @@ export function appendScheduleRuleSheets(
         rule.targetPositionKeyword,
         rule.allowAutomatic ? "是" : "否",
         rule.allowManual ? "是" : "否",
+        rule.requiresConfirmation ? "是" : "否",
       ]),
     ],
-    [32, 10, 16, 24, 16, 24, 16, 16]
+    [32, 10, 16, 24, 16, 24, 16, 16, 12]
   );
   append(
     workbook,

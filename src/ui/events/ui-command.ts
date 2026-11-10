@@ -1,4 +1,5 @@
 import type { SchedulePolicyInput } from "../../app/policy-actions";
+import type { MobileSupervisorFillRule } from "../../domain/rules/structured-policy-contract";
 import type { WorkbookImportMode } from "../../app/workbook-import-controller";
 import type { DutyRosterSlot } from "../../domain/duty-roster/roster";
 import type {
@@ -175,6 +176,8 @@ export type UiCommand =
   | { type: "run-flight-query"; date: string }
   | { type: "apply-flight-query"; templateIds: string[]; flightIds: string[] }
   | { type: "apply-policy"; input: SchedulePolicyInput }
+  | { type: "save-supervisor-fill"; rule: MobileSupervisorFillRule }
+  | { type: "open-supervisor-fill-settings" }
   | {
       type: "update-policy";
       entity: string;

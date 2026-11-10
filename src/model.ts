@@ -66,6 +66,7 @@ export interface PositionRule {
   name: string;
   category: "常规" | "引导" | "机动督导" | "分流" | "行政支援";
   /** Orthogonal coverage behavior; it does not replace the position category. */
+  /** Legacy input only, consumed when migrating pre-v12 data/workbooks. */
   coverageRole?: "none" | "supervisor-fill";
   remark: string;
   qualifiedStaffIds: string[];
@@ -242,7 +243,7 @@ export interface GroupWorkspace {
 export type GroupWorkspaces = Record<ScheduleGroupId, GroupWorkspace>;
 
 export interface AppState {
-  version: 11;
+  version: 12;
   /** Shared flight planning data and the two isolated group workspaces. */
   shared: SharedScheduleData;
   groups: GroupWorkspaces;

@@ -207,6 +207,7 @@ export class AutoscheduleAppElement extends LightDomElement {
     if (section === "policy")
       return html`<autoschedule-policy-page
         .model=${this.model}
+        .query=${this.view.policyQuery ?? ""}
       ></autoschedule-policy-page>`;
     if (section === "statistics")
       return html`<autoschedule-statistics-page

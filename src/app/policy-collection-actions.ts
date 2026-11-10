@@ -21,6 +21,17 @@ export function appendPolicyItem<T extends IdentifiedPolicyItem>(
   return item;
 }
 
+export function savePolicyItem<T extends IdentifiedPolicyItem>(
+  state: AppState,
+  items: T[],
+  item: T
+): void {
+  const index = items.findIndex((existing) => existing.id === item.id);
+  if (index < 0) items.push(item);
+  else items[index] = item;
+  markChanged(state);
+}
+
 export function movePolicyItem<T extends IdentifiedPolicyItem>(
   state: AppState,
   items: T[],

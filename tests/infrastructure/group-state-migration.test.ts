@@ -66,7 +66,7 @@ describe("双组工作区状态迁移", () => {
     const migrated = restorePersistedState(legacy, createDefaultState());
 
     expect(migrated).not.toBeNull();
-    expect(migrated!.version).toBe(11);
+    expect(migrated!.version).toBe(12);
     expect(migrated!.activeGroupId).toBe("A");
     expect(migrated!.groups.A.staff.map((item) => item.id)).toEqual([
       "legacy-a-1",
@@ -165,7 +165,7 @@ describe("双组工作区状态迁移", () => {
       createDefaultState()
     );
 
-    expect(migrated!.version).toBe(11);
+    expect(migrated!.version).toBe(12);
     expect(migrated!.groups.A.positionRules.map((rule) => rule.name)).toEqual([
       "H1",
       "H2",
@@ -253,7 +253,7 @@ describe("双组工作区状态迁移", () => {
       createDefaultState()
     );
 
-    expect(migrated!.version).toBe(11);
+    expect(migrated!.version).toBe(12);
     expect(migrated!.templates.map((template) => template.flightNo)).toEqual([
       "CX937",
       "FD573",

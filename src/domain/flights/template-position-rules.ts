@@ -30,7 +30,6 @@ export function addMissingTemplatePositionRules(
         flightNo,
         name,
         category: "常规",
-        coverageRole: "none",
         remark: "",
         qualifiedStaffIds: [],
         manual: false,

@@ -135,7 +135,6 @@ describe("all-flight mobile-supervisor scheduling", { timeout: 15_000 }, () => {
         flightNo: "KE166",
         name: "H05",
         category: "常规",
-        coverageRole: "supervisor-fill",
         qualifiedStaffIds: includeRegularCandidate ? [regular.id] : [],
         fatiguePoints: 7,
       },
@@ -207,6 +206,52 @@ describe("all-flight mobile-supervisor scheduling", { timeout: 15_000 }, () => {
     expect(exported).toContain("TW616");
     expect(exported).not.toContain("TWB616");
   });
+
+  it.each(["pending", "removed", "wrong-link", "cross-flight"] as const)(
+    "rejects a later write after a legal fill becomes %s",
+    async (mutation) => {
+      const { state } = configuredSupervisorFillState(false);
+      const result = await generateSchedule(state, DATE);
+      const valid = result.assignments;
+      const session = createScheduleSafetySession({
+        phase: "partial",
+        state,
+        date: DATE,
+        runFacts: createScheduleRunFacts(state, DATE),
+        guards: [createMobileSupervisorCoverageScheduleGuard()],
+      });
+      session.assertAssignmentsSafe(valid);
+      const ledger = createScheduleLedger(valid, { safetySession: session });
+      const broken = structuredClone(valid);
+      const target = broken.find(
+        (assignment) => assignment.supervisorFillRuleId
+      )!;
+      expect(target).toBeDefined();
+      if (mutation === "pending")
+        state.settings.mobileSupervisorFillRules[0]!.requiresConfirmation = true;
+      if (mutation === "removed") state.settings.mobileSupervisorFillRules = [];
+      if (mutation === "cross-flight") {
+        state.flights.push({
+          ...state.flights[0]!,
+          id: "other-flight",
+          flightNo: "OTHER",
+          startTime: "23:30",
+          endTime: "01:30",
+        });
+        target.flightId = "other-flight";
+        target.flightNo = "OTHER";
+        state.positionRules.find(
+          (rule) => rule.id === target.positionRuleId
+        )!.flightNo = "OTHER";
+        state.settings.mobileSupervisorFillRules[0]!.targetFlightNo = "OTHER";
+      }
+      if (mutation === "wrong-link") target.supervisorFillRuleId = "unknown";
+      expect(() =>
+        ledger.commit({ type: "replace", assignments: broken })
+      ).toThrow(/督导补位.*无效/);
+      expect(ledger.snapshot()).toEqual(valid);
+    }
+  );
 
   it("fills a configured supervisor-fill target only when no safe regular candidate exists", async () => {
     const { state, supervisor } = configuredSupervisorFillState(false);
@@ -2579,7 +2624,7 @@ describe("all-flight mobile-supervisor scheduling", { timeout: 15_000 }, () => {
     expect(result.warnings.join("；")).toContain("TR121 / H05 空岗：");
   });
 
-  it("ignores a legal guide display when a cross-flight supervisor fill starts after release", () => {
+  it("rejects cross-flight fill even after release with a legal guide display", () => {
     const { state, supervisor } = configuredSupervisorFillState(false);
     const sourceFlight = state.flights.find((flight) => flight.id === "ke166")!;
     const targetFlight = {
@@ -2659,7 +2704,7 @@ describe("all-flight mobile-supervisor scheduling", { timeout: 15_000 }, () => {
         "manual",
         { ignoreSafeRegularCandidate: true }
       )
-    ).toMatchObject({ allowed: true });
+    ).toMatchObject({ allowed: false, reason: "督导只能在同一航班内补位" });
   });
 
   it("automatically binds a non-KE166 supervisor to an allowed counter when staffing is short", async () => {

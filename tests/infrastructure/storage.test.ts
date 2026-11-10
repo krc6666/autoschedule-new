@@ -162,7 +162,7 @@ describe("state persistence", () => {
 
     const loaded = loadState({ getItem: () => JSON.stringify(legacy) });
 
-    expect(loaded.version).toBe(11);
+    expect(loaded.version).toBe(12);
     expect(loaded.settings.crossFlightPriorityPolicies).toEqual([
       {
         id: "legacy-priority",
@@ -282,7 +282,7 @@ describe("state persistence", () => {
 
   it("falls back to valid defaults for corrupt persisted data", () => {
     const state = loadState({ getItem: () => "not-json" });
-    expect(state.version).toBe(11);
+    expect(state.version).toBe(12);
     expect(state.staff.length).toBeGreaterThan(0);
     expect(
       state.positionRules.some((rule) => rule.category === "机动督导")
@@ -484,7 +484,7 @@ describe("state persistence", () => {
 
     const loaded = loadState({ getItem: () => JSON.stringify(legacy) });
 
-    expect(loaded.version).toBe(11);
+    expect(loaded.version).toBe(12);
     expect(
       loaded.positionRules.some((rule) => rule.category === "机动督导")
     ).toBe(false);
@@ -551,7 +551,7 @@ describe("state persistence", () => {
 
     const loaded = loadState({ getItem: () => JSON.stringify(legacy) });
 
-    expect(loaded.version).toBe(11);
+    expect(loaded.version).toBe(12);
     expect(loaded.weeklyFlightPlans).toHaveLength(7);
     expect(
       loaded.weeklyFlightPlans.every((entry) => entry.flightNos.length === 0)
@@ -742,15 +742,21 @@ describe("state persistence", () => {
   it("migrates retired supervisor-fill rules to regular positions", () => {
     const state = createDefaultState();
     const legacy = JSON.parse(JSON.stringify(state));
+    legacy.version = 11;
     legacy.positionRules[0].category = "督导补位";
 
     const loaded = loadState({ getItem: () => JSON.stringify(legacy) });
 
     expect(loaded.positionRules[0]).toMatchObject({
       category: "常规",
-      coverageRole: "supervisor-fill",
       manual: false,
     });
+    expect(loaded.settings.mobileSupervisorFillRules).toContainEqual(
+      expect.objectContaining({
+        targetPositionKeyword: loaded.positionRules[0]!.name,
+        requiresConfirmation: true,
+      })
+    );
   });
 
   it("keeps an existing regular supervisor in the regular category", () => {

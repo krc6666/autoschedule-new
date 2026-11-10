@@ -95,7 +95,7 @@ function stateWithSupervisor(): AppState {
 }
 
 describe("督导同航班机动补位", () => {
-  it("允许人工把机动督导补到配置的跨航班督导补位岗位", () => {
+  it("拒绝人工把机动督导补到其他航班，即使配置关系且时段不冲突", () => {
     const state = stateWithSupervisor();
     state.flights.push({
       id: "f2",
@@ -135,14 +135,9 @@ describe("督导同航班机动补位", () => {
         "supervisor-assignment",
         "h04-assignment"
       )
-    ).toBeNull();
-    expect(target).toMatchObject({
-      staffId: state.staff[0]!.id,
-      status: "assigned",
-      workHours: 0,
-      fatiguePoints: 0,
-      supervisorSourceAssignmentId: "supervisor-assignment",
-    });
+    ).toContain("同一航班");
+    expect(target).toMatchObject({ staffId: null, status: "unfilled" });
+    expect(target.supervisorSourceAssignmentId).toBeUndefined();
   });
 
   it("拒绝人工把机动督导补到时段重叠的跨航班岗位", () => {
@@ -185,11 +180,11 @@ describe("督导同航班机动补位", () => {
         "supervisor-assignment",
         "h04-assignment"
       )
-    ).toContain("已有排班");
+    ).toContain("同一航班");
     expect(target).toMatchObject({ staffId: null, status: "unfilled" });
   });
 
-  it("最终守卫接受合法跨航班补位并拒绝拆开的关联", () => {
+  it("人工入口和最终守卫拒绝旧跨航班补位，即使时段不冲突", () => {
     const state = stateWithSupervisor();
     state.flights.push({
       id: "f2",
@@ -228,7 +223,20 @@ describe("督导同航班机动补位", () => {
         "supervisor-assignment",
         "h04-assignment"
       )
-    ).toBeNull();
+    ).toContain("同一航班");
+    expect(target.staffId).toBeNull();
+    const source = state.assignments.find(
+      (assignment) => assignment.id === "supervisor-assignment"
+    )!;
+    Object.assign(target, {
+      staffId: source.staffId,
+      staffName: source.staffName,
+      status: "assigned",
+      supervisorSourceAssignmentId: source.id,
+      supervisorFillRuleId: "f1-f2-fill",
+      workHours: 0,
+      fatiguePoints: 0,
+    });
     const session = createScheduleSafetySession({
       phase: "final",
       state,
@@ -237,14 +245,9 @@ describe("督导同航班机动补位", () => {
       guards: [createMobileSupervisorCoverageScheduleGuard()],
     });
 
-    expect(() =>
-      session.assertAssignmentsSafe(state.assignments)
-    ).not.toThrow();
-    const broken = state.assignments.map((assignment) => ({ ...assignment }));
-    delete broken.find((assignment) => assignment.id === target.id)!
-      .supervisorSourceAssignmentId;
-
-    expect(() => session.assertAssignmentsSafe(broken)).toThrow(/关联被拆开/);
+    expect(() => session.assertAssignmentsSafe(state.assignments)).toThrow(
+      /督导补位关联无效/
+    );
   });
 
   it("最终守卫拒绝同航班督导补位缺失补位规则关联", () => {

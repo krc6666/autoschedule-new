@@ -1,3 +1,4 @@
+import { isSupervisorFillTarget } from "../coverage/supervisor-fill-configuration";
 import type { Assignment, Flight, PositionRule } from "../../model";
 import type { ScheduleGenerationFacts } from "../shared/scheduling-facts";
 import { createId } from "../../utils";
@@ -452,7 +453,7 @@ export async function assignMobileSupervisorByCounterCoverage(
         eligibleIds.has(assignment.staffId) &&
         Boolean(
           sourceRule &&
-          sourceRule.coverageRole !== "supervisor-fill" &&
+          !isSupervisorFillTarget(state, sourceRule) &&
           isNumberedRegularPosition(sourceRule) &&
           canMobileSupervisorCoverPosition(state, {
             flightNo: flight.flightNo,

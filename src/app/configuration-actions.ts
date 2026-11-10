@@ -669,7 +669,6 @@ export function addPositions(
       flightNo,
       name,
       category: "常规",
-      coverageRole: "none",
       remark: "",
       qualifiedStaffIds: [],
       manual: false,
@@ -824,6 +823,7 @@ export function updateConfigurationField(
     return "updated";
   }
   if (entity === "position") {
+    if (field === "coverageRole") return "missing";
     const rule = state.positionRules.find((item) => item.id === id);
     if (!rule) return "missing";
     const previousReference = { flightNo: rule.flightNo, name: rule.name };
@@ -837,11 +837,7 @@ export function updateConfigurationField(
       if (value !== "分流") rule.earlyReleaseMinutes = 0;
       if (value === "引导" || value === "机动督导") rule.manual = false;
       if (value === "引导") rule.qualifiedStaffIds = [];
-      if (value !== "常规") rule.coverageRole = "none";
     }
-    if (field === "coverageRole")
-      rule.coverageRole =
-        value === "supervisor-fill" ? "supervisor-fill" : "none";
     if (field === "name" || field === "flightNo")
       state.positionRules = orderPositionRules(state.positionRules);
     if (field === "name" || field === "flightNo")

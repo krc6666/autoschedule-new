@@ -1,3 +1,4 @@
+import { isSupervisorFillTarget } from "../coverage/supervisor-fill-configuration";
 import type { Assignment, PositionRule } from "../../model";
 import type { ScheduleGenerationFacts } from "../shared/scheduling-facts";
 import {
@@ -961,7 +962,8 @@ export function createMobileSupervisorCoverageScheduleGuard(): ScheduleGuard {
         if (
           !supervisor ||
           supervisorRule?.category !== "机动督导" ||
-          (counterRule?.coverageRole === "supervisor-fill" && !fill) ||
+          (Boolean(counter.supervisorFillRuleId) && !fill) ||
+          (isSupervisorFillTarget(facts.state, counterRule) && !fill) ||
           (supervisor.flightId !== counter.flightId && !fill)
         ) {
           return [
@@ -969,7 +971,7 @@ export function createMobileSupervisorCoverageScheduleGuard(): ScheduleGuard {
               ruleId: "mobile-supervisor",
               assignmentId: counter.id,
               message:
-                counterRule?.coverageRole === "supervisor-fill" ||
+                isSupervisorFillTarget(facts.state, counterRule) ||
                 Boolean(counter.supervisorFillRuleId)
                   ? `${counter.flightNo}/${counter.position}的督导补位关联无效，拒绝提交`
                   : `${counter.flightNo}/${counter.position}的机动督导兼任关联无效，拒绝提交`,

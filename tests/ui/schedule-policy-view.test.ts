@@ -60,8 +60,7 @@ describe("rules page", () => {
 
   it("keeps repair instructions collapsed and identifies the field to change", async () => {
     const state = tw616FillState();
-    state.positionRules.find((rule) => rule.id === "tw-target")!.coverageRole =
-      "none";
+    state.settings.mobileSupervisorFillRules[0]!.requiresConfirmation = true;
     const element = await mountElement<
       HTMLElement & { updateComplete: Promise<unknown> }
     >("autoschedule-policy-page", { model: state });
@@ -74,9 +73,8 @@ describe("rules page", () => {
     expect(help!.querySelector("summary")?.textContent).toContain(
       "查看原因与处理方法"
     );
-    expect(help!.textContent).toContain("配置 → 岗位配置");
-    expect(help!.textContent).toContain("补位性质");
-    expect(help!.textContent).toContain("督导补位");
+    expect(help!.textContent).toContain("点击编辑");
+    expect(help!.textContent).toContain("保存关系");
   });
 
   it("explains unmatched rules beyond supervisor fill and keeps all help closed", async () => {
@@ -320,14 +318,16 @@ describe("rules page", () => {
     expect(card).not.toBeNull();
     expect(card.textContent).toContain("督导补位关系");
     expect(card.textContent).toContain("人手不足");
+    expect(card.textContent?.replace(/\s+/g, " ")).toContain(
+      "KE166：机动督导 → H05"
+    );
+    card
+      .querySelector<HTMLButtonElement>('[aria-label="编辑补位关系"]')!
+      .click();
+    await settleLit();
     expect(
-      card.querySelector<HTMLInputElement>('input[aria-label="来源航班"]')
-        ?.value
+      card.querySelector<HTMLSelectElement>('select[aria-label="航班"]')?.value
     ).toBe("KE166");
-    expect(
-      card.querySelector<HTMLInputElement>('input[aria-label="目标岗位"]')
-        ?.value
-    ).toBe("H05");
     const switches = card.querySelectorAll<HTMLInputElement>(
       'input[type="checkbox"]'
     );
@@ -338,7 +338,7 @@ describe("rules page", () => {
     ]);
   });
 
-  it("reports when a configured target position is not marked for supervisor fill", async () => {
+  it("reports an old supervisor fill relationship that needs confirmation", async () => {
     const state = createDefaultState();
     const flightNo = state.flights[0]!.flightNo;
     state.positionRules.push({
@@ -365,6 +365,7 @@ describe("rules page", () => {
         sourcePositionKeyword: "机动督导",
         targetFlightNo: flightNo,
         targetPositionKeyword: "H05",
+        requiresConfirmation: true,
         allowAutomatic: true,
         allowManual: true,
       },
@@ -375,7 +376,7 @@ describe("rules page", () => {
     >("autoschedule-policy-page", { model: state });
     const card = element.querySelector<HTMLElement>("[data-supervisor-fill]")!;
 
-    expect(card.textContent).toContain("目标岗位未标记为督导补位");
+    expect(card.textContent).toContain("此补位关系待确认");
   });
 
   it("configures cross-flight priority by current-group people instead of positions", async () => {

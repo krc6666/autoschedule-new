@@ -5,6 +5,7 @@ import {
   addLateShiftRecoveryPositionRule,
   addMobileSupervisorCoverageRule,
   addMobileSupervisorFillRule,
+  saveSupervisorFillRule,
   addSameFlightStaffExclusion,
   addNextWorkdayRecoveryTarget,
   addTransitionPolicy,
@@ -30,6 +31,7 @@ import {
   type SchedulePolicyInput,
 } from "../policy-actions";
 import type { StateCommand } from "./store-command";
+import type { MobileSupervisorFillRule } from "../../domain/rules/structured-policy-contract";
 
 export function createPolicyCommands(command: StateCommand) {
   return {
@@ -66,6 +68,8 @@ export function createPolicyCommands(command: StateCommand) {
     deleteSupervisorCoverage: (id: string) =>
       command((state) => deleteMobileSupervisorCoverageRule(state, id)),
     addSupervisorFill: () => command(addMobileSupervisorFillRule),
+    saveSupervisorFill: (rule: MobileSupervisorFillRule) =>
+      command((state) => saveSupervisorFillRule(state, rule)),
     deleteSupervisorFill: (id: string) =>
       command((state) => deleteMobileSupervisorFillRule(state, id)),
     addTransition: () => command(addTransitionPolicy),

@@ -95,17 +95,18 @@ describe("configuration diagnostics", () => {
 
   it("reports the target role before the plan absence and accepts any matching eligible position", () => {
     const state = fillState();
-    state.positionRules[1]!.coverageRole = "none";
+    state.positionRules[1]!.category = "分流";
     expect(
       diagnoseSupervisorFillRuleConfiguration(
         state,
         state.settings.mobileSupervisorFillRules[0]!
       )?.code
-    ).toBe("target-position-not-fill");
+    ).toBe("target-position-not-regular");
     state.positionRules.push({
       ...state.positionRules[1]!,
       id: "target-valid",
       name: "G16备用",
+      category: "常规",
       coverageRole: "supervisor-fill",
     });
     state.positionRules.unshift({
@@ -136,6 +137,7 @@ describe("configuration diagnostics", () => {
     });
     rule.enabled = false;
     rule.sourceFlightNo = "MISSING";
+    rule.targetFlightNo = "MISSING";
     expect(diagnoseSupervisorFillRuleConfiguration(state, rule)).toMatchObject({
       code: "disabled",
       severity: "info",

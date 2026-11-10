@@ -1,3 +1,4 @@
+import { supervisorFillRelationsForTarget } from "../../domain/coverage/supervisor-fill-configuration";
 import { html } from "lit";
 
 import type { AppState, PositionRule } from "../../model";
@@ -156,7 +157,7 @@ export class PositionRulesSectionElement extends LightDomElement {
               <th>航班</th>
               <th>岗位</th>
               <th>分类</th>
-              <th>补位性质</th>
+              <th>督导补位</th>
               <th>疲劳点</th>
               <th>启用旅客人数</th>
               <th>提前撤岗</th>
@@ -267,24 +268,15 @@ export class PositionRulesSectionElement extends LightDomElement {
         ${configurationSelect(this, "position", rule.id, "category", rule.category, "分类", POSITION_CATEGORIES)}
       </td>
       <td>
-        <select
-          ${dynamicSelectValue(rule.coverageRole ?? "none")}
-          class="form-select form-select-sm"
-          .value=${rule.coverageRole ?? "none"}
-          aria-label="补位性质"
-          ?disabled=${rule.category !== "常规"}
-          @change=${(event: Event) =>
-            dispatchUiCommand(this, {
-              type: "update-configuration",
-              entity: "position",
-              id: rule.id,
-              field: "coverageRole",
-              value: (event.currentTarget as HTMLSelectElement).value,
-            })}
+        ${supervisorFillRelationsForTarget(this.model, rule).map((relation) => html`<div class="small">${relation.sourceFlightNo || "待选来源"} / ${relation.sourcePositionKeyword || "待选岗位"}（${relation.requiresConfirmation ? "待确认" : relation.enabled ? "启用" : "停用"}）</div>`)}
+        <button
+          type="button"
+          class="btn btn-sm btn-outline-secondary"
+          aria-label="管理督导补位"
+          @click=${() => dispatchUiCommand(this, { type: "open-supervisor-fill-settings" })}
         >
-          <option value="none">无</option>
-          <option value="supervisor-fill">督导补位</option>
-        </select>
+          管理督导补位
+        </button>
       </td>
       <td>
         ${configurationInput(this, "position", rule.id, "fatiguePoints", rule.fatiguePoints, "疲劳点数", { type: "number", className: "number-input", min: 0, step: 0.5 })}

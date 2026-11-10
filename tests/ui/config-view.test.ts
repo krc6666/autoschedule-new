@@ -143,12 +143,23 @@ describe("configuration page", () => {
     ).toBe("休假");
   });
 
-  it("shows a regular position's supervisor-fill role", async () => {
+  it("shows a regular position's supervisor-fill relationship", async () => {
     const state = createDefaultState();
     const positionRule = state.positionRules.find(
       (rule) => rule.category === "常规"
     )!;
-    positionRule.coverageRole = "supervisor-fill";
+    state.settings.mobileSupervisorFillRules = [
+      {
+        id: "fill",
+        enabled: true,
+        sourceFlightNo: positionRule.flightNo,
+        sourcePositionKeyword: "督导",
+        targetFlightNo: positionRule.flightNo,
+        targetPositionKeyword: positionRule.name,
+        allowAutomatic: true,
+        allowManual: true,
+      },
+    ];
 
     const element = await mountElement<
       HTMLElement & { updateComplete: Promise<unknown> }
@@ -162,10 +173,9 @@ describe("configuration page", () => {
         )?.value === positionRule.name
     );
 
-    expect(
-      row?.querySelector<HTMLSelectElement>('select[aria-label="补位性质"]')
-        ?.value
-    ).toBe("supervisor-fill");
+    expect(row?.querySelector('select[aria-label="补位性质"]')).toBeNull();
+    expect(row?.textContent).toContain(`${positionRule.flightNo} / 督导`);
+    expect(row?.querySelector('[aria-label="管理督导补位"]')).not.toBeNull();
   });
 
   it("dispatches the selected target when copying a position group", async () => {

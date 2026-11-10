@@ -12,6 +12,10 @@ import { evaluateAutomaticHardConstraints } from "../rules/built-in-rule-registr
 import { assignmentRule } from "../flights/schedule-position-rules";
 import { isDisplayOnlyGuideReuse } from "../candidates/assignment-eligibility-facts";
 import { durationHours } from "../shared/time";
+import {
+  fillPositionMatches,
+  isSameFlightSupervisorFillRule,
+} from "./supervisor-fill-configuration";
 
 export type SupervisorFillMode = "automatic" | "manual";
 
@@ -27,11 +31,15 @@ export interface SupervisorFillEvaluation {
 export interface SupervisorFillConfigurationIssue extends PolicyDiagnostic {
   code:
     | "source-flight-missing"
+    | "source-template-missing"
     | "source-position-missing"
     | "source-position-not-supervisor"
     | "target-flight-missing"
+    | "target-template-missing"
     | "target-position-missing"
-    | "target-position-not-fill"
+    | "target-position-not-regular"
+    | "requires-confirmation"
+    | "cross-flight-not-allowed"
     | "no-operation-enabled"
     | "disabled"
     | "automatic-disabled"
@@ -83,10 +91,8 @@ function positionsForKeyword(
   flightNo: string,
   keyword: string
 ): PositionRule[] {
-  return state.positionRules.filter(
-    (rule) =>
-      normalize(rule.flightNo) === normalize(flightNo) &&
-      matches(rule.name, keyword)
+  return state.positionRules.filter((rule) =>
+    fillPositionMatches(rule, flightNo, keyword)
   );
 }
 
@@ -111,6 +117,20 @@ export function diagnoseSupervisorFillRuleConfiguration(
     ...policyDiagnostic(code, message, explanation, steps, severity),
     code,
   });
+  if (rule.sourceFlightNo && !isSameFlightSupervisorFillRule(rule))
+    return issue(
+      "cross-flight-not-allowed",
+      "旧跨航班补位关系待处理，不参与补位",
+      "督导只能补同一航班内的岗位，原跨航班信息保留供核对。",
+      ["点击编辑，选择一个航班，再选择该航班的督导岗位和补位岗位后保存。"]
+    );
+  if (rule.requiresConfirmation)
+    return issue(
+      "requires-confirmation",
+      "此补位关系待确认，不参与补位",
+      "旧配置未完整生效，或旧岗位只有补位标记。需要在统一入口核对来源与目标后保存。",
+      ["点击编辑，选择一个模板航班，再选择“督导岗位”和“补位岗位”，保存关系。"]
+    );
   if (!rule.enabled)
     return issue(
       "disabled",
@@ -130,7 +150,22 @@ export function diagnoseSupervisorFillRuleConfiguration(
       "航班模板和当前航班计划中都没有这个名称；不同航班号不会自动当作同一个航班。",
       [
         "在配置 → 航班计划模板核对准确航班号。",
-        "回到规则 → 督导补位关系，将“来源航班”填成相同名称；若改过名，检查这里是否仍是旧名称。",
+        "回到规则 → 督导补位关系，点击编辑，从“航班”选择对应模板，再核对两个岗位。",
+      ]
+    );
+  if (
+    !state.templates.some(
+      (template) =>
+        normalize(template.flightNo) === normalize(rule.sourceFlightNo)
+    )
+  )
+    return issue(
+      "source-template-missing",
+      `来源航班 ${rule.sourceFlightNo} 没有对应模板，需核对关联`,
+      "当前计划有这个航班，但模板没有对应名称，模板改名无法同步这一旧名称。现有运行仍按原关系和安全条件检查。",
+      [
+        "在配置 → 航班计划模板核对航班号。",
+        "点击编辑，从“航班”选择正确模板，再选“督导岗位”后保存；不要猜测旧名映射。",
       ]
     );
   const sourceRules = positionsForKeyword(
@@ -145,7 +180,7 @@ export function diagnoseSupervisorFillRuleConfiguration(
       "来源岗位关键词没有命中该航班的岗位名称。",
       [
         `在配置 → 岗位配置查看 ${sourceFlight.flightNo} 的岗位名称。`,
-        "回到本条关系，修改“来源岗位”关键词，使它包含在正确的机动督导岗位名称中；关键词不能为空。",
+        "回到本条关系，点击编辑，在“督导岗位”选择该航班的机动督导岗位。",
       ]
     );
   if (!sourceRules.some((position) => position.category === "机动督导"))
@@ -167,7 +202,22 @@ export function diagnoseSupervisorFillRuleConfiguration(
       "航班模板和当前航班计划中都没有目标航班的名称。",
       [
         "在配置 → 航班计划模板核对航班号。",
-        "回到本条关系，将“目标航班”填成准确名称，不要混用不同航班号。",
+        "回到本条关系，点击编辑，从“航班”选择正确模板，核对“补位岗位”。",
+      ]
+    );
+  if (
+    !state.templates.some(
+      (template) =>
+        normalize(template.flightNo) === normalize(rule.targetFlightNo)
+    )
+  )
+    return issue(
+      "target-template-missing",
+      `目标航班 ${rule.targetFlightNo} 没有对应模板，需核对关联`,
+      "当前计划有这个航班，但模板没有对应名称，模板改名无法同步这一旧名称。现有运行仍按原关系和安全条件检查。",
+      [
+        "在配置 → 航班计划模板核对航班号。",
+        "点击编辑，从“航班”选择正确模板，再选“补位岗位”后保存；不要猜测旧名映射。",
       ]
     );
   const targetRules = positionsForKeyword(
@@ -182,19 +232,17 @@ export function diagnoseSupervisorFillRuleConfiguration(
       "目标岗位关键词没有命中该航班的岗位名称。",
       [
         `在配置 → 岗位配置核对 ${targetFlight.flightNo} 的柜台名称。`,
-        "在本条关系修改“目标岗位”关键词；关键词不能为空，并应包含在指定柜台名称中。",
+        "点击编辑，在“补位岗位”选择该航班正确的常规柜台。",
       ]
     );
-  if (
-    !targetRules.some((position) => position.coverageRole === "supervisor-fill")
-  )
+  if (!targetRules.some((position) => position.category === "常规"))
     return issue(
-      "target-position-not-fill",
-      `目标岗位未标记为督导补位（${targetRules[0]!.name}），当前关系不会生效`,
-      "只填来源与目标关系还不够；目标柜台也必须允许督导补位。",
+      "target-position-not-regular",
+      `目标岗位不是常规岗位（${targetRules[0]!.name}），当前关系不会生效`,
+      "督导补位关系的目标应为常规岗位，无需另设补位标记。",
       [
         `在配置 → 岗位配置找到 ${targetFlight.flightNo} / ${targetRules[0]!.name}。`,
-        "将该岗位“补位性质”设为“督导补位”，再核对本条关系的目标岗位关键词。",
+        "在本条关系编辑时选择正确的常规目标岗位。",
         "完整配置仍只在柜台缺人且没有安全普通候选时补位，不会强制替换已安排的普通人员。",
       ]
     );
@@ -248,6 +296,8 @@ function matchingRule(
   return state.settings.mobileSupervisorFillRules.find(
     (rule) =>
       rule.enabled &&
+      isSameFlightSupervisorFillRule(rule) &&
+      !rule.requiresConfirmation &&
       (mode === "automatic" ? rule.allowAutomatic : rule.allowManual) &&
       normalize(rule.sourceFlightNo) === normalize(sourceFlight.flightNo) &&
       matches(sourceRule.name, rule.sourcePositionKeyword) &&
@@ -307,6 +357,13 @@ export function evaluateSupervisorFillFacts(
   mode: SupervisorFillMode,
   options: SupervisorFillEvaluationOptions = {}
 ): SupervisorFillEvaluation {
+  if (source.flightId !== target.flightId)
+    return {
+      allowed: false,
+      reason: "督导只能在同一航班内补位",
+      rule: null,
+      hasSafeRegularCandidate: false,
+    };
   const sourceRule = assignmentRule(state, source);
   const targetRule = assignmentRule(state, target);
   const sourceFlight = assignmentFlight(state, source);
@@ -325,10 +382,10 @@ export function evaluateSupervisorFillFacts(
       rule: null,
       hasSafeRegularCandidate: false,
     };
-  if (targetRule.coverageRole !== "supervisor-fill")
+  if (targetRule.category !== "常规")
     return {
       allowed: false,
-      reason: "目标岗位未标记为督导补位",
+      reason: "目标岗位不是常规岗位",
       rule: null,
       hasSafeRegularCandidate: false,
     };

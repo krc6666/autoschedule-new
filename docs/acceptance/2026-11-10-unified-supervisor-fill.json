@@ -1,0 +1,152 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-10-unified-supervisor-fill",
+  "title": "督导补位规则页统一维护、模板改名同步与失效集中提醒",
+  "startedFrom": "10bdfb6df731bf5c4f61f2491107d6a5ff1b813f",
+  "expectation": {
+    "example": "owner确认规则页一次配置KE166/督导到KE166/H05，岗位页显示关联；模板改名后A/B对应关系跟随，TW616/G16旧无效关系先待确认。 owner随后确认督导只在同一航班补位，页面应只选一次航班。",
+    "expected": "统一选择航班岗位并一次保存；岗位不需第二次标记；收起和三准备入口可见配置问题；localStorage/Excel保存确认状态与关系。 自动/人工/最终守卫均禁止跨航班；旧跨航班关系保留待处理，不执行。",
+    "unchanged": "除owner明确取消跨航班补位外，保留独立督导/短员补位优先级、人员状态/资格/时段/工时和最终关联检查；岗位分类、历史和A/B隔离不变。",
+    "fallback": "新关系校验失败不写入半份结果，旧配置保留；旧无效关系不自动激活，未知航班/多义旧关键词不猜映射；不提交/推送/发布。"
+  },
+  "testedVersion": "d889c6a4e247d930dcc4a5e567b23e3018cbcecdb5c5984ecccbfa32d996237e",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "先保留统一入口8项失败；同航班追加需求2项先失败；待确认恢复缺口先失败再收窄修复。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-unified-supervisor-fill-red.txt",
+          "summary": "改前8项新增回归全部失败，证明缺单次保存、旧迁移、岗位只读及集中提醒。",
+          "sha256": "909deb1d7e7def8e35bb30224566e9b4d1159f2b62cfbdc660eb0c6cffb6aaaf"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-unified-supervisor-fill-same-flight-red.txt",
+          "summary": "owner明确同航班口径后，单航班选择和拒绝跨航班保存两项先失败。",
+          "sha256": "315185e58319c84e5a4806454a8fa0c54b71c811e623ece24ab7b3795fd27287"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-unified-supervisor-fill-restoration-red.txt",
+          "summary": "查漏红测发现恢复可能将失效补位转换为通用兼任；最终按旧合同仅阻止待确认关系生效，保留已删除关系的合法普通兼任。",
+          "sha256": "4fb403b7e72d7f1cdc623e022c1c8c563d382f001dd1e1e1fed3bc753068e2c8"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-unified-supervisor-fill-complete-target.txt",
+          "summary": "最终5文件110项通过：统一入口、普通人员优先、安全、迁移、真实内核、跨航班人工拒绝与最终守卫反向回归。",
+          "sha256": "10c7de636b8213644f2941b4a17fc3816b2e588723975deb96d02623844dfd4a"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "一次选择航班及两个岗位，经真实UI命令、Store和controller原子保存；无需岗位标记，真实内核仍按普通候选优先与安全规则补位。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-unified-supervisor-fill-complete-target.txt",
+          "summary": "最终5文件110项通过：统一入口、普通人员优先、安全、迁移、真实内核、跨航班人工拒绝与最终守卫反向回归。",
+          "sha256": "10c7de636b8213644f2941b4a17fc3816b2e588723975deb96d02623844dfd4a"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-unified-supervisor-fill-complete-verify.txt",
+          "summary": "最终npm.cmd run verify退出0：157文件1585项功能、7文件19项性能、类型检查及生产构建通过；现有HiGHS node:module外置提示未阻止构建。",
+          "sha256": "0aa4566e19adaa5555547aceec9bb71b56bd78480d36bc4fe780d59c5bab8363"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-unified-supervisor-fill-ui.txt",
+          "summary": "owner真实本地页面先确认模板名称/岗位关联，再确认最终单航班表单及两个岗位选项符合。人工操作范围和未执行项已单独说明。",
+          "sha256": "4b58648d58846f1a3a3301029be3e1ea5ca7795e94a173dc727b345b4de8bcd9"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "覆盖无效保存、取消、模板改名A/B引用与选择值、切组、旧完整/无效/孤立配置、损坏确认值、XLSX字节/旧表/岗位单表、三准备入口、旧跨航班保留待处理。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-unified-supervisor-fill-complete-target.txt",
+          "summary": "最终5文件110项通过：统一入口、普通人员优先、安全、迁移、真实内核、跨航班人工拒绝与最终守卫反向回归。",
+          "sha256": "10c7de636b8213644f2941b4a17fc3816b2e588723975deb96d02623844dfd4a"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-unified-supervisor-fill-complete-verify.txt",
+          "summary": "最终npm.cmd run verify退出0：157文件1585项功能、7文件19项性能、类型检查及生产构建通过；现有HiGHS node:module外置提示未阻止构建。",
+          "sha256": "0aa4566e19adaa5555547aceec9bb71b56bd78480d36bc4fe780d59c5bab8363"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "真实生成后再尝试改变规则/关联/跨航班，Ledger拒绝并保留合法快照；恢复禁止待确认关系退成普通兼任，保留原已删除关系合法通用兼任回归。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-unified-supervisor-fill-complete-target.txt",
+          "summary": "最终5文件110项通过：统一入口、普通人员优先、安全、迁移、真实内核、跨航班人工拒绝与最终守卫反向回归。",
+          "sha256": "10c7de636b8213644f2941b4a17fc3816b2e588723975deb96d02623844dfd4a"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-unified-supervisor-fill-complete-verify.txt",
+          "summary": "最终npm.cmd run verify退出0：157文件1585项功能、7文件19项性能、类型检查及生产构建通过；现有HiGHS node:module外置提示未阻止构建。",
+          "sha256": "0aa4566e19adaa5555547aceec9bb71b56bd78480d36bc4fe780d59c5bab8363"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "同一关系事实限制配置两端航班一致，evaluate要求实际flightId一致；原关联ID、同人、0工时疲劳及安全守卫继续，跨航班即使时段合法也拒绝。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-unified-supervisor-fill-complete-target.txt",
+          "summary": "最终5文件110项通过：统一入口、普通人员优先、安全、迁移、真实内核、跨航班人工拒绝与最终守卫反向回归。",
+          "sha256": "10c7de636b8213644f2941b4a17fc3816b2e588723975deb96d02623844dfd4a"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-unified-supervisor-fill-complete-verify.txt",
+          "summary": "最终npm.cmd run verify退出0：157文件1585项功能、7文件19项性能、类型检查及生产构建通过；现有HiGHS node:module外置提示未阻止构建。",
+          "sha256": "0aa4566e19adaa5555547aceec9bb71b56bd78480d36bc4fe780d59c5bab8363"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "完整功能/性能/构建门禁通过；保留普通人员优先、状态/资格/时段/工时、局部留空及A/B独立；除明确取消跨航班补位外不改规则优先级、历史和统计。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-unified-supervisor-fill-complete-verify.txt",
+          "summary": "最终npm.cmd run verify退出0：157文件1585项功能、7文件19项性能、类型检查及生产构建通过；现有HiGHS node:module外置提示未阻止构建。",
+          "sha256": "0aa4566e19adaa5555547aceec9bb71b56bd78480d36bc4fe780d59c5bab8363"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "verified",
+      "reason": "最终表单由owner确认只选一个航班且岗位正确，岗位关联与模板号对应正常；实际模板改名/Excel界面/浏览器Worker计算未另行人工操作，由自动回归与构建覆盖对应边界。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-unified-supervisor-fill-ui.txt",
+          "summary": "owner真实本地页面先确认模板名称/岗位关联，再确认最终单航班表单及两个岗位选项符合。人工操作范围和未执行项已单独说明。",
+          "sha256": "4b58648d58846f1a3a3301029be3e1ea5ca7795e94a173dc727b345b4de8bcd9"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-unified-supervisor-fill-complete-target.txt",
+          "summary": "最终5文件110项通过：统一入口、普通人员优先、安全、迁移、真实内核、跨航班人工拒绝与最终守卫反向回归。",
+          "sha256": "10c7de636b8213644f2941b4a17fc3816b2e588723975deb96d02623844dfd4a"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-10-unified-supervisor-fill-complete-verify.txt",
+          "summary": "最终npm.cmd run verify退出0：157文件1585项功能、7文件19项性能、类型检查及生产构建通过；现有HiGHS node:module外置提示未阻止构建。",
+          "sha256": "0aa4566e19adaa5555547aceec9bb71b56bd78480d36bc4fe780d59c5bab8363"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "原双重门槛让只保存关系仍不生效，原页面又允许误填不同航班。统一入口红测8项和same-flight红测2项先失败，最终complete-target及complete-verify通过；旧缺标记与跨航班配置保留待处理。",
+    "laterChanges": "模板/岗位生命周期、切组、导入恢复及后置收尾可能破坏关系；已覆盖模板改名A/B传播、迁移/XLSX往返、三准备窗口与合法结果后续篡改/跨航班的拒绝回滚；待确认恢复不得绕过。证据见complete-target与complete-verify。",
+    "finalArtifact": "本次ui.txt保存owner最终原话“符合，只选一个航班，岗位也正确”，complete-verify绑定当前源文件产出生产构建并验证1585项功能和19项性能。实际生成/导入导出及模板改名未冒充owner人工验收。"
+  },
+  "review": {
+    "missedScope": "按传播矩阵复查岗位只读、保存/取消、共享模板A/B同步、准备窗口、所有原coverageRole运行消费者、默认/旧状态/Excel及最终凭证。查漏确实发现下载模板和集合接口、恢复降级及旧跨航班断言，均补长期回归。移动视口、真实Excel界面和浏览器Worker未单独人工验收，自动边界及构建通过。",
+    "rootCause": "配置事实分成岗位标记与关系两份，关系编辑缺少模板/岗位完整校验；此前只加提醒未收口。初始实现沿用了产品原有跨航班能力，owner澄清后才明确同航班边界。恢复还有将待确认补位退成通用兼任的旧逻辑，需在同一事实源下阻断。",
+    "earlyDetection": "需求例子阶段明确是否同一实际航班、唯一选择入口和旧配置回退；写代码前列出全部读写消费者。先测仅在规则页保存一次、模板存在本次未选、旧缺标记/跨航班不自动激活，再对真实生成后的关联执行反向篡改和恢复测试，最终核对owner实际表单。"
+  }
+}

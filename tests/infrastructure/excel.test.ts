@@ -1077,6 +1077,7 @@ describe("workbook boundary", () => {
     state.settings.mobileSupervisorFillRules = [
       {
         id: "supervisor-fill-export",
+        requiresConfirmation: true,
         enabled: true,
         sourceFlightNo: "KE166",
         sourcePositionKeyword: "机动督导",
@@ -1129,7 +1130,7 @@ describe("workbook boundary", () => {
       imported.positionRules?.find(
         (rule) => rule.flightNo === "TR121" && rule.name === "H05"
       )
-    ).toMatchObject({ category: "常规", coverageRole: "supervisor-fill" });
+    ).toMatchObject({ category: "常规" });
     expect(imported.settings).not.toHaveProperty("adminSupportEnabled");
     expect(workbook.SheetNames).not.toContain("值班备勤表");
   });

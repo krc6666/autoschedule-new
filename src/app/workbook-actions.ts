@@ -1,3 +1,4 @@
+import { migrateLegacySupervisorFillConfiguration } from "../domain/coverage/supervisor-fill-configuration";
 import type { WorkbookImport } from "../infrastructure/excel";
 import type { DutyRosterImportPreview } from "../infrastructure/duty-roster-excel";
 import type { LegacyScheduleImportPreview } from "../infrastructure/legacy-schedule-excel";
@@ -309,6 +310,20 @@ export function applyWorkbookImport(
           ),
         }));
     state.settings = applyScheduleSettingsPatch(state.settings, settingsPatch);
+  }
+  if (
+    importConfig &&
+    (imported.positionRules !== undefined ||
+      imported.settings?.mobileSupervisorFillRules !== undefined)
+  ) {
+    // Missing relationship sheets retain current canonical relationships. Legacy
+    // position flags can add a pending item, never silently enable a new link.
+    const relations = state.settings.mobileSupervisorFillRules;
+    if (imported.settings?.mobileSupervisorFillRules === undefined)
+      relations.forEach((rule) => {
+        rule.requiresConfirmation ??= false;
+      });
+    migrateLegacySupervisorFillConfiguration(state.positionRules, relations);
   }
   if (importConfig && imported.latePriorityFrequencyAdjustments !== undefined)
     state.latePriorityFrequencyAdjustments =

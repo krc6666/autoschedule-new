@@ -1,3 +1,4 @@
+import { migrateLegacySupervisorFillConfiguration } from "../domain/coverage/supervisor-fill-configuration";
 import * as XLSX from "xlsx-js-style";
 import {
   parseManualCountEvidence,
@@ -777,6 +778,14 @@ export function parseWorkbook(
   const positionRules = parsePositions(workbook);
   const history = parseHistory(workbook, effectiveStaff);
   const parsedRules = parseScheduleRuleSettings(workbook, effectiveStaff);
+  if (
+    positionRules &&
+    parsedRules.settings?.mobileSupervisorFillRules !== undefined
+  )
+    migrateLegacySupervisorFillConfiguration(
+      positionRules,
+      parsedRules.settings.mobileSupervisorFillRules
+    );
   const latePriorityFrequencyAdjustments =
     parseLatePriorityFrequencyAdjustments(workbook);
   const ordinaryPriorityFrequencyAdjustments =
@@ -989,7 +998,7 @@ export function buildConfigWorkbook(state: AppState): XLSX.WorkBook {
       ],
       ...state.positionRules.map((rule) => [
         rule.flightNo,
-        rule.coverageRole === "supervisor-fill" ? "督导补位" : rule.category,
+        rule.category,
         rule.name,
         rule.remark,
         rule.manual

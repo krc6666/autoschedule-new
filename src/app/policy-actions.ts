@@ -21,7 +21,13 @@ import {
 } from "../domain/coverage/team-leader-gap-fill-protection";
 import { createId, normalizeText, splitList } from "../utils";
 import {
+  fillPositionMatches,
+  isSameFlightSupervisorFillRule,
+  normalizeFillReference,
+} from "../domain/coverage/supervisor-fill-configuration";
+import {
   appendPolicyItem,
+  savePolicyItem,
   deletePolicyItem,
   movePolicyItem,
   updatePolicyItem,
@@ -625,7 +631,71 @@ export function addMobileSupervisorFillRule(
     targetPositionKeyword: "H05",
     allowAutomatic: true,
     allowManual: true,
+    requiresConfirmation: true,
   });
+}
+
+export function saveSupervisorFillRule(
+  state: AppState,
+  input: MobileSupervisorFillRule
+): { ok: true } | { ok: false; error: string } {
+  const rule = {
+    ...input,
+    id: input.id || createId("supervisor-fill"),
+    sourceFlightNo: normalizeFillReference(input.sourceFlightNo),
+    targetFlightNo: normalizeFillReference(input.targetFlightNo),
+    sourcePositionKeyword: input.sourcePositionKeyword.trim(),
+    targetPositionKeyword: input.targetPositionKeyword.trim(),
+    requiresConfirmation: false,
+  };
+  if (!isSameFlightSupervisorFillRule(rule))
+    return {
+      ok: false,
+      error: "督导只能在同一航班内补位，请选择一个航班及其岗位",
+    };
+  for (const flightNo of [rule.sourceFlightNo, rule.targetFlightNo]) {
+    if (
+      !state.templates.some(
+        (template) => normalizeFillReference(template.flightNo) === flightNo
+      )
+    )
+      return { ok: false, error: "请选择航班模板中已有的航班" };
+  }
+  const sources = state.positionRules.filter(
+    (position) =>
+      fillPositionMatches(
+        position,
+        rule.sourceFlightNo,
+        rule.sourcePositionKeyword
+      ) &&
+      position.name === rule.sourcePositionKeyword &&
+      position.category === "机动督导"
+  );
+  const targets = state.positionRules.filter(
+    (position) =>
+      fillPositionMatches(
+        position,
+        rule.targetFlightNo,
+        rule.targetPositionKeyword
+      ) &&
+      position.name === rule.targetPositionKeyword &&
+      position.category === "常规"
+  );
+  if (sources.length !== 1 || targets.length !== 1)
+    return { ok: false, error: "请选择唯一的来源机动督导和目标常规岗位" };
+  if (
+    state.settings.mobileSupervisorFillRules.some(
+      (existing) =>
+        existing.id !== rule.id &&
+        existing.sourceFlightNo === rule.sourceFlightNo &&
+        existing.sourcePositionKeyword === rule.sourcePositionKeyword &&
+        existing.targetFlightNo === rule.targetFlightNo &&
+        existing.targetPositionKeyword === rule.targetPositionKeyword
+    )
+  )
+    return { ok: false, error: "这条督导补位关系已存在" };
+  savePolicyItem(state, state.settings.mobileSupervisorFillRules, rule);
+  return { ok: true };
 }
 
 export function deleteMobileSupervisorFillRule(

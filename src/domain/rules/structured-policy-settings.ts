@@ -1,3 +1,4 @@
+import { isSameFlightSupervisorFillRule } from "../coverage/supervisor-fill-configuration";
 import type {
   CrossWorkdayQualificationReservation,
   CrossFlightPriorityPolicy,
@@ -117,6 +118,7 @@ const DEFAULT_STRUCTURED_POLICIES: StructuredSchedulePolicies = {
   mobileSupervisorFillRules: [
     {
       id: "ke166-h05-supervisor-fill",
+      requiresConfirmation: true,
       enabled: true,
       sourceFlightNo: "KE166",
       sourcePositionKeyword: "督导",
@@ -342,9 +344,17 @@ function normalizeSupervisorFillRules(
       const targetPositionKeyword = String(
         rule.targetPositionKeyword ?? ""
       ).trim();
+      const requiresConfirmation = !isSameFlightSupervisorFillRule({
+        sourceFlightNo,
+        targetFlightNo,
+      })
+        ? true
+        : rule.requiresConfirmation === undefined
+          ? undefined
+          : rule.requiresConfirmation !== false;
       if (
-        !sourceFlightNo ||
-        !sourcePositionKeyword ||
+        (!sourceFlightNo && !requiresConfirmation) ||
+        (!sourcePositionKeyword && !requiresConfirmation) ||
         !targetFlightNo ||
         !targetPositionKeyword
       )
@@ -358,6 +368,7 @@ function normalizeSupervisorFillRules(
         targetPositionKeyword,
         allowAutomatic: rule.allowAutomatic !== false,
         allowManual: rule.allowManual !== false,
+        ...(requiresConfirmation !== undefined ? { requiresConfirmation } : {}),
       };
       unique.set(
         [

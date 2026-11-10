@@ -1,3 +1,7 @@
+import {
+  isSupervisorFillTarget,
+  supervisorFillRelationsForTarget,
+} from "../coverage/supervisor-fill-configuration";
 import type { Assignment, PositionRule } from "../../model";
 import type { AssignmentEligibilityFacts } from "../shared/scheduling-facts";
 import { clearAutomaticAssignmentEvidence } from "./assignment-evidence";
@@ -93,7 +97,7 @@ export function moveSupervisorWithinFlight(
     "manual"
   );
   const targetRule = assignmentRule(state, target);
-  if (targetRule?.coverageRole === "supervisor-fill" && !configuredFill.allowed)
+  if (isSupervisorFillTarget(state, targetRule) && !configuredFill.allowed)
     return `机动督导不能补位 ${target.flightNo}/${target.position}：${configuredFill.reason}`;
   if (supervisor.flightId !== target.flightId && !configuredFill.allowed)
     return `机动督导不能补位 ${target.flightNo}/${target.position}：${configuredFill.reason}`;
@@ -157,7 +161,7 @@ export function normalizeSupervisorAssignments(
       : undefined;
     const inferredConfiguredFillSource =
       !source &&
-      assignmentRule(state, assignment)?.coverageRole === "supervisor-fill"
+      isSupervisorFillTarget(state, assignmentRule(state, assignment))
         ? state.assignments.find(
             (candidate) =>
               candidate.flightId === assignment.flightId &&
@@ -207,6 +211,10 @@ export function normalizeSupervisorAssignments(
       source.status === "assigned" &&
       (configuredFill ||
         (source.flightId === assignment.flightId &&
+          !supervisorFillRelationsForTarget(
+            state,
+            assignmentRule(state, assignment)
+          ).some((rule) => rule.requiresConfirmation) &&
           evaluateMobileSupervisorCoverage(state, {
             flightNo: assignment.flightNo,
             position: assignment.position,

@@ -1,3 +1,4 @@
+import { isSupervisorFillTarget } from "../coverage/supervisor-fill-configuration";
 import type { Assignment } from "../../model";
 import { assignmentConflictFacts } from "../candidates/assignment-eligibility-facts";
 import { canMobileSupervisorCoverPosition } from "../coverage/mobile-supervisor-coverage";
@@ -93,7 +94,7 @@ export function isControlledConcurrentAssignmentPair(
     supervisorRule &&
     supervisorFlight &&
     target.flightId === supervisor.flightId &&
-    (targetRule.coverageRole === "supervisor-fill"
+    (isSupervisorFillTarget(state, targetRule) || target.supervisorFillRuleId
       ? hasValidSupervisorFillLink(
           state,
           assignments,

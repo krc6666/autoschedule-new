@@ -47,6 +47,7 @@ import {
 import { airlineCode } from "../domain/rules/airline-rotation";
 import { scheduleRuleFingerprint } from "../domain/rules/schedule-rule-fingerprint";
 import { normalizeTime } from "../domain/shared/time";
+import { migrateLegacySupervisorFillConfiguration } from "../domain/coverage/supervisor-fill-configuration";
 import { clearActiveSchedule } from "../domain/kernel/schedule-lifecycle";
 import {
   addMissingRuleFlightTemplates,
@@ -55,7 +56,7 @@ import {
 
 type PersistedSettings = Partial<ScheduleSettings>;
 type PersistedAppState = Record<string, unknown> & {
-  version: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11;
+  version: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
 };
 
 const LATE_PRIORITY_KINDS = new Set([
@@ -153,7 +154,8 @@ function isPersistedState(value: unknown): value is PersistedAppState {
     value.version === 8 ||
     value.version === 9 ||
     value.version === 10 ||
-    value.version === 11
+    value.version === 11 ||
+    value.version === 12
   );
 }
 
@@ -803,6 +805,15 @@ function restoreGroupWorkspace(
           positionRules
         )
       : structuredClone(fallback.settings);
+  if (persistedVersion < 12)
+    migrateLegacySupervisorFillConfiguration(
+      positionRules,
+      settings.mobileSupervisorFillRules
+    );
+  else
+    positionRules.forEach((position) => {
+      delete position.coverageRole;
+    });
   const history = migrateLegacyHistoryMetadata(
     restoredCollection(value.history, fallback.history, restoreHistory),
     positionRules
@@ -919,7 +930,7 @@ export function restorePersistedState(
     positionRules
   );
   const next: AppState = {
-    version: 11,
+    version: 12,
     shared: structuredClone(fallback.shared),
     groups: structuredClone(fallback.groups),
     activeGroupId: "A",
@@ -979,6 +990,15 @@ export function restorePersistedState(
         : fallback.updatedAt,
   };
   next.leaveTypes = restoreLeaveTypes(value.leaveTypes, next.staff, issues);
+  if (value.version < 12)
+    migrateLegacySupervisorFillConfiguration(
+      next.positionRules,
+      next.settings.mobileSupervisorFillRules
+    );
+  else
+    next.positionRules.forEach((position) => {
+      delete position.coverageRole;
+    });
   try {
     const persistedAssignments = Array.isArray(value.assignments)
       ? value.assignments

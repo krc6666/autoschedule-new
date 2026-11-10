@@ -1,3 +1,4 @@
+import { isSupervisorFillTarget } from "../coverage/supervisor-fill-configuration";
 import type { Assignment, ScheduleResult } from "../../model";
 import type { ScheduleGuardContext } from "./schedule-guard";
 import { previousWorkdayLateProtection } from "../reviews/cross-day-recovery";
@@ -499,13 +500,14 @@ function contextFingerprint(context: ScheduleGuardContext): string {
               (rule) => ({ ...rule })
             ),
           fillPositionRules: mobileSupervisorCoverage.state.positionRules
-            .filter((rule) => rule.coverageRole === "supervisor-fill")
+            .filter((rule) =>
+              isSupervisorFillTarget(mobileSupervisorCoverage.state, rule)
+            )
             .map((rule) => ({
               id: rule.id,
               flightNo: rule.flightNo,
               name: rule.name,
               category: rule.category,
-              coverageRole: rule.coverageRole,
             }))
             .sort((left, right) => left.id.localeCompare(right.id)),
         }

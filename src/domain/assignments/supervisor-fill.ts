@@ -22,6 +22,10 @@ import { durationHours } from "../shared/time";
 import type { ScheduleRunFacts } from "../shared/schedule-run-facts";
 import { optimizeReassignment } from "../solver/reassignment-optimizer";
 import type { SolverPort } from "../solver/solver-port";
+import {
+  isSupervisorFillTarget,
+  isSameFlightSupervisorFillRule,
+} from "../coverage/supervisor-fill-configuration";
 
 function normalize(value: string): string {
   return value.trim().toLocaleLowerCase("zh-CN");
@@ -101,18 +105,20 @@ function configuredFillTargets(
   const rules = state.settings.mobileSupervisorFillRules.filter(
     (rule) =>
       rule.enabled &&
+      isSameFlightSupervisorFillRule(rule) &&
+      !rule.requiresConfirmation &&
       (mode === "automatic" ? rule.allowAutomatic : rule.allowManual) &&
       normalize(rule.sourceFlightNo) === normalize(sourceFlight.flightNo) &&
       matches(sourceRule.name, rule.sourcePositionKeyword)
   );
   if (!rules.length) return [];
   return assignments.filter((assignment) => {
+    if (assignment.flightId !== sourceFlight.id) return false;
     const rule = assignmentRule(state, assignment);
     const flight = state.flights.find(
       (item) => item.id === assignment.flightId
     );
-    if (!rule || !flight || rule.coverageRole !== "supervisor-fill")
-      return false;
+    if (!rule || !flight || !isSupervisorFillTarget(state, rule)) return false;
     return rules.some(
       (fillRule) =>
         normalize(fillRule.targetFlightNo) === normalize(flight.flightNo) &&

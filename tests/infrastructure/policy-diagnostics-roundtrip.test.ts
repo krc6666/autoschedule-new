@@ -82,9 +82,9 @@ describe("configuration diagnostics after persistence", () => {
     );
   });
 
-  it("recomputes matching and missing-role help after Excel export and config import", async () => {
+  it("retains pending confirmation after Excel export and config import", async () => {
     const state = scenario();
-    state.positionRules[1]!.coverageRole = "none";
+    state.settings.mobileSupervisorFillRules[0]!.requiresConfirmation = true;
     const workbook = buildConfigWorkbook(state);
     const parsed = parseWorkbook(workbook, state.staff);
     const imported = createDefaultState();
@@ -101,7 +101,7 @@ describe("configuration diagnostics after persistence", () => {
         "mobileSupervisorFillRules",
         fill.id
       )[0]
-    ).toMatchObject({ code: "target-position-not-fill", severity: "warning" });
+    ).toMatchObject({ code: "requires-confirmation", severity: "warning" });
     const page = await mountElement<
       HTMLElement & { updateComplete: Promise<unknown> }
     >("autoschedule-policy-page", { model: imported });
@@ -109,7 +109,7 @@ describe("configuration diagnostics after persistence", () => {
       "[data-supervisor-fill] details[data-policy-diagnostic]"
     )!;
     expect(details.open).toBe(false);
-    expect(details.textContent).toContain("补位性质");
-    expect(details.textContent).toContain("配置 → 岗位配置");
+    expect(details.textContent).toContain("点击编辑");
+    expect(details.textContent).toContain("保存关系");
   });
 });

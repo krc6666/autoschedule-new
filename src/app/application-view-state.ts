@@ -130,6 +130,7 @@ export interface ScheduleProgressView {
 }
 
 export interface ApplicationViewState {
+  policyQuery?: string;
   section: AppSection;
   date: string;
   zoom: number;

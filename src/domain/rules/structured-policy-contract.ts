@@ -51,6 +51,8 @@ export interface MobileSupervisorFillRule {
   targetPositionKeyword: string;
   allowAutomatic: boolean;
   allowManual: boolean;
+  /** Unresolved legacy configuration cannot grant runtime fill permission. */
+  requiresConfirmation?: boolean;
 }
 
 export interface CrossWorkdayQualificationReservation {

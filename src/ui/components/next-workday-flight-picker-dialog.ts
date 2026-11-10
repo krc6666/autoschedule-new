@@ -11,6 +11,8 @@ import { dispatchUiCommand } from "../events/ui-command";
 import { LightDomElement } from "./light-dom-element";
 import { dynamicSelectValue } from "./dynamic-select";
 import { weekdayLabel } from "../../domain/flights/weekly-flight-plan";
+import { diagnoseSupervisorFillRuleConfiguration } from "../../domain/coverage/supervisor-fill-facts";
+import { renderPolicyDiagnostics } from "./policy-diagnostic";
 
 type PickerDialog = Extract<
   ApplicationDialog,
@@ -122,6 +124,7 @@ export class NextWorkdayFlightPickerDialogElement extends LightDomElement {
         <div class="small text-secondary mt-3">
           已选择 ${selectedCount} 个航班
         </div>
+        ${this.supervisorFillIssues()}
         ${hasStaffStatusDraft ? this.staffStatusSection() : null}
         ${this.dutyRosterSection()}
       </div>
@@ -212,6 +215,25 @@ export class NextWorkdayFlightPickerDialogElement extends LightDomElement {
       selectedIds: this.dialog.selectedIds,
     });
   };
+
+  private supervisorFillIssues() {
+    const flights = this.dialog.candidates.filter((candidate) =>
+      this.dialog.selectedIds.includes(candidate.id)
+    );
+    const facts = { ...this.model, flights };
+    const issues = this.model.settings.mobileSupervisorFillRules.flatMap(
+      (rule) => {
+        const issue = diagnoseSupervisorFillRuleConfiguration(facts, rule);
+        return issue ? [issue] : [];
+      }
+    );
+    return issues.length
+      ? html`<section class="mt-3" aria-label="督导补位检查">
+          <h3 class="h6">督导补位检查</h3>
+          ${renderPolicyDiagnostics(issues, "preflight-supervisor-fill")}
+        </section>`
+      : null;
+  }
 
   private staffStatusSection() {
     const statuses =

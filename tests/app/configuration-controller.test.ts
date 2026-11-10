@@ -87,7 +87,7 @@ describe("configuration controller", () => {
     ).toBe("TW616");
   });
 
-  it("warns when saving a supervisor-fill relation whose target lacks the fill role", async () => {
+  it("saves a supervisor-fill relation without a separate target flag", async () => {
     const initial = createDefaultState();
     const flight = initial.flights[0]!;
     const base = initial.positionRules[0]!;
@@ -127,16 +127,12 @@ describe("configuration controller", () => {
     });
 
     await coordinator.handle({
-      type: "update-policy",
-      entity: "supervisor-fill",
-      id: "fill-rule",
-      field: "allowAutomatic",
-      value: true,
+      type: "save-supervisor-fill",
+      rule: initial.settings.mobileSupervisorFillRules[0]!,
     });
-
     expect(coordinator.view().toast).toMatchObject({
-      message: "目标岗位未标记为督导补位（H05），当前关系不会生效",
-      tone: "warning",
+      message: "督导补位关系已保存；当前班表需重新排班后执行",
+      tone: "success",
     });
   });
 

@@ -11,6 +11,19 @@ export class PolicyController implements UiCommandController {
   async handle(command: UiCommand): Promise<boolean> {
     const policy = this.context.store.getState().policy;
     switch (command.type) {
+      case "open-supervisor-fill-settings":
+        this.context.updateView({
+          section: "policy",
+          policyQuery: "督导补位关系",
+        });
+        return true;
+      case "save-supervisor-fill": {
+        const result = policy.saveSupervisorFill(command.rule);
+        if (result.ok)
+          this.context.commit("督导补位关系已保存；当前班表需重新排班后执行");
+        else this.context.toast(result.error, "warning");
+        return true;
+      }
       case "apply-policy":
         policy.apply(command.input);
         this.context.commit(
