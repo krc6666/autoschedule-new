@@ -1,0 +1,31 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/app/season-sync-preserve-positions.test.ts (0 test)
+npm.cmd :
+所在位置 行:2 字符: 1
++ npm.cmd exec vitest -- run tests/app/season-sync-preserve-positions.t ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/app/season-sync-preserve-positions.test.ts [ tests/app/season-sync-preserve-positions.test.ts ]
+Error: Cannot find module '../../src/domain/flights/flight-season-sync' imported from D:/autoschedule-migrate/autosched
+ule/tests/app/season-sync-preserve-positions.test.ts
+ ❯ tests/app/season-sync-preserve-positions.test.ts:5:1
+      3| import { createDefaultState } from "../../src/defaults";
+      4| import { configuredFlightNumbers, configuredSeasonTemplates } from "..…
+      5| import { flightSeasonSyncPreview } from "../../src/domain/flights/flig…
+       | ^
+      6| import { applyFlightSeasonSync, setFlightSeasonEnabled } from "../../s…
+      7| import { applyWorkbookImport } from "../../src/app/workbook-actions";
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Start at  19:22:40
+   Duration  589ms (transform 226ms, setup 0ms, import 0ms, tests 0ms, environment 0ms)

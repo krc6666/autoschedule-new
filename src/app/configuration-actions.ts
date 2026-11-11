@@ -31,6 +31,7 @@ import {
 } from "../domain/coverage/team-leader-gap-fill-protection";
 import {
   configuredSeasonTemplates,
+  renameFlightSeasonOverride,
   withConfiguredFlightPositions,
 } from "../domain/flights/configured-flight-positions";
 import { applyStaffStatusChange } from "../domain/kernel/schedule-state";
@@ -47,6 +48,15 @@ function flightRenameConflicts(
   const oldNo = normalizeWeeklyFlightNo(previous);
   const newNo = normalizeWeeklyFlightNo(next);
   if (oldNo === newNo) return false;
+  if (
+    [state, ...Object.values(state.groups)].some(
+      (w) =>
+        w.flightSeasonOverrides?.[oldNo] !== undefined &&
+        w.flightSeasonOverrides?.[newNo] !== undefined &&
+        w.flightSeasonOverrides[oldNo] !== w.flightSeasonOverrides[newNo]
+    )
+  )
+    return true;
   return [
     state.flights,
     ...Object.entries(state.groups)
@@ -87,6 +97,7 @@ function renameFlightConfigurationReferences(
       .filter(([id]) => id !== state.activeGroupId)
       .map(([, group]) => group),
   ]) {
+    renameFlightSeasonOverride(workspace, previous, next);
     const affected =
       workspace.flights.some(
         (flight) => normalizeWeeklyFlightNo(flight.flightNo) === previous
@@ -144,6 +155,7 @@ function renameActiveFlightReferences(
   state.latePriorityFrequencyAdjustments.forEach((item) => {
     item.flightNo = rename(item.flightNo);
   });
+  renameFlightSeasonOverride(state, previous, next);
 }
 
 function createFlightFromTemplate(
@@ -301,6 +313,8 @@ export function cleanupOrphanedFlightRules(
       workspace.settings,
       normalized
     );
+    if (workspace.flightSeasonOverrides)
+      delete workspace.flightSeasonOverrides[normalized];
     const hasAssignments = workspace.assignments.some(
       (assignment) =>
         normalizeWeeklyFlightNo(assignment.flightNo) === normalized
@@ -339,7 +353,8 @@ export function setWeeklyFlightPlanFlight(
     !configuredSeasonTemplates(
       state.templates,
       state.positionRules,
-      state.flights
+      state.flights,
+      state.flightSeasonOverrides
     ).some(
       (template) => normalizeWeeklyFlightNo(template.flightNo) === normalized
     )
@@ -363,7 +378,8 @@ export function addTemplateFlight(state: AppState, id: string): boolean {
   const template = configuredSeasonTemplates(
     state.templates,
     state.positionRules,
-    state.flights
+    state.flights,
+    state.flightSeasonOverrides
   ).find((item) => item.id === id);
   if (!template) return false;
   state.flights.push(createFlightFromTemplate(template, state.positionRules));
@@ -384,7 +400,8 @@ export function addFlightsFromTemplates(
   const season = configuredSeasonTemplates(
     state.templates,
     state.positionRules,
-    state.flights
+    state.flights,
+    state.flightSeasonOverrides
   );
   for (const templateId of templateIds) {
     if (requestedTemplateIds.has(templateId)) {

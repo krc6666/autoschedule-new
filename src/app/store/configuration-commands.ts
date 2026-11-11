@@ -1,4 +1,8 @@
 import { applyFlightPlanReview } from "../flight-plan-review-actions";
+import {
+  applyFlightSeasonSync,
+  setFlightSeasonEnabled,
+} from "../flight-season-actions";
 import type { FlightPlanReviewChoice } from "../../domain/flights/flight-plan-review";
 import {
   addAdministrativeStaff,
@@ -34,6 +38,10 @@ import type { LeaveType } from "../../model";
 
 export function createConfigurationCommands(command: StateCommand) {
   return {
+    syncFlightSeason: (fingerprint: string) =>
+      command((state) => applyFlightSeasonSync(state, fingerprint)),
+    setFlightSeasonEnabled: (flightNo: string, enabled: boolean) =>
+      command((state) => setFlightSeasonEnabled(state, flightNo, enabled)),
     addLeaveType: (name: string) =>
       command((state) => addLeaveType(state, name)),
     updateLeaveType: (

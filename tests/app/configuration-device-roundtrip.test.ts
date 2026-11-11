@@ -80,6 +80,7 @@ describe("complete configuration device transfer", () => {
       fields("ScheduleSettings").filter((key) => key !== "adminSupportEnabled")
     );
     const persistedConfiguration = [
+      "flightSeasonOverrides",
       "flightPlanConfirmations",
       "halfRestSelections",
       "leaveTypes",

@@ -1,6 +1,7 @@
 import {
   configuredSeasonTemplates,
   configuredSeasonFlights,
+  seasonFlightSelectionError,
   withConfiguredFlightPositions,
 } from "../../domain/flights/configured-flight-positions";
 import { setStaffStatus, staffStatusValue } from "../../domain/staff-status";
@@ -688,12 +689,17 @@ export class ScheduleController implements UiCommandController {
         configuredSeasonTemplates(
           model.templates,
           model.positionRules,
-          model.flights
+          model.flights,
+          model.flightSeasonOverrides
         ),
         model.positionRules
       ),
       withConfiguredFlightPositions(
-        configuredSeasonFlights(model.flights, model.positionRules),
+        configuredSeasonFlights(
+          model.flights,
+          model.positionRules,
+          model.flightSeasonOverrides
+        ),
         model.positionRules
       )
     );
@@ -818,6 +824,11 @@ export class ScheduleController implements UiCommandController {
       this.context.toast("请至少选择一个航班", "warning");
       return;
     }
+    const selectionError = seasonFlightSelectionError(
+      this.context.model(),
+      flights
+    );
+    if (selectionError) return this.context.toast(selectionError, "warning");
     const temporaryState = structuredClone(this.context.model());
     this.applyPreflightAdministrativeMode(temporaryState, dialog);
     this.applyPreflightStaffStatuses(temporaryState, dialog.staffStatuses);
@@ -881,12 +892,17 @@ export class ScheduleController implements UiCommandController {
         configuredSeasonTemplates(
           model.templates,
           model.positionRules,
-          model.flights
+          model.flights,
+          model.flightSeasonOverrides
         ),
         model.positionRules
       ),
       withConfiguredFlightPositions(
-        configuredSeasonFlights(model.flights, model.positionRules),
+        configuredSeasonFlights(
+          model.flights,
+          model.positionRules,
+          model.flightSeasonOverrides
+        ),
         model.positionRules
       )
     );
@@ -960,6 +976,11 @@ export class ScheduleController implements UiCommandController {
       return;
     }
     const date = dialog.date;
+    const selectionError = seasonFlightSelectionError(
+      this.context.model(),
+      flights
+    );
+    if (selectionError) return this.context.toast(selectionError, "warning");
     const temporaryState = structuredClone(this.context.model());
     this.applyPreflightAdministrativeMode(temporaryState, dialog);
     this.applyPreflightStaffStatuses(
@@ -1031,7 +1052,8 @@ export class ScheduleController implements UiCommandController {
         configuredSeasonTemplates(
           model.templates,
           model.positionRules,
-          model.flights
+          model.flights,
+          model.flightSeasonOverrides
         ),
         model.positionRules
       ),
@@ -1138,6 +1160,11 @@ export class ScheduleController implements UiCommandController {
       return;
     }
     const nextDate = dialog.date;
+    const selectionError = seasonFlightSelectionError(
+      this.context.model(),
+      flights
+    );
+    if (selectionError) return this.context.toast(selectionError, "warning");
     if (
       !this.context.confirm(
         `归档 ${currentDate}，并根据已选择的 ${flights.length} 个航班生成后天 ${nextDate} 排班？`

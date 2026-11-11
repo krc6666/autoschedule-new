@@ -12,7 +12,11 @@ import { normalizeWeeklyFlightNo as normalize } from "./weekly-flight-plan";
 
 type FlightPlanReviewWorkspace = Pick<
   GroupWorkspace,
-  "positionRules" | "settings" | "flights" | "flightPlanConfirmations"
+  | "positionRules"
+  | "settings"
+  | "flights"
+  | "flightPlanConfirmations"
+  | "flightSeasonOverrides"
 >;
 
 interface FlightPlanReviewInput extends FlightPlanReviewWorkspace {
@@ -70,13 +74,23 @@ export function flightPlanReview(
   groupId: ScheduleGroupId = state.activeGroupId
 ) {
   const group = groupFlightWorkspace(state, groupId);
-  const sourceGroupId = groupId === "A" ? "B" : "A";
+  const sourceGroupId = "A";
   const source = groupFlightWorkspace(state, sourceGroupId);
-  const sourceFlightNos = configuredFlightNumbers(source.positionRules);
-  const configuredFlightNos = configuredFlightNumbers(group.positionRules);
+  const sourceFlightNos = configuredFlightNumbers(
+    source.positionRules,
+    source.flightSeasonOverrides
+  );
+  const configuredFlightNos = configuredFlightNumbers(
+    group.positionRules,
+    group.flightSeasonOverrides
+  );
   const references = new Set([
     ...configuredFlightNos,
-    ...group.flights.map((f) => normalize(f.flightNo)).filter(Boolean),
+    ...group.flights
+      .map((f) => normalize(f.flightNo))
+      .filter(
+        (no) => Boolean(no) && group.flightSeasonOverrides?.[no] !== false
+      ),
   ]);
   const unmatchedFlightNos = [...references].filter(
     (no) => !sourceFlightNos.includes(no)
@@ -102,15 +116,22 @@ export function flightPlanReview(
   const sourceTemplates = configuredSeasonTemplates(
     state.templates,
     source.positionRules,
-    source.flights
+    source.flights,
+    source.flightSeasonOverrides
   );
   const missingPositions = sourceTemplates
-    .filter((t) => !configuredFlightNos.includes(normalize(t.flightNo)))
+    .filter(
+      (t) =>
+        !group.positionRules.some(
+          (r) => normalize(r.flightNo) === normalize(t.flightNo)
+        )
+    )
     .map((template) => ({
       template,
       confirmedNew: confirmed(template, "new-flight"),
     }));
   const timeDifferences = group.flights.flatMap((flight) => {
+    if (groupId === "A") return [];
     const template = state.templates.find(
       (t) => normalize(t.flightNo) === normalize(flight.flightNo)
     );

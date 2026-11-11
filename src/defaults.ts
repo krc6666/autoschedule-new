@@ -224,6 +224,7 @@ export function createDefaultState(): AppState {
     weeklyFlightPlans: structuredClone(weeklyFlightPlans),
   };
   const groupA: GroupWorkspace = {
+    flightSeasonOverrides: {},
     flightPlanConfirmations: [],
     halfRestSelections: [],
     leaveTypes: [],
@@ -240,6 +241,7 @@ export function createDefaultState(): AppState {
     schedulePolicyStale: false,
   };
   const groupB: GroupWorkspace = {
+    flightSeasonOverrides: {},
     flightPlanConfirmations: [],
     halfRestSelections: [],
     leaveTypes: [],
@@ -260,6 +262,7 @@ export function createDefaultState(): AppState {
     shared,
     groups: { A: groupA, B: groupB },
     activeGroupId: "A",
+    flightSeasonOverrides: groupA.flightSeasonOverrides,
     flightPlanConfirmations: groupA.flightPlanConfirmations,
     halfRestSelections: groupA.halfRestSelections,
     leaveTypes: groupA.leaveTypes,

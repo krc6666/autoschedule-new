@@ -250,6 +250,8 @@ export interface HalfRestSelection {
 
 /** Scheduling facts and configuration owned exclusively by one group. */
 export interface GroupWorkspace {
+  /** Explicit seasonal choices; absent choices follow configured jobs. */
+  flightSeasonOverrides?: Record<string, boolean>;
   flightPlanConfirmations?: FlightPlanConfirmation[];
   halfRestSelections: HalfRestSelection[];
   leaveTypes: LeaveType[];
@@ -270,6 +272,7 @@ export interface GroupWorkspace {
 export type GroupWorkspaces = Record<ScheduleGroupId, GroupWorkspace>;
 
 export interface AppState {
+  flightSeasonOverrides?: Record<string, boolean>;
   flightPlanConfirmations?: FlightPlanConfirmation[];
   halfRestSelections: HalfRestSelection[];
   version: 12;

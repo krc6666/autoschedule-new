@@ -70,14 +70,14 @@ describe("seasonal flight confirmation and group isolation", () => {
     expect(state.templates.map((r) => r.flightNo)).toContain("SPARE100");
   });
 
-  it("compares A and B seasons in either direction and refuses a stale source list", () => {
+  it("always uses A as source and refuses a stale source list", () => {
     const store = currentB();
     expect(flightPlanReview(store.getState().model).sourceFlightNos).toEqual([
       "NEW100",
     ]);
     const aReview = flightPlanReview(store.getState().model, "A");
-    expect(aReview.sourceFlightNos).toEqual(["OLD100"]);
-    expect(aReview.unmatchedFlightNos).toContain("NEW100");
+    expect(aReview.sourceFlightNos).toEqual(["NEW100"]);
+    expect(aReview.count).toBe(0);
     const command = choice(store.getState().model, "rename");
     const state = structuredClone(store.getState().model);
     state.groups.A.positionRules.push({

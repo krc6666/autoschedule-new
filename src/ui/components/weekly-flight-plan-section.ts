@@ -25,7 +25,8 @@ export class WeeklyFlightPlanSectionElement extends LightDomElement {
     const season = configuredSeasonTemplates(
       this.model.templates,
       this.model.positionRules,
-      this.model.flights
+      this.model.flights,
+      this.model.flightSeasonOverrides
     );
     const seasonNos = new Set(
       season.map((r) => normalizeWeeklyFlightNo(r.flightNo))

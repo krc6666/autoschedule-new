@@ -17,6 +17,7 @@ import type {
  * lifecycle, weekly-plan metadata, versioning and persistence timestamps.
  */
 export interface SchedulingFacts {
+  flightSeasonOverrides?: Record<string, boolean>;
   staff: Staff[];
   flights: Flight[];
   templates: FlightTemplate[];
@@ -33,6 +34,7 @@ export interface SchedulingFacts {
 export type ScheduleGenerationFacts = Pick<
   SchedulingFacts,
   | "staff"
+  | "flightSeasonOverrides"
   | "flights"
   | "templates"
   | "positionRules"
@@ -104,6 +106,7 @@ export function createScheduleGenerationFacts(
   state: Pick<
     AppState,
     | "staff"
+    | "flightSeasonOverrides"
     | "flights"
     | "templates"
     | "positionRules"
@@ -116,6 +119,7 @@ export function createScheduleGenerationFacts(
   >
 ): ScheduleGenerationFacts {
   return {
+    flightSeasonOverrides: state.flightSeasonOverrides,
     staff: state.staff,
     flights: state.flights,
     templates: state.templates,
@@ -134,6 +138,7 @@ export function createSchedulingFacts(
   state: Pick<
     AppState,
     | "staff"
+    | "flightSeasonOverrides"
     | "flights"
     | "templates"
     | "positionRules"

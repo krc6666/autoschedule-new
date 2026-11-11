@@ -1,0 +1,37 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+stderr | tests/ui/season-sync-preserve-positions.test.ts
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+
+ ❯ tests/ui/season-sync-preserve-positions.test.ts (6 tests | 1 failed) 182ms
+     × explains why B update is unavailable when only A's daily time needs review 63ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/ui/season-sync-preserve-positions.test.ts > B season synchronization controls and later paths > explains why B update is unavailable when only A's daily time needs review
+AssertionError: expected '\n                B组本季航班按A组更新\n      …' to contain 'B组已与A组一致，无需更新'
+
+- Expected
++ Received
+
+- B组已与A组一致，无需更新
++
++                 B组本季航班按A组更新
++
+
+ ❯ tests/ui/season-sync-preserve-positions.test.ts:40:32
+     38|     const button = el.querySelector<HTMLButtonElement>("[data-sync-b-s…
+     39|     expect(button.disabled).toBe(true);
+     40|     expect(button.textContent).toContain("B组已与A组一致，无需更新");
+       |                                ^
+     41|     expect(el.querySelector("[data-flight-season-review]")!.textConten…
+     42|     button.click();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 5 passed (6)
+   Start at  19:58:16
+   Duration  3.16s (transform 2.04s, setup 0ms, import 2.41s, tests 182ms, environment 366ms)

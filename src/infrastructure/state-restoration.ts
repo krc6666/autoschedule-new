@@ -1,4 +1,5 @@
 import { normalizeFlightPlanConfirmations } from "../domain/flights/flight-plan-review";
+import { normalizeFlightSeasonOverrides } from "../domain/flights/configured-flight-positions";
 import { normalizeSupervisorAssignments } from "../domain/assignments/schedule-adjustment";
 import { restoreManualCountEvidence } from "./manual-count-evidence";
 import { normalizeScheduleSettings } from "../domain/rules/schedule-settings";
@@ -740,6 +741,7 @@ function emptyGroupWorkspace(
   settings: ScheduleSettings
 ): GroupWorkspace {
   return {
+    flightSeasonOverrides: {},
     flightPlanConfirmations: [],
     halfRestSelections: [],
     leaveTypes: [],
@@ -759,6 +761,9 @@ function emptyGroupWorkspace(
 
 function groupWorkspaceFromState(state: AppState): GroupWorkspace {
   return {
+    flightSeasonOverrides: normalizeFlightSeasonOverrides(
+      state.flightSeasonOverrides
+    ),
     flightPlanConfirmations: normalizeFlightPlanConfirmations(
       state.flightPlanConfirmations
     ),
@@ -833,6 +838,9 @@ function restoreGroupWorkspace(
   );
   const workspaceState = {
     ...base,
+    flightSeasonOverrides: normalizeFlightSeasonOverrides(
+      value.flightSeasonOverrides
+    ),
     leaveTypes,
     flights,
     staff,
@@ -873,6 +881,9 @@ function restoreGroupWorkspace(
   }
   return {
     leaveTypes,
+    flightSeasonOverrides: normalizeFlightSeasonOverrides(
+      value.flightSeasonOverrides
+    ),
     flightPlanConfirmations: normalizeFlightPlanConfirmations(
       value.flightPlanConfirmations
     ),
@@ -910,6 +921,7 @@ function projectActiveGroup(next: AppState): void {
   next.flights = active.flights;
   next.staff = active.staff;
   next.flightPlanConfirmations = active.flightPlanConfirmations ?? [];
+  next.flightSeasonOverrides = active.flightSeasonOverrides ?? {};
   next.halfRestSelections = active.halfRestSelections;
   next.leaveTypes = active.leaveTypes;
   next.positionRules = active.positionRules;
@@ -984,6 +996,9 @@ export function restorePersistedState(
         value.ordinaryPriorityFrequencyAdjustments
       ),
     assignments: [],
+    flightSeasonOverrides: normalizeFlightSeasonOverrides(
+      value.flightSeasonOverrides
+    ),
     flightPlanConfirmations: normalizeFlightPlanConfirmations(
       value.flightPlanConfirmations
     ),

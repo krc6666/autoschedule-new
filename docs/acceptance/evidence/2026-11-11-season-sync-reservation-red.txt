@@ -1,0 +1,40 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/app/season-sync-preserve-positions.test.ts (5 tests | 1 failed) 240ms
+     × retains inactive flight reservation settings without reserving staff for an unused seasonal flight 11ms
+npm.cmd :
+所在位置 行:2 字符: 1
++ npm.cmd exec vitest -- run tests/app/season-sync-preserve-positions.t ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/app/season-sync-preserve-positions.test.ts > season synchronization without overwriting group jobs > retai
+ns inactive flight reservation settings without reserving staff for an unused seasonal flight
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ tests/app/season-sync-preserve-positions.test.ts:24:129
+     22|     expect(crossWorkdayReservationTargets(createScheduleGenerationFact…
+     23|     state.flightSeasonOverrides = { [reservation.flightNo]: false };
+     24|     expect(crossWorkdayReservationTargets(createScheduleGenerationFact…
+       |
+                  ^
+     25|     expect(state.settings.crossWorkdayQualificationReservations).toCon…
+     26|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 4 passed (5)
+   Start at  19:32:05
+   Duration  2.44s (transform 1.61s, setup 0ms, import 1.99s, tests 240ms, environment 0ms)

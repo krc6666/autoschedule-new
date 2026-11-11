@@ -9,12 +9,15 @@ import {
 } from "../domain/flights/group-flight-references";
 import { normalizeWeeklyFlightNo as normalize } from "../domain/flights/weekly-flight-plan";
 import { clearActiveSchedule } from "../domain/kernel/schedule-lifecycle";
+import { renameFlightSeasonOverride } from "../domain/flights/configured-flight-positions";
 
 export function applyFlightPlanReview(
   state: AppState,
   choice: FlightPlanReviewChoice
 ): { ok: boolean; message: string } {
   const fail = (message: string) => ({ ok: false, message });
+  if (state.activeGroupId !== "B")
+    return fail("本季航班固定以A组为准，只更新B组；A组未修改");
   const review = flightPlanReview(state);
   if (
     JSON.stringify(choice.expectedSourceFlightNos) !==
@@ -34,6 +37,8 @@ export function applyFlightPlanReview(
       (r) => normalize(r.flightNo) !== previous
     );
     removeFlightScopedReferences(state.settings, previous);
+    if (state.flightSeasonOverrides)
+      delete state.flightSeasonOverrides[previous];
     state.flightPlanConfirmations = (
       state.flightPlanConfirmations ?? []
     ).filter((r) => normalize(r.flightNo) !== previous);
@@ -74,6 +79,7 @@ export function applyFlightPlanReview(
     const rename = (value: string) =>
       normalize(value) === previous ? template.flightNo : value;
     renameGroupFlightReferences(state.positionRules, state.settings, rename);
+    renameFlightSeasonOverride(state, previous, template.flightNo);
     for (const row of state.latePriorityFrequencyAdjustments)
       row.flightNo = rename(row.flightNo);
     for (const flight of state.flights) {

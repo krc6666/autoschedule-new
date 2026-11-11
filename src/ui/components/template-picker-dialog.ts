@@ -16,7 +16,8 @@ export class TemplatePickerDialogElement extends LightDomElement {
     const season = configuredSeasonTemplates(
       this.model.templates,
       this.model.positionRules,
-      this.model.flights
+      this.model.flights,
+      this.model.flightSeasonOverrides
     );
     return html`<div class="modal-body">
         ${

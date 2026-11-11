@@ -1,0 +1,21 @@
+{
+  "inputSha256": "9d35437329e197f1f59596bde0e3f2c917be89e6b9261c9bd64e81ed965914e4",
+  "inputBytes": 38967,
+  "inputChangedDuringWork": {
+    "initiallyObservedBytes": 51423,
+    "currentBytes": 38967,
+    "originalSpareRowsTest": "Same-path file changed externally during this task; origin unconfirmed. Agent did not write that file. Three initially observed spare rows were added only to an isolated in-memory workbook for verification; not claimed as original bytes."
+  },
+  "staffCount": 16,
+  "jobCount": 81,
+  "currentFlightCount": 6,
+  "templatesCount": 10,
+  "spareWithoutTimes": [],
+  "restoreErrors": [],
+  "independentlyComparedOriginalTemplateCells": true,
+  "otherGroupUnchanged": true,
+  "jobsUnchangedThroughStorageAndXlsx": true,
+  "templatesUnchangedThroughStorageAndXlsx": true,
+  "isolatedOriginalSpareRowsAcceptedAndRetained": true,
+  "browserAndPhysicalDeviceAcceptance": "not performed"
+}

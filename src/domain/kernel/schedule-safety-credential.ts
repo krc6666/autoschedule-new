@@ -119,6 +119,8 @@ function contextFingerprint(context: ScheduleGuardContext): string {
       : undefined,
     crossWorkdayQualificationReservationFacts: crossWorkdayReservation
       ? {
+          flightSeasonOverrides:
+            crossWorkdayReservation.state.flightSeasonOverrides ?? {},
           settings: {
             lateShiftEndTime:
               crossWorkdayReservation.state.settings.lateShiftEndTime,

@@ -7,6 +7,7 @@ import { configurationInput, configurationSelect } from "./configuration-field";
 import { LightDomElement } from "./light-dom-element";
 import { dynamicSelectValue } from "./dynamic-select";
 import { normalizeWeeklyFlightNo } from "../../domain/flights/weekly-flight-plan";
+import { configuredFlightNumbers } from "../../domain/flights/configured-flight-positions";
 
 const POSITION_CATEGORIES = [
   "常规",
@@ -111,11 +112,18 @@ export class PositionRulesSectionElement extends LightDomElement {
   }
 
   private group(flightNo: string, rules: PositionRule[], hasTemplate: boolean) {
+    const enabled = configuredFlightNumbers(
+      this.model.positionRules,
+      this.model.flightSeasonOverrides
+    ).includes(normalizeWeeklyFlightNo(flightNo));
     const count = (category: PositionRule["category"]) =>
       rules.filter((rule) => rule.category === category).length;
     return html`<details class="position-rule-group">
       <summary>
         <strong>${flightNo}</strong
+        ><span
+          class=${`badge ${enabled ? "text-bg-success" : "text-bg-secondary"}`}
+          >${enabled ? "本季启用" : "暂不使用（岗位保留）"}</span
         ><span>
           ${count("常规")} 常规 · ${count("引导")} 引导 · ${count("机动督导")}
           机动督导 · ${count("分流")} 分流 · ${count("行政支援")} 行政支援
@@ -141,6 +149,14 @@ export class PositionRulesSectionElement extends LightDomElement {
         <i class="bi bi-chevron-down"></i>
       </summary>
       <div class="position-group-toolbar">
+        <button
+          class="btn btn-sm btn-outline-secondary"
+          type="button"
+          data-season-toggle=${flightNo}
+          @click=${() => dispatchUiCommand(this, { type: "set-flight-season-enabled", flightNo, enabled: !enabled })}
+        >
+          ${enabled ? "本季暂不使用，保留岗位" : "恢复本季使用"}
+        </button>
         <button
           class="btn btn-sm btn-outline-secondary"
           type="button"

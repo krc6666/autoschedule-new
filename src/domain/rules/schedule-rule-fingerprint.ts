@@ -9,6 +9,7 @@ export const SCHEDULE_RULE_FINGERPRINT_VERSION = "rules-v3";
 type FingerprintState = Pick<
   AppState,
   | "staff"
+  | "flightSeasonOverrides"
   | "flights"
   | "positionRules"
   | "dutyRosterOverrides"
@@ -46,6 +47,9 @@ export function scheduleRuleFingerprint(state: FingerprintState): string {
   return fnv64Fingerprint(
     {
       version: SCHEDULE_RULE_FINGERPRINT_VERSION,
+      ...(Object.keys(state.flightSeasonOverrides ?? {}).length
+        ? { flightSeasonOverrides: state.flightSeasonOverrides }
+        : {}),
       staff: [...state.staff]
         .map((person) => ({
           id: person.id,

@@ -5,6 +5,7 @@ import type {
 import type { UiCommand } from "../../ui/events/ui-command";
 import { normalizeWeeklyFlightNo } from "../../domain/flights/weekly-flight-plan";
 import { scheduleRunStopMessage } from "../schedule-run-controller";
+import { flightSeasonSyncPreview } from "../../domain/flights/flight-season-sync";
 
 export class ConfigurationController implements UiCommandController {
   constructor(private readonly context: ApplicationContext) {}
@@ -12,13 +13,53 @@ export class ConfigurationController implements UiCommandController {
   async handle(command: UiCommand): Promise<boolean> {
     const commands = this.context.store.getState().configuration;
     switch (command.type) {
+      case "sync-b-flight-season": {
+        const plan = flightSeasonSyncPreview(this.context.model());
+        if (
+          this.context.model().activeGroupId !== "B" ||
+          plan.fingerprint !== command.fingerprint ||
+          plan.error
+        ) {
+          this.context.toast(plan.error || "资料已改变，请重新核对", "warning");
+          return true;
+        }
+        if (
+          !this.context.confirm(
+            `B组本季航班按A组更新？新增/重新启用：${plan.additions.join("、") || "无"}；暂不使用：${plan.retirements.join("、") || "无"}；时间更新：${plan.timeChanges.map((r) => `${r.flightNo} ${r.from} → ${r.to}`).join("、") || "无"}。B组全部岗位性质、资质、人员、规则和历史保留；停用只移出当天航班，旧班表需要重排。待配B组岗位：${plan.missingPositions.join("、") || "无"}。取消不修改。`
+          )
+        )
+          return true;
+        const result = commands.syncFlightSeason(command.fingerprint);
+        if (result.ok) this.context.commit(result.message);
+        else this.context.toast(result.message, "warning");
+        return true;
+      }
+      case "set-flight-season-enabled": {
+        if (
+          !this.context.confirm(
+            `${command.flightNo} ${command.enabled ? "恢复为本季启用" : "标为暂不使用"}？保留全部岗位配置、资质及历史，本组旧班表需要重排。`
+          )
+        )
+          return true;
+        const result = commands.setFlightSeasonEnabled(
+          command.flightNo,
+          command.enabled
+        );
+        if (result.ok) this.context.commit(result.message);
+        else this.context.toast(result.message, "warning");
+        return true;
+      }
       case "confirm-flight-plan-review": {
+        if (command.groupId !== "B") {
+          this.context.toast("本季航班以A组为准，请切到B组核对", "warning");
+          return true;
+        }
         if (command.groupId !== this.context.model().activeGroupId) {
           this.context.toast("当前组已改变，请重新核对", "warning");
           return true;
         }
         const choice = command.choice;
-        const sourceGroup = command.groupId === "A" ? "B" : "A";
+        const sourceGroup = "A";
         const effect =
           choice.action === "retire-flight"
             ? `确认 ${choice.previousFlightNo} 是已停用的旧航班？将删除当前组这个航班、岗位和相关规则，并清空本组未归档班表，需要重新排班。过去历史、次数记录和另一组保留。取消不修改。`

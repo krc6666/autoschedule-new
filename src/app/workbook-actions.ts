@@ -1,3 +1,4 @@
+import { normalizeFlightSeasonOverrides } from "../domain/flights/configured-flight-positions";
 import {
   flightPlanReviewSummaries,
   type FlightPlanReviewSummary,
@@ -288,6 +289,10 @@ export function applyWorkbookImport(
         ],
       };
   }
+  if (importConfig && imported.flightSeasonOverrides !== undefined)
+    state.flightSeasonOverrides = normalizeFlightSeasonOverrides(
+      imported.flightSeasonOverrides
+    );
   if (importConfig && imported.flightPlanConfirmations !== undefined)
     state.flightPlanConfirmations = normalizeFlightPlanConfirmations(
       imported.flightPlanConfirmations
@@ -457,6 +462,7 @@ export function applyWorkbookImport(
       imported.latePriorityFrequencyAdjustments !== undefined ||
       imported.ordinaryPriorityFrequencyAdjustments !== undefined ||
       imported.halfRestSelections !== undefined ||
+      imported.flightSeasonOverrides !== undefined ||
       imported.flightPlanConfirmations !== undefined ||
       imported.dutyRosterOverrides !== undefined
     );
@@ -464,6 +470,9 @@ export function applyWorkbookImport(
     clearActiveSchedule(state);
   }
   const recognized = [
+    importConfig &&
+      imported.flightSeasonOverrides !== undefined &&
+      `${Object.keys(imported.flightSeasonOverrides).length} 条本季航班状态`,
     importConfig &&
       imported.flightPlanConfirmations !== undefined &&
       `${imported.flightPlanConfirmations.length} 条航班换季确认`,

@@ -7,6 +7,7 @@ import {
   type OperationalWorkInterval,
 } from "../assignments/minimum-flight-transition";
 import { timeToMinutes } from "../shared/time";
+import { configuredFlightNumbers } from "../flights/configured-flight-positions";
 
 export interface CrossWorkdayReservationTarget {
   reservation: CrossWorkdayQualificationReservation;
@@ -68,8 +69,14 @@ function targetInterval(
 export function crossWorkdayReservationTargets(
   state: ScheduleGenerationFacts
 ): CrossWorkdayReservationTarget[] {
+  const active = new Set(
+    configuredFlightNumbers(state.positionRules, state.flightSeasonOverrides)
+  );
   return state.settings.crossWorkdayQualificationReservations
-    .filter((reservation) => reservation.enabled)
+    .filter(
+      (reservation) =>
+        reservation.enabled && active.has(normalized(reservation.flightNo))
+    )
     .map((reservation) => {
       const positionRules = matchingPositionRules(state, reservation);
       const configuredStaffIds = new Set(

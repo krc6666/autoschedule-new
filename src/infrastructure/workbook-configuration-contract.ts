@@ -4,6 +4,8 @@ import {
 } from "../domain/rules/schedule-settings";
 import { STRUCTURED_POLICY_DEFINITIONS } from "../domain/rules/structured-policy-settings";
 import type { WorkbookImport } from "./excel";
+import { configuredFlightNumbers } from "../domain/flights/configured-flight-positions";
+import { normalizeWeeklyFlightNo as normalize } from "../domain/flights/weekly-flight-plan";
 
 /** Added after existing workbooks; absent values have a defined initial meaning. */
 export const OPTIONAL_CONFIGURATION_SCALARS = new Set([
@@ -35,6 +37,25 @@ function workbookConfigurationRestoreErrors(
     ...(imported.flightConfigurationErrors ?? []),
     ...imported.warnings,
   ];
+  const used = new Set([
+    ...configuredFlightNumbers(
+      imported.positionRules ?? [],
+      imported.flightSeasonOverrides
+    ),
+    ...(imported.flights ?? []).map((f) => normalize(f.flightNo)),
+    ...(imported.weeklyFlightPlans ?? []).flatMap((r) =>
+      r.flightNos.map(normalize)
+    ),
+  ]);
+  for (const template of imported.templates ?? []) {
+    if (
+      used.has(normalize(template.flightNo)) &&
+      (!template.startTime || !template.endTime)
+    )
+      errors.push(
+        `航班配置 ${template.flightNo} 正在本季或航班计划中使用，必须补齐开始和结束时间；不能完整恢复`
+      );
+  }
   for (const [field, sheet] of Object.entries(CONFIGURATION_SECTIONS)) {
     if (imported[field as keyof typeof CONFIGURATION_SECTIONS] === undefined)
       errors.push(`完整恢复缺少有效的“${sheet}”工作表`);
@@ -74,6 +95,10 @@ export function compileWorkbookConfigurationRestore(input: WorkbookImport): {
 } {
   const imported = { ...input, settings: { ...input.settings } };
   const restoreDefaults: string[] = [];
+  if (imported.flightSeasonOverrides === undefined) {
+    imported.flightSeasonOverrides = {};
+    restoreDefaults.push("本季航班状态：文件未记录，按岗位配置确定本季航班");
+  }
   if (imported.flightPlanConfirmations === undefined) {
     imported.flightPlanConfirmations = [];
     restoreDefaults.push("航班换季确认：未确认，按实际差异重新核对");

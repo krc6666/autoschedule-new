@@ -1,0 +1,86 @@
+
+> autoschedule@1.0.0 verify
+> npm run typecheck && npm test && npm run test:performance && npm run build
+
+
+> autoschedule@1.0.0 typecheck
+> tsc -b --pretty false
+
+
+> autoschedule@1.0.0 test
+> vitest run --exclude tests/performance/**
+
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/architecture/acceptance-gate.test.ts (16 tests | 2 failed) 39296ms
+     × also catches changed build settings and newly added source files 5538ms
+     × keeps completed historical records while requiring current-version evidence 5424ms
+ ❯ tests/architecture/scheduling-facts-boundary.test.ts (1 test | 1 failed) 862ms
+     × 完整 AppState 只进入投影和应用状态职责 857ms
+npm.cmd :
+所在位置 行:2 字符: 1
++ npm.cmd run verify *> docs/acceptance/evidence/2026-11-11-season-sync ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/architecture/acceptance-gate.test.ts > acceptance release gate > also catches changed build settings and n
+ewly added source files
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ tests/architecture/acceptance-gate.test.ts:155:3
+    153|   });
+    154|
+    155|   it("also catches changed build settings and newly added source files…
+       |   ^
+    156|     const root = fixture();
+    157|     save(root, record(root));
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  tests/architecture/acceptance-gate.test.ts > acceptance release gate > keeps completed historical records while
+requiring current-version evidence
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ tests/architecture/acceptance-gate.test.ts:253:3
+    251|   });
+    252|
+    253|   it("keeps completed historical records while requiring current-versi…
+       |   ^
+    254|     const root = fixture();
+    255|     save(root, record(root, "previous"));
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  tests/architecture/scheduling-facts-boundary.test.ts > 排班事实依赖边界 > 完整 AppState 只进入投影和应用状态职责
+AssertionError: expected [ …(5) ] to deeply equal [ …(4) ]
+
+- Expected
++ Received
+
+  [
+    "src/domain/flights/flight-plan-reconciliation.ts",
++   "src/domain/flights/flight-season-sync.ts",
+    "src/domain/kernel/schedule-lifecycle.ts",
+    "src/domain/rules/schedule-rule-fingerprint.ts",
+    "src/domain/shared/scheduling-facts.ts",
+  ]
+
+ ❯ tests/architecture/scheduling-facts-boundary.test.ts:58:27
+     56|       .sort();
+     57|
+     58|     expect(directImports).toEqual([...allowedAppStateImports].sort());
+       |                           ^
+     59|   });
+     60| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  2 failed | 173 passed (175)
+      Tests  3 failed | 1746 passed (1749)
+   Start at  19:41:38
+   Duration  104.93s (transform 25.15s, setup 0ms, import 84.48s, tests 363.90s, environment 25.61s)

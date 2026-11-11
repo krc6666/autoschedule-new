@@ -61,6 +61,7 @@ function reconcileInitialProjection(model: AppState): void {
   const active = model.groups[model.activeGroupId];
   if (!active) return;
   active.staff = model.staff;
+  active.flightSeasonOverrides = model.flightSeasonOverrides ?? {};
   active.flightPlanConfirmations = model.flightPlanConfirmations ?? [];
   active.halfRestSelections = model.halfRestSelections ?? [];
   active.leaveTypes = model.leaveTypes;
@@ -87,6 +88,7 @@ function syncActiveGroupProjection(model: AppState): void {
   if (!group) return;
   group.flights = model.flights;
   group.staff = model.staff;
+  group.flightSeasonOverrides = model.flightSeasonOverrides ?? {};
   group.flightPlanConfirmations = model.flightPlanConfirmations ?? [];
   group.halfRestSelections = model.halfRestSelections;
   group.leaveTypes = model.leaveTypes;
@@ -116,6 +118,7 @@ function activateGroupProjection(
   model.settings = group.settings;
   model.flights = group.flights;
   model.staff = group.staff;
+  model.flightSeasonOverrides = group.flightSeasonOverrides ?? {};
   model.flightPlanConfirmations = group.flightPlanConfirmations ?? [];
   model.halfRestSelections = group.halfRestSelections ?? [];
   model.leaveTypes = group.leaveTypes;

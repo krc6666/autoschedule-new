@@ -28,7 +28,10 @@ function normalizedFlightNo(flightNo: string): string {
 export function buildFlightPlanReconciliation<
   TFlight extends QueriedFlightReference,
 >(
-  state: Pick<AppState, "flights" | "templates" | "positionRules">,
+  state: Pick<
+    AppState,
+    "flights" | "templates" | "positionRules" | "flightSeasonOverrides"
+  >,
   currentScheduleDate: string,
   result: { date: string; flights: TFlight[] }
 ): FlightPlanReconciliation<TFlight> {
@@ -40,7 +43,8 @@ export function buildFlightPlanReconciliation<
   configuredSeasonTemplates(
     state.templates,
     state.positionRules,
-    state.flights
+    state.flights,
+    state.flightSeasonOverrides
   ).forEach((template) =>
     templateByFlightNo.set(normalizedFlightNo(template.flightNo), template)
   );

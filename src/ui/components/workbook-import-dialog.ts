@@ -184,12 +184,22 @@ export class WorkbookImportDialogElement extends LightDomElement {
           this.dialog.flightPlanReview?.length
             ? html`<div class="alert alert-warning" data-import-flight-review>
                 <strong>导入后仍需核对各组航班</strong
-                >：本季航班以岗位配置为准，备用模板继续保留。确认导入后，选择以本次调好的组为准，核对另一组，分别确认新增、旧号换号或旧航班退出本季。
+                >：本季航班按岗位配置及本季启用状态确定，备用模板继续保留。导入B组后可选择“B组本季航班按A组更新”，保留B组岗位性质和资质；也可逐项核对新增、换号或退季。
                 ${this.dialog.flightPlanReview.map((review) => html`<div class="mt-1">以 ${review.sourceGroupId} 组为准核对 ${review.groupId} 组：${review.unmatchedFlightNos.length ? `本组多出 ${review.unmatchedFlightNos.join("、")}；` : ""}${review.missingPositionFlightNos.length ? `待配岗位 ${review.missingPositionFlightNos.join("、")}；` : ""}${review.timeDifferenceFlightNos.length ? `当天时段不同 ${review.timeDifferenceFlightNos.join("、")}` : ""}</div>`)}
               </div>`
             : ""
         }
         <div class="row g-2 mb-3">
+          ${
+            imported.templates?.some((t) => !t.startTime && !t.endTime)
+              ? html`<div class="small text-warning-emphasis">
+                  备用模板未填时间：${imported.templates
+                    .filter((t) => !t.startTime && !t.endTime)
+                    .map((t) => t.flightNo)
+                    .join("、")}。未使用的备用项会原样保留，启用前必须补齐时间。
+                </div>`
+              : ""
+          }
           ${this.summary("导入入口", importModeLabel)}
           ${this.summary("识别内容", this.dialog.recognized || "无有效数据")}
           ${this.summary(

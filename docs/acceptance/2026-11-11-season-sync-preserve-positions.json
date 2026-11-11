@@ -1,0 +1,187 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-11-season-sync-preserve-positions",
+  "title": "备用模板空时间恢复与B组按A组同步本季航班，保留岗位配置",
+  "startedFrom": "7a6d83884de44970f90d3380cdb7e9497bccdeb7",
+  "expectation": {
+    "example": "真实B配置12至14行有三个未使用且无时段的备用模板，完整恢复被拒。Owner要求B本季航班按A更新，特别确认已有岗位性质/资质不变，退季也保留并标为暂不使用。",
+    "expected": "备用未使用模板空时段可原样恢复；实际计划/本季使用仍检查时间。B同步预览增删和时段，确认后名单以A为准；只修改季节启用状态及匹配当天时段，岗位配置不覆盖。新航班提示另配B岗位；退季岗位保留。启用状态在切组、刷新和Excel转移后保持。 最终裁决固定A为准；B完成同步且岗位已齐后，页面与导入预览均无换季黄色提醒，不反向核对A。",
+    "unchanged": "两组人员、岗位名称/分类/资质/疲劳/备注、历史及次数账本、排班安全和公平规则均保留。共享备用模板不删除，不把A当天航班列表复制给B。行政模式仍由每台设备选择。",
+    "fallback": "预览和取消不写入。A无本季名单、资料无效或确认时输入已变则整次拒绝；变更后B旧班表失效需重排。非法时间/重复号及实际使用的缺时间航班仍拒绝导入。"
+  },
+  "testedVersion": "305334a901cb56d502ed90934e3c3dab1b990474f1ae7afcfac0b874ce3b45cc",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "最终自动检查已覆盖此路径；真实页面范围单独记录。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-season-sync-final-verify.txt",
+          "summary": "Final npm.cmd run verify exited 0: typecheck, 175 functional files / 1752 tests, 7 performance files / 19 tests and production build passed.",
+          "sha256": "1c5ff1e32ac32a04d035a8c36c96cdc27805d38a3609c1245af46ab0b59bdc0f"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-season-sync-one-direction-focused.txt",
+          "summary": "After the fixed A-to-B correction, 4 files / 36 focused tests passed; full final verify covers latest source.",
+          "sha256": "7ed9410b654f977064410df87e610caae97576318fc5ea58f5dcfc068ca8e6ba"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-season-sync-real.json",
+          "summary": "Independently compared 10 template records and 81 jobs from the currently supplied B workbook, retained through storage and real XLSX bytes; three original blank-time spare rows tested on isolated in-memory copy.",
+          "sha256": "cc60c4d5be0d2f6195a4dcdeee85e2e4f954786f8c47ebf22ebcac8628e1fdb6"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-season-sync-one-direction-red.txt",
+          "summary": "Before final correction, one test failed because A temporary daily time incorrectly kept the yellow review visible.",
+          "sha256": "ea588a546248e4f4d363b9f178b81dd5ce0386154c2276a70e27e67a7aba76c6"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-season-sync-red.txt",
+          "summary": "Initial new-feature module unavailable before implementation.",
+          "sha256": "a347afbf9c899445ff9af1920f0fd2f506a01e1294e5e271f4409405f87cb260"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-season-sync-reservation-red.txt",
+          "summary": "Four other tests passed, inactive reservation still consumed a target before correction.",
+          "sha256": "273b16e9f8f1c42c7c52f0e2430fa83466381c5ced9cc47ff9759c8e84b184fc"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "最终自动检查已覆盖此路径；真实页面范围单独记录。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-season-sync-final-verify.txt",
+          "summary": "Final npm.cmd run verify exited 0: typecheck, 175 functional files / 1752 tests, 7 performance files / 19 tests and production build passed.",
+          "sha256": "1c5ff1e32ac32a04d035a8c36c96cdc27805d38a3609c1245af46ab0b59bdc0f"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-season-sync-one-direction-focused.txt",
+          "summary": "After the fixed A-to-B correction, 4 files / 36 focused tests passed; full final verify covers latest source.",
+          "sha256": "7ed9410b654f977064410df87e610caae97576318fc5ea58f5dcfc068ca8e6ba"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-season-sync-real.json",
+          "summary": "Independently compared 10 template records and 81 jobs from the currently supplied B workbook, retained through storage and real XLSX bytes; three original blank-time spare rows tested on isolated in-memory copy.",
+          "sha256": "cc60c4d5be0d2f6195a4dcdeee85e2e4f954786f8c47ebf22ebcac8628e1fdb6"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "最终自动检查已覆盖此路径；真实页面范围单独记录。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-season-sync-final-verify.txt",
+          "summary": "Final npm.cmd run verify exited 0: typecheck, 175 functional files / 1752 tests, 7 performance files / 19 tests and production build passed.",
+          "sha256": "1c5ff1e32ac32a04d035a8c36c96cdc27805d38a3609c1245af46ab0b59bdc0f"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-season-sync-one-direction-focused.txt",
+          "summary": "After the fixed A-to-B correction, 4 files / 36 focused tests passed; full final verify covers latest source.",
+          "sha256": "7ed9410b654f977064410df87e610caae97576318fc5ea58f5dcfc068ca8e6ba"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-season-sync-real.json",
+          "summary": "Independently compared 10 template records and 81 jobs from the currently supplied B workbook, retained through storage and real XLSX bytes; three original blank-time spare rows tested on isolated in-memory copy.",
+          "sha256": "cc60c4d5be0d2f6195a4dcdeee85e2e4f954786f8c47ebf22ebcac8628e1fdb6"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "最终自动检查已覆盖此路径；真实页面范围单独记录。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-season-sync-final-verify.txt",
+          "summary": "Final npm.cmd run verify exited 0: typecheck, 175 functional files / 1752 tests, 7 performance files / 19 tests and production build passed.",
+          "sha256": "1c5ff1e32ac32a04d035a8c36c96cdc27805d38a3609c1245af46ab0b59bdc0f"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-season-sync-one-direction-focused.txt",
+          "summary": "After the fixed A-to-B correction, 4 files / 36 focused tests passed; full final verify covers latest source.",
+          "sha256": "7ed9410b654f977064410df87e610caae97576318fc5ea58f5dcfc068ca8e6ba"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-season-sync-real.json",
+          "summary": "Independently compared 10 template records and 81 jobs from the currently supplied B workbook, retained through storage and real XLSX bytes; three original blank-time spare rows tested on isolated in-memory copy.",
+          "sha256": "cc60c4d5be0d2f6195a4dcdeee85e2e4f954786f8c47ebf22ebcac8628e1fdb6"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "最终自动检查已覆盖此路径；真实页面范围单独记录。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-season-sync-final-verify.txt",
+          "summary": "Final npm.cmd run verify exited 0: typecheck, 175 functional files / 1752 tests, 7 performance files / 19 tests and production build passed.",
+          "sha256": "1c5ff1e32ac32a04d035a8c36c96cdc27805d38a3609c1245af46ab0b59bdc0f"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-season-sync-one-direction-focused.txt",
+          "summary": "After the fixed A-to-B correction, 4 files / 36 focused tests passed; full final verify covers latest source.",
+          "sha256": "7ed9410b654f977064410df87e610caae97576318fc5ea58f5dcfc068ca8e6ba"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-season-sync-real.json",
+          "summary": "Independently compared 10 template records and 81 jobs from the currently supplied B workbook, retained through storage and real XLSX bytes; three original blank-time spare rows tested on isolated in-memory copy.",
+          "sha256": "cc60c4d5be0d2f6195a4dcdeee85e2e4f954786f8c47ebf22ebcac8628e1fdb6"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "最终自动检查已覆盖此路径；真实页面范围单独记录。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-season-sync-final-verify.txt",
+          "summary": "Final npm.cmd run verify exited 0: typecheck, 175 functional files / 1752 tests, 7 performance files / 19 tests and production build passed.",
+          "sha256": "1c5ff1e32ac32a04d035a8c36c96cdc27805d38a3609c1245af46ab0b59bdc0f"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-season-sync-one-direction-focused.txt",
+          "summary": "After the fixed A-to-B correction, 4 files / 36 focused tests passed; full final verify covers latest source.",
+          "sha256": "7ed9410b654f977064410df87e610caae97576318fc5ea58f5dcfc068ca8e6ba"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-season-sync-real.json",
+          "summary": "Independently compared 10 template records and 81 jobs from the currently supplied B workbook, retained through storage and real XLSX bytes; three original blank-time spare rows tested on isolated in-memory copy.",
+          "sha256": "cc60c4d5be0d2f6195a4dcdeee85e2e4f954786f8c47ebf22ebcac8628e1fdb6"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "本地真实文件及往返产物通过，owner已确认黄色框消失；新增/停用/恢复的完整真实页面操作及两台物理设备仍未验，不能声明全部现场验收。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-season-sync-owner-page.json",
+          "summary": "Owner confirms yellow seasonal review disappeared on local page; added/retired/restored real-page flows and two physical devices remain unverified.",
+          "sha256": "1334014225e83d6ca0a5822ea048454ce9009c23c679cf9d01a0aed1b62e1030"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-season-sync-real.json",
+          "summary": "Independently compared 10 template records and 81 jobs from the currently supplied B workbook, retained through storage and real XLSX bytes; three original blank-time spare rows tested on isolated in-memory copy.",
+          "sha256": "cc60c4d5be0d2f6195a4dcdeee85e2e4f954786f8c47ebf22ebcac8628e1fdb6"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-season-sync-final-verify.txt",
+          "summary": "Final npm.cmd run verify exited 0: typecheck, 175 functional files / 1752 tests, 7 performance files / 19 tests and production build passed.",
+          "sha256": "1c5ff1e32ac32a04d035a8c36c96cdc27805d38a3609c1245af46ab0b59bdc0f"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "原文件三行备用模板双空时间触发旧解析整份拒绝；当前文件隔离恢复及原三行内存副本保留均通过。单向核对红测证明反向A提醒原来仍显示，修复后owner确认黄色框消失。",
+    "laterChanges": "同步确认、停用切换、三个排班准备入口、在线增补、未来资质预留、规则指纹、存储和Excel都走同一本季状态；聚焦测试覆盖后置不能绕过。 统一flight-plan-review编译A到B方向，A反向写入拒绝；普通入口、导入预览、切组及刷新一致。",
+    "finalArtifact": "最终verify日志和真实文件独立往返记录证明自动检查；owner-page记录证明当前黄色框已消失。新增/停用/恢复现场和两台物理设备尚未取得，保留未验状态。"
+  },
+  "review": {
+    "missedScope": "原现场文件在检查期间被替换，最初三行无时间只能在隔离副本复核；未把现场残留归因到单一动作。 第一次只给禁用原因仍保留反向核对A的黄色框，owner再次指出，现以单向核对和整框消失回归修正。",
+    "rootCause": "旧解析把全部模板等同必须有时段的实际航班；原岗位存在即本季无法表达退季保留；第一次新增B同步仍沿用双向提醒，导致B一致后反向A差异持续出现。真正删除模板当前未复现复活，未臆测旧现场根因。",
+    "earlyDetection": "每次换季先独立比较模板原始行、岗位本季集合和导出再读；删除模板后立即切组、刷新、二次导出并查模板号。"
+  }
+}

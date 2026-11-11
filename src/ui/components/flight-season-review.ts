@@ -7,6 +7,7 @@ import {
 } from "../../domain/flights/flight-plan-review";
 import { dispatchUiCommand } from "../events/ui-command";
 import { LightDomElement } from "./light-dom-element";
+import { flightSeasonSyncPreview } from "../../domain/flights/flight-season-sync";
 
 export class FlightSeasonReviewElement extends LightDomElement {
   static override properties = {
@@ -41,23 +42,45 @@ export class FlightSeasonReviewElement extends LightDomElement {
   }
 
   protected override render() {
-    const reviews = (["A", "B"] as const).map((id) =>
+    const reviews = (["B"] as const).map((id) =>
       flightPlanReview(this.model, id)
     );
-    if (!reviews.some((r) => r.count)) return null;
-    const review = reviews.find((r) => r.groupId === this.model.activeGroupId)!;
+    const sync = flightSeasonSyncPreview(this.model);
+    if (
+      !reviews.some((r) => r.count) &&
+      !(this.model.activeGroupId === "B" && sync.count)
+    )
+      return null;
+    const review = reviews[0]!;
+    const syncDisabledReason =
+      sync.error || (!sync.count ? "B组已与A组一致，无需更新" : "");
     return html`<aside
       class="alert alert-warning"
       data-flight-season-review
       role="status"
     >
-      <strong>航班核对</strong>：A/B
-      组本季航班名单或当天时段有差异。请先选以哪组调好的名单为准；各组岗位和资质可以不同，模板库里的备用航班继续保留。
+      <strong>航班核对</strong
+      >：本季航班固定以A组为准，B组跟随更新；各组岗位性质和人员资质仍独立，备用模板继续保留。两组一致且B组岗位已配齐后，此提醒自动消失。
       <div class="d-flex gap-2 mt-2">
+        ${
+          this.model.activeGroupId === "B"
+            ? html`<button
+                class="btn btn-sm btn-primary"
+                type="button"
+                data-sync-b-season
+                title=${syncDisabledReason || "查看B组按A组更新的具体变化"}
+                ?disabled=${Boolean(sync.error) || !sync.count}
+                @click=${() => dispatchUiCommand(this, { type: "sync-b-flight-season", fingerprint: sync.fingerprint })}
+              >
+                ${!sync.error && !sync.count ? "B组已与A组一致，无需更新" : "B组本季航班按A组更新"}
+              </button>`
+            : ""
+        }
         ${reviews.filter((r) => r.count).map((r) => html`<button class="btn btn-sm btn-outline-dark" type="button" @click=${() => dispatchUiCommand(this, { type: "switch-group", groupId: r.groupId })}>以 ${r.sourceGroupId} 组为准，核对 ${r.groupId} 组（${r.count} 项）</button>`)}
       </div>
+      ${this.model.activeGroupId === "B" ? html`<p class="small mt-2 mb-0">${syncDisabledReason || `将新增/启用：${sync.additions.join("、") || "无"}；暂不使用：${sync.retirements.join("、") || "无"}。B组岗位性质、资质及历史保留。`}${sync.missingPositions.length ? ` 待配置B组岗位及资质：${sync.missingPositions.join("、")}` : ""}</p>` : ""}
       ${
-        review.count
+        review.count && this.model.activeGroupId === "B"
           ? html`<details class="mt-2">
               <summary>
                 按 ${review.sourceGroupId} 组本季名单核对当前 ${review.groupId}
