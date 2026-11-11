@@ -1,0 +1,63 @@
+{
+  "comparisons": [
+    {
+      "label": "previous supplied configuration 15",
+      "inputSha256": "bc5b7743822c1252e59737c66c76d54c654f622e30fd88660b6c1415150e3219",
+      "total": 24,
+      "regular": 18,
+      "availableRegular": 14,
+      "administrative": 6,
+      "flightCount": 4,
+      "singleFlightAvailableRegular": [],
+      "exemptions": {
+        "dailyFlightCountBalanceExemptHalfRest": "是",
+        "dailyFlightCountBalanceExemptTeamLeaders": "是"
+      }
+    },
+    {
+      "label": "previous supplied configuration 35",
+      "inputSha256": "44d987051f6a071ece567f3110e6e020df2c65d871e70db010176f212a5b3e85",
+      "total": 24,
+      "regular": 18,
+      "availableRegular": 16,
+      "administrative": 6,
+      "flightCount": 5,
+      "singleFlightAvailableRegular": [
+        {
+          "alias": "P01",
+          "regular": true,
+          "available": true,
+          "teamLeader": "是",
+          "qualifiedFlights": ["AK151"]
+        }
+      ],
+      "exemptions": {
+        "dailyFlightCountBalanceExemptHalfRest": "是",
+        "dailyFlightCountBalanceExemptTeamLeaders": "是"
+      }
+    },
+    {
+      "label": "current B configuration 7",
+      "inputSha256": "d7dd9771a69e8aba6b02824545902896c053d30bb9fa5545141a0dc82c260524",
+      "total": 18,
+      "regular": 18,
+      "availableRegular": 18,
+      "administrative": 0,
+      "flightCount": 6,
+      "singleFlightAvailableRegular": [
+        {
+          "alias": "P18",
+          "regular": true,
+          "available": true,
+          "teamLeader": "否",
+          "qualifiedFlights": ["CX937"]
+        }
+      ],
+      "exemptions": {
+        "dailyFlightCountBalanceExemptHalfRest": "是",
+        "dailyFlightCountBalanceExemptTeamLeaders": "是"
+      }
+    }
+  ],
+  "scope": "Earlier supplied files are reference snapshots, not proof of the latest A-device configuration. Qualification counts use scheduled-flight rows; no browser data read."
+}

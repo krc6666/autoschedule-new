@@ -1,0 +1,137 @@
+{
+  "inputSha256": "d7dd9771a69e8aba6b02824545902896c053d30bb9fa5545141a0dc82c260524",
+  "ownerFact": "The single-CX937-qualified final staff row represents a departed employee and should be removed.",
+  "diagnosticImportMode": "Ordinary all import into empty B group with template replacement; malformed spare-template rows are already documented in the preceding audit, not bypassed in product code.",
+  "originalStaffCount": 18,
+  "afterRemovalStaffCount": 17,
+  "elapsedMs": 2212,
+  "target": {
+    "flightNo": "KE160",
+    "position": "H04",
+    "status": "assigned",
+    "staff": "P10"
+  },
+  "vacancies": [
+    {
+      "flightNo": "AK151",
+      "position": "引导",
+      "notes": [
+        "空岗：岗位资质名单无当前人员（0人）",
+        "求解阶段记录：真实无候选人员；没有通过人员状态、资质、时段和安全约束的候选人员",
+        "以上为本次候选限制与当前直接检查；不代表多岗换人一定无解。"
+      ]
+    }
+  ],
+  "staffFlightCounts": [
+    {
+      "staff": "P01",
+      "teamLeader": false,
+      "duty": false,
+      "flights": ["CX937", "MF8683"]
+    },
+    {
+      "staff": "P02",
+      "teamLeader": false,
+      "duty": false,
+      "flights": ["MF8683", "TR121"]
+    },
+    {
+      "staff": "P03",
+      "teamLeader": false,
+      "duty": false,
+      "flights": ["KE160", "MF8683"]
+    },
+    {
+      "staff": "P04",
+      "teamLeader": false,
+      "duty": false,
+      "flights": ["KE160", "TR121"]
+    },
+    {
+      "staff": "P05",
+      "teamLeader": false,
+      "duty": false,
+      "flights": ["KE160", "AE218", "AK151"]
+    },
+    {
+      "staff": "P06",
+      "teamLeader": false,
+      "duty": false,
+      "flights": ["CX937", "AE218", "AK151"]
+    },
+    {
+      "staff": "P07",
+      "teamLeader": false,
+      "duty": false,
+      "flights": ["KE160", "AK151"]
+    },
+    {
+      "staff": "P08",
+      "teamLeader": false,
+      "duty": false,
+      "flights": ["KE160", "MF8683", "TR121"]
+    },
+    {
+      "staff": "P09",
+      "teamLeader": false,
+      "duty": false,
+      "flights": ["CX937", "TR121"]
+    },
+    {
+      "staff": "P10",
+      "teamLeader": false,
+      "duty": false,
+      "flights": ["KE160", "AE218", "TR121"]
+    },
+    {
+      "staff": "P11",
+      "teamLeader": false,
+      "duty": false,
+      "flights": ["CX937", "AE218", "TR121"]
+    },
+    {
+      "staff": "P12",
+      "teamLeader": false,
+      "duty": false,
+      "flights": ["CX937", "TR121"]
+    },
+    {
+      "staff": "P13",
+      "teamLeader": false,
+      "duty": false,
+      "flights": ["CX937", "AE218"]
+    },
+    {
+      "staff": "P14",
+      "teamLeader": false,
+      "duty": true,
+      "flights": ["CX937", "TR121"]
+    },
+    {
+      "staff": "P15",
+      "teamLeader": true,
+      "duty": false,
+      "flights": ["KE160"]
+    },
+    {
+      "staff": "P16",
+      "teamLeader": false,
+      "duty": false,
+      "flights": ["CX937", "MF8683", "TR121"]
+    },
+    {
+      "staff": "P17",
+      "teamLeader": false,
+      "duty": false,
+      "flights": ["CX937", "AE218", "AK151"]
+    }
+  ],
+  "finalSafetyCredential": "final",
+  "sourceFileUnchanged": true,
+  "otherGroupUnchanged": true,
+  "historyUnchanged": true,
+  "productCodeChanged": false,
+  "browserOperated": false,
+  "originalSourceFileOrBrowserUpdated": false,
+  "scope": "Isolated existing delete-staff command plus unchanged production scheduling kernel. Names anonymized before scheduling."
+}
