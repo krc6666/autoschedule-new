@@ -623,7 +623,7 @@ select {
 }
 .position-rule-group summary {
   display: grid;
-  grid-template-columns: minmax(90px, 1fr) auto 18px;
+  grid-template-columns: minmax(0, 1fr) auto 18px;
   align-items: center;
   gap: 10px;
   min-height: 42px;
@@ -635,16 +635,40 @@ select {
 .position-rule-group summary::-webkit-details-marker {
   display: none;
 }
-.position-rule-group summary span {
+.position-group-identity {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-width: 0;
+}
+.position-group-identity strong {
+  overflow-wrap: anywhere;
+}
+.position-group-counts {
+  min-width: 0;
   color: var(--as-muted);
   font-size: 12px;
 }
-.position-rule-group summary i {
+.position-rule-group summary > .bi-chevron-down {
   color: var(--as-muted);
   transition: transform 0.15s ease;
 }
-.position-rule-group[open] summary i {
+.position-rule-group[open] summary > .bi-chevron-down {
   transform: rotate(180deg);
+}
+@media (max-width: 768px) {
+  .position-rule-group summary {
+    grid-template-columns: minmax(0, 1fr) 18px;
+    gap: 6px 10px;
+  }
+  .position-group-counts {
+    grid-column: 1;
+  }
+  .position-rule-group summary > .bi-chevron-down {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+  }
 }
 .position-rule-table {
   min-width: 1180px;

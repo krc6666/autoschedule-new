@@ -1,0 +1,60 @@
+RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+stderr | tests/ui/position-summary-layout.test.ts
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+
+ ❯ tests/ui/position-summary-layout.test.ts (4 tests | 4 failed) 73ms
+     × keeps metadata out of the count and arrow columns: {"enabled":true,"hasTemplate":true} 41ms
+     × keeps metadata out of the count and arrow columns: {"enabled":false,"hasTemplate":true} 10ms
+     × keeps metadata out of the count and arrow columns: {"enabled":true,"hasTemplate":false} 8ms
+     × keeps metadata out of the count and arrow columns: {"enabled":false,"hasTemplate":false} 11ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/ui/position-summary-layout.test.ts > compact position group summary > keeps metadata out of the count and arrow columns: {"enabled":true,"hasTemplate":true}
+ FAIL  tests/ui/position-summary-layout.test.ts > compact position group summary > keeps metadata out of the count and arrow columns: {"enabled":false,"hasTemplate":true}
+AssertionError: expected <strong></strong>
+…(3) to have a length of 3 but got 4
+
+- Expected
++ Received
+
+- 3
++ 4
+
+ ❯ tests/ui/position-summary-layout.test.ts:24:30
+     22|     // Three grid cells: flexible flight metadata, job counts, fixed-w…
+     23|     // Extra badges/buttons previously put counts in the 18px arrow co…
+     24|     expect(summary.children).toHaveLength(3);
+       |                              ^
+     25|     const [identity, counts, arrow] = Array.from(summary.children);
+     26|     expect(identity!.querySelector("strong")!.textContent).toBe("NEW10…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  tests/ui/position-summary-layout.test.ts > compact position group summary > keeps metadata out of the count and arrow columns: {"enabled":true,"hasTemplate":false}
+ FAIL  tests/ui/position-summary-layout.test.ts > compact position group summary > keeps metadata out of the count and arrow columns: {"enabled":false,"hasTemplate":false}
+AssertionError: expected <strong></strong>
+…(5) to have a length of 3 but got 6
+
+- Expected
++ Received
+
+- 3
++ 6
+
+ ❯ tests/ui/position-summary-layout.test.ts:24:30
+     22|     // Three grid cells: flexible flight metadata, job counts, fixed-w…
+     23|     // Extra badges/buttons previously put counts in the 18px arrow co…
+     24|     expect(summary.children).toHaveLength(3);
+       |                              ^
+     25|     const [identity, counts, arrow] = Array.from(summary.children);
+     26|     expect(identity!.querySelector("strong")!.textContent).toBe("NEW10…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed (4)
+   Start at  20:18:35
+   Duration  1.01s (transform 258ms, setup 0ms, import 323ms, tests 73ms, environment 387ms)

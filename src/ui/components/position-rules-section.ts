@@ -120,32 +120,38 @@ export class PositionRulesSectionElement extends LightDomElement {
       rules.filter((rule) => rule.category === category).length;
     return html`<details class="position-rule-group">
       <summary>
-        <strong>${flightNo}</strong
-        ><span
-          class=${`badge ${enabled ? "text-bg-success" : "text-bg-secondary"}`}
-          >${enabled ? "本季启用" : "暂不使用（岗位保留）"}</span
-        ><span>
+        <span class="position-group-identity">
+          <strong>${flightNo}</strong>
+          ${
+            enabled
+              ? null
+              : html`<span class="badge text-bg-secondary"
+                  >暂不使用（岗位保留）</span
+                >`
+          }
+          ${
+            hasTemplate
+              ? null
+              : html`<span class="badge text-bg-warning">无模板航班</span>
+                  <button
+                    class="btn btn-sm btn-outline-danger"
+                    type="button"
+                    title="清理无模板航班岗位规则"
+                    aria-label="清理无模板航班岗位规则"
+                    @click=${() =>
+                      dispatchUiCommand(this, {
+                        type: "cleanup-orphaned-flight-rules",
+                        flightNo,
+                      })}
+                  >
+                    <i class="bi bi-trash3 me-1"></i>清理岗位规则
+                  </button>`
+          }
+        </span>
+        <span class="position-group-counts">
           ${count("常规")} 常规 · ${count("引导")} 引导 · ${count("机动督导")}
           机动督导 · ${count("分流")} 分流 · ${count("行政支援")} 行政支援
         </span>
-        ${
-          hasTemplate
-            ? null
-            : html`<span class="badge text-bg-warning ms-2">无模板航班</span>
-                <button
-                  class="btn btn-sm btn-outline-danger ms-2"
-                  type="button"
-                  title="清理无模板航班岗位规则"
-                  aria-label="清理无模板航班岗位规则"
-                  @click=${() =>
-                    dispatchUiCommand(this, {
-                      type: "cleanup-orphaned-flight-rules",
-                      flightNo,
-                    })}
-                >
-                  <i class="bi bi-trash3 me-1"></i>清理岗位规则
-                </button>`
-        }
         <i class="bi bi-chevron-down"></i>
       </summary>
       <div class="position-group-toolbar">

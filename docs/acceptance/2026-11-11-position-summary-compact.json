@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-11-position-summary-compact",
+  "title": "恢复岗位配置航班折叠标题的紧凑布局",
+  "startedFrom": "662eef90d6de13b53d4a5a562121ff3cbe83595d",
+  "expectation": {
+    "example": "owner反馈配置页收起的AE218标题异常增高，岗位数量竖排。新增本季状态标签后，四个直接元素进入原有三列，数量误入18px箭头列。",
+    "expected": "航班号及必要提示归入同一信息区，岗位数量正常横排、空间不足时自然换行，箭头保持在右侧；启用、停用、无模板三种标题均紧凑。owner刷新确认正常后要求去掉碍眼的本季启用标签；仅停用航班继续保留提示，不改变实际启停状态。",
+    "unchanged": "仅组件标题和专属CSS；岗位性质、资质、数量、启停/清理命令以及排班、存储、Excel合同不变。历史索引提醒：局部测试不能代替真实页面验收；检查无模板额外按钮和停用长标签。",
+    "fallback": "不裁掉岗位统计、不隐藏状态或删除数据；窄屏允许数量单独换一行；真实页面未核对前保持未验收。"
+  },
+  "testedVersion": "66d078b97a2f2cc3c3ef56d92d03559b0049dec83315f5376df210d8fe7ea319",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "修复前四个组合均因summary有4或6个直接元素而非3个失败，与固定18px第三列造成数量竖排一致。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-position-summary-red.txt",
+          "summary": "red command output",
+          "sha256": "79a0ccec46b12d90024c212df4604e1affc1ef82dbe661642010d3bf45ba7ff4"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-position-summary-badge-red.txt",
+          "summary": "badge-red command output",
+          "sha256": "610da6e310805bc158a22b06b8684091fe6a1c89262bdc0029f4a60619a0e65e"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-position-summary-green.txt",
+          "summary": "green command output",
+          "sha256": "ada0bccebb72774fd516e980597332d5ed97601f73296e0789e4f856e387aaef"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "修复后启用、有模板标题保持三格，数量与箭头不再错列；现有季节同步及组内岗位测试通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-position-summary-green.txt",
+          "summary": "green command output",
+          "sha256": "ada0bccebb72774fd516e980597332d5ed97601f73296e0789e4f856e387aaef"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "停用长标签、有/无模板共四组合结构通过；窄屏CSS将数量移至下一行，但真实像素尚未验收。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-position-summary-green.txt",
+          "summary": "green command output",
+          "sha256": "ada0bccebb72774fd516e980597332d5ed97601f73296e0789e4f856e387aaef"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "not_applicable",
+      "reason": "只调整只读组件标题结构及专属样式，不经求解、恢复或后置排班，不新增字段、缓存或数据编译点。",
+      "evidence": []
+    },
+    "finalGuard": {
+      "status": "not_applicable",
+      "reason": "未改业务规则与assignments写入路径；页面布局不新增排班安全守卫，最终像素效果单独等待owner确认。",
+      "evidence": []
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "岗位行与原始模型不变断言通过；现有启停与同步测试通过，另核对无模板清理命令与配置编辑。类型检查退出0，diff只含标题结构和专属CSS及本案材料。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-position-summary-green.txt",
+          "summary": "green command output",
+          "sha256": "ada0bccebb72774fd516e980597332d5ed97601f73296e0789e4f856e387aaef"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-position-summary-typecheck.txt",
+          "summary": "typecheck command output",
+          "sha256": "9b14ca2df96beab1aa8ce6fec998cfc0efa58c04c040c828dc69c1f043e4ea0d"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-position-summary-verify.txt",
+          "summary": "Full verify exit 0: typecheck, 1756 functional tests, 19 performance tests, production build",
+          "sha256": "4e90947053720cce7950bbc06bd0d60d188ea14c1dd9f4f86f4c9650082b732b"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "owner在58012刷新确认紧凑布局和展开内容正常，随后要求去掉本季启用标签；已移除该标签，最终样式尚未再次核对，窄屏也未实测。未自动操作浏览器。",
+      "evidence": []
+    }
+  },
+  "answers": {
+    "originalFailure": "owner现场反馈标题异常增高；红测日志证明四种组合中直接元素超过三列，修复后同一回归通过。",
+    "laterChanges": "启用/停用和无模板分支会增加标签及按钮，统一放入第一格，四组合回归覆盖；窄屏数量独立下一行，箭头只旋转自身。未改数据与排班链路。",
+    "finalArtifact": "position-rules-section.ts与styles.css是本次最终页面实现；六文件39项相关测试通过，owner已确认布局恢复正常，随后去掉启用标签的最终页面尚未再确认，不能用DOM结构冒充像素验收。"
+  },
+  "review": {
+    "missedScope": "已检查停用长标签、无模板清理按钮、箭头旋转及窄屏换行；owner确认布局恢复正常，但去掉启用标签后的最终页面及小屏未再核对，最终产物保持未验收。",
+    "rootCause": "上一轮只给航班标题加本季状态标签，未同步检查三列网格的直接子元素数量，导致数量落入18px箭头列，属于局部UI布局回归。",
+    "earlyDetection": "新增标题元素时先核对全部条件分支与网格列数，并保留四组合测试；交付前核对真实页面收起高度与窄屏换行，不能只依赖命令功能测试。"
+  }
+}
