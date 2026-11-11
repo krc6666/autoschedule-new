@@ -1,4 +1,5 @@
 import { html } from "lit";
+import { withConfiguredFlightPositions } from "../../domain/flights/configured-flight-positions";
 
 import type { AppState, FlightTemplate } from "../../model";
 import { currentFlightsWithoutTemplates } from "../../domain/flights/next-workday-flight-plan";
@@ -12,43 +13,50 @@ export class ConfigurationSettingsSectionElement extends LightDomElement {
 
   protected override render() {
     const settings = this.model.settings;
-    return html`<section
-      class="workspace-section split-section settings-section"
-    >
-      <div>
-        <div class="section-heading"><h3>排班约束</h3></div>
-        <div class="form-grid">
-          ${this.setting("maxDailyHours", settings.maxDailyHours, "每日工时上限", { min: 1, max: 24, step: 0.5 })}
-          ${this.setting("historyWindowDays", settings.historyWindowDays, "历史统计天数", { min: 1, max: 90 })}
-          ${this.setting("consecutiveDayPenalty", settings.consecutiveDayPenalty, "连续工作惩罚", { min: 0, step: 0.5 })}
-          ${this.setting("nightStart", settings.nightStart, "夜班开始时间", { type: "time" })}
-          ${this.setting("nightEnd", settings.nightEnd, "夜班结束时间", { type: "time" })}
-        </div>
-      </div>
-      <div>
-        <div class="section-heading">
-          <div>
-            <h3>航班计划模板（A、B 共用）</h3>
-            <span>改名会同步两组对应的当前航班和规则，保留当天人数与时段</span>
+    return html`<section class="workspace-section settings-section">
+        <div>
+          <div class="section-heading"><h3>排班约束</h3></div>
+          <div class="form-grid">
+            ${this.setting("maxDailyHours", settings.maxDailyHours, "每日工时上限", { min: 1, max: 24, step: 0.5 })}
+            ${this.setting("historyWindowDays", settings.historyWindowDays, "历史统计天数", { min: 1, max: 90 })}
+            ${this.setting("consecutiveDayPenalty", settings.consecutiveDayPenalty, "连续工作惩罚", { min: 0, step: 0.5 })}
+            ${this.setting("nightStart", settings.nightStart, "夜班开始时间", { type: "time" })}
+            ${this.setting("nightEnd", settings.nightEnd, "夜班结束时间", { type: "time" })}
           </div>
-          <button
-            class="btn btn-primary"
-            type="button"
-            @click=${() => dispatchUiCommand(this, { type: "add-template" })}
-          >
-            <i class="bi bi-plus-lg me-2"></i>新增航班模板
-          </button>
         </div>
-        <div class="template-editor">
-          ${
-            this.model.templates.length
-              ? this.model.templates.map((template) => this.template(template))
-              : html`<div class="empty-state">尚无航班模板</div>`
-          }
+      </section>
+      <section class="workspace-section flight-template-section">
+        <div>
+          <div class="section-heading">
+            <div>
+              <h3>航班计划模板（航班资料 A、B 共用）</h3>
+              <span
+                >岗位随当前 ${this.model.activeGroupId}
+                组自动显示，请在上方“岗位配置”维护。本季航班以岗位配置为准，这里可保留往季备用航班；模板资料
+                A/B 共用。</span
+              >
+            </div>
+            <button
+              class="btn btn-primary"
+              type="button"
+              @click=${() => dispatchUiCommand(this, { type: "add-template" })}
+            >
+              <i class="bi bi-plus-lg me-2"></i>新增航班模板
+            </button>
+          </div>
+          <div class="template-editor">
+            ${
+              this.model.templates.length
+                ? withConfiguredFlightPositions(
+                    this.model.templates,
+                    this.model.positionRules
+                  ).map((template) => this.template(template))
+                : html`<div class="empty-state">尚无航班模板</div>`
+            }
+          </div>
+          ${this.flightNameRepair()}
         </div>
-        ${this.flightNameRepair()}
-      </div>
-    </section>`;
+      </section>`;
   }
 
   private flightNameRepair() {
@@ -114,7 +122,9 @@ export class ConfigurationSettingsSectionElement extends LightDomElement {
         <span>至</span>
         ${configurationInput(this, "template", template.id, "endTime", template.endTime, "模板结束时间", { type: "time" })}
       </div>
-      ${configurationInput(this, "template", template.id, "positions", template.positions.join(", "), "模板岗位", { className: "template-positions" })}
+      <div class="template-positions" aria-label="模板岗位">
+        ${template.positions.length ? template.positions.join("、") : "尚未配置岗位"}
+      </div>
       ${configurationInput(this, "template", template.id, "remark", template.remark, "模板备注")}
       <button
         class="btn btn-sm btn-outline-danger icon-btn"

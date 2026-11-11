@@ -1,3 +1,4 @@
+import type { FlightPlanReviewSummary } from "../domain/flights/flight-plan-review";
 import type {
   ScheduleProgressStage,
   ScheduleProgressStep,
@@ -86,8 +87,12 @@ export type ApplicationDialog =
       recognized: string;
       warnings: string[];
       changedConfig: boolean;
+      flightPlanReview?: FlightPlanReviewSummary[];
       sharedTemplatesAvailable: boolean;
       replaceSharedTemplates: boolean;
+      restoreFlightConfiguration?: boolean;
+      restoreErrors?: string[];
+      restoreDefaults?: string[];
       weeklyPlanPreview?: WeeklyPlanImportPreview;
       historySummary?: HistoryImportSummary;
     }

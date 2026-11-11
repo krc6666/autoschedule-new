@@ -1,0 +1,127 @@
+
+> autoschedule@1.0.0 verify
+> npm run typecheck && npm test && npm run test:performance && npm run build
+
+
+> autoschedule@1.0.0 typecheck
+> tsc -b --pretty false
+
+
+> autoschedule@1.0.0 test
+> vitest run --exclude tests/performance/**
+
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/app/application-coordinator.test.ts (50 tests | 1 failed) 2267ms
+     × atomically adopts selected flights and a safe result when stop-and-adopt is requested 60ms
+ ❯ tests/app/autoschedule-store.test.ts (8 tests | 1 failed) 138ms
+     × adds a flight template while the command is running through Immer 33ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/app/application-coordinator.test.ts > current schedule flight picker workflow > atomically adopts selected flights and a safe result when stop-and-adopt is requested
+AssertionError: expected [ { id: 'flight-cx937', …(6) } ] to deeply equal [ { id: 'flight-cx937', …(6) } ]
+
+- Expected
++ Received
+
+@@ -4,19 +4,23 @@
+      "endTime": "10:30",
+      "flightNo": "CX937",
+      "id": "flight-cx937",
+      "positions": [
+        "督导",
+-       "G20",
+-       "G19",
+-       "G18",
+-       "G17",
+-       "G16",
+-       "G15",
++       "G12",
++       "G13",
+        "G14",
+-       "G13",
+-       "G12",
++       "G15",
++       "G16",
++       "G17",
++       "G18",
++       "G19",
++       "G20",
++       "柜台引导1",
++       "柜台引导2",
++       "超规柜台",
++       "超规行李引导",
+      ],
+      "remark": "到岗08:05",
+      "startTime": "08:30",
+    },
+  ]
+
+ ❯ tests/app/application-coordinator.test.ts:1847:41
+    1845|     });
+    1846|
+    1847|     expect(coordinator.model().flights).toEqual(original.flights);
+       |                                         ^
+    1848|     expect(coordinator.model().assignments).toEqual([]);
+    1849|     expect(coordinator.model().history).toEqual(original.history);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/app/autoschedule-store.test.ts > autoschedule store > adds a flight template while the command is running through Immer
+AssertionError: expected { id: 'flight-mwbpi0oo-5mc4vv', …(6) } to match object { flightNo: 'CX937', …(4) }
+(2 matching properties omitted from actual)
+
+- Expected
++ Received
+
+@@ -2,17 +2,21 @@
+    "bookedPassengers": 0,
+    "endTime": "10:30",
+    "flightNo": "CX937",
+    "positions": [
+      "督导",
+-     "G20",
+-     "G19",
+-     "G18",
+-     "G17",
+-     "G16",
+-     "G15",
++     "G12",
++     "G13",
+      "G14",
+-     "G13",
+-     "G12",
++     "G15",
++     "G16",
++     "G17",
++     "G18",
++     "G19",
++     "G20",
++     "柜台引导1",
++     "柜台引导2",
++     "超规柜台",
++     "超规行李引导",
+    ],
+    "startTime": "08:30",
+  }
+
+ ❯ tests/app/autoschedule-store.test.ts:70:51
+     68|     );
+     69|     expect(store.getState().model.flights).toHaveLength(beforeCount + …
+     70|     expect(store.getState().model.flights.at(-1)).toMatchObject({
+       |                                                   ^
+     71|       flightNo: template.flightNo,
+     72|       startTime: template.startTime,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed | 169 passed (171)
+      Tests  2 failed | 1710 passed (1712)
+   Start at  13:55:44
+   Duration  97.00s (transform 22.63s, setup 0ms, import 78.64s, tests 332.57s, environment 22.63s)
+
+
+VERIFY_EXIT_CODE=1

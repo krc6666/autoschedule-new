@@ -1,0 +1,23 @@
+{
+  "results": [
+    {
+      "path": "/src/infrastructure/workbook-configuration-contract.ts",
+      "httpStatus": 200,
+      "allExpectedMarkersPresent": true,
+      "sha256": "8af3fbac83fa24c2b2b13eb72af374ec0f320718b4ce913b939ff1cae33e09f3"
+    },
+    {
+      "path": "/src/ui/components/workbook-import-dialog.ts",
+      "httpStatus": 200,
+      "allExpectedMarkersPresent": true,
+      "sha256": "f645dd0153f69d256f255ef88d0828ab8583ea7149587626d453b61914962be8"
+    },
+    {
+      "path": "/src/app/controllers/transfer-controller.ts",
+      "httpStatus": 200,
+      "allExpectedMarkersPresent": true,
+      "sha256": "b84a00c45b448b88c011bed77bbbc42e1257d4f9015c154afd6980e92f20b307"
+    }
+  ],
+  "scope": "Read-only HTTP module checks only; not a browser import acceptance."
+}

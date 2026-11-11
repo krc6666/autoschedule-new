@@ -1,3 +1,4 @@
+import type { FlightPlanReviewChoice } from "../../domain/flights/flight-plan-review";
 import type { SchedulePolicyInput } from "../../app/policy-actions";
 import type { MobileSupervisorFillRule } from "../../domain/rules/structured-policy-contract";
 import type { WorkbookImportMode } from "../../app/workbook-import-controller";
@@ -23,6 +24,11 @@ export type UiCommand =
   | { type: "navigate"; section: AppSection }
   | { type: "change-date"; date: string }
   | { type: "switch-group"; groupId: ScheduleGroupId }
+  | {
+      type: "confirm-flight-plan-review";
+      groupId: ScheduleGroupId;
+      choice: FlightPlanReviewChoice;
+    }
   | { type: "open-import"; mode: WorkbookImportMode; date?: string }
   | {
       type: "import-file";
@@ -32,6 +38,7 @@ export type UiCommand =
     }
   | { type: "close-dialog" }
   | { type: "set-workbook-import-shared-templates"; enabled: boolean }
+  | { type: "set-workbook-import-flight-restore"; enabled: boolean }
   | { type: "apply-workbook-import" }
   | { type: "apply-legacy-schedule-import" }
   | { type: "update-legacy-schedule-import-date"; date: string }

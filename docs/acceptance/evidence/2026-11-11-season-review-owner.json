@@ -1,0 +1,15 @@
+{
+  "source": "Owner reply in current conversation",
+  "url": "http://127.0.0.1:50966/",
+  "question": "刷新页面核对航班核对提醒、A/B差异及新增/旧号换号选项",
+  "reply": "提醒和选择都正常",
+  "verifiedScope": [
+    "visible review reminder",
+    "new-flight and old-flight mapping choices visible"
+  ],
+  "notVerified": [
+    "owner has not submitted a real seasonal mapping",
+    "no two-device manual roundtrip"
+  ],
+  "browserOperatedByAgent": false
+}

@@ -1,0 +1,71 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/domain/flight-plan-reconciliation.test.ts (3 tests | 1 failed) 27ms
+     × does not suggest a spare template as a current-season addition 18ms
+npm.cmd :
+所在位置 行:2 字符: 1
++ npm.cmd exec vitest -- run tests/domain/flight-plan-reconciliation.te ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/domain/flight-plan-reconciliation.test.ts > flight plan reconciliation > does not suggest a spare template
+ as a current-season addition
+AssertionError: expected [ { flight: { …(8) }, …(1) } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "flight": {
++       "country": "韩国",
++       "countryCode": "KR",
++       "date": "2026-11-11",
++       "departureTime": "10:00",
++       "destination": "D0",
++       "destinationCity": "Destination 0",
++       "flightNo": "SPARE100",
++       "key": "2026-11-11|0|SPARE100",
++     },
++     "template": {
++       "endTime": "10:30",
++       "flightNo": "SPARE100",
++       "id": "spare",
++       "positions": [
++         "督导",
++         "G20",
++         "G19",
++         "G18",
++         "G17",
++         "G16",
++         "G15",
++         "G14",
++         "G13",
++         "G12",
++       ],
++       "remark": "到岗08:05",
++       "startTime": "08:30",
++     },
++   },
++ ]
+
+ ❯ tests/domain/flight-plan-reconciliation.test.ts:34:30
+     32|     state.templates.push({ ...state.templates[0]!, id: "spare", flight…
+     33|     const result = buildFlightPlanReconciliation(state, "2026-11-11", …
+     34|     expect(result.additions).toEqual([]);
+       |                              ^
+     35|     expect(result.unmatched.map((f) => f.flightNo)).toEqual(["SPARE100…
+     36|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 2 passed (3)
+   Start at  15:06:11
+   Duration  597ms (transform 287ms, setup 0ms, import 335ms, tests 27ms, environment 0ms)

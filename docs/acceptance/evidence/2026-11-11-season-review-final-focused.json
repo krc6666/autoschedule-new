@@ -1,0 +1,7 @@
+{
+  "command": "npm.cmd exec vitest -- run tests/app/flight-season-review.test.ts tests/ui/flight-season-review.test.ts tests/ui/group-derived-flight-positions.test.ts tests/app/application-coordinator.test.ts tests/domain/configured-flight-positions.test.ts tests/app/configuration-actions.test.ts tests/domain/flight-plan-reconciliation.test.ts tests/ui/online-flight-query-view.test.ts tests/app/autoschedule-store.test.ts",
+  "exitCode": 0,
+  "stdout": "Test Files 9 passed (9)\nTests 118 passed (118)\nStart at 15:06:55\nDuration 11.03s",
+  "source": "captured exec_command and write_stdin results in current session",
+  "typecheckExitCode": 0
+}

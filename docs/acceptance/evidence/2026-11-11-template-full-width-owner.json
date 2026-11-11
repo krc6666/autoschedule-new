@@ -1,0 +1,8 @@
+{
+  "date": "2026-11-11",
+  "page": "http://127.0.0.1:50966/",
+  "question": "刷新当前页面后，航班计划模板是否在排班约束下面独占一整行，右侧删除按钮方便看见和操作？",
+  "ownerAnswer": "符合，整行显示，删除方便",
+  "componentSha256": "d0623fd33225915d5c8feebd9edcdb8ee5787b7cf787e5a7d9d67ebcfdc4d5e6",
+  "scope": "Owner-operated current viewport; other viewports not manually checked. No browser automation."
+}

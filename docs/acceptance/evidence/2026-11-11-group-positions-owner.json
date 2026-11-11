@@ -1,0 +1,13 @@
+{
+  "url": "http://127.0.0.1:50966/",
+  "question": "Refresh and check: template positions are read-only and match current group; switch A/B and observe group-specific names; full-row layout and deletion remain usable.",
+  "answer": "都符合",
+  "evidenceType": "Owner operated actual page; agent did not open browser.",
+  "fileSha256": {
+    "src/ui/components/configuration-settings-section.ts": "0cadc4b6146a68cd99a263787fddffd12429eefd1cae3f94f0044fe07701b254",
+    "src/ui/components/weekly-flight-plan-section.ts": "3be8b87c17bc6208b56e8c6c418ef24c38e380a35133357145612ea75cee3630",
+    "src/ui/components/template-picker-dialog.ts": "641111ff9836be16f9a9cf6258a0ffcceded78164b9f7c60e6aaeedebee65a73",
+    "src/domain/flights/configured-flight-positions.ts": "fd16043fcd3c8562058478174748a6794be892a09fc22ab932ca859e84a50480"
+  },
+  "limits": "This confirms local display and group switching. No two-physical-device acceptance is claimed."
+}

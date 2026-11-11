@@ -71,7 +71,16 @@ describe("autoschedule store", () => {
       flightNo: template.flightNo,
       startTime: template.startTime,
       endTime: template.endTime,
-      positions: template.positions,
+      positions: [
+        ...new Set(
+          store
+            .getState()
+            .model.positionRules.filter(
+              (rule) => rule.flightNo === template.flightNo
+            )
+            .map((rule) => rule.name)
+        ),
+      ],
       bookedPassengers: 0,
     });
   });

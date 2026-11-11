@@ -1,0 +1,18 @@
+实际终端输出节选：现场反馈之后补整页事件、Store和配置页渲染链测试。
+这不是owner浏览器验收，不能据此否定现场截图。
+
+$ npm.cmd run typecheck
+> autoschedule@1.0.0 typecheck
+> tsc -b --pretty false
+无编译错误。
+
+$ npm.cmd exec vitest -- run tests/ui/flight-restore-dialog.test.ts tests/app/flight-config-device-restore.test.ts
+RUN v4.1.10 D:/autoschedule-migrate/autoschedule
+Test Files  2 passed (2)
+Tests  15 passed (15)
+Start at 12:17:01
+Duration 3.91s
+
+整页测试输入：旧模板KE166、CX937（早）、CX937（晚），时间空。
+操作：挂载真实app组件，真实checkbox.click，经协调器与Store确认导入，再读取配置页input。
+结果：模板集合和配置页均只剩文件内AK151，21:05–23:05。

@@ -46,7 +46,7 @@ export class FlightQueryDialogElement extends LightDomElement {
           </button>
         </div>
         <p class="online-flight-query-note">
-          ${"工作日边界：排除当日 00:00-06:00，纳入次日 00:00-06:00。计划起飞时间只用于核对，新增航班的保障时段和岗位来自同名模板。"}
+          ${"工作日边界：排除当日 00:00-06:00，纳入次日 00:00-06:00。计划起飞时间只用于核对；只可新增岗位配置中的本季航班，保障时段读取同名模板，岗位读取本组配置。"}
         </p>
         ${
           this.dialog.error
@@ -196,7 +196,7 @@ export class FlightQueryDialogElement extends LightDomElement {
       ? "继续保留"
       : item.template
         ? "建议新增"
-        : "缺少同名模板";
+        : "不在本组本季航班资料中";
     const style = item.currentFlight
       ? "text-bg-light"
       : item.template

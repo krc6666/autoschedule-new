@@ -1,6 +1,14 @@
+import {
+  appendFlightPlanConfirmations,
+  parseFlightPlanConfirmations,
+} from "./flight-plan-confirmations-excel";
+import type { FlightPlanConfirmation } from "../model";
+import { withConfiguredFlightPositions } from "../domain/flights/configured-flight-positions";
 import { migrateLegacySupervisorFillConfiguration } from "../domain/coverage/supervisor-fill-configuration";
 import * as XLSX from "xlsx-js-style";
 import { workbookBytes } from "./workbook-bytes";
+import { SCHEDULE_SETTING_DEFINITIONS } from "../domain/rules/schedule-settings";
+import { OPTIONAL_CONFIGURATION_SCALARS } from "./workbook-configuration-contract";
 import {
   additionalAttendanceByAssignment,
   normalizeAttendanceIntervals,
@@ -32,6 +40,7 @@ import {
   normalizeText,
   orderPositionRules,
   splitList,
+  splitPositionList,
 } from "../utils";
 import { durationHours, normalizeTime } from "../domain/shared/time";
 import { mergeLatePriorityFrequencyAdjustments } from "../domain/statistics/late-priority-frequency-adjustment";
@@ -72,11 +81,15 @@ import {
 } from "../domain/staff-status";
 
 export interface WorkbookImport {
+  flightPlanConfirmations?: FlightPlanConfirmation[];
   halfRestSelections?: HalfRestSelection[];
   leaveTypes?: LeaveType[];
   staff?: Staff[];
   flights?: Flight[];
   templates?: FlightTemplate[];
+  flightConfigurationErrors?: string[];
+  /** Parse-time evidence only; never persisted to the application model. */
+  configurationRestoreErrors?: string[];
   weeklyFlightPlans?: WeeklyFlightPlanEntry[];
   weeklyFlightPlanStatus?: "valid" | "invalid";
   positionRules?: PositionRule[];
@@ -189,7 +202,8 @@ function parseDutyRosterOverrides(
 }
 
 function parseLatePriorityFrequencyAdjustments(
-  workbook: XLSX.WorkBook
+  workbook: XLSX.WorkBook,
+  restoreErrors: string[]
 ): LatePriorityFrequencyAdjustment[] | undefined {
   if (!workbook.SheetNames.includes("末班重点次数修正")) return undefined;
   const data = rows(workbook, "末班重点次数修正");
@@ -204,75 +218,90 @@ function parseLatePriorityFrequencyAdjustments(
     "delivery",
   ]);
   return mergeLatePriorityFrequencyAdjustments(
-    data.slice(1).flatMap((row): LatePriorityFrequencyAdjustment[] => {
-      const month = normalizeText(row[index(["月份"], 0)]);
-      const staffId = normalizeText(row[index(["人员编号", "编号"], 1)]);
-      const flightNo = normalizeText(row[index(["航班号"], 2)]).toUpperCase();
-      const kind = normalizeText(row[kindIndex]);
-      const delta = Number(row[index(["修正次数", "修正值"], 4)]);
-      const resetBaseline = Number(row[index(["清零基准次数"], 5)] ?? 0);
-      if (
-        !/^\d{4}-\d{2}$/.test(month) ||
-        !staffId ||
-        !flightNo ||
-        !kinds.has(kind) ||
-        !Number.isFinite(delta) ||
-        !Number.isInteger(delta) ||
-        (delta === 0 && resetBaseline <= 0) ||
-        !Number.isFinite(resetBaseline) ||
-        !Number.isInteger(resetBaseline) ||
-        resetBaseline < 0
-      )
-        return [];
-      return [
-        {
-          month,
-          staffId,
-          flightNo,
-          kind: kind as LatePriorityFrequencyAdjustment["kind"],
-          delta,
-          resetBaseline: resetBaseline || undefined,
-        },
-      ];
-    })
+    data
+      .slice(1)
+      .flatMap((row, rowIndex): LatePriorityFrequencyAdjustment[] => {
+        if (row.every((value) => !normalizeText(value))) return [];
+        const month = normalizeText(row[index(["月份"], 0)]);
+        const staffId = normalizeText(row[index(["人员编号", "编号"], 1)]);
+        const flightNo = normalizeText(row[index(["航班号"], 2)]).toUpperCase();
+        const kind = normalizeText(row[kindIndex]);
+        const delta = Number(row[index(["修正次数", "修正值"], 4)]);
+        const resetBaseline = Number(row[index(["清零基准次数"], 5)] ?? 0);
+        if (
+          !/^\d{4}-\d{2}$/.test(month) ||
+          !staffId ||
+          !flightNo ||
+          !kinds.has(kind) ||
+          !Number.isFinite(delta) ||
+          !Number.isInteger(delta) ||
+          (delta === 0 && resetBaseline <= 0) ||
+          !Number.isFinite(resetBaseline) ||
+          !Number.isInteger(resetBaseline) ||
+          resetBaseline < 0
+        ) {
+          restoreErrors.push(
+            `末班重点次数修正第${rowIndex + 2}行：月份、人员、航班、类别或次数无效，不能完整恢复`
+          );
+          return [];
+        }
+        return [
+          {
+            month,
+            staffId,
+            flightNo,
+            kind: kind as LatePriorityFrequencyAdjustment["kind"],
+            delta,
+            resetBaseline: resetBaseline || undefined,
+          },
+        ];
+      })
   );
 }
 
 function parseOrdinaryPriorityFrequencyAdjustments(
-  workbook: XLSX.WorkBook
+  workbook: XLSX.WorkBook,
+  restoreErrors: string[]
 ): OrdinaryPriorityFrequencyAdjustment[] | undefined {
   if (!workbook.SheetNames.includes("普通重点次数修正")) return undefined;
   const data = rows(workbook, "普通重点次数修正");
   return mergeOrdinaryPriorityFrequencyAdjustments(
-    data.slice(1).flatMap((row): OrdinaryPriorityFrequencyAdjustment[] => {
-      const month = normalizeText(row[0]);
-      const staffId = normalizeText(row[1]);
-      const airlineCode = normalizeText(row[2]);
-      const position = normalizeText(row[3]);
-      const delta = Number(row[4]);
-      const resetBaseline = Number(row[5] ?? 0);
-      if (
-        !/^\d{4}-\d{2}$/.test(month) ||
-        !staffId ||
-        !airlineCode ||
-        !position ||
-        !Number.isInteger(delta) ||
-        !Number.isInteger(resetBaseline) ||
-        resetBaseline < 0 ||
-        (delta === 0 && resetBaseline === 0)
-      )
-        return [];
-      return [
-        {
-          month,
-          staffId,
-          airlineCode,
-          position,
-          delta,
-          resetBaseline: resetBaseline || undefined,
-        },
-      ];
-    })
+    data
+      .slice(1)
+      .flatMap((row, rowIndex): OrdinaryPriorityFrequencyAdjustment[] => {
+        if (row.every((value) => !normalizeText(value))) return [];
+        const month = normalizeText(row[0]);
+        const staffId = normalizeText(row[1]);
+        const airlineCode = normalizeText(row[2]);
+        const position = normalizeText(row[3]);
+        const delta = Number(row[4]);
+        const resetBaseline = Number(row[5] ?? 0);
+        if (
+          !/^\d{4}-\d{2}$/.test(month) ||
+          !staffId ||
+          !airlineCode ||
+          !position ||
+          !Number.isInteger(delta) ||
+          !Number.isInteger(resetBaseline) ||
+          resetBaseline < 0 ||
+          (delta === 0 && resetBaseline === 0)
+        ) {
+          restoreErrors.push(
+            `普通重点次数修正第${rowIndex + 2}行：月份、人员、航司、岗位或次数无效，不能完整恢复`
+          );
+          return [];
+        }
+        return [
+          {
+            month,
+            staffId,
+            airlineCode,
+            position,
+            delta,
+            resetBaseline: resetBaseline || undefined,
+          },
+        ];
+      })
   );
 }
 
@@ -318,7 +347,8 @@ function sheetHasDataRows(
 function parseStaff(
   workbook: XLSX.WorkBook,
   leaveTypes: readonly LeaveType[],
-  warnings: string[]
+  warnings: string[],
+  restoreErrors: string[]
 ): Staff[] | undefined {
   const sheetName = findSheet(workbook, ["人员信息", "员工信息"]);
   if (!sheetName) return undefined;
@@ -358,9 +388,15 @@ function parseStaff(
     )
   );
   return data.slice(1).flatMap((row, rowIndex) => {
+    if (row.every((value) => !normalizeText(value))) return [];
     const id = normalizeText(row[idIndex]);
     const name = normalizeText(row[nameIndex]);
-    if (!id || !name) return [];
+    if (!id || !name) {
+      restoreErrors.push(
+        `人员信息第${rowIndex + 2}行：缺少人员编号或姓名，不能完整恢复`
+      );
+      return [];
+    }
     const rawStatus = normalizeText(row[statusIndex]);
     const leaveId = leaveIdIndex >= 0 ? normalizeText(row[leaveIdIndex]) : "";
     const leaveType = leaveId
@@ -423,13 +459,57 @@ function parseStaff(
   });
 }
 
-function parseFlights(workbook: XLSX.WorkBook): Flight[] | undefined {
+function parseFlightPositions(value: unknown): string[] {
+  return splitPositionList(value).map(normalizePosition).filter(Boolean);
+}
+
+function recordFlightHeaderErrors(
+  header: unknown[],
+  sheetName: string,
+  errors: string[]
+): void {
+  if (
+    ["航班号", "开始时间", "结束时间"].some(
+      (name) => headerIndex(header, [name], -1) < 0
+    )
+  )
+    errors.push(
+      `${sheetName}表头需包含航班号、开始时间和结束时间；不能完整恢复`
+    );
+}
+
+function acceptFlightRow(
+  sheetName: string,
+  rowNumber: number,
+  flightNo: string,
+  startTime: string,
+  endTime: string,
+  seen: Set<string>,
+  errors: string[]
+): boolean {
+  if (!flightNo || !startTime || !endTime) {
+    errors.push(
+      `${sheetName}第${rowNumber}行：航班号或开始、结束时间缺失/无效；不能完整恢复`
+    );
+    return false;
+  }
+  if (seen.has(flightNo))
+    errors.push(`${sheetName}第${rowNumber}行：航班号重复；不能完整恢复`);
+  seen.add(flightNo);
+  return true;
+}
+
+function parseFlights(
+  workbook: XLSX.WorkBook,
+  errors: string[]
+): Flight[] | undefined {
   const sheetName = workbook.SheetNames.find(
     (name) => name.includes("航班计划") && !name.includes("每周航班计划")
   );
   if (!sheetName) return undefined;
   const data = rows(workbook, sheetName);
   const header = data[0] ?? [];
+  recordFlightHeaderErrors(header, sheetName, errors);
   const flightIndex = headerIndex(header, ["航班号"], 0);
   const startIndex = headerIndex(header, ["开始时间"], 1);
   const endIndex = headerIndex(header, ["结束时间"], 2);
@@ -440,11 +520,24 @@ function parseFlights(workbook: XLSX.WorkBook): Flight[] | undefined {
   );
   const positionIndex = headerIndex(header, ["涉及岗位", "岗位"], 4);
   const remarkIndex = headerIndex(header, ["备注"], 5);
-  return data.slice(1).flatMap((row) => {
+  const seen = new Set<string>();
+  return data.slice(1).flatMap((row, index) => {
+    if (row.every((value) => !normalizeText(value))) return [];
     const flightNo = normalizeText(row[flightIndex]).toUpperCase();
     const startTime = normalizeTime(normalizeText(row[startIndex]));
     const endTime = normalizeTime(normalizeText(row[endIndex]));
-    if (!flightNo || !startTime || !endTime) return [];
+    if (
+      !acceptFlightRow(
+        sheetName,
+        index + 2,
+        flightNo,
+        startTime,
+        endTime,
+        seen,
+        errors
+      )
+    )
+      return [];
     return [
       {
         id: createId("flight"),
@@ -452,35 +545,52 @@ function parseFlights(workbook: XLSX.WorkBook): Flight[] | undefined {
         startTime,
         endTime,
         bookedPassengers: Number(row[passengerIndex]) || 0,
-        positions: splitList(row[positionIndex]).map(normalizePosition),
+        positions: parseFlightPositions(row[positionIndex]),
         remark: normalizeText(row[remarkIndex]),
       },
     ];
   });
 }
 
-function parseTemplates(workbook: XLSX.WorkBook): FlightTemplate[] | undefined {
+function parseTemplates(
+  workbook: XLSX.WorkBook,
+  errors: string[]
+): FlightTemplate[] | undefined {
   const sheetName = findSheet(workbook, ["航班配置", "航班模板"]);
   if (!sheetName) return undefined;
   const data = rows(workbook, sheetName);
   const header = data[0] ?? [];
+  recordFlightHeaderErrors(header, sheetName, errors);
   const flightIndex = headerIndex(header, ["航班号"], 0);
   const startIndex = headerIndex(header, ["开始时间"], 1);
   const endIndex = headerIndex(header, ["结束时间"], 2);
   const positionIndex = headerIndex(header, ["涉及岗位", "岗位"], 3);
   const remarkIndex = headerIndex(header, ["备注"], 4);
-  return data.slice(1).flatMap((row) => {
+  const seen = new Set<string>();
+  return data.slice(1).flatMap((row, index) => {
+    if (row.every((value) => !normalizeText(value))) return [];
     const flightNo = normalizeText(row[flightIndex]).toUpperCase();
     const startTime = normalizeTime(normalizeText(row[startIndex]));
     const endTime = normalizeTime(normalizeText(row[endIndex]));
-    if (!flightNo || !startTime || !endTime) return [];
+    if (
+      !acceptFlightRow(
+        sheetName,
+        index + 2,
+        flightNo,
+        startTime,
+        endTime,
+        seen,
+        errors
+      )
+    )
+      return [];
     return [
       {
         id: createId("template"),
         flightNo,
         startTime,
         endTime,
-        positions: splitList(row[positionIndex]).map(normalizePosition),
+        positions: parseFlightPositions(row[positionIndex]),
         remark: normalizeText(row[remarkIndex]),
       },
     ];
@@ -589,7 +699,10 @@ function parseFatigueMap(workbook: XLSX.WorkBook): Map<string, number> {
   return result;
 }
 
-function parsePositions(workbook: XLSX.WorkBook): PositionRule[] | undefined {
+function parsePositions(
+  workbook: XLSX.WorkBook,
+  restoreErrors: string[]
+): PositionRule[] | undefined {
   const sheetName = findSheet(workbook, ["岗位配置"]);
   if (!sheetName) return undefined;
   const fatigueMap = parseFatigueMap(workbook);
@@ -611,17 +724,38 @@ function parsePositions(workbook: XLSX.WorkBook): PositionRule[] | undefined {
     ["提前撤岗分钟", "提前撤岗", "分流分钟"],
     minPassengersIndex + 1
   );
+  const manualIndex = header.findIndex((value) =>
+    normalizeText(value).includes("是否手动输入")
+  );
   const result: PositionRule[] = [];
   let currentFlight = "";
-  for (const row of data.slice(1)) {
+  for (const [rowIndex, row] of data.slice(1).entries()) {
+    if (row.every((value) => !normalizeText(value))) continue;
     currentFlight =
       normalizeText(row[flightIndex]).toUpperCase() || currentFlight;
     const name = normalizePosition(row[nameIndex]);
-    if (!currentFlight || !name) continue;
+    if (!currentFlight || !name) {
+      restoreErrors.push(
+        `岗位配置第${rowIndex + 2}行：缺少航班号或岗位名称，不能完整恢复`
+      );
+      continue;
+    }
     const rawQualified = normalizeText(row[qualifiedIndex]);
     const categoryText = normalizeText(row[categoryIndex]);
-    if (categoryText.includes("支援") && !categoryText.includes("行政支援"))
+    if (categoryText.includes("支援") && !categoryText.includes("行政支援")) {
+      restoreErrors.push(
+        `岗位配置第${rowIndex + 2}行：包含已停用的岗位分类，不能完整恢复`
+      );
       continue;
+    }
+    if (
+      normalizeText(row[fatiguePointsIndex]) === "" ||
+      !Number.isFinite(Number(row[fatiguePointsIndex])) ||
+      Number(row[fatiguePointsIndex]) < 0
+    )
+      restoreErrors.push(
+        `岗位配置第${rowIndex + 2}行：疲劳点数无效，不能完整恢复`
+      );
     const supervisorFill = categoryText.includes("督导补位");
     const category: PositionRule["category"] = supervisorFill
       ? "常规"
@@ -641,11 +775,19 @@ function parsePositions(workbook: XLSX.WorkBook): PositionRule[] | undefined {
       category,
       coverageRole: supervisorFill ? "supervisor-fill" : "none",
       remark: normalizeText(row[remarkIndex]),
-      qualifiedStaffIds: splitList(rawQualified),
-      manual: rawQualified.includes("手动输入"),
+      qualifiedStaffIds: rawQualified.includes("手动输入")
+        ? []
+        : splitList(rawQualified),
+      manual:
+        manualIndex >= 0
+          ? ["是", "true", "1"].includes(normalizeText(row[manualIndex]))
+          : rawQualified.includes("手动输入"),
       fatiguePoints:
         fatigueMap.get(`${currentFlight}|${name}`) ??
-        (Number(row[fatiguePointsIndex]) || 1),
+        (normalizeText(row[fatiguePointsIndex]) !== "" &&
+        Number.isFinite(Number(row[fatiguePointsIndex]))
+          ? Number(row[fatiguePointsIndex])
+          : 1),
       minPassengers: Number(row[minPassengersIndex]) || 0,
       earlyReleaseMinutes: Number(row[earlyReleaseIndex]) || 0,
     });
@@ -656,6 +798,8 @@ function parsePositions(workbook: XLSX.WorkBook): PositionRule[] | undefined {
       rule,
     ])
   );
+  if (unique.size !== result.length)
+    restoreErrors.push("岗位配置存在重复岗位，不能完整恢复");
   return orderPositionRules([...unique.values()]);
 }
 
@@ -774,22 +918,25 @@ export function parseWorkbook(
   currentStaff: Staff[],
   options: WorkbookImportOptions = {}
 ): WorkbookImport {
+  const configurationRestoreErrors: string[] = [];
   const parsedLeaveTypes = parseLeaveTypes(workbook);
   const staffWarnings: string[] = [];
   const staff = parseStaff(
     workbook,
     parsedLeaveTypes.types ?? options.leaveTypes ?? [],
-    staffWarnings
+    staffWarnings,
+    configurationRestoreErrors
   );
   const effectiveStaff = staff !== undefined ? staff : currentStaff;
-  const flights = parseFlights(workbook);
-  const templates = parseTemplates(workbook);
+  const flightConfigurationErrors: string[] = [];
+  const flights = parseFlights(workbook, flightConfigurationErrors);
+  const templates = parseTemplates(workbook, flightConfigurationErrors);
   const weeklyFlightPlanImport = parseWeeklyFlightPlans(workbook);
   const weeklyFlightPlans =
     weeklyFlightPlanImport?.status === "valid"
       ? weeklyFlightPlanImport.plans
       : undefined;
-  const positionRules = parsePositions(workbook);
+  const positionRules = parsePositions(workbook, configurationRestoreErrors);
   const history = parseHistory(workbook, effectiveStaff);
   const parsedRules = parseScheduleRuleSettings(workbook, effectiveStaff);
   if (
@@ -801,12 +948,16 @@ export function parseWorkbook(
       parsedRules.settings.mobileSupervisorFillRules
     );
   const latePriorityFrequencyAdjustments =
-    parseLatePriorityFrequencyAdjustments(workbook);
+    parseLatePriorityFrequencyAdjustments(workbook, configurationRestoreErrors);
   const ordinaryPriorityFrequencyAdjustments =
-    parseOrdinaryPriorityFrequencyAdjustments(workbook);
+    parseOrdinaryPriorityFrequencyAdjustments(
+      workbook,
+      configurationRestoreErrors
+    );
   const ordinaryPriorityPositions = parseOrdinaryPriorityPositions(workbook);
   const dutyRoster = parseDutyRosterOverrides(workbook, effectiveStaff);
   const halfRest = parseHalfRestSelections(workbook);
+  const flightPlanConfirmations = parseFlightPlanConfirmations(workbook);
   if (ordinaryPriorityPositions.present) {
     parsedRules.settings = {
       ...(parsedRules.settings ?? {}),
@@ -814,15 +965,38 @@ export function parseWorkbook(
     };
   }
   const warnings = [
+    ...flightConfigurationErrors,
     ...halfRest.warnings,
+    ...flightPlanConfirmations.warnings,
     ...parsedRules.warnings,
     ...dutyRoster.warnings,
     ...parsedLeaveTypes.warnings,
     ...staffWarnings,
   ];
+  // Older/partial parameter tables can supply defaults for ordinary import.
+  // Complete restore must prove every parameter was actually in the file.
+  const parameterRows = workbook.Sheets["规则参数"]
+    ? rows(workbook, "规则参数")
+    : [];
+  const parameterCodeIndex = headerIndex(
+    parameterRows[0] ?? [],
+    ["参数代码"],
+    0
+  );
+  const parameterCodes = new Set(
+    parameterRows.slice(1).map((row) => normalizeText(row[parameterCodeIndex]))
+  );
+  configurationRestoreErrors.push(
+    ...SCHEDULE_SETTING_DEFINITIONS.filter(
+      (definition) =>
+        !parameterCodes.has(definition.key) &&
+        !OPTIONAL_CONFIGURATION_SCALARS.has(definition.key)
+    ).map((definition) => `完整恢复缺少规则参数：${definition.label}`)
+  );
   if (weeklyFlightPlanImport?.status === "invalid")
     warnings.push(weeklyFlightPlanImport.warning);
   const hasStandardSheet = Boolean(
+    workbook.Sheets["航班换季确认"] ||
     workbook.Sheets["半休选择"] ||
     workbook.SheetNames.some((name) => name.includes("休假类别")) ||
     staff ||
@@ -865,6 +1039,7 @@ export function parseWorkbook(
   if (positionRules?.length === 0 && sheetHasDataRows(workbook, ["岗位配置"]))
     warnings.push("岗位配置工作表没有有效数据");
   if (
+    !workbook.Sheets["航班换季确认"] &&
     !staff &&
     !workbook.SheetNames.some((name) => name.includes("休假类别")) &&
     !flights &&
@@ -885,6 +1060,8 @@ export function parseWorkbook(
     staff,
     flights,
     templates,
+    flightConfigurationErrors,
+    configurationRestoreErrors,
     weeklyFlightPlans,
     ...(weeklyFlightPlanImport
       ? { weeklyFlightPlanStatus: weeklyFlightPlanImport.status }
@@ -897,6 +1074,7 @@ export function parseWorkbook(
     ordinaryPriorityFrequencyAdjustments,
     dutyRosterOverrides: dutyRoster.value,
     halfRestSelections: halfRest.value,
+    flightPlanConfirmations: flightPlanConfirmations.value,
     dutyRosterInvalid: dutyRoster.warnings.length > 0,
     warnings,
   };
@@ -962,14 +1140,16 @@ export function buildConfigWorkbook(state: AppState): XLSX.WorkBook {
         "涉及岗位（用逗号分隔）",
         "备注",
       ],
-      ...state.flights.map((flight) => [
-        flight.flightNo,
-        flight.startTime,
-        flight.endTime,
-        flight.bookedPassengers,
-        flight.positions.join(","),
-        flight.remark,
-      ]),
+      ...withConfiguredFlightPositions(state.flights, state.positionRules).map(
+        (flight) => [
+          flight.flightNo,
+          flight.startTime,
+          flight.endTime,
+          flight.bookedPassengers,
+          flight.positions.join(","),
+          flight.remark,
+        ]
+      ),
     ],
     [12, 12, 12, 12, 48, 24]
   );
@@ -978,7 +1158,10 @@ export function buildConfigWorkbook(state: AppState): XLSX.WorkBook {
     "航班配置",
     [
       ["航班号", "开始时间", "结束时间", "涉及岗位（用逗号分隔）", "备注"],
-      ...state.templates.map((template) => [
+      ...withConfiguredFlightPositions(
+        state.templates,
+        state.positionRules
+      ).map((template) => [
         template.flightNo,
         template.startTime,
         template.endTime,
@@ -1013,23 +1196,23 @@ export function buildConfigWorkbook(state: AppState): XLSX.WorkBook {
         "疲劳点数",
         "启用旅客人数",
         "提前撤岗分钟",
+        "是否手动输入",
       ],
       ...state.positionRules.map((rule) => [
         rule.flightNo,
         rule.category,
         rule.name,
         rule.remark,
-        rule.manual
-          ? "手动输入项"
-          : rule.qualifiedStaffIds
-              .filter((staffId) => activeStaffIds.has(staffId))
-              .join(","),
+        rule.qualifiedStaffIds
+          .filter((staffId) => activeStaffIds.has(staffId))
+          .join(","),
         rule.fatiguePoints,
         rule.minPassengers,
         rule.earlyReleaseMinutes,
+        rule.manual ? "是" : "否",
       ]),
     ],
-    [12, 18, 16, 24, 48, 12, 18, 18]
+    [12, 18, 16, 24, 48, 12, 18, 18, 16]
   );
   append(
     workbook,
@@ -1156,6 +1339,7 @@ export function buildConfigWorkbook(state: AppState): XLSX.WorkBook {
   );
   appendLeaveTypes(workbook, state.leaveTypes);
   appendHalfRestSelections(workbook, state.halfRestSelections ?? []);
+  appendFlightPlanConfirmations(workbook, state.flightPlanConfirmations ?? []);
   return workbook;
 }
 

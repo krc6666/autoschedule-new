@@ -1,0 +1,36 @@
+{
+  "inputSha256": "bc5b7743822c1252e59737c66c76d54c654f622e30fd88660b6c1415150e3219",
+  "templates": 10,
+  "currentFlights": 4,
+  "ruleRows": 82,
+  "reviews": [
+    {
+      "groupId": "A",
+      "count": 2,
+      "unmatchedFlightNos": [],
+      "missingPositionFlightNos": ["FD573"],
+      "timeDifferenceFlightNos": ["CX937"]
+    },
+    {
+      "groupId": "B",
+      "count": 7,
+      "unmatchedFlightNos": ["KE166"],
+      "missingPositionFlightNos": [
+        "FD571",
+        "AE218",
+        "MF8683",
+        "KE160",
+        "AK151",
+        "TW616"
+      ],
+      "timeDifferenceFlightNos": []
+    }
+  ],
+  "independentCurrentMissingJobs": ["FD573"],
+  "independentlyCheckedOtherOrphans": [],
+  "otherGroupPreserved": true,
+  "isolatedSimulatedChoice": "FD573 marked new only in memory; not an assertion of owner real seasonal mapping",
+  "sourceUnchanged": true,
+  "xlsxBytesReimportAndStorageReload": "passed",
+  "browserUsed": false
+}

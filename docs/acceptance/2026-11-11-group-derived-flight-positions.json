@@ -1,0 +1,152 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-11-group-derived-flight-positions",
+  "title": "Current-group position configuration owns flight position lists",
+  "startedFrom": "a9d47c8cf7cee7a71cc28bd6dede4fd52329636c",
+  "expectation": {
+    "example": "Owner screenshots show TR121 template position text independently editable despite detailed position configuration. Owner approved: A has H02/H03 and B only H02; template shows the active group list, while flight number/time/remark remain shared.",
+    "expected": "Remove manual template position input. Derive ordered unique position names from current-group positionRules for template display, weekly/template picker counts, all three schedule preparations, new current flights and config XLSX position columns. Changes, deletion and sorting in position config propagate automatically; template input/import cannot reconstruct deleted rules or change other-group rules. XLSX and storage reload preserve group isolation.",
+    "unchanged": "No new scheduling rule: actual task generation already uses activeFlightRules. Flight numbers, times, remarks, passenger counts, weekly selections, history and qualifications remain unchanged except existing position-edit invalidation. Historical pre-v10/v11 migration contracts are preserved. Existing Flight/FlightTemplate positions arrays remain transfer snapshots, never an alternative owner of current configuration.",
+    "fallback": "Missing rules show no configured positions, never fall back to stale template/flight snapshots. Template-only imports update flight metadata without guessing or adding group positions. Manual edit commands for obsolete position inputs are rejected without writes. Import validation and cancellation protect existing data."
+  },
+  "testedVersion": "e1210a8e34871642e4017c904d6eeabfa21e76b9313108f56e3ac5a81967baf1",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "Five initial failures distinguish old template snapshots from current-group configuration; current final tests pass.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-group-positions-red.txt",
+          "summary": "Pre-change five regression tests failed on editable/stale template lists, picker counts, preview and exported snapshots.",
+          "sha256": "dab1ef6dc481d29f7de01b0029d3ff938ac3269b0ad7ddeb8a3125d1b4662a8a"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-group-positions-verify.txt",
+          "summary": "Final npm.cmd run verify exit 0: typecheck, 171 files / 1712 functional tests, 7 files / 19 performance tests, production build. Existing solver externalization and bundle-size notices remain.",
+          "sha256": "a83c5abacf0dc3323245800cfee04823856fbf4bade42cb63368c943ca64755b"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "Read-only template reflects current-group add/rename/delete/order and switching; duplicate category names count once; slashes preserved. Owner confirms actual display.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-group-positions-verify.txt",
+          "summary": "Final npm.cmd run verify exit 0: typecheck, 171 files / 1712 functional tests, 7 files / 19 performance tests, production build. Existing solver externalization and bundle-size notices remain.",
+          "sha256": "a83c5abacf0dc3323245800cfee04823856fbf4bade42cb63368c943ca64755b"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-group-positions-owner.json",
+          "summary": "Owner refreshed actual localhost:50966 and answered 都符合: read-only current-group names, A/B switching, full row and delete usability. Source file hashes retained.",
+          "sha256": "ab619c9bbd58d22db364754cb769481dcc2ad8730844f177754a7589ebaff366"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "Three preparation controllers, template and online additions, weekly/picker counts, empty and seasonal flight names, Excel and storage roundtrip covered. Real file independently checked.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-group-positions-verify.txt",
+          "summary": "Final npm.cmd run verify exit 0: typecheck, 171 files / 1712 functional tests, 7 files / 19 performance tests, production build. Existing solver externalization and bundle-size notices remain.",
+          "sha256": "a83c5abacf0dc3323245800cfee04823856fbf4bade42cb63368c943ca64755b"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-group-positions-real.json",
+          "summary": "Owner config(15), unchanged SHA256: 10 templates, 4 flights, 82 rules; independent 14 flight-row check, no FD573 rules invented, other group preserved, XLSX reimport and storage reload passed.",
+          "sha256": "53d011cfd4426d2e95575ba16dafd8c9e0f2dc1aeb9faa10341b1b1b466d380f"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "Template import cannot reconstruct deleted jobs in either group. Storage reload and re-export read rules again. Final real solver regression starts with stale/missing snapshots, then deletes a rule; final assignments contain exactly configured jobs. Explicit old migrations remain covered.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-group-positions-verify.txt",
+          "summary": "Final npm.cmd run verify exit 0: typecheck, 171 files / 1712 functional tests, 7 files / 19 performance tests, production build. Existing solver externalization and bundle-size notices remain.",
+          "sha256": "a83c5abacf0dc3323245800cfee04823856fbf4bade42cb63368c943ca64755b"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-group-positions-real.json",
+          "summary": "Owner config(15), unchanged SHA256: 10 templates, 4 flights, 82 rules; independent 14 flight-row check, no FD573 rules invented, other group preserved, XLSX reimport and storage reload passed.",
+          "sha256": "53d011cfd4426d2e95575ba16dafd8c9e0f2dc1aeb9faa10341b1b1b466d380f"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "Obsolete template/flight positions commands return missing with exact state preserved; template import does not change other-group jobs/schedule. Existing schedule safety contracts run through full functional/performance suite. No new hard rule is introduced.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-group-positions-verify.txt",
+          "summary": "Final npm.cmd run verify exit 0: typecheck, 171 files / 1712 functional tests, 7 files / 19 performance tests, production build. Existing solver externalization and bundle-size notices remain.",
+          "sha256": "a83c5abacf0dc3323245800cfee04823856fbf4bade42cb63368c943ca64755b"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "All functional, performance, type and build checks pass after correcting two obsolete snapshot expectations. Current group rule values, other-group isolation, times/remarks/passengers, history, old migrations and existing layout covered; no solver implementation changed. Pre-commit full verification passed 1737 functional and 19 performance tests, typecheck and build; product behavior unchanged after that run.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-group-positions-verify.txt",
+          "summary": "Final npm.cmd run verify exit 0: typecheck, 171 files / 1712 functional tests, 7 files / 19 performance tests, production build. Existing solver externalization and bundle-size notices remain.",
+          "sha256": "a83c5abacf0dc3323245800cfee04823856fbf4bade42cb63368c943ca64755b"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-group-positions-first-full.txt",
+          "summary": "First full run retained: 1710 passed / two obsolete raw-snapshot assertions failed. Updated assertions to independently derive expected names from authoritative rules; no product changes to bypass checks.",
+          "sha256": "37c7a7d58a291fe5cc9f0bb4630cde364154116fb27e76459281085b4b33ad46"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-group-positions-real.json",
+          "summary": "Owner config(15), unchanged SHA256: 10 templates, 4 flights, 82 rules; independent 14 flight-row check, no FD573 rules invented, other group preserved, XLSX reimport and storage reload passed.",
+          "sha256": "53d011cfd4426d2e95575ba16dafd8c9e0f2dc1aeb9faa10341b1b1b466d380f"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-group-positions-owner.json",
+          "summary": "Owner refreshed actual localhost:50966 and answered 都符合: read-only current-group names, A/B switching, full row and delete usability. Source file hashes retained.",
+          "sha256": "ab619c9bbd58d22db364754cb769481dcc2ad8730844f177754a7589ebaff366"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-configuration-commit-verify.txt",
+          "summary": "Pre-commit npm.cmd run verify exit 0: typecheck, 173 files / 1737 functional tests, 7 files / 19 performance tests and production build passed. Subsequent changes only normalize documentation/evidence formatting and record this command. Existing build advisories retained; no physical-device acceptance inferred.",
+          "sha256": "561cd6a1634d885ca83f3d2fa12cb98cacafb4f255e7f0a6735868e65812d61b"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "verified",
+      "reason": "Current local source served to owner is accepted for current-group display and existing layout. Real owner workbook was independently checked through actual XLSX byte serialization and reimport in isolated models. Does not claim two physical devices or every viewport tested.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-group-positions-owner.json",
+          "summary": "Owner refreshed actual localhost:50966 and answered 都符合: read-only current-group names, A/B switching, full row and delete usability. Source file hashes retained.",
+          "sha256": "ab619c9bbd58d22db364754cb769481dcc2ad8730844f177754a7589ebaff366"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-group-positions-real.json",
+          "summary": "Owner config(15), unchanged SHA256: 10 templates, 4 flights, 82 rules; independent 14 flight-row check, no FD573 rules invented, other group preserved, XLSX reimport and storage reload passed.",
+          "sha256": "53d011cfd4426d2e95575ba16dafd8c9e0f2dc1aeb9faa10341b1b1b466d380f"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-group-positions-verify.txt",
+          "summary": "Final npm.cmd run verify exit 0: typecheck, 171 files / 1712 functional tests, 7 files / 19 performance tests, production build. Existing solver externalization and bundle-size notices remain.",
+          "sha256": "a83c5abacf0dc3323245800cfee04823856fbf4bade42cb63368c943ca64755b"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "group-positions-red.txt captured five failures; final verify proves current regressions pass. Duplicate ownership and reverse template-to-rule writes caused divergence.",
+    "laterChanges": "Import, storage reload, flight selection and final solver paths could reintroduce stale names. Negative-write/import, deletion/regeneration and real XLSX roundtrip evidence in final verify and real.json prevent this.",
+    "finalArtifact": "group-positions-owner.json records actual-page confirmation and source hashes; group-positions-real.json binds unchanged owner input and independently checked serialized flight rows; verify log binds automated checks."
+  },
+  "review": {
+    "missedScope": "Traced all source .positions consumers. Current UI, controller preparation, additions/rename and config export use the single projection. Historical snapshots and pre-v10/v11 migration deliberately remain; tests prove group isolation. Physical device pair and all narrow viewports not manually retested.",
+    "rootCause": "Actual schedule tasks used positionRules but template/UI/candidate/export lists consumed shared editable snapshots, while import rebuilt group rules from those snapshots. This task replaces that ownership contract with owner-approved group-specific derivation.",
+    "earlyDetection": "Before changing shared config, list all .positions producers/consumers and exercise A/B with different jobs plus deleted jobs and stale snapshots, then inspect real exported rows independently before actual-page acceptance."
+  }
+}

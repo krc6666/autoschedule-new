@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-11-template-editor-full-width",
+  "title": "Flight template editor below constraints at full page width",
+  "startedFrom": "a9d47c8cf7cee7a71cc28bd6dede4fd52329636c",
+  "expectation": {
+    "example": "Owner reports template editor is too narrow next to schedule constraints; long fields and the right-hand delete action are difficult to reach.",
+    "expected": "Place the existing flight template editor below schedule constraints in a separate full-width section. Preserve flight number, times, positions, remarks and per-row delete controls.",
+    "unchanged": "Template data, A/B sharing, add/edit/delete commands, confirmation protections, weekly plans, import/export and scheduling rules remain unchanged. Narrow-screen wrapping follows existing CSS.",
+    "fallback": "Layout only: rendering must not mutate model. Existing delete command retains its own confirmation flow; empty template list still offers Add. Actual visual acceptance is owner-operated."
+  },
+  "testedVersion": "e1210a8e34871642e4017c904d6eeabfa21e76b9313108f56e3ac5a81967baf1",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "Original layout used a two-column split; regression proves both blocks shared a section before the change.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-template-full-width-red.txt",
+          "summary": "Pre-fix UI test failed because template editor and constraints shared the same split section; seven existing UI tests passed.",
+          "sha256": "730e4120792cacad13ad4dc544779a322103e245b51281f0d80ab1e31bed9d20"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-template-full-width-validation.txt",
+          "summary": "After stabilizing Lit formatting, format check, 5 files / 34 targeted UI and import tests, typecheck, build and diff check all exit 0. Initial format-check failure is retained in the log. No full functional/performance/verify rerun for this layout-only change.",
+          "sha256": "37904fcd66793d1ce2cc7f406bd356acab36993431d737b1d06baa6d525ef70e"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "Templates now occupy a separate sibling section after constraints, rendering all rows and long remarks. Exact edit/delete IDs and no input mutation are checked; owner confirms actual full-row layout.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-template-full-width-validation.txt",
+          "summary": "After stabilizing Lit formatting, format check, 5 files / 34 targeted UI and import tests, typecheck, build and diff check all exit 0. Initial format-check failure is retained in the log. No full functional/performance/verify rerun for this layout-only change.",
+          "sha256": "37904fcd66793d1ce2cc7f406bd356acab36993431d737b1d06baa6d525ef70e"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-template-full-width-owner.json",
+          "summary": "Owner confirms current localhost page shows templates on a full row below constraints, and deletion is convenient; current component SHA-256 recorded.",
+          "sha256": "cdb182115ab89c024d275079028e196e89d35ac63037071d9141afb6bdc4dcc5"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "Existing current-flight repair controls, full root-component configuration import and leave-type UI tests pass. Empty template branch and narrow-screen CSS are unchanged by inspected diff; no new alternate data behavior.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-template-full-width-validation.txt",
+          "summary": "After stabilizing Lit formatting, format check, 5 files / 34 targeted UI and import tests, typecheck, build and diff check all exit 0. Initial format-check failure is retained in the log. No full functional/performance/verify rerun for this layout-only change.",
+          "sha256": "37904fcd66793d1ce2cc7f406bd356acab36993431d737b1d06baa6d525ef70e"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "not_applicable",
+      "reason": "Layout rendering adds no data transformation or scheduling post-processing. Existing typed edit/delete commands and no model mutation are tested."
+    },
+    "finalGuard": {
+      "status": "not_applicable",
+      "reason": "No new scheduling rule, persisted field or write path. Existing deletion confirmation controller is unchanged; exact delete ID dispatch is tested."
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "5 files / 34 targeted tests, typecheck, production build and diff check pass after final source formatting. Generic CSS, model, import contracts and edit/delete business actions are unchanged. Pre-commit full verification passed 1737 functional and 19 performance tests, typecheck and build; product behavior unchanged after that run.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-template-full-width-validation.txt",
+          "summary": "After stabilizing Lit formatting, format check, 5 files / 34 targeted UI and import tests, typecheck, build and diff check all exit 0. Initial format-check failure is retained in the log. No full functional/performance/verify rerun for this layout-only change.",
+          "sha256": "37904fcd66793d1ce2cc7f406bd356acab36993431d737b1d06baa6d525ef70e"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-configuration-commit-verify.txt",
+          "summary": "Pre-commit npm.cmd run verify exit 0: typecheck, 173 files / 1737 functional tests, 7 files / 19 performance tests and production build passed. Subsequent changes only normalize documentation/evidence formatting and record this command. Existing build advisories retained; no physical-device acceptance inferred.",
+          "sha256": "561cd6a1634d885ca83f3d2fa12cb98cacafb4f255e7f0a6735868e65812d61b"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "verified",
+      "reason": "Owner confirms the actual local page has a full-width template row below constraints and convenient deletion. Component version hash is included in owner evidence.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-template-full-width-owner.json",
+          "summary": "Owner confirms current localhost page shows templates on a full row below constraints, and deletion is convenient; current component SHA-256 recorded.",
+          "sha256": "cdb182115ab89c024d275079028e196e89d35ac63037071d9141afb6bdc4dcc5"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-template-full-width-validation.txt",
+          "summary": "After stabilizing Lit formatting, format check, 5 files / 34 targeted UI and import tests, typecheck, build and diff check all exit 0. Initial format-check failure is retained in the log. No full functional/performance/verify rerun for this layout-only change.",
+          "sha256": "37904fcd66793d1ce2cc7f406bd356acab36993431d737b1d06baa6d525ef70e"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "template-full-width-red.txt captures same-section failure before splitting layout; final validation passes.",
+    "laterChanges": "Existing root app rerender/import and config/leave UI paths pass. Edit/delete commands preserve original entity IDs; render does not mutate input. No downstream business pipeline was changed.",
+    "finalArtifact": "template-full-width-owner.json records owner confirmation from current localhost:50966 and the current component SHA-256, corroborated by final targeted tests/typecheck/build."
+  },
+  "review": {
+    "missedScope": "Actual owner viewport is accepted. Other desktop/mobile viewports were not manually checked; existing narrow-screen CSS is preserved. Residual import flights were tracked separately and owner has now confirmed disappearance.",
+    "rootCause": "Template editor was placed in the smaller 0.8fr column beside constraints, while its fields required more width; separate vertical full-width sections remove that container restriction.",
+    "earlyDetection": "Before placing a data editor in a split layout, compare container space with row minimum widths and verify the final rightmost action on the real page with long content. Preserve command-ID and input-immutability regression."
+  }
+}

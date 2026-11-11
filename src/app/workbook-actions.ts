@@ -1,5 +1,11 @@
+import {
+  flightPlanReviewSummaries,
+  type FlightPlanReviewSummary,
+  normalizeFlightPlanConfirmations,
+} from "../domain/flights/flight-plan-review";
 import { migrateLegacySupervisorFillConfiguration } from "../domain/coverage/supervisor-fill-configuration";
 import type { WorkbookImport } from "../infrastructure/excel";
+import { compileWorkbookConfigurationRestore } from "../infrastructure/workbook-configuration-contract";
 import type { DutyRosterImportPreview } from "../infrastructure/duty-roster-excel";
 import type { LegacyScheduleImportPreview } from "../infrastructure/legacy-schedule-excel";
 import {
@@ -16,20 +22,19 @@ import {
   normalizeWeeklyFlightNo,
   replaceWeeklyFlightPlan,
 } from "../domain/flights/weekly-flight-plan";
-import {
-  synchronizeImportedRuleFlightsToTemplates,
-  synchronizeTemplatePositionRules,
-} from "./template-position-rule-sync";
+import { synchronizeImportedRuleFlightsToTemplates } from "./template-position-rule-sync";
 
 export type ImportMode = "all" | "config" | "history";
 
 export interface AppliedWorkbookImport {
+  flightPlanReview?: FlightPlanReviewSummary[];
   changedConfig: boolean;
   recognized: string;
   weeklyPlanPreview?: WeeklyPlanImportPreview;
   historySummary?: HistoryImportSummary;
   rejected?: number;
   errors?: string[];
+  restoreDefaults?: string[];
 }
 
 export interface WeeklyPlanImportPreview {
@@ -39,6 +44,7 @@ export interface WeeklyPlanImportPreview {
 
 export interface WorkbookImportOptions {
   replaceSharedTemplates?: boolean;
+  restoreFlightConfiguration?: boolean;
 }
 
 export interface HistoryImportSummary {
@@ -211,12 +217,26 @@ export function applyWorkbookImport(
   options: WorkbookImportOptions = {}
 ): AppliedWorkbookImport {
   const importConfig = mode !== "history";
-  const replaceSharedTemplates = options.replaceSharedTemplates === true;
-  const importsSharedTemplates =
-    importConfig &&
-    replaceSharedTemplates &&
-    (imported.templates !== undefined ||
-      (imported.flights !== undefined && imported.templates === undefined));
+  const restoreFlightConfiguration =
+    importConfig && options.restoreFlightConfiguration === true;
+  const replaceSharedTemplates =
+    restoreFlightConfiguration || options.replaceSharedTemplates === true;
+  let restoreDefaults: string[] | undefined;
+  if (restoreFlightConfiguration) {
+    const compiled = compileWorkbookConfigurationRestore(imported);
+    const { errors } = compiled;
+    if (errors.length)
+      return {
+        changedConfig: false,
+        recognized: "",
+        errors: [
+          ...errors,
+          "本次未写入任何数据；请在原电脑用当前版本重新导出完整配置，或取消完整恢复后按部分配置导入",
+        ],
+      };
+    imported = compiled.imported;
+    restoreDefaults = compiled.restoreDefaults;
+  }
   if (importConfig && imported.dutyRosterInvalid) {
     return {
       changedConfig: false,
@@ -268,6 +288,10 @@ export function applyWorkbookImport(
         ],
       };
   }
+  if (importConfig && imported.flightPlanConfirmations !== undefined)
+    state.flightPlanConfirmations = normalizeFlightPlanConfirmations(
+      imported.flightPlanConfirmations
+    );
   if (importConfig && imported.leaveTypes !== undefined)
     state.leaveTypes = structuredClone(imported.leaveTypes);
   if (importConfig && imported.staff !== undefined) {
@@ -366,10 +390,15 @@ export function applyWorkbookImport(
     );
     state.shared.templates = state.templates;
   }
-  if (mode === "all" && imported.flights !== undefined)
+  if (
+    (mode === "all" || restoreFlightConfiguration) &&
+    imported.flights !== undefined
+  )
     state.flights = imported.flights;
   const addedRuleFlightTemplates =
-    importConfig && imported.positionRules !== undefined
+    importConfig &&
+    !restoreFlightConfiguration &&
+    imported.positionRules !== undefined
       ? synchronizeImportedRuleFlightsToTemplates(
           state,
           state.positionRules,
@@ -409,9 +438,6 @@ export function applyWorkbookImport(
       ),
     };
   }
-  if (importsSharedTemplates) synchronizeTemplatePositionRules(state);
-  else if (addedRuleFlightTemplates.length)
-    synchronizeTemplatePositionRules(state, addedRuleFlightTemplates);
   if (importHistory && imported.history)
     mergeHistoryImport(state, imported.history);
   const changedConfig =
@@ -419,7 +445,8 @@ export function applyWorkbookImport(
     Boolean(
       imported.staff !== undefined ||
       imported.leaveTypes !== undefined ||
-      (mode === "all" && imported.flights !== undefined) ||
+      ((mode === "all" || restoreFlightConfiguration) &&
+        imported.flights !== undefined) ||
       (replaceSharedTemplates &&
         (imported.templates !== undefined ||
           (imported.flights !== undefined &&
@@ -428,12 +455,18 @@ export function applyWorkbookImport(
       imported.positionRules !== undefined ||
       imported.settings ||
       imported.latePriorityFrequencyAdjustments !== undefined ||
+      imported.ordinaryPriorityFrequencyAdjustments !== undefined ||
+      imported.halfRestSelections !== undefined ||
+      imported.flightPlanConfirmations !== undefined ||
       imported.dutyRosterOverrides !== undefined
     );
   if (changedConfig) {
     clearActiveSchedule(state);
   }
   const recognized = [
+    importConfig &&
+      imported.flightPlanConfirmations !== undefined &&
+      `${imported.flightPlanConfirmations.length} 条航班换季确认`,
     imported.halfRestSelections !== undefined &&
       `${imported.halfRestSelections.length} 个工作日半休标记`,
     importConfig &&
@@ -443,7 +476,7 @@ export function applyWorkbookImport(
       imported.staff !== undefined &&
       `${imported.staff.length} 人`,
     importConfig &&
-      mode === "all" &&
+      (mode === "all" || restoreFlightConfiguration) &&
       imported.flights !== undefined &&
       `${imported.flights.length} 个航班计划`,
     importConfig &&
@@ -480,5 +513,7 @@ export function applyWorkbookImport(
     recognized,
     ...(weeklyPlanPreview ? { weeklyPlanPreview } : {}),
     historySummary,
+    flightPlanReview: importConfig ? flightPlanReviewSummaries(state) : [],
+    ...(restoreDefaults?.length ? { restoreDefaults } : {}),
   };
 }

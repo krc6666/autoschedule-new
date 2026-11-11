@@ -61,6 +61,8 @@ export class TransferController implements UiCommandController {
         return this.applyWorkbookImport();
       case "set-workbook-import-shared-templates":
         return this.setWorkbookImportSharedTemplates(command.enabled);
+      case "set-workbook-import-flight-restore":
+        return this.setWorkbookImportFlightRestore(command.enabled);
       case "apply-legacy-schedule-import":
         return this.applyLegacyScheduleImport();
       case "update-legacy-schedule-import-date":
@@ -170,8 +172,12 @@ export class TransferController implements UiCommandController {
           changedConfig: prepared.changedConfig,
           sharedTemplatesAvailable: prepared.sharedTemplatesAvailable,
           replaceSharedTemplates: false,
+          restoreFlightConfiguration: prepared.restoreFlightConfiguration,
+          restoreErrors: prepared.restoreErrors,
+          restoreDefaults: prepared.restoreDefaults,
           weeklyPlanPreview: prepared.weeklyPlanPreview,
           historySummary: prepared.historySummary,
+          flightPlanReview: prepared.flightPlanReview,
           warnings: prepared.warnings,
         },
       });
@@ -213,6 +219,7 @@ export class TransferController implements UiCommandController {
       .getState()
       .records.applyWorkbookImport(dialog.imported, dialog.mode, {
         replaceSharedTemplates: dialog.replaceSharedTemplates,
+        restoreFlightConfiguration: dialog.restoreFlightConfiguration,
       });
     if (applied.errors?.length) {
       this.context.toast(applied.errors.join("；"), "warning");
@@ -220,7 +227,8 @@ export class TransferController implements UiCommandController {
     }
     const hasHistory = (applied.historySummary?.total ?? 0) > 0;
     const hasSharedChange =
-      dialog.replaceSharedTemplates && dialog.sharedTemplatesAvailable;
+      (dialog.replaceSharedTemplates || dialog.restoreFlightConfiguration) &&
+      dialog.sharedTemplatesAvailable;
     if (!applied.changedConfig && !hasHistory && !hasSharedChange) {
       this.context.toast(
         dialog.warnings[0] ?? "文件中没有选择可导入内容，现有数据未改变",
@@ -234,7 +242,7 @@ export class TransferController implements UiCommandController {
         applied.changedConfig
           ? "当前组班表已清空，请到排班页重新排班"
           : "历史已归档"
-      }`
+      }${applied.restoreDefaults?.length ? "；文件未记录的新增项目已按统一初始设置恢复" : ""}`
     );
     if (dialog.warnings.length)
       this.context.toast(dialog.warnings.join("；"), "warning");
@@ -250,13 +258,52 @@ export class TransferController implements UiCommandController {
       previewState,
       dialog.imported,
       dialog.mode,
-      { replaceSharedTemplates: enabled }
+      {
+        replaceSharedTemplates: enabled,
+        restoreFlightConfiguration: dialog.restoreFlightConfiguration,
+      }
     );
     this.context.updateView({
       dialog: {
         ...dialog,
         replaceSharedTemplates: enabled,
+        changedConfig: preview.changedConfig,
+        recognized: preview.recognized,
         weeklyPlanPreview: preview.weeklyPlanPreview,
+        flightPlanReview: preview.flightPlanReview,
+        restoreErrors: preview.errors,
+        restoreDefaults: preview.restoreDefaults,
+        warnings: [...dialog.imported.warnings, ...(preview.errors ?? [])],
+      },
+    });
+    return true;
+  }
+
+  private setWorkbookImportFlightRestore(enabled: boolean): boolean {
+    const dialog = this.context.view().dialog;
+    if (dialog?.kind !== "workbook-import") return false;
+    if (dialog.mode === "history" || !dialog.sharedTemplatesAvailable)
+      return true;
+    const preview = applyWorkbookImport(
+      structuredClone(this.context.model()),
+      dialog.imported,
+      dialog.mode,
+      {
+        replaceSharedTemplates: dialog.replaceSharedTemplates,
+        restoreFlightConfiguration: enabled,
+      }
+    );
+    this.context.updateView({
+      dialog: {
+        ...dialog,
+        restoreFlightConfiguration: enabled,
+        changedConfig: preview.changedConfig,
+        recognized: preview.recognized,
+        weeklyPlanPreview: preview.weeklyPlanPreview,
+        flightPlanReview: preview.flightPlanReview,
+        restoreErrors: preview.errors,
+        restoreDefaults: preview.restoreDefaults,
+        warnings: [...dialog.imported.warnings, ...(preview.errors ?? [])],
       },
     });
     return true;

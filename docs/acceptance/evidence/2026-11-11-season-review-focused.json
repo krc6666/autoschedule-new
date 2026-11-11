@@ -1,0 +1,11 @@
+{
+  "command": "npm.cmd exec vitest -- run tests/architecture/scheduling-facts-boundary.test.ts tests/app/flight-season-review.test.ts tests/ui/flight-season-review.test.ts tests/app/configuration-actions.test.ts",
+  "exitCode": 0,
+  "stdout": "Test Files  4 passed (4)\nTests  40 passed (40)\nStart at  14:41:21\nDuration  4.91s",
+  "source": "captured exec_command result in current session",
+  "scope": "after narrowing domain inputs; before any retirement feature changes",
+  "counts": {
+    "newAppUiCases": 15,
+    "allFocusedCases": 40
+  }
+}

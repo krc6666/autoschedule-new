@@ -1,0 +1,17 @@
+{
+  "source": "Owner reply in current conversation",
+  "url": "http://127.0.0.1:50966/",
+  "question": "刷新核对本季计划只列岗位配置航班、模板保留备用、双向以组为准核对、旧航班退出本季按钮；暂不删除真实数据",
+  "reply": "这几项都符合",
+  "verifiedScope": [
+    "season plan list reflects configured jobs",
+    "spare templates remain",
+    "direction A-to-B or B-to-A available",
+    "retire option visible"
+  ],
+  "notVerified": [
+    "real seasonal mapping or retirement has not been submitted by owner",
+    "two physical devices have not been manually compared"
+  ],
+  "agentBrowserUsed": false
+}

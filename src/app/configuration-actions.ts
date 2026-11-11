@@ -1,3 +1,7 @@
+import {
+  removeFlightScopedReferences,
+  renameGroupFlightReferences,
+} from "../domain/flights/group-flight-references";
 import { isAuxiliaryCategory } from "../domain/flights/schedule-position-rules";
 import type { FlightPlanReconciliation } from "../domain/flights/flight-plan-reconciliation";
 import type {
@@ -15,7 +19,6 @@ import {
   normalizeText,
   orderPositionRules,
   sortFlightCountersDescending,
-  splitList,
 } from "../utils";
 import {
   normalizeWeeklyFlightNo,
@@ -26,7 +29,10 @@ import {
   removeTeamLeaderGapFillPositionReference,
   replaceTeamLeaderGapFillPositionReference,
 } from "../domain/coverage/team-leader-gap-fill-protection";
-import { synchronizeTemplatePositionRules } from "./template-position-rule-sync";
+import {
+  configuredSeasonTemplates,
+  withConfiguredFlightPositions,
+} from "../domain/flights/configured-flight-positions";
 import { applyStaffStatusChange } from "../domain/kernel/schedule-state";
 
 export type ConfigurationValue = string | number | boolean;
@@ -99,54 +105,6 @@ function renameFlightConfigurationReferences(
   }
 }
 
-function renameGroupFlightReferences(
-  positionRules: AppState["positionRules"],
-  settings: AppState["settings"],
-  rename: (flightNo: string) => string
-): void {
-  positionRules.forEach((rule) => {
-    rule.flightNo = rename(rule.flightNo);
-  });
-  const ordered = orderPositionRules(positionRules);
-  positionRules.splice(0, positionRules.length, ...ordered);
-  settings.latePriorityFlightNumbers =
-    settings.latePriorityFlightNumbers.map(rename);
-  settings.positionTransitionPolicies.forEach((policy) => {
-    policy.sourceFlightNo = rename(policy.sourceFlightNo);
-    policy.targetFlightNo = rename(policy.targetFlightNo);
-  });
-  settings.dutyPositionPriorities.forEach((policy) => {
-    policy.flightNo = rename(policy.flightNo);
-  });
-  settings.nextWorkdayRecoveryTargets.forEach((policy) => {
-    policy.flightNo = rename(policy.flightNo);
-  });
-  settings.lateShiftRecoveryPositionRules.forEach((policy) => {
-    policy.flightNo = rename(policy.flightNo);
-  });
-  settings.mobileSupervisorCoverageRules.forEach((policy) => {
-    policy.flightNo = rename(policy.flightNo);
-  });
-  settings.mobileSupervisorFillRules.forEach((policy) => {
-    policy.sourceFlightNo = rename(policy.sourceFlightNo);
-    policy.targetFlightNo = rename(policy.targetFlightNo);
-  });
-  settings.crossWorkdayQualificationReservations.forEach((policy) => {
-    policy.flightNo = rename(policy.flightNo);
-  });
-  settings.crossFlightPriorityPolicies.forEach((policy) => {
-    policy.flightNo = rename(policy.flightNo);
-  });
-  settings.sameFlightStaffExclusions.forEach((policy) => {
-    policy.flightNo = rename(policy.flightNo);
-  });
-  settings.teamLeaderGapFillPositionPolicies =
-    settings.teamLeaderGapFillPositionPolicies.map((policy) => ({
-      ...policy,
-      flightNo: rename(policy.flightNo),
-    }));
-}
-
 export function renameCurrentFlightToTemplate(
   state: AppState,
   flightId: string,
@@ -180,20 +138,17 @@ function renameActiveFlightReferences(
   const previous = normalizeWeeklyFlightNo(previousFlightNo);
   const next = nextFlightNo.trim().toUpperCase();
   if (!previous || !next || previous === normalizeWeeklyFlightNo(next)) return;
-  state.positionRules.forEach((rule) => {
-    if (normalizeWeeklyFlightNo(rule.flightNo) === previous)
-      rule.flightNo = next;
-  });
-  state.settings.mobileSupervisorFillRules.forEach((policy) => {
-    if (normalizeWeeklyFlightNo(policy.sourceFlightNo) === previous)
-      policy.sourceFlightNo = next;
-    if (normalizeWeeklyFlightNo(policy.targetFlightNo) === previous)
-      policy.targetFlightNo = next;
+  const rename = (flightNo: string) =>
+    normalizeWeeklyFlightNo(flightNo) === previous ? next : flightNo;
+  renameGroupFlightReferences(state.positionRules, state.settings, rename);
+  state.latePriorityFrequencyAdjustments.forEach((item) => {
+    item.flightNo = rename(item.flightNo);
   });
 }
 
 function createFlightFromTemplate(
   template: FlightTemplate,
+  rules: readonly PositionRule[],
   flightNo = template.flightNo
 ): Flight {
   return {
@@ -202,7 +157,7 @@ function createFlightFromTemplate(
     startTime: template.startTime,
     endTime: template.endTime,
     bookedPassengers: 0,
-    positions: [...template.positions],
+    positions: withConfiguredFlightPositions([template], rules)[0]!.positions,
     remark: template.remark,
   };
 }
@@ -280,82 +235,6 @@ function removePositionRuleReferences(
           rule.targetPositionKeyword === deleted.name
         )
     );
-}
-
-function removeFlightScopedReferences(
-  settings: AppState["settings"],
-  normalizedFlightNo: string
-): boolean {
-  const beforeCount =
-    settings.latePriorityFlightNumbers.length +
-    settings.positionTransitionPolicies.length +
-    settings.dutyPositionPriorities.length +
-    settings.nextWorkdayRecoveryTargets.length +
-    settings.lateShiftRecoveryPositionRules.length +
-    settings.mobileSupervisorCoverageRules.length +
-    settings.mobileSupervisorFillRules.length +
-    settings.crossWorkdayQualificationReservations.length +
-    settings.crossFlightPriorityPolicies.length +
-    settings.sameFlightStaffExclusions.length +
-    settings.teamLeaderGapFillPositionPolicies.length;
-  const keepsFlight = (flightNo: string) =>
-    normalizeWeeklyFlightNo(flightNo) !== normalizedFlightNo;
-  settings.latePriorityFlightNumbers =
-    settings.latePriorityFlightNumbers.filter(keepsFlight);
-  settings.positionTransitionPolicies =
-    settings.positionTransitionPolicies.filter(
-      (policy) =>
-        keepsFlight(policy.sourceFlightNo) && keepsFlight(policy.targetFlightNo)
-    );
-  settings.dutyPositionPriorities = settings.dutyPositionPriorities.filter(
-    (policy) => keepsFlight(policy.flightNo)
-  );
-  settings.nextWorkdayRecoveryTargets =
-    settings.nextWorkdayRecoveryTargets.filter((policy) =>
-      keepsFlight(policy.flightNo)
-    );
-  settings.lateShiftRecoveryPositionRules =
-    settings.lateShiftRecoveryPositionRules.filter((policy) =>
-      keepsFlight(policy.flightNo)
-    );
-  settings.mobileSupervisorCoverageRules =
-    settings.mobileSupervisorCoverageRules.filter((policy) =>
-      keepsFlight(policy.flightNo)
-    );
-  settings.mobileSupervisorFillRules =
-    settings.mobileSupervisorFillRules.filter(
-      (policy) =>
-        keepsFlight(policy.sourceFlightNo) && keepsFlight(policy.targetFlightNo)
-    );
-  settings.crossWorkdayQualificationReservations =
-    settings.crossWorkdayQualificationReservations.filter((policy) =>
-      keepsFlight(policy.flightNo)
-    );
-  settings.crossFlightPriorityPolicies =
-    settings.crossFlightPriorityPolicies.filter((policy) =>
-      keepsFlight(policy.flightNo)
-    );
-  settings.sameFlightStaffExclusions =
-    settings.sameFlightStaffExclusions.filter(
-      (policy) => !policy.flightNo || keepsFlight(policy.flightNo)
-    );
-  settings.teamLeaderGapFillPositionPolicies =
-    settings.teamLeaderGapFillPositionPolicies.filter((policy) =>
-      keepsFlight(policy.flightNo)
-    );
-  const afterCount =
-    settings.latePriorityFlightNumbers.length +
-    settings.positionTransitionPolicies.length +
-    settings.dutyPositionPriorities.length +
-    settings.nextWorkdayRecoveryTargets.length +
-    settings.lateShiftRecoveryPositionRules.length +
-    settings.mobileSupervisorCoverageRules.length +
-    settings.mobileSupervisorFillRules.length +
-    settings.crossWorkdayQualificationReservations.length +
-    settings.crossFlightPriorityPolicies.length +
-    settings.sameFlightStaffExclusions.length +
-    settings.teamLeaderGapFillPositionPolicies.length;
-  return afterCount !== beforeCount;
 }
 
 function synchronizeTemplateTimesToCurrentFlights(
@@ -457,7 +336,11 @@ export function setWeeklyFlightPlanFlight(
   const normalized = normalizeWeeklyFlightNo(flightNo);
   if (
     !normalized ||
-    !state.templates.some(
+    !configuredSeasonTemplates(
+      state.templates,
+      state.positionRules,
+      state.flights
+    ).some(
       (template) => normalizeWeeklyFlightNo(template.flightNo) === normalized
     )
   )
@@ -477,9 +360,13 @@ export function setWeeklyFlightPlanFlight(
 }
 
 export function addTemplateFlight(state: AppState, id: string): boolean {
-  const template = state.templates.find((item) => item.id === id);
+  const template = configuredSeasonTemplates(
+    state.templates,
+    state.positionRules,
+    state.flights
+  ).find((item) => item.id === id);
   if (!template) return false;
-  state.flights.push(createFlightFromTemplate(template));
+  state.flights.push(createFlightFromTemplate(template, state.positionRules));
   clearSchedule(state);
   return true;
 }
@@ -494,19 +381,26 @@ export function addFlightsFromTemplates(
   const requestedTemplateIds = new Set<string>();
   let added = 0;
   let skipped = 0;
+  const season = configuredSeasonTemplates(
+    state.templates,
+    state.positionRules,
+    state.flights
+  );
   for (const templateId of templateIds) {
     if (requestedTemplateIds.has(templateId)) {
       skipped += 1;
       continue;
     }
     requestedTemplateIds.add(templateId);
-    const template = state.templates.find((item) => item.id === templateId);
+    const template = season.find((item) => item.id === templateId);
     const flightNo = template?.flightNo.trim().toUpperCase() ?? "";
     if (!template || !flightNo || existingFlightNumbers.has(flightNo)) {
       skipped += 1;
       continue;
     }
-    state.flights.push(createFlightFromTemplate(template, flightNo));
+    state.flights.push(
+      createFlightFromTemplate(template, state.positionRules, flightNo)
+    );
     existingFlightNumbers.add(flightNo);
     added += 1;
   }
@@ -799,8 +693,8 @@ export function updateConfigurationField(
     const flight = state.flights.find((item) => item.id === id);
     if (!flight) return "missing";
     const previousFlightNo = flight.flightNo;
-    if (field === "positions") flight.positions = splitList(value);
-    else {
+    if (field === "positions") return "missing";
+    {
       const nextValue =
         typeof value === "string" && field === "flightNo"
           ? value.toUpperCase()
@@ -814,7 +708,10 @@ export function updateConfigurationField(
         if (template) {
           flight.startTime = template.startTime;
           flight.endTime = template.endTime;
-          flight.positions = [...template.positions];
+          flight.positions = withConfiguredFlightPositions(
+            [flight],
+            state.positionRules
+          )[0]!.positions;
           flight.remark = template.remark;
         }
       }
@@ -890,10 +787,8 @@ export function updateConfigurationField(
       )
         return "duplicate";
     }
-    if (field === "positions") {
-      template.positions = splitList(value);
-      synchronizeTemplatePositionRules(state, [template]);
-    } else {
+    if (field === "positions") return "missing";
+    {
       (template as unknown as Record<string, unknown>)[field] =
         typeof value === "string" && field === "flightNo"
           ? normalizeWeeklyFlightNo(value)

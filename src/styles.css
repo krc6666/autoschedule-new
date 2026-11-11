@@ -603,6 +603,8 @@ select {
 }
 .template-positions {
   min-width: 220px;
+  overflow-wrap: anywhere;
+  white-space: normal;
 }
 .position-batch-controls {
   display: grid;

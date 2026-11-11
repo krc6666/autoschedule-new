@@ -1,0 +1,35 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+npm.cmd : stderr | tests/ui/config-view.test.ts
+所在位置 行:2 字符: 1
++ npm.cmd exec vitest -- run tests/ui/config-view.test.ts 2>&1 | Tee-Ob ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (stderr | tests/ui/config-view.test.ts:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+
+ ❯ tests/ui/config-view.test.ts (8 tests | 1 failed) 690ms
+     × puts all template rows in a separate full-width section below constraints and preserves edit/delete commands 35ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/ui/config-view.test.ts > configuration page > puts all template rows in a separate full-width section belo
+w constraints and preserves edit/delete commands
+AssertionError: expected <section …(1)>…(2)</section> not to be <section …(1)>…(2)</section> // Object.is equality
+ ❯ tests/ui/config-view.test.ts:23:27
+     21|     const constraints = [...element.querySelectorAll("h3")].find(headi…
+     22|     const templates = element.querySelector(".template-editor")!.close…
+     23|     expect(templates).not.toBe(constraints);
+       |                           ^
+     24|     expect(templates.previousElementSibling).toBe(constraints);
+     25|     expect(templates.parentElement).toBe(element);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 7 passed (8)
+   Start at  13:31:22
+   Duration  1.62s (transform 297ms, setup 0ms, import 363ms, tests 690ms, environment 358ms)

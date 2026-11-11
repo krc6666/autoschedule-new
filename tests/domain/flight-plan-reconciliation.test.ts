@@ -27,6 +27,21 @@ function queryResult(
 }
 
 describe("flight plan reconciliation", () => {
+  it("does not suggest a spare template as a current-season addition", () => {
+    const state = createDefaultState();
+    state.templates.push({
+      ...state.templates[0]!,
+      id: "spare",
+      flightNo: "SPARE100",
+    });
+    const result = buildFlightPlanReconciliation(
+      state,
+      "2026-11-11",
+      queryResult("2026-11-11", ["SPARE100"])
+    );
+    expect(result.additions).toEqual([]);
+    expect(result.unmatched.map((f) => f.flightNo)).toEqual(["SPARE100"]);
+  });
   it("classifies retained, addable, unmatched, and removal-candidate flights", () => {
     const state = createDefaultState();
     const [retainedTemplate, addableTemplate] = state.templates;

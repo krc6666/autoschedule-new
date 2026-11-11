@@ -1,0 +1,8 @@
+{
+  "date": "2026-11-11",
+  "source": "Owner reply to the administrative-mode configuration-transfer question",
+  "ownerAnswer": "继续在每台设备单独选择",
+  "decision": "Administrative support mode remains local to each device and is excluded from configuration export and import. Import preserves the target device's existing selection.",
+  "productBehaviorChanged": false,
+  "physicalDeviceAcceptance": "No additional physical-device verification was supplied by this reply."
+}

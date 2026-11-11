@@ -1,0 +1,23 @@
+{
+  "inputSha256": "bc5b7743822c1252e59737c66c76d54c654f622e30fd88660b6c1415150e3219",
+  "templates": 10,
+  "currentFlights": 4,
+  "positionRules": 82,
+  "restoreErrors": [],
+  "announcedDefaults": [
+    "上午统计开始：06:00",
+    "上午统计结束：12:00",
+    "晚上统计开始：18:00",
+    "晚上统计结束：06:00",
+    "休假类别：无自建类别",
+    "半休选择：无半休人员"
+  ],
+  "targetDeviceVariants": 2,
+  "restoredHashes": [
+    "2648489cb28f5df5726e4d49189556b5f9efed3c091ab15cc3b67b6852fb9d5f",
+    "2648489cb28f5df5726e4d49189556b5f9efed3c091ab15cc3b67b6852fb9d5f"
+  ],
+  "storeReloadAndLatestXlsxExport": "passed; no missing new fields on second import",
+  "sourceUnchanged": true,
+  "limitation": "Missing fields use announced initial values, not recovered A-device values. Browser acceptance pending owner operation."
+}

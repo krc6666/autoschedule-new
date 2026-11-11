@@ -1,0 +1,40 @@
+
+> autoschedule@1.0.0 verify
+> npm run typecheck && npm test && npm run test:performance && npm run build
+
+
+> autoschedule@1.0.0 typecheck
+> tsc -b --pretty false
+
+
+> autoschedule@1.0.0 test
+> vitest run --exclude tests/performance/**
+
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+
+ Test Files  173 passed (173)
+      Tests  1727 passed (1727)
+   Start at  14:44:02
+   Duration  97.86s (transform 24.55s, setup 0ms, import 80.67s, tests 331.01s, environment 24.45s)
+
+
+> autoschedule@1.0.0 test:performance
+> vitest run tests/performance
+
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+
+ Test Files  7 passed (7)
+      Tests  19 passed (19)
+   Start at  14:45:41
+   Duration  71.57s (transform 5.95s, setup 0ms, import 8.35s, tests 240.10s, environment 610ms)
+
+
+> autoschedule@1.0.0 build
+> tsc -b && vite build
+
+tests/app/flight-season-review.test.ts(487,92): error TS2322: Type '"retire-flight"' is not assignable to type '"new-flight" | "keep-current-time" | "rename" | "use-template-time"'.
+tests/app/flight-season-review.test.ts(517,94): error TS2322: Type '"retire-flight"' is not assignable to type '"new-flight" | "keep-current-time" | "rename" | "use-template-time"'.

@@ -20,7 +20,12 @@ import type {
   SameFlightStaffExclusion,
   TeamLeaderGapFillPositionPolicy,
 } from "../domain/rules/structured-policy-contract";
-import { createId, normalizeText, splitList } from "../utils";
+import {
+  createId,
+  normalizeText,
+  splitList,
+  splitPositionList,
+} from "../utils";
 import { normalizeLatePriorityFlightNumber } from "../domain/reviews/late-priority-policy";
 import {
   append,
@@ -230,9 +235,9 @@ function parseTransitionPolicies(
           name: cell(row, header, ["规则名称", "名称"], 1),
           enabled,
           sourceFlightNo: cell(row, header, ["来源航班"], 3).toUpperCase(),
-          sourcePositions: splitList(cell(row, header, ["来源岗位"], 4)).map(
-            normalizePosition
-          ),
+          sourcePositions: splitPositionList(
+            cell(row, header, ["来源岗位"], 4)
+          ).map(normalizePosition),
           targetFlightNo: cell(row, header, ["目标航班"], 5).toUpperCase(),
           targetPosition: normalizePosition(cell(row, header, ["目标岗位"], 6)),
           minimumGapMinutes,

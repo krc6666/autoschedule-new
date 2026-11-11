@@ -78,6 +78,13 @@ describe("workbook import scope", () => {
     const file = createImportFile();
 
     await coordinator.handle({ type: "import-file", file, mode: "config" });
+    expect(coordinator.view().dialog).toMatchObject({
+      restoreFlightConfiguration: true,
+    });
+    await coordinator.handle({
+      type: "set-workbook-import-flight-restore",
+      enabled: false,
+    });
 
     const preview = coordinator.view().dialog;
     expect(preview?.kind).toBe("workbook-import");
@@ -117,6 +124,10 @@ describe("workbook import scope", () => {
       mode: "config",
     });
     await coordinator.handle({
+      type: "set-workbook-import-flight-restore",
+      enabled: false,
+    });
+    await coordinator.handle({
       type: "set-workbook-import-shared-templates",
       enabled: true,
     });
@@ -148,6 +159,10 @@ describe("workbook import scope", () => {
     const beforeTemplateNos = state.templates.map((item) => item.flightNo);
 
     await coordinator.handle({ type: "import-file", file, mode: "config" });
+    await coordinator.handle({
+      type: "set-workbook-import-flight-restore",
+      enabled: false,
+    });
 
     const preview = coordinator.view().dialog;
     expect(preview?.kind).toBe("workbook-import");
@@ -207,6 +222,10 @@ describe("workbook import scope", () => {
     );
 
     await coordinator.handle({ type: "import-file", file, mode: "config" });
+    await coordinator.handle({
+      type: "set-workbook-import-flight-restore",
+      enabled: false,
+    });
 
     const preview = coordinator.view().dialog;
     expect(preview?.kind).toBe("workbook-import");
@@ -252,6 +271,10 @@ describe("workbook import scope", () => {
     );
 
     await coordinator.handle({ type: "import-file", file, mode: "config" });
+    await coordinator.handle({
+      type: "set-workbook-import-flight-restore",
+      enabled: false,
+    });
 
     const initialPreview = coordinator.view().dialog;
     expect(initialPreview?.kind).toBe("workbook-import");
@@ -295,6 +318,10 @@ describe("workbook import scope", () => {
       type: "import-file",
       file: createImportFile(undefined, false),
       mode: "config",
+    });
+    await coordinator.handle({
+      type: "set-workbook-import-flight-restore",
+      enabled: false,
     });
     await coordinator.handle({ type: "apply-workbook-import" });
 

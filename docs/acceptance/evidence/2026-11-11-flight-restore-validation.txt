@@ -1,0 +1,65 @@
+$ npm.cmd run typecheck
+
+> autoschedule@1.0.0 typecheck
+> tsc -b --pretty false
+
+
+EXIT_CODE=0
+$ npm.cmd test
+
+> autoschedule@1.0.0 test
+> vitest run --exclude tests/performance/**
+
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+
+ Test Files  168 passed (168)
+      Tests  1681 passed (1681)
+   Start at  12:10:12
+   Duration  97.22s (transform 25.72s, setup 0ms, import 78.49s, tests 337.10s, environment 23.04s)
+
+
+EXIT_CODE=0
+$ npm.cmd run build
+
+> autoschedule@1.0.0 build
+> tsc -b && vite build
+
+vite v7.3.6 building client environment for production...
+transforming...
+✓ 320 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                         0.55 kB │ gzip:     0.37 kB
+dist/assets/highs-BiXO3Gr_.js                          42.30 kB
+dist/assets/highs-D7tWWU1Z.js                          42.97 kB
+dist/assets/bootstrap-icons-mSm7cUeB.woff2            134.04 kB
+dist/assets/bootstrap-icons-BeopsB42.woff             180.29 kB
+dist/assets/schedule.worker-K0Ofhp-g.js               414.39 kB
+dist/assets/highs-D01W9kFF.wasm                     3,651.47 kB │ gzip: 1,097.46 kB
+dist/assets/highs-DEeTqoGR.wasm                     3,674.43 kB │ gzip: 1,092.08 kB
+dist/assets/style-DlumObZE.css                        368.95 kB │ gzip:    55.70 kB
+dist/assets/__vite-browser-external-D7Ct-6yo.js         0.19 kB │ gzip:     0.18 kB │ map:     0.21 kB
+dist/assets/excel-worksheet-Cpn42pNY.js                 0.64 kB │ gzip:     0.41 kB │ map:     2.59 kB
+dist/assets/late-priority-counts-excel-DyjRYeTn.js      2.92 kB │ gzip:     1.60 kB │ map:    11.64 kB
+dist/assets/duty-roster-excel-CB4diWwM.js               7.13 kB │ gzip:     3.31 kB │ map:    25.69 kB
+dist/assets/highs-solver-B8qW8zya.js                   25.94 kB │ gzip:     6.55 kB │ map:   145.39 kB
+dist/assets/excel-yN1gJL_g.js                          41.56 kB │ gzip:    14.19 kB │ map:   164.21 kB
+dist/assets/highs-2xQWLuJ6.js                          42.42 kB │ gzip:    15.10 kB │ map:   207.57 kB
+dist/assets/highs-Dk93sH88.js                          43.09 kB │ gzip:    15.33 kB │ map:   211.54 kB
+dist/assets/html2canvas.esm-DXEQVQnt.js               201.09 kB │ gzip:    47.47 kB │ map:   602.72 kB
+dist/assets/xlsx.min-Cpw7QPbe.js                      869.58 kB │ gzip:   322.62 kB │ map: 1,678.38 kB
+dist/assets/index-Ch-WOSq6.js                         901.55 kB │ gzip:   245.81 kB │ map: 3,177.61 kB
+✓ built in 7.70s
+[plugin vite:resolve] Module "node:module" has been externalized for browser compatibility, imported by "D:/autoschedule-migrate/autoschedule/node_modules/@bubblyworld/highs-ts/build/highs.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "node:module" has been externalized for browser compatibility, imported by "D:/autoschedule-migrate/autoschedule/node_modules/@autoschedule/highs-ts/build/highs.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "node:module" has been externalized for browser compatibility, imported by "D:/autoschedule-migrate/autoschedule/node_modules/@bubblyworld/highs-ts/build/highs.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "node:module" has been externalized for browser compatibility, imported by "D:/autoschedule-migrate/autoschedule/node_modules/@autoschedule/highs-ts/build/highs.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+
+(!) Some chunks are larger than 900 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+
+EXIT_CODE=0

@@ -1,4 +1,8 @@
 import { html } from "lit";
+import {
+  configuredSeasonTemplates,
+  withConfiguredFlightPositions,
+} from "../../domain/flights/configured-flight-positions";
 
 import type { AppState } from "../../model";
 import { dispatchUiCommand } from "../events/ui-command";
@@ -9,11 +13,19 @@ export class TemplatePickerDialogElement extends LightDomElement {
   model!: AppState;
 
   protected override render() {
+    const season = configuredSeasonTemplates(
+      this.model.templates,
+      this.model.positionRules,
+      this.model.flights
+    );
     return html`<div class="modal-body">
         ${
-          this.model.templates.length
+          season.length
             ? html`<div class="list-group">
-                ${this.model.templates.map(
+                ${withConfiguredFlightPositions(
+                  season,
+                  this.model.positionRules
+                ).map(
                   (template) =>
                     html`<button
                       class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
@@ -36,7 +48,9 @@ export class TemplatePickerDialogElement extends LightDomElement {
                     </button>`
                 )}
               </div>`
-            : html`<div class="empty-state">尚无航班模板</div>`
+            : html`<div class="empty-state">
+                当前组尚无本季航班，请先配置岗位
+              </div>`
         }
       </div>
       <div class="modal-footer">

@@ -1,0 +1,192 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-11-flight-season-review",
+  "title": "Owner-confirmed seasonal flight reconciliation with isolated group rules",
+  "startedFrom": "a9d47c8cf7cee7a71cc28bd6dede4fd52329636c",
+  "expectation": {
+    "example": "Owner clarifies positionRules flight names are current-season flights; shared template library intentionally retains previous-season flights. Owner selects most recently adjusted A or B as source and explicitly handles new, renamed or retired differences.",
+    "expected": "Season candidates exactly follow normalized job flight names; library spare templates retained without missing-job alarms. Compare A/B seasons in either direction, keep group job/qualification independence. Explicit new confirmation waits for target job setup; rename preserves target jobs and updates scoped references and current time; retire removes target current flight/jobs/scoped rules, retains historical records/frequency ledgers/other group/library. Offline preparation and online suggestions share current-season projection. Owner verified resulting UI list, library, direction and retirement option.",
+    "unchanged": "Solver safety/fairness/qualifications, historical facts, other group configurations, shared library/weekly plan on target mapping, explicit shared-template edit contracts, current-group-only configuration export retained. No whole A/B backup.",
+    "fallback": "No automatic mapping or deletion. Cancel, changed source-season list, stale template/current time or duplicate target refuse whole action. New confirmations do not invent jobs or qualifications and remain pending until jobs configured. Spare templates and historical/frequency ledgers not removed on retirement; pending differences persist after refresh. Missing source template/time requires completion instead of invented time."
+  },
+  "testedVersion": "e1210a8e34871642e4017c904d6eeabfa21e76b9313108f56e3ac5a81967baf1",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "Four observed failure classes are retained: missing review, missing retirement, spare library mistaken for season, online spare admission.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-season-review-red.txt",
+          "summary": "Initial root reminder absent; one failed UI test before implementation",
+          "sha256": "9828ab3aaa3abaa747957b3b6e5fd8a978aa832188bd0a752d65dce74b2767a3"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-season-review-retire-red.txt",
+          "summary": "Missing retirement button and unchanged old flight: two red tests, sixteen passed",
+          "sha256": "9beed7881650f46de581249cbbd83032611d023c0121b0cae069d6a023d63d70"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-season-review-season-source-red.txt",
+          "summary": "Spare template wrongly reported as missing job; separate fixture error explicitly diagnosed in history",
+          "sha256": "67adefeda291c12f898306f566851a8bb5394bda35184bc69187dbb4f0bb6564"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-season-review-online-red.txt",
+          "summary": "Spare library flight incorrectly suggested for online addition before seasonal filter",
+          "sha256": "900555d0826d7dbc96ddce08d0aea54b0eb05b034df5b35fa4babca9fe75ac22"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-season-review-final-verify.txt",
+          "summary": "Final npm.cmd run verify exit 0: 173 files/1736 functional tests, 7 files/19 performance tests, typecheck and production build passed. Existing HiGHS externalization and 920.06kB entry warning retained.",
+          "sha256": "6c2ddfc2a51d816267a7724ae89e53794bce5895f768a3560de66f7b4c92e439"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "Explicit new/rename/retire and time choices execute through Store/coordinator/DOM tests; source and target guards run before writes.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-season-review-final-focused.json",
+          "summary": "Nine relevant files / 118 tests and typecheck passed after online filter",
+          "sha256": "3712a117829d56e3e35b81e0e16cf4e348d427ebd4f222f23960deb30f09634a"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-season-review-final-real.json",
+          "summary": "Source-hashed real workbook: 10 library templates, 82 rules, 9 A season flights, FD573 spare retained; XLSX bytes and reload passed",
+          "sha256": "d7c22e1ec14aa954a090531e2f9cdaaa41973a873703b02ef6629c91fd2891c8"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-season-review-final-verify.txt",
+          "summary": "Final npm.cmd run verify exit 0: 173 files/1736 functional tests, 7 files/19 performance tests, typecheck and production build passed. Existing HiGHS externalization and 920.06kB entry warning retained.",
+          "sha256": "6c2ddfc2a51d816267a7724ae89e53794bce5895f768a3560de66f7b4c92e439"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "Both directions, all rule references, missing templates/times, empty B, stale source/time, cancellation, duplicates, old/empty/broken confirmation sheets and pure history paths covered.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-season-review-final-focused.json",
+          "summary": "Nine relevant files / 118 tests and typecheck passed after online filter",
+          "sha256": "3712a117829d56e3e35b81e0e16cf4e348d427ebd4f222f23960deb30f09634a"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-season-review-independent-counts.json",
+          "summary": "Independent A/B set difference counts and both reconciliation directions",
+          "sha256": "06e9a5e95cb8fe2291a6bec11c387b305945cbf7e1400287bc40b50388fa3bf7"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-season-review-final-verify.txt",
+          "summary": "Final npm.cmd run verify exit 0: 173 files/1736 functional tests, 7 files/19 performance tests, typecheck and production build passed. Existing HiGHS externalization and 920.06kB entry warning retained.",
+          "sha256": "6c2ddfc2a51d816267a7724ae89e53794bce5895f768a3560de66f7b4c92e439"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "Repeated group activation, storage reload, actual XLSX bytes export/reimport preserve season, spare library and confirmation; online submit rechecks season and invalidates affected target schedules.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-season-review-final-focused.json",
+          "summary": "Nine relevant files / 118 tests and typecheck passed after online filter",
+          "sha256": "3712a117829d56e3e35b81e0e16cf4e348d427ebd4f222f23960deb30f09634a"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-season-review-final-real.json",
+          "summary": "Source-hashed real workbook: 10 library templates, 82 rules, 9 A season flights, FD573 spare retained; XLSX bytes and reload passed",
+          "sha256": "d7c22e1ec14aa954a090531e2f9cdaaa41973a873703b02ef6629c91fd2891c8"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-season-review-final-verify.txt",
+          "summary": "Final npm.cmd run verify exit 0: 173 files/1736 functional tests, 7 files/19 performance tests, typecheck and production build passed. Existing HiGHS externalization and 920.06kB entry warning retained.",
+          "sha256": "6c2ddfc2a51d816267a7724ae89e53794bce5895f768a3560de66f7b4c92e439"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "Source/target stale choices, cancelled commands, unknown/duplicate mappings and malformed complete restores preserve exact state. Final architecture, functional, performance, typecheck and build gates all pass without weakening guard contracts.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-season-review-final-focused.json",
+          "summary": "Nine relevant files / 118 tests and typecheck passed after online filter",
+          "sha256": "3712a117829d56e3e35b81e0e16cf4e348d427ebd4f222f23960deb30f09634a"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-season-review-final-verify.txt",
+          "summary": "Final npm.cmd run verify exit 0: 173 files/1736 functional tests, 7 files/19 performance tests, typecheck and production build passed. Existing HiGHS externalization and 920.06kB entry warning retained.",
+          "sha256": "6c2ddfc2a51d816267a7724ae89e53794bce5895f768a3560de66f7b4c92e439"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "Other group, historical facts, frequency ledgers on retirement and spare library preserved; explicit template edit and existing cleanup tests retained. Pre-commit full verification passed 1737 functional and 19 performance tests, typecheck and build; product behavior unchanged after that run.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-season-review-final-focused.json",
+          "summary": "Nine relevant files / 118 tests and typecheck passed after online filter",
+          "sha256": "3712a117829d56e3e35b81e0e16cf4e348d427ebd4f222f23960deb30f09634a"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-season-review-final-real.json",
+          "summary": "Source-hashed real workbook: 10 library templates, 82 rules, 9 A season flights, FD573 spare retained; XLSX bytes and reload passed",
+          "sha256": "d7c22e1ec14aa954a090531e2f9cdaaa41973a873703b02ef6629c91fd2891c8"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-season-review-final-verify.txt",
+          "summary": "Final npm.cmd run verify exit 0: 173 files/1736 functional tests, 7 files/19 performance tests, typecheck and production build passed. Existing HiGHS externalization and 920.06kB entry warning retained.",
+          "sha256": "6c2ddfc2a51d816267a7724ae89e53794bce5895f768a3560de66f7b4c92e439"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-configuration-commit-verify.txt",
+          "summary": "Pre-commit npm.cmd run verify exit 0: typecheck, 173 files / 1737 functional tests, 7 files / 19 performance tests and production build passed. Subsequent changes only normalize documentation/evidence formatting and record this command. Existing build advisories retained; no physical-device acceptance inferred.",
+          "sha256": "561cd6a1634d885ca83f3d2fa12cb98cacafb4f255e7f0a6735868e65812d61b"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "Owner confirms final page list, spare library and three choices. Synthetic DOM submissions and real workbook roundtrip pass, but owner has not submitted a real seasonal rename/retirement after this change; no two-physical-device manual comparison. Do not substitute automated tests for these remaining real actions.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-season-review-owner-final.json",
+          "summary": "Owner confirms seasonal plan, spare library, two directions and third option; no destructive real-data action requested",
+          "sha256": "177c8c0821cdad63324481be8402b4bd511891d1ea48e167b084660545976df4"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-season-review-final-real.json",
+          "summary": "Source-hashed real workbook: 10 library templates, 82 rules, 9 A season flights, FD573 spare retained; XLSX bytes and reload passed",
+          "sha256": "d7c22e1ec14aa954a090531e2f9cdaaa41973a873703b02ef6629c91fd2891c8"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-season-review-independent-counts.json",
+          "summary": "Independent A/B set difference counts and both reconciliation directions",
+          "sha256": "06e9a5e95cb8fe2291a6bec11c387b305945cbf7e1400287bc40b50388fa3bf7"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-season-review-final-focused.json",
+          "summary": "Nine relevant files / 118 tests and typecheck passed after online filter",
+          "sha256": "3712a117829d56e3e35b81e0e16cf4e348d427ebd4f222f23960deb30f09634a"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-season-review-final-verify.txt",
+          "summary": "Final npm.cmd run verify exit 0: 173 files/1736 functional tests, 7 files/19 performance tests, typecheck and production build passed. Existing HiGHS externalization and 920.06kB entry warning retained.",
+          "sha256": "6c2ddfc2a51d816267a7724ae89e53794bce5895f768a3560de66f7b4c92e439"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "See retained red reminder/retire/spare-season/online tests and final focused/verify evidence. The original catalogue-based comparison has been replaced following owner clarification by independent actual-job season sets.",
+    "laterChanges": "Group projection, storage restoration, configuration import, seasonal candidates and online batch additions can regress results; source fingerprint guards, all-reference isolation tests, repeated switch/reload, XLSX byte reimport and online submit-season filtering cover them.",
+    "finalArtifact": "Owner final page confirmation plus source-hashed real-workbook roundtrip and independent set counts demonstrate displayed scope and data persistence. Real owner-data mapping/retirement remains unverified and recorded as such."
+  },
+  "review": {
+    "missedScope": "Initial design treated all library templates as active flights and missed retired old flights. Owner clarified seasonal membership; reviewed weekly/daily pickers, all three preparation entries and online batch additions. Library-only flights no longer warn or enter season. Real action on owner data remains unverified.",
+    "rootCause": "The original requirement discussion conflated reusable template library and current-season membership. Current-season fact must be actual job flight names; A/B isolated rules require explicit source-group choice. Separate consumer paths had still admitted full-library flights.",
+    "earlyDetection": "Before future seasonal or import edits, independently count actual job-flight names and compare with spare library, trace all candidate-producing and final write paths, then fail a spare-template admission test and both-direction set-difference test. Retain XLSX byte/reload and historical-ledger invariants; request only actual page evidence within owner authorization."
+  }
+}

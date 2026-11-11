@@ -1,0 +1,357 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/app/configuration-device-roundtrip.test.ts (11 tests | 11 failed) 222ms
+     × preserves compound rule positions, zero fatigue and manual qualifications through actual XLSX bytes 57ms
+     × restores all scalar and structured rules on a device with different existing settings, then survives save/reload and re-export 49ms
+     × keeps the source position-rule set even when a template has a deliberately missing position 36ms
+     × rejects missing 规则参数 before changing anything in complete restore 7ms
+     × rejects missing 岗位衔接规则 before changing anything in complete restore 5ms
+     × rejects missing 半休选择 before changing anything in complete restore 5ms
+     × rejects missing 休假类别 before changing anything in complete restore 5ms
+     × rejects a missing scalar and a broken rule table without mixing old settings, while ordinary import remains partial 5ms
+     × preselects complete restore for a full exported configuration without writing before confirmation 40ms
+     × preserves slash names in template, current-flight and transition-policy editors 5ms
+     × updates every current-group rule reference when editing the current flight number 7ms
+
+ Test Files  1 failed (1)
+      Tests  11 failed (11)
+   Start at  12:56:57
+   Duration  2.23s (transform 1.43s, setup 0ms, import 1.78s, tests 222ms, environment 0ms)
+
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 11 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/app/configuration-device-roundtrip.test.ts > complete configuration device transfer > preserves compound rule positions, zero fatigue and manual qualifications through actual XLSX bytes
+AssertionError: expected [ { …(9) } ] to deeply equal [ { …(9) } ]
+
+- Expected
++ Received
+
+@@ -5,11 +5,12 @@
+      "minimumGapMinutes": 180,
+      "mode": "prefer",
+      "name": "TR121 H02 准备保护",
+      "sourceFlightNo": "CX931",
+      "sourcePositions": [
+-       "督导/引导",
++       "督导",
++       "引导",
+        "送资料",
+      ],
+      "targetFlightNo": "TR121",
+      "targetPosition": "H02",
+    },
+
+ ❯ tests/app/configuration-device-roundtrip.test.ts:33:59
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/11]⎯
+
+ FAIL  tests/app/configuration-device-roundtrip.test.ts > complete configuration device transfer > restores all scalar and structured rules on a device with different existing settings, then survives save/reload and re-export
+AssertionError: expected { settings: { …(46) }, …(10) } to deeply equal { settings: { …(46) }, …(10) }
+
+- Expected
++ Received
+
+@@ -379,11 +379,13 @@
+        "fatiguePoints": 2.5,
+        "flightNo": "CX937",
+        "manual": true,
+        "minPassengers": 0,
+        "name": "超规柜台",
+-       "qualifiedStaffIds": [],
++       "qualifiedStaffIds": [
++         "手动输入项",
++       ],
+        "remark": "",
+      },
+      {
+        "category": "引导",
+        "earlyReleaseMinutes": 0,
+
+ ❯ tests/app/configuration-device-roundtrip.test.ts:53:43
+     51|     const result=store.getState().records.applyWorkbookImport(parse(so…
+     52|     expect(result.errors).toBeUndefined();
+     53|     expect(facts(store.getState().model)).toEqual(facts(source));
+       |                                           ^
+     54|     let saved="";
+     55|     saveState(store.getState().model,{setItem:(_k,v)=>{saved=v;}});
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/11]⎯
+
+ FAIL  tests/app/configuration-device-roundtrip.test.ts > complete configuration device transfer > keeps the source position-rule set even when a template has a deliberately missing position
+AssertionError: expected { settings: { …(46) }, …(10) } to deeply equal { settings: { …(46) }, …(10) }
+
+- Expected
++ Received
+
+@@ -340,11 +340,13 @@
+        "fatiguePoints": 2.5,
+        "flightNo": "CX937",
+        "manual": true,
+        "minPassengers": 0,
+        "name": "超规柜台",
+-       "qualifiedStaffIds": [],
++       "qualifiedStaffIds": [
++         "手动输入项",
++       ],
+        "remark": "",
+      },
+      {
+        "category": "引导",
+        "earlyReleaseMinutes": 0,
+@@ -998,10 +1000,21 @@
+        "name": "收费/引导",
+        "qualifiedStaffIds": [
+          "5",
+          "15",
+        ],
++       "remark": "",
++     },
++     {
++       "category": "常规",
++       "earlyReleaseMinutes": 0,
++       "fatiguePoints": 1,
++       "flightNo": "CX937",
++       "manual": false,
++       "minPassengers": 0,
++       "name": "督导",
++       "qualifiedStaffIds": [],
+        "remark": "",
+      },
+    ],
+    "settings": {
+      "afternoonRestEndTime": "18:00",
+
+ ❯ tests/app/configuration-device-roundtrip.test.ts:69:27
+     67|     const result=applyWorkbookImport(target,parse(source),"config",res…
+     68|     expect(result.errors).toBeUndefined();
+     69|     expect(facts(target)).toEqual(facts(source));
+       |                           ^
+     70|   });
+     71|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/11]⎯
+
+ FAIL  tests/app/configuration-device-roundtrip.test.ts > complete configuration device transfer > rejects missing 规则参数 before changing anything in complete restore
+ FAIL  tests/app/configuration-device-roundtrip.test.ts > complete configuration device transfer > rejects missing 岗位衔接规则 before changing anything in complete restore
+ FAIL  tests/app/configuration-device-roundtrip.test.ts > complete configuration device transfer > rejects missing 半休选择 before changing anything in complete restore
+ FAIL  tests/app/configuration-device-roundtrip.test.ts > complete configuration device transfer > rejects missing 休假类别 before changing anything in complete restore
+AssertionError: the given combination of arguments (undefined and string) is invalid for this assertion. You can use an array, a map, an object, a set, a string, or a weakset instead of a string
+ ❯ tests/app/configuration-device-roundtrip.test.ts:77:38
+     75|     const target=createDefaultState(), before=structuredClone(target);
+     76|     const result=applyWorkbookImport(target,parseWorkbook(book,[]),"co…
+     77|     expect(result.errors?.join(" ")).toContain(sheetName);
+       |                                      ^
+     78|     expect(target).toEqual(before);
+     79|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/11]⎯
+
+ FAIL  tests/app/configuration-device-roundtrip.test.ts > complete configuration device transfer > rejects a missing scalar and a broken rule table without mixing old settings, while ordinary import remains partial
+TypeError: actual value must be number or bigint, received "undefined"
+ ❯ tests/app/configuration-device-roundtrip.test.ts:91:84
+     89|       const target=createDefaultState(),before=structuredClone(target);
+     90|       const imported=parseWorkbook(book,[]);
+     91|       expect(applyWorkbookImport(target,imported,"config",restore).err…
+       |                                                                                    ^
+     92|       expect(target).toEqual(before);
+     93|       expect(applyWorkbookImport(target,imported,"config").errors).toB…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/11]⎯
+
+ FAIL  tests/app/configuration-device-roundtrip.test.ts > complete configuration device transfer > preselects complete restore for a full exported configuration without writing before confirmation
+AssertionError: expected { kind: 'workbook-import', …(10) } to match object { restoreFlightConfiguration: true }
+(33 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "restoreFlightConfiguration": true,
++   "restoreFlightConfiguration": false,
+  }
+
+ ❯ tests/app/configuration-device-roundtrip.test.ts:104:39
+    102|     const before=structuredClone(store.getState().model);
+    103|     await coordinator.handle({type:"import-file",mode:"config",file:ne…
+    104|     expect(coordinator.view().dialog).toMatchObject({restoreFlightConf…
+       |                                       ^
+    105|     expect(store.getState().model).toEqual(before);
+    106|     await coordinator.handle({type:"apply-workbook-import"});
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/11]⎯
+
+ FAIL  tests/app/configuration-device-roundtrip.test.ts > complete configuration device transfer > preserves slash names in template, current-flight and transition-policy editors
+AssertionError: expected [ '督导', '引导', 'G16' ] to deeply equal [ '督导/引导', 'G16' ]
+
+- Expected
++ Received
+
+  [
+-   "督导/引导",
++   "督导",
++   "引导",
+    "G16",
+  ]
+
+ ❯ tests/app/configuration-device-roundtrip.test.ts:118:95
+    116|       store.getState().configuration.updateField(entity,id,"positions"…
+    117|       const next=store.getState().model;
+    118|       expect((entity==="template"?next.templates:next.flights).find(f=…
+       |                                                                                               ^
+    119|     }
+    120|     const model=createDefaultState(),id=model.settings.positionTransit…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/11]⎯
+
+ FAIL  tests/app/configuration-device-roundtrip.test.ts > complete configuration device transfer > updates every current-group rule reference when editing the current flight number
+AssertionError: expected { maxDailyHours: 12, …(46) } to deeply equal { maxDailyHours: 12, …(46) }
+
+- Expected
++ Received
+
+@@ -4,21 +4,21 @@
+    "afternoonRestStartTime": "12:00",
+    "consecutiveDayPenalty": 5,
+    "crossFlightPriorityPolicies": [
+      {
+        "enabled": false,
+-       "flightNo": "NEW100",
++       "flightNo": "CX937",
+        "id": "p",
+        "staffIds": [
+          "1",
+        ],
+      },
+    ],
+    "crossWorkdayQualificationReservations": [
+      {
+        "enabled": true,
+-       "flightNo": "NEW100",
++       "flightNo": "CX937",
+        "id": "r",
+        "keyword": "G16",
+        "matchField": "position",
+        "minimumStaffCount": 1,
+      },
+@@ -28,11 +28,11 @@
+    "dailyPrimaryPositionUniqueEnabled": true,
+    "dutyFatiguePoints": 12,
+    "dutyPositionPriorities": [
+      {
+        "enabled": true,
+-       "flightNo": "NEW100",
++       "flightNo": "CX937",
+        "id": "duty-priority-tr121-h02",
+        "positionKeyword": "H02",
+      },
+      {
+        "enabled": true,
+@@ -47,18 +47,18 @@
+    "highLoadFatigueThreshold": 4,
+    "highLoadProtectionEnabled": true,
+    "highLoadRecoveryMinutes": 360,
+    "historyWindowDays": 7,
+    "latePriorityFlightNumbers": [
+-     "NEW100",
++     "CX937",
+    ],
+    "lateShiftEndTime": "23:00",
+    "lateShiftRecoveryEnabled": true,
+    "lateShiftRecoveryPositionRules": [
+      {
+        "enabled": true,
+-       "flightNo": "NEW100",
++       "flightNo": "CX937",
+        "id": "late-recovery-supervisor",
+        "keyword": "督导",
+        "matchField": "position",
+        "nextWorkdayCutoffTime": "",
+      },
+@@ -92,11 +92,11 @@
+    "maxWorkHoursDifference": 2,
+    "minimumRegularTransitionMinutes": 90,
+    "mobileSupervisorCoverageRules": [
+      {
+        "enabled": true,
+-       "flightNo": "NEW100",
++       "flightNo": "CX937",
+        "id": "supervisor-forbid-one",
+        "keyword": "一号",
+        "matchField": "remark",
+        "mode": "forbid",
+      },
+@@ -134,17 +134,17 @@
+    "morningStatsStartTime": "06:00",
+    "nextWorkdayRecoveryMode": "prefer",
+    "nextWorkdayRecoveryTargets": [
+      {
+        "enabled": true,
+-       "flightNo": "NEW100",
++       "flightNo": "CX937",
+        "id": "recovery-target-cx937-one",
+        "positionKeyword": "一号",
+      },
+      {
+        "enabled": true,
+-       "flightNo": "NEW100",
++       "flightNo": "CX937",
+        "id": "recovery-target-cx937-control",
+        "positionKeyword": "控制",
+      },
+      {
+        "enabled": true,
+@@ -207,17 +207,17 @@
+        "enabled": true,
+        "id": "transition-cx931-tr121-h02",
+        "minimumGapMinutes": 180,
+        "mode": "prefer",
+        "name": "TR121 H02 准备保护",
+-       "sourceFlightNo": "NEW100",
++       "sourceFlightNo": "CX937",
+        "sourcePositions": [
+          "督导",
+          "G20",
+          "G19",
+        ],
+-       "targetFlightNo": "NEW100",
++       "targetFlightNo": "CX937",
+        "targetPosition": "H02",
+      },
+    ],
+    "remarkedPositionHighLoad": true,
+    "rollingLoadMaxFatigue": 8,
+@@ -226,19 +226,19 @@
+    "sameDayCrossFlightPriorityEnabled": true,
+    "sameFlightStaffExclusions": [
+      {
+        "enabled": false,
+        "firstStaffId": "1",
+-       "flightNo": "NEW100",
++       "flightNo": "CX937",
+        "id": "e",
+        "secondStaffId": "2",
+      },
+    ],
+    "teamLeaderConcurrentSupervisionMaxOverlapMinutes": 30,
+    "teamLeaderGapFillPositionPolicies": [
+      {
+-       "flightNo": "NEW100",
++       "flightNo": "CX937",
+        "movable": true,
+        "position": "G16",
+      },
+    ],
+    "tr121H02CooldownWorkdays": 3,
+
+ ❯ tests/app/configuration-device-roundtrip.test.ts:149:45
+    147|     const expected=structuredClone(before.settings);visit(expected,old…
+    148|     store.getState().configuration.updateField("flight",before.flights…
+    149|     expect(store.getState().model.settings).toEqual(expected);
+       |                                             ^
+    150|     expect(store.getState().model.latePriorityFrequencyAdjustments[0]!…
+    151|     expect(store.getState().model.groups.B).toEqual(before.groups.B);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/11]⎯

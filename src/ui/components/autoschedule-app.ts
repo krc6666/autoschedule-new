@@ -12,6 +12,7 @@ import {
 import { APPLICATION_NAVIGATION } from "../projections/application-navigation";
 import { LightDomElement } from "./light-dom-element";
 import "./app-dialog";
+import "./flight-season-review";
 import "./app-toast";
 import "./config-page";
 import "./flights-page";
@@ -149,6 +150,9 @@ export class AutoscheduleAppElement extends LightDomElement {
               </div>
             </div>
           </div>
+          <autoschedule-flight-season-review
+            .model=${this.model}
+          ></autoschedule-flight-season-review>
           <div class="view-root">${this.page(this.view.section)}</div>
         </main>
       </div>

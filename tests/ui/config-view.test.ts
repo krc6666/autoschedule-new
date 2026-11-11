@@ -11,6 +11,51 @@ import "../../src/ui/components/flights-page";
 import { mountElement } from "./lit-test-helpers";
 
 describe("configuration page", () => {
+  it("puts all template rows in a separate full-width section below constraints and preserves edit/delete commands", async () => {
+    const state = createDefaultState();
+    state.templates[0]!.remark = "用于核对较长备注和后面的删除操作".repeat(8);
+    const before = structuredClone(state);
+    const element = await mountElement<
+      HTMLElement & { updateComplete: Promise<unknown> }
+    >("autoschedule-configuration-settings", { model: state });
+    const constraints = [...element.querySelectorAll("h3")]
+      .find((heading) => heading.textContent === "排班约束")!
+      .closest("section")!;
+    const templates = element
+      .querySelector(".template-editor")!
+      .closest("section")!;
+    expect(templates).not.toBe(constraints);
+    expect(templates.previousElementSibling).toBe(constraints);
+    expect(templates.parentElement).toBe(element);
+    expect(templates.closest(".split-section")).toBeNull();
+    expect(templates.querySelectorAll(".template-row")).toHaveLength(
+      state.templates.length
+    );
+    const row = templates.querySelector(".template-row")!;
+    const remark = row.querySelector<HTMLInputElement>(
+      '[aria-label="模板备注"]'
+    )!;
+    expect(remark.value).toBe(state.templates[0]!.remark);
+    const commands: unknown[] = [];
+    element.addEventListener(UI_COMMAND_EVENT, (event) =>
+      commands.push((event as CustomEvent).detail)
+    );
+    remark.value = "新备注";
+    remark.dispatchEvent(new Event("change", { bubbles: true }));
+    row.querySelector<HTMLButtonElement>('[aria-label="删除模板"]')!.click();
+    expect(commands).toEqual([
+      {
+        type: "update-configuration",
+        entity: "template",
+        id: state.templates[0]!.id,
+        field: "remark",
+        value: "新备注",
+      },
+      { type: "delete-template", id: state.templates[0]!.id },
+    ]);
+    expect(state).toEqual(before);
+  });
+
   it("offers a collapsed explicit template choice for an old current flight without guessing a match", async () => {
     const state = createDefaultState();
     state.templates = [{ ...state.templates[0]!, id: "tw", flightNo: "TW616" }];

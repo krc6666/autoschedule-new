@@ -19,7 +19,12 @@ import {
   fixedTeamLeaderGapFillPositionReason,
   teamLeaderGapFillPositionKey,
 } from "../domain/coverage/team-leader-gap-fill-protection";
-import { createId, normalizeText, splitList } from "../utils";
+import {
+  createId,
+  normalizeText,
+  splitList,
+  splitPositionList,
+} from "../utils";
 import {
   fillPositionMatches,
   isSameFlightSupervisorFillRule,
@@ -721,7 +726,7 @@ function updateTransitionPolicy(
     id,
     (policy) => {
       if (field === "sourcePositions") {
-        const nextValue = splitList(value);
+        const nextValue = splitPositionList(value);
         if (policy.sourcePositions.join("\u0000") === nextValue.join("\u0000"))
           return "unchanged";
         policy.sourcePositions = nextValue;

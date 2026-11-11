@@ -42,6 +42,7 @@ export interface Flight {
   startTime: string;
   endTime: string;
   bookedPassengers: number;
+  /** Transfer snapshot only; current-group positionRules own configured jobs. */
   positions: string[];
   remark: string;
 }
@@ -223,6 +224,16 @@ export interface ScheduleSettings {
 
 export type ScheduleGroupId = "A" | "B";
 
+/** A user's review of exact compared values, never a second flight catalogue. */
+export interface FlightPlanConfirmation {
+  kind: "new-flight" | "keep-current-time";
+  flightNo: string;
+  templateStartTime: string;
+  templateEndTime: string;
+  currentStartTime: string;
+  currentEndTime: string;
+}
+
 /** Reusable flight planning facts shared by both groups. */
 export interface SharedScheduleData {
   templates: FlightTemplate[];
@@ -239,6 +250,7 @@ export interface HalfRestSelection {
 
 /** Scheduling facts and configuration owned exclusively by one group. */
 export interface GroupWorkspace {
+  flightPlanConfirmations?: FlightPlanConfirmation[];
   halfRestSelections: HalfRestSelection[];
   leaveTypes: LeaveType[];
   flights: Flight[];
@@ -258,6 +270,7 @@ export interface GroupWorkspace {
 export type GroupWorkspaces = Record<ScheduleGroupId, GroupWorkspace>;
 
 export interface AppState {
+  flightPlanConfirmations?: FlightPlanConfirmation[];
   halfRestSelections: HalfRestSelection[];
   version: 12;
   /** Shared flight planning data and the two isolated group workspaces. */

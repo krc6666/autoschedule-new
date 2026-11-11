@@ -65,6 +65,14 @@ export function splitList(value: unknown): string[] {
     .filter(Boolean);
 }
 
+/** Slashes belong to compound position names, such as 督导/引导. */
+export function splitPositionList(value: unknown): string[] {
+  return normalizeText(value)
+    .split(/[,，、]+/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
 export function visiblePositionRemark(value: unknown): string {
   return normalizeText(value)
     .replaceAll("一号", "")

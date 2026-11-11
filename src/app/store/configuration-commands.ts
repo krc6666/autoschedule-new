@@ -1,3 +1,5 @@
+import { applyFlightPlanReview } from "../flight-plan-review-actions";
+import type { FlightPlanReviewChoice } from "../../domain/flights/flight-plan-review";
 import {
   addAdministrativeStaff,
   addFlight,
@@ -40,6 +42,8 @@ export function createConfigurationCommands(command: StateCommand) {
     ) => command((state) => updateLeaveType(state, id, patch)),
     deleteLeaveType: (id: string) =>
       command((state) => deleteLeaveType(state, id)),
+    reviewFlightPlan: (choice: FlightPlanReviewChoice) =>
+      command((state) => applyFlightPlanReview(state, choice)),
     addFlight: () => command(addFlight),
     deleteFlight: (id: string) => command((state) => deleteFlight(state, id)),
     addTemplate: () => command(addTemplate),

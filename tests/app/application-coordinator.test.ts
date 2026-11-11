@@ -1567,6 +1567,12 @@ describe("next workday flight picker workflow", () => {
 
   it("commits archive, selected flights, date, and result only after success", async () => {
     const state = stateWithCurrentSchedule();
+    state.positionRules.push({
+      ...state.positionRules[0]!,
+      id: "season-ke166",
+      flightNo: "KE166",
+      name: "G18",
+    });
     state.templates.push({
       id: "template-ke166",
       flightNo: "KE166",
@@ -1844,7 +1850,18 @@ describe("current schedule flight picker workflow", () => {
       selectedIds: dialog.selectedIds,
     });
 
-    expect(coordinator.model().flights).toEqual(original.flights);
+    expect(coordinator.model().flights).toEqual(
+      original.flights.map((flight) => ({
+        ...flight,
+        positions: [
+          ...new Set(
+            original.positionRules
+              .filter((rule) => rule.flightNo === flight.flightNo)
+              .map((rule) => rule.name)
+          ),
+        ],
+      }))
+    );
     expect(coordinator.model().assignments).toEqual([]);
     expect(coordinator.model().history).toEqual(original.history);
     expect(coordinator.view().toast?.message).toContain("完整安全方案");

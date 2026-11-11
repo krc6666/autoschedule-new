@@ -1,4 +1,8 @@
 import { html } from "lit";
+import {
+  configuredSeasonTemplates,
+  withConfiguredFlightPositions,
+} from "../../domain/flights/configured-flight-positions";
 
 import {
   ISO_WEEKDAYS,
@@ -18,10 +22,19 @@ export class WeeklyFlightPlanSectionElement extends LightDomElement {
   private selectedWeekday: IsoWeekday = 1;
 
   protected override render() {
+    const season = configuredSeasonTemplates(
+      this.model.templates,
+      this.model.positionRules,
+      this.model.flights
+    );
+    const seasonNos = new Set(
+      season.map((r) => normalizeWeeklyFlightNo(r.flightNo))
+    );
     const selected = new Set(
       this.model.weeklyFlightPlans
         .find((entry) => entry.weekday === this.selectedWeekday)
-        ?.flightNos.map(normalizeWeeklyFlightNo) ?? []
+        ?.flightNos.map(normalizeWeeklyFlightNo)
+        .filter((no) => seasonNos.has(no)) ?? []
     );
     return html`<section class="workspace-section weekly-flight-plan-section">
       <div class="section-heading weekly-flight-plan-heading">
@@ -31,6 +44,7 @@ export class WeeklyFlightPlanSectionElement extends LightDomElement {
             >${weekdayLabel(this.selectedWeekday)} · ${selected.size}
             个航班</span
           >
+          <span>只列当前组岗位配置中的本季航班，备用航班保留在模板库。</span>
         </div>
       </div>
       <div
@@ -52,9 +66,12 @@ export class WeeklyFlightPlanSectionElement extends LightDomElement {
         )}
       </div>
       ${
-        this.model.templates.length
+        season.length
           ? html`<div class="weekly-flight-template-list">
-              ${this.model.templates.map((template) => {
+              ${withConfiguredFlightPositions(
+                season,
+                this.model.positionRules
+              ).map((template) => {
                 const flightNo = normalizeWeeklyFlightNo(template.flightNo);
                 return html`<label class="weekly-flight-template-row">
                   <input
@@ -63,13 +80,13 @@ export class WeeklyFlightPlanSectionElement extends LightDomElement {
                     aria-label=${`${weekdayLabel(this.selectedWeekday)} ${flightNo}`}
                     .checked=${selected.has(flightNo)}
                     @change=${(event: Event) =>
-                    dispatchUiCommand(this, {
-                      type: "set-weekly-flight-template",
-                      weekday: this.selectedWeekday,
-                      flightNo,
-                      selected: (event.currentTarget as HTMLInputElement)
-                        .checked,
-                    })}
+                      dispatchUiCommand(this, {
+                        type: "set-weekly-flight-template",
+                        weekday: this.selectedWeekday,
+                        flightNo,
+                        selected: (event.currentTarget as HTMLInputElement)
+                          .checked,
+                      })}
                   />
                   <strong>${flightNo}</strong>
                   <span>${template.startTime}-${template.endTime}</span>
@@ -77,7 +94,9 @@ export class WeeklyFlightPlanSectionElement extends LightDomElement {
                 </label>`;
               })}
             </div>`
-          : html`<div class="empty-state">尚无航班模板</div>`
+          : html`<div class="empty-state">
+              当前组尚无本季航班，请先配置岗位
+            </div>`
       }
     </section>`;
   }

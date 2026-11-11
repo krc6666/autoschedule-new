@@ -12,6 +12,34 @@ export class ConfigurationController implements UiCommandController {
   async handle(command: UiCommand): Promise<boolean> {
     const commands = this.context.store.getState().configuration;
     switch (command.type) {
+      case "confirm-flight-plan-review": {
+        if (command.groupId !== this.context.model().activeGroupId) {
+          this.context.toast("当前组已改变，请重新核对", "warning");
+          return true;
+        }
+        const choice = command.choice;
+        const sourceGroup = command.groupId === "A" ? "B" : "A";
+        const effect =
+          choice.action === "retire-flight"
+            ? `确认 ${choice.previousFlightNo} 是已停用的旧航班？将删除当前组这个航班、岗位和相关规则，并清空本组未归档班表，需要重新排班。过去历史、次数记录和另一组保留。取消不修改。`
+            : choice.action === "rename"
+              ? `将本组 ${choice.previousFlightNo} 换号为 ${choice.expectedFlightNo}，保留岗位和资质，时段改为 ${choice.expectedStartTime}–${choice.expectedEndTime}，清除本组未归档班表。历史及另一组不变。`
+              : choice.action === "new-flight"
+                ? `确认 ${choice.expectedFlightNo} 是新增航班？不会沿用旧航班岗位，请另配本组岗位和资质。`
+                : choice.action === "use-template-time"
+                  ? `按模板更新本组 ${choice.expectedFlightNo} 时段为 ${choice.expectedStartTime}–${choice.expectedEndTime}，清除本组未归档班表，需重新排班。`
+                  : `确认本组 ${choice.expectedFlightNo} 保留当天时段 ${choice.expectedCurrentStartTime}–${choice.expectedCurrentEndTime}？`;
+        if (
+          !this.context.confirm(
+            `以 ${sourceGroup} 组本季名单为准，核对当前 ${command.groupId} 组。${effect}`
+          )
+        )
+          return true;
+        const result = commands.reviewFlightPlan(choice);
+        if (result.ok) this.context.commit(result.message);
+        else this.context.toast(result.message, "warning");
+        return true;
+      }
       case "add-leave-type":
       case "update-leave-type":
       case "delete-leave-type": {

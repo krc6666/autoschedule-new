@@ -1,3 +1,4 @@
+import type { FlightPlanReviewSummary } from "../domain/flights/flight-plan-review";
 import type { DutyRosterImportPreview } from "../infrastructure/duty-roster-excel";
 import type { AppState } from "../model";
 import type { LegacyScheduleImportPreview } from "../infrastructure/legacy-schedule-excel";
@@ -23,8 +24,12 @@ export type PreparedWorkbookImport =
       recognized: string;
       warnings: string[];
       changedConfig: boolean;
+      restoreFlightConfiguration: boolean;
+      restoreErrors?: string[];
+      restoreDefaults?: string[];
       imported: WorkbookImport;
       weeklyPlanPreview?: WeeklyPlanImportPreview;
+      flightPlanReview?: FlightPlanReviewSummary[];
       sharedTemplatesAvailable: boolean;
       historySummary?: HistoryImportSummary;
     };
@@ -63,7 +68,13 @@ export async function prepareWorkbookImport(
   });
   if (imported.legacySchedule?.recognizedSheets)
     return { kind: "legacy-schedule", preview: imported.legacySchedule };
-  const applied = applyWorkbookImport(state, imported, mode);
+  const restoreFlightConfiguration =
+    mode !== "history" &&
+    imported.templates !== undefined &&
+    (imported.staff !== undefined || imported.positionRules !== undefined);
+  const applied = applyWorkbookImport(state, imported, mode, {
+    restoreFlightConfiguration,
+  });
   return {
     kind: "workbook",
     imported,
@@ -74,7 +85,11 @@ export async function prepareWorkbookImport(
         (imported.flights !== undefined && imported.templates === undefined)),
     recognized: applied.recognized,
     changedConfig: applied.changedConfig,
+    restoreFlightConfiguration,
+    restoreErrors: applied.errors,
+    restoreDefaults: applied.restoreDefaults,
     historySummary: applied.historySummary,
+    flightPlanReview: applied.flightPlanReview,
     warnings: [
       ...imported.warnings,
       ...(applied.errors?.map((error) => `导入的班表未写入：${error}`) ?? []),

@@ -1,0 +1,12 @@
+{
+  "inputSha256": "bc5b7743822c1252e59737c66c76d54c654f622e30fd88660b6c1415150e3219",
+  "templates": 10,
+  "currentFlights": 4,
+  "configuredRuleRows": 82,
+  "independentlyCheckedFlightRows": 14,
+  "noFD573RulesCreated": true,
+  "otherGroupPreserved": true,
+  "xlsxReimportAndStorageReload": "passed",
+  "sourceUnchanged": true,
+  "browserUsed": false
+}

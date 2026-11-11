@@ -1,4 +1,5 @@
 import type { AppState, Flight, FlightTemplate } from "../../model";
+import { configuredSeasonTemplates } from "./configured-flight-positions";
 
 export interface QueriedFlightReference {
   flightNo: string;
@@ -27,7 +28,7 @@ function normalizedFlightNo(flightNo: string): string {
 export function buildFlightPlanReconciliation<
   TFlight extends QueriedFlightReference,
 >(
-  state: Pick<AppState, "flights" | "templates">,
+  state: Pick<AppState, "flights" | "templates" | "positionRules">,
   currentScheduleDate: string,
   result: { date: string; flights: TFlight[] }
 ): FlightPlanReconciliation<TFlight> {
@@ -36,7 +37,11 @@ export function buildFlightPlanReconciliation<
     currentByFlightNo.set(normalizedFlightNo(flight.flightNo), flight)
   );
   const templateByFlightNo = new Map<string, FlightTemplate>();
-  state.templates.forEach((template) =>
+  configuredSeasonTemplates(
+    state.templates,
+    state.positionRules,
+    state.flights
+  ).forEach((template) =>
     templateByFlightNo.set(normalizedFlightNo(template.flightNo), template)
   );
 

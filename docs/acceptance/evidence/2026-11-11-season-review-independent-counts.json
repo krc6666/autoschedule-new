@@ -1,0 +1,15 @@
+{
+  "basis": "Independent set difference on separately normalized job flight names in final real-file probe",
+  "sourceASeasonCount": 9,
+  "sourceBSeasonCount": 4,
+  "whenAIsSource": {
+    "addOrRenameInB": ["AE218", "AK151", "FD571", "KE160", "MF8683", "TW616"],
+    "retireOrRenameInB": ["FD573"]
+  },
+  "whenBIsSource": {
+    "addOrRenameInA": ["FD573"],
+    "retireOrRenameInA": ["AE218", "AK151", "FD571", "KE160", "MF8683", "TW616"]
+  },
+  "spareTemplatesDoNotDefineSeason": true,
+  "noActualOwnerMappingAssumed": true
+}

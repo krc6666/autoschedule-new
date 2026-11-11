@@ -1,0 +1,11 @@
+{
+  "date": "2026-11-11",
+  "page": "http://127.0.0.1:50966/",
+  "ownerReported": [
+    "导入成功并且航班号也更新了",
+    "航班模版 中  ke166 cx937早晚",
+    "现在没了"
+  ],
+  "confirmed": "Import succeeds, flight numbers update and the three reported stale templates are now absent.",
+  "limits": "No additional import implementation change was made between the residual report and disappearance. Exact cause of the transient residual is not established. Other rule values/times were not individually confirmed by owner; two physical devices remain unverified."
+}

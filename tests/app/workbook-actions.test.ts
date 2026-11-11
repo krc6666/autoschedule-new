@@ -251,7 +251,7 @@ describe("workbook actions", () => {
     expect(
       state.weeklyFlightPlans.find((entry) => entry.weekday === 2)?.flightNos
     ).toEqual([state.templates[1]!.flightNo]);
-    expect(result).toEqual({
+    expect(result).toMatchObject({
       changedConfig: true,
       recognized: "每周航班计划",
       weeklyPlanPreview: {
@@ -665,7 +665,7 @@ describe("workbook actions", () => {
     expect(sharedScope.recognized).toContain("每周航班计划");
   });
 
-  it("fills missing template positions in both groups only when shared templates are imported", () => {
+  it("never reconstructs either group positions from imported template snapshots", () => {
     const state = createDefaultState();
     const template = { ...state.templates[0]!, positions: ["H1", "H2"] };
     const ruleA = {
@@ -695,11 +695,9 @@ describe("workbook actions", () => {
 
     expect(state.groups.A.positionRules.map((rule) => rule.name)).toEqual([
       "H1",
-      "H2",
     ]);
     expect(state.groups.B.positionRules.map((rule) => rule.name)).toEqual([
       "H1",
-      "H2",
     ]);
     expect(state.groups.A.positionRules[0]!.category).toBe("分流");
     expect(state.groups.B.positionRules[0]!.category).toBe("常规");
@@ -799,8 +797,8 @@ describe("workbook actions", () => {
     expect(
       state.groups.B.positionRules.find((rule) => rule.flightNo === "MF8683")
         ?.category
-    ).toBe("常规");
-    expect(state.groups.B.activeScheduleDate).toBeNull();
+    ).toBeUndefined();
+    expect(state.groups.B.activeScheduleDate).toBe("2026-08-13");
     expect(state.weeklyFlightPlans).toEqual(beforeWeeklyPlans);
     expect(state.shared.templates).toEqual(state.templates);
     expect(result.recognized).toContain("2 个岗位航班补入共用模板");
@@ -842,7 +840,10 @@ describe("workbook actions", () => {
       "config"
     );
 
-    expect(result).toEqual({ changedConfig: true, recognized: "规则配置" });
+    expect(result).toMatchObject({
+      changedConfig: true,
+      recognized: "规则配置",
+    });
     expect(state.settings.dutyFatiguePoints).toBe(6);
     expect(state.settings.dutyPositionPriorities).toEqual([]);
     expect(state.settings.highLoadFatigueThreshold).toBe(

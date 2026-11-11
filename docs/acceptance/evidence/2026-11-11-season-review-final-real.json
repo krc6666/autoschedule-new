@@ -1,0 +1,23 @@
+{
+  "inputSha256": "bc5b7743822c1252e59737c66c76d54c654f622e30fd88660b6c1415150e3219",
+  "templates": 10,
+  "ruleRows": 82,
+  "independentlyCountedSeasonA": [
+    "AE218",
+    "AK151",
+    "CX931",
+    "CX937",
+    "FD571",
+    "KE160",
+    "MF8683",
+    "TR121",
+    "TW616"
+  ],
+  "independentlyCountedSeasonB": ["CX931", "CX937", "FD573", "TR121"],
+  "preservedSpareLibrary": ["FD573"],
+  "otherGroupPreserved": true,
+  "xlsxByteRoundtripAndStorageReload": "passed",
+  "sourceUnchanged": true,
+  "mappingSubmittedToOwnerData": false,
+  "browserUsed": false
+}

@@ -224,6 +224,7 @@ export function createDefaultState(): AppState {
     weeklyFlightPlans: structuredClone(weeklyFlightPlans),
   };
   const groupA: GroupWorkspace = {
+    flightPlanConfirmations: [],
     halfRestSelections: [],
     leaveTypes: [],
     flights: structuredClone(flights),
@@ -239,6 +240,7 @@ export function createDefaultState(): AppState {
     schedulePolicyStale: false,
   };
   const groupB: GroupWorkspace = {
+    flightPlanConfirmations: [],
     halfRestSelections: [],
     leaveTypes: [],
     flights: [],
@@ -258,6 +260,7 @@ export function createDefaultState(): AppState {
     shared,
     groups: { A: groupA, B: groupB },
     activeGroupId: "A",
+    flightPlanConfirmations: groupA.flightPlanConfirmations,
     halfRestSelections: groupA.halfRestSelections,
     leaveTypes: groupA.leaveTypes,
     staff,

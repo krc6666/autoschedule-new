@@ -1,0 +1,34 @@
+实际终端运行输出节选。仅保留本案失败及数量，不是完整原始日志。
+
+修复前：npm.cmd exec vitest -- run tests/app/flight-config-device-restore.test.ts
+Start at 12:02:07
+Test Files  1 failed (1)
+Tests  9 failed | 1 passed (10)
+
+preserves whole slash position names in templates and current flights across XLSX bytes
+- "督导/引导"
++ "督导", "引导"
+- "收费/引导"
++ "收费", "引导"
+
+restores file flights and templates in config mode without old blank times or old flights
+- "endTime": "23:05"
++ "endTime": ""
++ "flightNo": "OLD999"
+
+Error: 未处理的界面命令：set-workbook-import-flight-restore
+
+UI实现前：npm.cmd exec vitest -- run tests/ui/flight-restore-dialog.test.ts
+Start at 12:03:34
+Test Files  1 failed (1)
+Tests  1 failed (1)
+AssertionError: expected null not to be null
+expect(input).not.toBeNull();
+
+后置复核补充失败：npm.cmd exec vitest -- run tests/app/flight-config-device-restore.test.ts
+Start at 12:08:39
+Test Files  1 failed (1)
+Tests  2 failed | 11 passed (13)
+AssertionError: expected [] to deeply equal [ Array(1) ]
+expect(target.groups.B.assignments).toEqual(other.assignments);
+原因：共享模板补新岗位会清掉另一组已有班表，已在完整恢复专用路径保护。

@@ -1,0 +1,53 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/app/flight-season-review.test.ts (14 tests | 2 failed) 186ms
+     × uses actual group job flights as the season and keeps spare templates without a missing-job warning 12ms
+     × retires an unmatched old flight in only the current group and preserves history and frequency ledgers 3ms
+npm.cmd :
+所在位置 行:2 字符: 1
++ npm.cmd exec vitest -- run tests/app/flight-season-review.test.ts *>  ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/app/flight-season-review.test.ts > seasonal flight confirmation and group isolation > uses actual group jo
+b flights as the season and keeps spare templates without a missing-job warning
+AssertionError: expected 7 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 7
+
+ ❯ tests/app/flight-season-review.test.ts:63:43
+     61|     state.groups.B.flights = [];
+     62|     state.templates.push({ ...state.templates[0]!, id: "spare", flight…
+     63|     expect(flightPlanReview(state).count).toBe(0);
+       |                                           ^
+     64|     expect(flightPlanReview(state, "B").count).toBe(0);
+     65|     expect(state.templates.map((r) => r.flightNo)).toContain("SPARE100…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/app/flight-season-review.test.ts > seasonal flight confirmation and group isolation > retires an unmatched
+ old flight in only the current group and preserves history and frequency ledgers
+TypeError: Cannot read properties of undefined (reading 'id')
+ ❯ tests/app/flight-season-review.test.ts:504:25
+    502|         flightNo: "OLD100",
+    503|         position: "H03",
+    504|         staffId: person.id,
+       |                         ^
+    505|         staffName: "匿名",
+    506|         startTime: "10:00",
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 12 passed (14)
+   Start at  14:54:55
+   Duration  2.34s (transform 1.57s, setup 0ms, import 1.95s, tests 186ms, environment 0ms)

@@ -1,0 +1,79 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/app/flight-season-review.test.ts (13 tests | 1 failed) 345ms
+     × retires an unmatched old flight in only the current group and preserves history and frequency ledgers 22ms
+ ❯ tests/ui/flight-season-review.test.ts (5 tests | 1 failed) 343ms
+     × offers retired-old-flight removal without requiring a replacement flight 85ms
+npm.cmd : stderr | tests/ui/flight-season-review.test.ts
+所在位置 行:2 字符: 1
++ npm.cmd exec vitest -- run tests/app/flight-season-review.test.ts tes ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (stderr | tests/...-review.test.ts:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/app/flight-season-review.test.ts > seasonal flight confirmation and group isolation > retires an unmatched
+ old flight in only the current group and preserves history and frequency ledgers
+AssertionError: expected [ { id: 'b-flight', …(6) } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "bookedPassengers": 123,
++     "endTime": "12:00",
++     "flightNo": "OLD100",
++     "id": "b-flight",
++     "positions": [
++       "督导",
++       "G20",
++       "G19",
++       "G18",
++       "G17",
++       "G16",
++       "G15",
++       "G14",
++       "G13",
++       "G12",
++     ],
++     "remark": "到岗08:05",
++     "startTime": "10:00",
++   },
++ ]
+
+ ❯ tests/app/flight-season-review.test.ts:489:27
+    487|     await coordinator.handle({ type: "confirm-flight-plan-review", gro…
+    488|     const after = store.getState().model;
+    489|     expect(after.flights).toEqual([]);
+       |                           ^
+    490|     expect(after.positionRules).toEqual([]);
+    491|     expect(after.settings.latePriorityFlightNumbers).toEqual(["NEW100"…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/ui/flight-season-review.test.ts > seasonal group review at the real app seam > offers retired-old-flight r
+emoval without requiring a replacement flight
+AssertionError: the given combination of arguments (undefined and string) is invalid for this assertion. You can use an
+ array, a map, an object, a set, a string, or a weakset instead of a string
+ ❯ tests/ui/flight-season-review.test.ts:26:33
+     24|     const before = structuredClone(store.getState().model);
+     25|     const button = element.querySelector<HTMLButtonElement>('[data-ret…
+     26|     expect(button?.textContent).toContain("旧航班已停用，删除本组");
+       |                                 ^
+     27|     button!.click();
+     28|     await settleLit();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  2 failed | 16 passed (18)
+   Start at  14:46:13
+   Duration  6.11s (transform 7.32s, setup 0ms, import 8.84s, tests 688ms, environment 693ms)

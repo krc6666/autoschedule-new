@@ -1,0 +1,56 @@
+
+> autoschedule@1.0.0 verify
+> npm run typecheck && npm test && npm run test:performance && npm run build
+
+
+> autoschedule@1.0.0 typecheck
+> tsc -b --pretty false
+
+
+> autoschedule@1.0.0 test
+> vitest run --exclude tests/performance/**
+
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/architecture/scheduling-facts-boundary.test.ts (1 test | 1 failed) 603ms
+     × 完整 AppState 只进入投影和应用状态职责 601ms
+npm.cmd :
+所在位置 行:2 字符: 1
++ npm.cmd run verify *> docs/acceptance/evidence/2026-11-11-season-revi ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/architecture/scheduling-facts-boundary.test.ts > 排班事实依赖边界 > 完整 AppState 只进入投影和应用状态职责
+AssertionError: expected [ …(6) ] to deeply equal [ …(4) ]
+
+- Expected
++ Received
+
+  [
+    "src/domain/flights/flight-plan-reconciliation.ts",
++   "src/domain/flights/flight-plan-review.ts",
++   "src/domain/flights/group-flight-references.ts",
+    "src/domain/kernel/schedule-lifecycle.ts",
+    "src/domain/rules/schedule-rule-fingerprint.ts",
+    "src/domain/shared/scheduling-facts.ts",
+  ]
+
+ ❯ tests/architecture/scheduling-facts-boundary.test.ts:58:27
+     56|       .sort();
+     57|
+     58|     expect(directImports).toEqual([...allowedAppStateImports].sort());
+       |                           ^
+     59|   });
+     60| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 172 passed (173)
+      Tests  1 failed | 1726 passed (1727)
+   Start at  14:39:16
+   Duration  92.71s (transform 20.25s, setup 0ms, import 73.77s, tests 303.12s, environment 19.98s)

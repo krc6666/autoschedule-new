@@ -1,0 +1,36 @@
+
+> autoschedule@1.0.0 test
+> vitest run --exclude tests/performance/**
+
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/app/application-coordinator.test.ts (50 tests | 1 failed) 1819ms
+     × commits archive, selected flights, date, and result only after success 51ms
+npm.cmd :
+所在位置 行:2 字符: 1
++ npm.cmd test *> docs/acceptance/evidence/2026-11-11-season-review-sea ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/app/application-coordinator.test.ts > next workday flight picker workflow > commits archive, selected flig
+hts, date, and result only after success
+Error: 缺少本地模板航班
+ ❯ tests/app/application-coordinator.test.ts:1605:28
+    1603|       (item) => item.flightNo === "KE166"
+    1604|     )?.id;
+    1605|     if (!selectedId) throw new Error("缺少本地模板航班");
+       |                            ^
+    1606|     await coordinator.handle({
+    1607|       type: "update-next-workday-flight-picker-passengers",
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 172 passed (173)
+      Tests  1 failed | 1733 passed (1734)
+   Start at  15:00:31
+   Duration  94.11s (transform 24.39s, setup 0ms, import 78.99s, tests 315.15s, environment 22.93s)

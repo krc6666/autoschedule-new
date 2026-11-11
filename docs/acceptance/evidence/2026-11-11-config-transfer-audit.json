@@ -1,0 +1,89 @@
+{
+  "realFileParseWarningCount": 0,
+  "realFileApplyErrorCount": 0,
+  "realFilePositionFlightsWithoutTemplate": [],
+  "realFileRuleFlightsWithoutTemplate": [],
+  "realFileWeeklyFlightsWithoutTemplate": [],
+  "realFileMissingPositionRules": [
+    {
+      "flightNo": "FD573",
+      "position": "督导/引导"
+    },
+    {
+      "flightNo": "FD573",
+      "position": "G10"
+    },
+    {
+      "flightNo": "FD573",
+      "position": "G09"
+    },
+    {
+      "flightNo": "FD573",
+      "position": "G08"
+    },
+    {
+      "flightNo": "FD573",
+      "position": "G07"
+    }
+  ],
+  "realFileManualPositionCount": 1,
+  "realFileExportImportDifferences": [],
+  "realFileSaveReloadDifferences": [],
+  "sameRealFileDifferentDeviceDifferences": [
+    ".settings.morningStatsStartTime",
+    ".settings.mobileSupervisorFillRules[3].id",
+    ".halfRestSelections.length"
+  ],
+  "syntheticRoundtripDifferences": [
+    ".settings.positionTransitionPolicies[0].sourcePositions.length",
+    ".positionRules[0].fatiguePoints"
+  ],
+  "realFileCompoundTransitionRows": 0,
+  "realFileZeroFatigueRows": 0,
+  "realFileMissingSettings": [
+    "morningStatsStartTime",
+    "morningStatsEndTime",
+    "eveningStatsStartTime",
+    "eveningStatsEndTime"
+  ],
+  "realFileMissingSections": ["leaveTypes", "halfRestSelections"],
+  "scalarFieldCount": 34,
+  "comprehensiveConfigurationDifferences": [],
+  "allRuleFlightRenameDifferences": [],
+  "currentFlightEditRuleRenameDifferences": [
+    ".latePriorityFlightNumbers[0]",
+    ".sameFlightStaffExclusions[0].flightNo",
+    ".positionTransitionPolicies[0].sourceFlightNo",
+    ".positionTransitionPolicies[0].targetFlightNo",
+    ".dutyPositionPriorities[0].flightNo",
+    ".dutyPositionPriorities[1].flightNo",
+    ".nextWorkdayRecoveryTargets[0].flightNo",
+    ".nextWorkdayRecoveryTargets[1].flightNo",
+    ".nextWorkdayRecoveryTargets[2].flightNo",
+    ".lateShiftRecoveryPositionRules[0].flightNo",
+    ".lateShiftRecoveryPositionRules[1].flightNo",
+    ".lateShiftRecoveryPositionRules[2].flightNo",
+    ".lateShiftRecoveryPositionRules[3].flightNo",
+    ".mobileSupervisorCoverageRules[0].flightNo",
+    ".mobileSupervisorCoverageRules[1].flightNo",
+    ".mobileSupervisorCoverageRules[2].flightNo",
+    ".crossWorkdayQualificationReservations[0].flightNo",
+    ".crossFlightPriorityPolicies[0].flightNo",
+    ".teamLeaderGapFillPositionPolicies[0].flightNo"
+  ],
+  "compoundPositionTemplateEditPreserved": false,
+  "invalidRuleTableWarningCount": 1,
+  "invalidRuleTableStillAcceptsCompleteFlightRestore": true,
+  "inputSha256": "bc5b7743822c1252e59737c66c76d54c654f622e30fd88660b6c1415150e3219",
+  "scope": "Read-only audit: current group configuration and shared templates; history behavior deferred by owner",
+  "probeResult": "Exit 1: compound transition position name split and zero fatigue changed to 1; product fixes not applied in this audit",
+  "notes": [
+    "Missing supervisor fill rule id difference is a generated identifier, not evidence of changed permission.",
+    "Real file has no compound transition row or zero fatigue position; those failures use synthetic inputs.",
+    "FD573 template lists five positions absent from its position configuration; existing synchronization adds empty-qualified defaults.",
+    "Source facts are captured after applying file into a default state, so successful second roundtrip does not establish the old file contains every source-device setting.",
+    "Template rename updates tested structured-rule references; current-flight editor updates only position rules and supervisor fill references.",
+    "Admin support enabled mode and other-group workspace are intentionally excluded by current export contract.",
+    "No browser or owner storage operation performed. Owner page acceptance remains failed."
+  ]
+}

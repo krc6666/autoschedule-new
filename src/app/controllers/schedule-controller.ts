@@ -1,3 +1,8 @@
+import {
+  configuredSeasonTemplates,
+  configuredSeasonFlights,
+  withConfiguredFlightPositions,
+} from "../../domain/flights/configured-flight-positions";
 import { setStaffStatus, staffStatusValue } from "../../domain/staff-status";
 import { currentScheduleHistory } from "../history-actions";
 import { halfRestSelectionForDate } from "../../domain/records/half-rest-selections";
@@ -679,8 +684,18 @@ export class ScheduleController implements UiCommandController {
   private openSchedulePreflight(): void {
     const model = this.context.model();
     let candidates = buildCurrentScheduleFlightCandidates(
-      model.templates,
-      model.flights
+      withConfiguredFlightPositions(
+        configuredSeasonTemplates(
+          model.templates,
+          model.positionRules,
+          model.flights
+        ),
+        model.positionRules
+      ),
+      withConfiguredFlightPositions(
+        configuredSeasonFlights(model.flights, model.positionRules),
+        model.positionRules
+      )
     );
     if (model.assignments.length === 0) {
       const plannedFlightNos = new Set(
@@ -862,8 +877,18 @@ export class ScheduleController implements UiCommandController {
   private openRescheduleFlightPicker(): void {
     const model = this.context.model();
     const candidates = buildCurrentScheduleFlightCandidates(
-      model.templates,
-      model.flights
+      withConfiguredFlightPositions(
+        configuredSeasonTemplates(
+          model.templates,
+          model.positionRules,
+          model.flights
+        ),
+        model.positionRules
+      ),
+      withConfiguredFlightPositions(
+        configuredSeasonFlights(model.flights, model.positionRules),
+        model.positionRules
+      )
     );
     if (!candidates.length)
       return this.context.toast("没有可选择的本地航班", "warning");
@@ -1002,7 +1027,14 @@ export class ScheduleController implements UiCommandController {
     const nextDate = addIsoDays(currentDate, 2);
     const model = this.context.model();
     const candidates = buildNextWorkdayFlightCandidates(
-      model.templates,
+      withConfiguredFlightPositions(
+        configuredSeasonTemplates(
+          model.templates,
+          model.positionRules,
+          model.flights
+        ),
+        model.positionRules
+      ),
       flightNumbersForDate(model.weeklyFlightPlans, nextDate)
     );
     if (!candidates.length)

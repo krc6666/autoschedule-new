@@ -1,0 +1,17 @@
+{
+  "inputSha256": "bc5b7743822c1252e59737c66c76d54c654f622e30fd88660b6c1415150e3219",
+  "templates": 10,
+  "currentFlights": 4,
+  "positionRules": 82,
+  "restoredDeviceVariants": 2,
+  "allKnownRawFlightAndPositionFieldsMatch": true,
+  "latestExportHasAllLongTermFields": true,
+  "restoredConfigurationHashes": [
+    "3366fdcc93cfdc4bd9cc342afeb3da3a6eec79d7762ce40f7c384f26234fb9b0",
+    "3366fdcc93cfdc4bd9cc342afeb3da3a6eec79d7762ce40f7c384f26234fb9b0"
+  ],
+  "storeAndReloadAndSecondExportMatch": true,
+  "oldIncompleteFileRejectedWithoutWrites": true,
+  "sourceFixtureLimit": "Fields absent from the supplied file use defaults only in this diagnostic source fixture; the original A-device unexported values cannot be recovered or verified here.",
+  "browserAcceptance": "pending owner-operated real page"
+}

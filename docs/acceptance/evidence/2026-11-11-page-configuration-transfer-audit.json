@@ -1,0 +1,150 @@
+{
+  "inventory": {
+    "declaredSettings": 47,
+    "scalarFields": 34,
+    "structuredRuleCollections": 10,
+    "specialCollections": [
+      "ordinaryPriorityPositions",
+      "latePriorityFlightNumbers"
+    ],
+    "deliberateLocalOnly": ["adminSupportEnabled"],
+    "unexplainedMissing": [],
+    "exportedSettings": 46
+  },
+  "A": {
+    "twoDifferentDestinations": "passed",
+    "editedFields": [
+      "all scalar settings",
+      "flight/template number and distinct times",
+      "template/current/staff/job remarks",
+      "slash job name",
+      "zero fatigue",
+      "manual qualifications",
+      "custom leave status",
+      "half-rest",
+      "season confirmation",
+      "all structured rule tables",
+      "weekly plan",
+      "roster",
+      "frequency corrections",
+      "history and attendance"
+    ],
+    "groupSwitchAndReload": "passed",
+    "secondXlsxRoundtrip": "passed",
+    "otherGroupUntouched": true,
+    "sheetNames": [
+      "人员信息",
+      "航班计划",
+      "航班配置",
+      "每周航班计划",
+      "岗位配置",
+      "普通重点岗位集合",
+      "规则参数",
+      "岗位衔接规则",
+      "值班岗位优先",
+      "次班恢复目标",
+      "末班重点岗位",
+      "机动督导范围",
+      "督导补位关系",
+      "跨工作日资质预留",
+      "末班重点航班范围",
+      "跨航班重点人员优先",
+      "同航班人员互斥",
+      "分队长补差保护范围",
+      "末班重点次数修正",
+      "普通重点次数修正",
+      "值班轮值",
+      "历史排班",
+      "休假类别",
+      "半休选择",
+      "航班换季确认"
+    ]
+  },
+  "B": {
+    "twoDifferentDestinations": "passed",
+    "editedFields": [
+      "all scalar settings",
+      "flight/template number and distinct times",
+      "template/current/staff/job remarks",
+      "slash job name",
+      "zero fatigue",
+      "manual qualifications",
+      "custom leave status",
+      "half-rest",
+      "season confirmation",
+      "all structured rule tables",
+      "weekly plan",
+      "roster",
+      "frequency corrections",
+      "history and attendance"
+    ],
+    "groupSwitchAndReload": "passed",
+    "secondXlsxRoundtrip": "passed",
+    "otherGroupUntouched": true,
+    "sheetNames": [
+      "人员信息",
+      "航班计划",
+      "航班配置",
+      "每周航班计划",
+      "岗位配置",
+      "普通重点岗位集合",
+      "规则参数",
+      "岗位衔接规则",
+      "值班岗位优先",
+      "次班恢复目标",
+      "末班重点岗位",
+      "机动督导范围",
+      "督导补位关系",
+      "跨工作日资质预留",
+      "末班重点航班范围",
+      "跨航班重点人员优先",
+      "同航班人员互斥",
+      "分队长补差保护范围",
+      "末班重点次数修正",
+      "普通重点次数修正",
+      "值班轮值",
+      "历史排班",
+      "休假类别",
+      "半休选择",
+      "航班换季确认"
+    ]
+  },
+  "unsavedDraft": {
+    "beforeSave": "not exported; persisted settings retained",
+    "afterSave": "edited value exported",
+    "productBehaviorChanged": false
+  },
+  "administrativeModeException": {
+    "sourceMode": true,
+    "exportedFieldPresent": false,
+    "targetModeAfterImport": false,
+    "reason": "explicit existing spec.md contract excludes administrative mode; product code not changed in audit"
+  },
+  "scope": {
+    "kind": "source audit and isolated tests; no product behavior changes",
+    "source": "current working tree with completed seasonal reconciliation",
+    "physicalDevicesUsed": false,
+    "browserOperatedByAgent": false,
+    "gateAdded": "tests/app/configuration-device-roundtrip.test.ts: independent TypeScript interface field inventory must be accounted for by parsed Excel settings or explicitly generated schedule state",
+    "probe": "temporary isolated test removed after five audit cases passed; final functional and build gate recorded separately",
+    "fixtureCorrection": "initial roster fixture selected a staff member without CX-preflight qualification; explicit fixture qualifications fixed before rerun, no product rule change",
+    "pendingDecision": "whether administrative mode should be exported; current spec exclusion retained pending owner response"
+  },
+  "finalVerification": {
+    "command": "npm.cmd run verify",
+    "exitCode": 0,
+    "functionalFiles": 173,
+    "functionalTests": 1737,
+    "performanceFiles": 7,
+    "performanceTests": 19,
+    "typecheck": "passed",
+    "productionBuild": "passed",
+    "warnings": [
+      "Existing HiGHS node:module browser externalization",
+      "Entry chunk 920.06 kB exceeds 900 kB advisory"
+    ],
+    "productCodeChangedInThisAudit": false,
+    "physicalDeviceAcceptance": "not performed; remains unverified",
+    "commitPushDeployment": "not performed"
+  }
+}

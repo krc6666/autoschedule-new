@@ -1,3 +1,4 @@
+import { normalizeFlightPlanConfirmations } from "../domain/flights/flight-plan-review";
 import { normalizeSupervisorAssignments } from "../domain/assignments/schedule-adjustment";
 import { restoreManualCountEvidence } from "./manual-count-evidence";
 import { normalizeScheduleSettings } from "../domain/rules/schedule-settings";
@@ -739,6 +740,7 @@ function emptyGroupWorkspace(
   settings: ScheduleSettings
 ): GroupWorkspace {
   return {
+    flightPlanConfirmations: [],
     halfRestSelections: [],
     leaveTypes: [],
     flights: [],
@@ -757,6 +759,9 @@ function emptyGroupWorkspace(
 
 function groupWorkspaceFromState(state: AppState): GroupWorkspace {
   return {
+    flightPlanConfirmations: normalizeFlightPlanConfirmations(
+      state.flightPlanConfirmations
+    ),
     halfRestSelections: structuredClone(state.halfRestSelections ?? []),
     leaveTypes: structuredClone(state.leaveTypes),
     flights: structuredClone(state.flights),
@@ -868,6 +873,9 @@ function restoreGroupWorkspace(
   }
   return {
     leaveTypes,
+    flightPlanConfirmations: normalizeFlightPlanConfirmations(
+      value.flightPlanConfirmations
+    ),
     halfRestSelections: normalizeHalfRestSelections(value.halfRestSelections),
     flights,
     staff,
@@ -901,6 +909,7 @@ function projectActiveGroup(next: AppState): void {
   }
   next.flights = active.flights;
   next.staff = active.staff;
+  next.flightPlanConfirmations = active.flightPlanConfirmations ?? [];
   next.halfRestSelections = active.halfRestSelections;
   next.leaveTypes = active.leaveTypes;
   next.positionRules = active.positionRules;
@@ -975,6 +984,9 @@ export function restorePersistedState(
         value.ordinaryPriorityFrequencyAdjustments
       ),
     assignments: [],
+    flightPlanConfirmations: normalizeFlightPlanConfirmations(
+      value.flightPlanConfirmations
+    ),
     halfRestSelections: normalizeHalfRestSelections(value.halfRestSelections),
     activeScheduleDate:
       value.activeScheduleDate === null ||

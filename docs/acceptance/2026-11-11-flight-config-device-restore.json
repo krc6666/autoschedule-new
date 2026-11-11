@@ -1,0 +1,307 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-11-flight-config-device-restore",
+  "title": "Complete current-group configuration transfer between devices",
+  "startedFrom": "a9d47c8cf7cee7a71cc28bd6dede4fd52329636c",
+  "expectation": {
+    "example": "owner提供换季后的真实配置文件，AK151模板及当天航班均为21:05–23:05；目标设备仍有空时间AK151和文件之外的旧航班。owner确认新增换设备完整恢复选项，并暂不处理11月17日历史来源。",
+    "expected": "显式选择完整恢复后，共用模板和当前组当天航班逐项按文件恢复，文件之外旧航班不残留或被补回；开始结束时间和包含斜杠的完整岗位名称往返一致；生成及重排准备不再消费旧航班空时间。 Owner subsequently clarified that A-device export must carry all current-group long-term configuration and import seamlessly on B; complete imports must not mix in target-device old settings. Fix compound position names, zero fatigue and manual qualification roundtrip, and current-flight rename references. Follow-up: the same supplied config (15) must restore its existing valid flights and rules even when four newer statistics parameters and leave-type/half-rest tables are absent. Announce and apply central initial values only for those absent items; latest export must include them. Never silently inherit target-device values.",
+    "unchanged": "Ordinary partial import is available after explicitly deselecting complete restore; history merge remains unchanged and the November 17 history investigation is deferred. Other-group existing staff, rule values, settings and current schedule remain unchanged; shared templates still add missing other-group rules. Admin support mode is intentionally excluded by the existing config contract. Scheduling eligibility, solver and fairness rules are unchanged. Owner subsequently explicitly chose to keep administrative support mode local to each device; imports preserve the target selection.",
+    "fallback": "Full restore rejects required sections/parameters missing or any recorded invalid content before writing. The four newer morning/evening scalar values and absent leave/half-rest sections alone have an explicit, previewed initial-value recovery contract. Recorded invalid optional content, unresolved leave references and equal statistics interval endpoints (including after default compilation) remain rejected. Partial and history import contracts are unchanged."
+  },
+  "testedVersion": "e1210a8e34871642e4017c904d6eeabfa21e76b9313108f56e3ac5a81967baf1",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "Initial flight regressions and expanded 11 pre-fix failures reproduce data loss and incomplete synchronization; additional five malformed-row failures were observed before parser guards were added. Final L2 and private-file checks passed. Follow-up: owner confirmed config (15), not a different input; strict new-field requirements were the blocker. Direct current-file probe now imports successfully. The two equal-interval red failures are separate additional guard evidence.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-config-transfer-red.txt",
+          "summary": "Actual pre-fix 11 failing regressions: compound names, manual qualifications, source rule set, missing configuration and parameters, default restore and current-flight rule references.",
+          "sha256": "50ff46e0a0e0e325b3050ef0c726c43f9c305437db4801de334669016fa3bd86"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-config-transfer-validation.txt",
+          "summary": "Final L2: typecheck exit 0; 169 test files / 1698 functional tests passed; production build exit 0. Includes corrupted-row and root-app import checks.",
+          "sha256": "9e6b4b977ee2fee192e1de98dc29fab2f29023ddfb092b93befac350219c195d"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-config-transfer-real.json",
+          "summary": "Real-file known facts: 10 templates, 4 current flights and 82 position rules independently checked; latest export restores identical business hashes into two different target-device fixtures, including storage reload and second export. Missing original source-device fields are explicitly unverified.",
+          "sha256": "9dd610bce1d45b40c7026edf8226a6acce4cad03d4146af1203d44e230a68a57"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-config-optional-validation.txt",
+          "summary": "Current final L2: typecheck exit 0; 169 files / 1703 functional tests passed; build exit 0. Existing HiGHS externalization and 905.42kB entry warnings retained. No performance/verify run, commit, push or deployment.",
+          "sha256": "49cf49e439ccb3fce56364ac2a00b74056d90c323b63f6d1a579c07530329df4"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-config-optional-real.json",
+          "summary": "Supplied workbook restored directly on two differing target stores: no fatal errors, six announced defaults, 10 templates / 4 current flights / 82 rules, equal restored configuration hashes, no stale template, storage reload and latest XLSX export parsed without missing optional values. Original input hash unchanged; no browser acceptance claimed.",
+          "sha256": "9fc2258c29b26a94c96672aa790c5dc29bc7fe642eeaa7f97554dd552df3238e"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-config-optional-red.txt",
+          "summary": "Two genuine pre-fix failures expose equal statistics intervals silently retaining device values. A third failure was a test-label typo subsequently corrected, not a product regression. The inherited missing-new-fields recovery test was already passing when this continuation began.",
+          "sha256": "1734ae67628ea89d06f4843e52518b8efc0cb95070dca142b33bfe1d7d1889ef"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "Current complete exports and config (15) pass direct restore. The absent four newer scalar settings and leave/half-rest tables receive only announced central initial values, independent of target old settings; recorded values are retained. 1703 functional tests, typecheck and build pass. Follow-up page-setting audit: declared-setting inventory, isolated A/B transfers to differing targets, persistence and second XLSX transfer passed; final verify passed 1737 functional and 19 performance tests. Administrative mode remains intentionally local and unsaved form drafts are not exported.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-config-transfer-validation.txt",
+          "summary": "Final L2: typecheck exit 0; 169 test files / 1698 functional tests passed; production build exit 0. Includes corrupted-row and root-app import checks.",
+          "sha256": "9e6b4b977ee2fee192e1de98dc29fab2f29023ddfb092b93befac350219c195d"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-config-transfer-real.json",
+          "summary": "Real-file known facts: 10 templates, 4 current flights and 82 position rules independently checked; latest export restores identical business hashes into two different target-device fixtures, including storage reload and second export. Missing original source-device fields are explicitly unverified.",
+          "sha256": "9dd610bce1d45b40c7026edf8226a6acce4cad03d4146af1203d44e230a68a57"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-config-optional-validation.txt",
+          "summary": "Current final L2: typecheck exit 0; 169 files / 1703 functional tests passed; build exit 0. Existing HiGHS externalization and 905.42kB entry warnings retained. No performance/verify run, commit, push or deployment.",
+          "sha256": "49cf49e439ccb3fce56364ac2a00b74056d90c323b63f6d1a579c07530329df4"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-config-optional-real.json",
+          "summary": "Supplied workbook restored directly on two differing target stores: no fatal errors, six announced defaults, 10 templates / 4 current flights / 82 rules, equal restored configuration hashes, no stale template, storage reload and latest XLSX export parsed without missing optional values. Original input hash unchanged; no browser acceptance claimed.",
+          "sha256": "9fc2258c29b26a94c96672aa790c5dc29bc7fe642eeaa7f97554dd552df3238e"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-page-configuration-transfer-audit.json",
+          "summary": "Independent inventory: 47 settings, 46 in Excel and explicit local-only administrative mode. Isolated A/B edits, XLSX bytes, two differing destinations per group, group switch, reload and second transfer agree. Unsaved versus saved rule form and administrative-mode exclusion were directly verified. No physical-device acceptance.",
+          "sha256": "a0279af5749c823c44849b7e6822a044682c73fc984c6aa7f9b2d209775eebea"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-page-configuration-transfer-probe.txt",
+          "summary": "Five isolated audit probes and related suites: 5 files / 52 tests passed. Temporary probe removed; permanent field-inventory regression retained.",
+          "sha256": "89e58ef25a3b511763c38ac11059c5e180deb8fe2e6de75ad666545ddd86d81e"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-page-configuration-transfer-verify.txt",
+          "summary": "Final npm.cmd run verify exit 0: typecheck, 173 files / 1737 functional tests, 7 files / 19 performance tests and production build passed. Existing HiGHS externalization and entry-size advisories remain.",
+          "sha256": "366e45e6a3c26c95f45a787cc00f43871ce197635673c331144d0f502028b848"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "Config and mixed imports, explicit ordinary partial import, template-only and pure-history paths, empty tables, cancel, two target-device variants and other-group preservation are covered. Follow-up UI test covers restore enabled/disabled/enabled without writing before confirmation, then applies exactly announced defaults. Ordinary partial and pure-history behavior remain covered by current full suite. Follow-up page-setting audit: declared-setting inventory, isolated A/B transfers to differing targets, persistence and second XLSX transfer passed; final verify passed 1737 functional and 19 performance tests. Administrative mode remains intentionally local and unsaved form drafts are not exported.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-config-transfer-validation.txt",
+          "summary": "Final L2: typecheck exit 0; 169 test files / 1698 functional tests passed; production build exit 0. Includes corrupted-row and root-app import checks.",
+          "sha256": "9e6b4b977ee2fee192e1de98dc29fab2f29023ddfb092b93befac350219c195d"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-config-transfer-real.json",
+          "summary": "Real-file known facts: 10 templates, 4 current flights and 82 position rules independently checked; latest export restores identical business hashes into two different target-device fixtures, including storage reload and second export. Missing original source-device fields are explicitly unverified.",
+          "sha256": "9dd610bce1d45b40c7026edf8226a6acce4cad03d4146af1203d44e230a68a57"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-config-optional-validation.txt",
+          "summary": "Current final L2: typecheck exit 0; 169 files / 1703 functional tests passed; build exit 0. Existing HiGHS externalization and 905.42kB entry warnings retained. No performance/verify run, commit, push or deployment.",
+          "sha256": "49cf49e439ccb3fce56364ac2a00b74056d90c323b63f6d1a579c07530329df4"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-config-optional-real.json",
+          "summary": "Supplied workbook restored directly on two differing target stores: no fatal errors, six announced defaults, 10 templates / 4 current flights / 82 rules, equal restored configuration hashes, no stale template, storage reload and latest XLSX export parsed without missing optional values. Original input hash unchanged; no browser acceptance claimed.",
+          "sha256": "9fc2258c29b26a94c96672aa790c5dc29bc7fe642eeaa7f97554dd552df3238e"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-page-configuration-transfer-audit.json",
+          "summary": "Independent inventory: 47 settings, 46 in Excel and explicit local-only administrative mode. Isolated A/B edits, XLSX bytes, two differing destinations per group, group switch, reload and second transfer agree. Unsaved versus saved rule form and administrative-mode exclusion were directly verified. No physical-device acceptance.",
+          "sha256": "a0279af5749c823c44849b7e6822a044682c73fc984c6aa7f9b2d209775eebea"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-page-configuration-transfer-probe.txt",
+          "summary": "Five isolated audit probes and related suites: 5 files / 52 tests passed. Temporary probe removed; permanent field-inventory regression retained.",
+          "sha256": "89e58ef25a3b511763c38ac11059c5e180deb8fe2e6de75ad666545ddd86d81e"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-page-configuration-transfer-verify.txt",
+          "summary": "Final npm.cmd run verify exit 0: typecheck, 173 files / 1737 functional tests, 7 files / 19 performance tests and production build passed. Existing HiGHS externalization and entry-size advisories remain.",
+          "sha256": "366e45e6a3c26c95f45a787cc00f43871ce197635673c331144d0f502028b848"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "Complete restore skips rule-flight template resurrection and active-group missing-position creation. Other-group existing schedule is preserved. Root-app click/confirm, Store group switches, reload and second XLSX transfer preserve final configuration. Direct config (15) restore is rechecked after Store persistence reload and a latest XLSX re-export: no missing newer fields, equal restored hashes on differing targets. Follow-up page-setting audit: declared-setting inventory, isolated A/B transfers to differing targets, persistence and second XLSX transfer passed; final verify passed 1737 functional and 19 performance tests. Administrative mode remains intentionally local and unsaved form drafts are not exported.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-config-transfer-validation.txt",
+          "summary": "Final L2: typecheck exit 0; 169 test files / 1698 functional tests passed; production build exit 0. Includes corrupted-row and root-app import checks.",
+          "sha256": "9e6b4b977ee2fee192e1de98dc29fab2f29023ddfb092b93befac350219c195d"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-config-transfer-real.json",
+          "summary": "Real-file known facts: 10 templates, 4 current flights and 82 position rules independently checked; latest export restores identical business hashes into two different target-device fixtures, including storage reload and second export. Missing original source-device fields are explicitly unverified.",
+          "sha256": "9dd610bce1d45b40c7026edf8226a6acce4cad03d4146af1203d44e230a68a57"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-config-optional-validation.txt",
+          "summary": "Current final L2: typecheck exit 0; 169 files / 1703 functional tests passed; build exit 0. Existing HiGHS externalization and 905.42kB entry warnings retained. No performance/verify run, commit, push or deployment.",
+          "sha256": "49cf49e439ccb3fce56364ac2a00b74056d90c323b63f6d1a579c07530329df4"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-config-optional-real.json",
+          "summary": "Supplied workbook restored directly on two differing target stores: no fatal errors, six announced defaults, 10 templates / 4 current flights / 82 rules, equal restored configuration hashes, no stale template, storage reload and latest XLSX export parsed without missing optional values. Original input hash unchanged; no browser acceptance claimed.",
+          "sha256": "9fc2258c29b26a94c96672aa790c5dc29bc7fe642eeaa7f97554dd552df3238e"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-page-configuration-transfer-audit.json",
+          "summary": "Independent inventory: 47 settings, 46 in Excel and explicit local-only administrative mode. Isolated A/B edits, XLSX bytes, two differing destinations per group, group switch, reload and second transfer agree. Unsaved versus saved rule form and administrative-mode exclusion were directly verified. No physical-device acceptance.",
+          "sha256": "a0279af5749c823c44849b7e6822a044682c73fc984c6aa7f9b2d209775eebea"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-page-configuration-transfer-probe.txt",
+          "summary": "Five isolated audit probes and related suites: 5 files / 52 tests passed. Temporary probe removed; permanent field-inventory regression retained.",
+          "sha256": "89e58ef25a3b511763c38ac11059c5e180deb8fe2e6de75ad666545ddd86d81e"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-page-configuration-transfer-verify.txt",
+          "summary": "Final npm.cmd run verify exit 0: typecheck, 173 files / 1737 functional tests, 7 files / 19 performance tests and production build passed. Existing HiGHS externalization and entry-size advisories remain.",
+          "sha256": "366e45e6a3c26c95f45a787cc00f43871ce197635673c331144d0f502028b848"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "Required missing sections/parameters, recorded invalid new parameters, malformed leave/half-rest sheets and equal statistics endpoints reject before writes; UI disable and direct commit checks pass. Six explicitly recoverable absent newer fields are not fatal. Target-dependent fallback is forbidden in full restore.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-config-transfer-validation.txt",
+          "summary": "Final L2: typecheck exit 0; 169 test files / 1698 functional tests passed; production build exit 0. Includes corrupted-row and root-app import checks.",
+          "sha256": "9e6b4b977ee2fee192e1de98dc29fab2f29023ddfb092b93befac350219c195d"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-config-transfer-real.json",
+          "summary": "Real-file known facts: 10 templates, 4 current flights and 82 position rules independently checked; latest export restores identical business hashes into two different target-device fixtures, including storage reload and second export. Missing original source-device fields are explicitly unverified.",
+          "sha256": "9dd610bce1d45b40c7026edf8226a6acce4cad03d4146af1203d44e230a68a57"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-config-optional-validation.txt",
+          "summary": "Current final L2: typecheck exit 0; 169 files / 1703 functional tests passed; build exit 0. Existing HiGHS externalization and 905.42kB entry warnings retained. No performance/verify run, commit, push or deployment.",
+          "sha256": "49cf49e439ccb3fce56364ac2a00b74056d90c323b63f6d1a579c07530329df4"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-config-optional-real.json",
+          "summary": "Supplied workbook restored directly on two differing target stores: no fatal errors, six announced defaults, 10 templates / 4 current flights / 82 rules, equal restored configuration hashes, no stale template, storage reload and latest XLSX export parsed without missing optional values. Original input hash unchanged; no browser acceptance claimed.",
+          "sha256": "9fc2258c29b26a94c96672aa790c5dc29bc7fe642eeaa7f97554dd552df3238e"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "Current L2 passes: 169 files / 1703 functional tests, typecheck and build. Partial and pure-history paths, other-group isolation and scheduling rules remain covered. No solver changes, so performance and verify not rerun; no new commit/push authorization. Follow-up page-setting audit: declared-setting inventory, isolated A/B transfers to differing targets, persistence and second XLSX transfer passed; final verify passed 1737 functional and 19 performance tests. Administrative mode remains intentionally local and unsaved form drafts are not exported. Pre-commit full verification passed 1737 functional and 19 performance tests, typecheck and build; product behavior unchanged after that run.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-config-transfer-validation.txt",
+          "summary": "Final L2: typecheck exit 0; 169 test files / 1698 functional tests passed; production build exit 0. Includes corrupted-row and root-app import checks.",
+          "sha256": "9e6b4b977ee2fee192e1de98dc29fab2f29023ddfb092b93befac350219c195d"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-config-transfer-real.json",
+          "summary": "Real-file known facts: 10 templates, 4 current flights and 82 position rules independently checked; latest export restores identical business hashes into two different target-device fixtures, including storage reload and second export. Missing original source-device fields are explicitly unverified.",
+          "sha256": "9dd610bce1d45b40c7026edf8226a6acce4cad03d4146af1203d44e230a68a57"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-config-optional-validation.txt",
+          "summary": "Current final L2: typecheck exit 0; 169 files / 1703 functional tests passed; build exit 0. Existing HiGHS externalization and 905.42kB entry warnings retained. No performance/verify run, commit, push or deployment.",
+          "sha256": "49cf49e439ccb3fce56364ac2a00b74056d90c323b63f6d1a579c07530329df4"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-page-configuration-transfer-audit.json",
+          "summary": "Independent inventory: 47 settings, 46 in Excel and explicit local-only administrative mode. Isolated A/B edits, XLSX bytes, two differing destinations per group, group switch, reload and second transfer agree. Unsaved versus saved rule form and administrative-mode exclusion were directly verified. No physical-device acceptance.",
+          "sha256": "a0279af5749c823c44849b7e6822a044682c73fc984c6aa7f9b2d209775eebea"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-page-configuration-transfer-probe.txt",
+          "summary": "Five isolated audit probes and related suites: 5 files / 52 tests passed. Temporary probe removed; permanent field-inventory regression retained.",
+          "sha256": "89e58ef25a3b511763c38ac11059c5e180deb8fe2e6de75ad666545ddd86d81e"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-page-configuration-transfer-verify.txt",
+          "summary": "Final npm.cmd run verify exit 0: typecheck, 173 files / 1737 functional tests, 7 files / 19 performance tests and production build passed. Existing HiGHS externalization and entry-size advisories remain.",
+          "sha256": "366e45e6a3c26c95f45a787cc00f43871ce197635673c331144d0f502028b848"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-administrative-mode-owner-decision.json",
+          "summary": "Owner explicitly chose to keep administrative mode device-local. Existing exclusion remains unchanged; no new physical-device acceptance is implied.",
+          "sha256": "dfba8c46a7107cec565112b65acf106903b1201c9f4a1326ed985069fee42c01"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-configuration-commit-verify.txt",
+          "summary": "Pre-commit npm.cmd run verify exit 0: typecheck, 173 files / 1737 functional tests, 7 files / 19 performance tests and production build passed. Subsequent changes only normalize documentation/evidence formatting and record this command. Existing build advisories retained; no physical-device acceptance inferred.",
+          "sha256": "561cd6a1634d885ca83f3d2fa12cb98cacafb4f255e7f0a6735868e65812d61b"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "Owner has now confirmed real localhost:50966 import succeeds, flight numbers update and KE166/CX937 early/late template remnants are gone. This resolves the reported residual symptom. Broad transfer task remains unverified for two physical devices and source-device fields not recorded in the supplied workbook; no invented cause or complete manual comparison is claimed. Follow-up automated page-setting audit passed, including actual workbook bytes and persisted settings; this does not close the remaining two-physical-device acceptance.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-config-transfer-real.json",
+          "summary": "Real-file known facts: 10 templates, 4 current flights and 82 position rules independently checked; latest export restores identical business hashes into two different target-device fixtures, including storage reload and second export. Missing original source-device fields are explicitly unverified.",
+          "sha256": "9dd610bce1d45b40c7026edf8226a6acce4cad03d4146af1203d44e230a68a57"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-config-transfer-validation.txt",
+          "summary": "Final L2: typecheck exit 0; 169 test files / 1698 functional tests passed; production build exit 0. Includes corrupted-row and root-app import checks.",
+          "sha256": "9e6b4b977ee2fee192e1de98dc29fab2f29023ddfb092b93befac350219c195d"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-flight-restore-page.json",
+          "summary": "Owner screenshot still shows old flight templates and blank times; acceptance failed, awaiting import-option evidence.",
+          "sha256": "6a5c1463c3f13ec26a2161df1fe8695515cabfd1e3623843fa078d05d10b91e9"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-config-optional-validation.txt",
+          "summary": "Current final L2: typecheck exit 0; 169 files / 1703 functional tests passed; build exit 0. Existing HiGHS externalization and 905.42kB entry warnings retained. No performance/verify run, commit, push or deployment.",
+          "sha256": "49cf49e439ccb3fce56364ac2a00b74056d90c323b63f6d1a579c07530329df4"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-config-optional-real.json",
+          "summary": "Supplied workbook restored directly on two differing target stores: no fatal errors, six announced defaults, 10 templates / 4 current flights / 82 rules, equal restored configuration hashes, no stale template, storage reload and latest XLSX export parsed without missing optional values. Original input hash unchanged; no browser acceptance claimed.",
+          "sha256": "9fc2258c29b26a94c96672aa790c5dc29bc7fe642eeaa7f97554dd552df3238e"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-config-optional-served.json",
+          "summary": "Current localhost:50966 serves HTTP 200 for all three changed import modules with expected defaults, guard, dialog and controller markers. Read-only HTTP checks are not browser import acceptance.",
+          "sha256": "7bd9dd97dbbf475389c1eb940975dcdf4e02d5909bf4359a00e6787a505ef9c0"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-flight-restore-owner-confirmation.json",
+          "summary": "Owner-operated local-page evidence: import success, updated flight numbers, initial three stale templates and subsequent explicit confirmation they are gone. Records limits; no browser automation.",
+          "sha256": "ac3637da21eb73ff696ecceb6ffe62c15ce50e8d89b085e0a523516ffd5f6a71"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-page-configuration-transfer-audit.json",
+          "summary": "Independent inventory: 47 settings, 46 in Excel and explicit local-only administrative mode. Isolated A/B edits, XLSX bytes, two differing destinations per group, group switch, reload and second transfer agree. Unsaved versus saved rule form and administrative-mode exclusion were directly verified. No physical-device acceptance.",
+          "sha256": "a0279af5749c823c44849b7e6822a044682c73fc984c6aa7f9b2d209775eebea"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-page-configuration-transfer-verify.txt",
+          "summary": "Final npm.cmd run verify exit 0: typecheck, 173 files / 1737 functional tests, 7 files / 19 performance tests and production build passed. Existing HiGHS externalization and entry-size advisories remain.",
+          "sha256": "366e45e6a3c26c95f45a787cc00f43871ce197635673c331144d0f502028b848"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "The original private file contains complete flight times, but normal config import preserves current flights and templates. Expanded red tests additionally expose slash splitting, zero-point fallback, manual-qualification loss, skipped rule tables and current-flight rename omissions. Evidence: config-transfer-red.txt, config-transfer-audit.json and final config-transfer-validation.txt. Follow-up evidence: owner confirmed the same config (15); overly strict missing-new-field checks blocked valid existing data. Two new red regressions also expose equal statistics intervals silently retaining device settings. An additional red failure was only a test-label typo and is not claimed as product evidence. Follow-up independent interface inventory guards against newly declared fields silently missing Excel; audit found no unexplained missing saved setting.",
+    "laterChanges": "Template auto-add can reintroduce old flights or source-deleted positions; complete restore now prevents both. Other-group nonempty schedules, initial preview versus confirmation, UI bypass, storage reload and second exports are explicitly tested. Current-flight rename reuses the existing current-group reference updater instead of duplicating a partial rule list. The single compileWorkbookConfigurationRestore handles defaults, validation, preview, option toggles and commit; UI integration verifies preview does not write, toggles remove/restore the notice and confirmation applies the announced values. Follow-up audit independently verifies each group through switch, persistence reload and second workbook transfer after editing, with the other group preserved (page-configuration-transfer-audit.json).",
+    "finalArtifact": "config-transfer-real.json independently checks 10 templates, 4 current flights and 82 rules from the supplied workbook and equal restored-business hashes across two differing target fixtures. Missing fields use defaults only in that diagnostic source fixture; this is not proof of the original A-device missing values. Actual A/B page acceptance remains unverified, and no deployment is claimed. config-optional-real.json now checks direct restoration of the supplied file on two different target stores, matching templates/flights/rules, removal of stale templates, storage reload and re-export with no missing optional values. Actual browser confirmation remains pending. Follow-up audit JSON and final verify log establish isolated complete transfers and 1737 functional / 19 performance passes, while physical-device comparison remains unverified."
+  },
+  "review": {
+    "missedScope": "Initial flight-only repair missed rule position lists, manual qualifications, zero fatigue, source-deleted rules and default restoration mode. Expanded checks cover editors, XLSX, Store, UI, alternate imports and persistence. Real A-device unexported values, updated owner page and native WPS/Excel application opening remain unverified. Other-group whole-device backup and history replacement are outside the confirmed scope. Initial-value recovery does not recover A-device values absent from the original file. Actual browser/WPS/Excel and two physical devices remain unverified; no claim of final page acceptance. Follow-up audit distinguishes saved settings from unsaved drafts. Owner has explicitly confirmed keeping the verified administrative-mode exclusion; current-group export is not a full A/B backup.",
+    "rootCause": "A partial merge workflow was treated as device restoration; current flights overrode replaced template times, missing fields reused local settings, and template synchronization could reconstruct deleted positions. Shared generic list parsing split compound names, manual markers replaced qualification IDs, and numeric falsy fallback changed zero. Current-flight rename maintained only a subset of existing rule references. The follow-up check incorrectly treated known missing newer fields as fatal. Settings normalization could also silently use a target-specific fallback for an equal start/end interval; complete restore now rejects that combination before writing. The follow-up inventory found no new unexplained omission; unsaved input uses the saved value by design and administrative mode is explicitly excluded by the current specification.",
+    "earlyDetection": "Before a transfer change, use a source with changed flight names/times, slash positions, manual IDs, zero points, empty/deleted rule sets and nondefault settings. Export bytes and restore into two differently populated targets, compare all business fields and source rows independently, then reload/re-export and exercise the real confirmation path. Full files with missing/invalid configuration must not silently become successful partial restores. Include the actual previously exported file with absent newer fields, two target stores with different settings, and valid-versus-corrupt optional sections. Verify the announced defaults, direct confirmation, invalid interval rejection and a second full export. Independent TypeScript interface inventory now fails if a new ScheduleSettings or GroupWorkspace field lacks an explicit Excel or regenerated-state classification; use differing nondefault target settings and test save-before-export separately."
+  }
+}

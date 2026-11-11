@@ -1,8 +1,4 @@
-import { clearActiveSchedule } from "../domain/kernel/schedule-lifecycle";
-import {
-  addMissingRuleFlightTemplates,
-  addMissingTemplatePositionRules,
-} from "../domain/flights/template-position-rules";
+import { addMissingRuleFlightTemplates } from "../domain/flights/template-position-rules";
 import type { AppState, Flight, FlightTemplate, PositionRule } from "../model";
 import { normalizeWeeklyFlightNo } from "../domain/flights/weekly-flight-plan";
 
@@ -43,32 +39,4 @@ export function synchronizeImportedRuleFlightsToTemplates(
   state.templates = result.templates;
   state.shared.templates = result.templates;
   return result.added;
-}
-
-/** Add missing template jobs while keeping each group's existing rule facts. */
-export function synchronizeTemplatePositionRules(
-  state: AppState,
-  templates: readonly FlightTemplate[] = state.templates
-): number {
-  let totalAdded = 0;
-
-  for (const groupId of ["A", "B"] as const) {
-    const group = state.groups[groupId];
-    const current =
-      groupId === state.activeGroupId
-        ? state.positionRules
-        : group.positionRules;
-    const result = addMissingTemplatePositionRules(current, templates);
-    if (!result.added) continue;
-
-    group.positionRules = result.rules;
-    clearActiveSchedule(group);
-    if (groupId === state.activeGroupId) {
-      state.positionRules = result.rules;
-      clearActiveSchedule(state);
-    }
-    totalAdded += result.added;
-  }
-
-  return totalAdded;
 }
