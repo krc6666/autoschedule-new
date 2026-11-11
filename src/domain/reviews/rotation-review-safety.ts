@@ -14,6 +14,7 @@ import {
 import type { ScheduleRunFacts } from "../shared/schedule-run-facts";
 import type { ScheduleGenerationFacts } from "../shared/scheduling-facts";
 import { intervalsOverlap } from "../shared/time";
+import { isPreNoonFlight } from "../flights/schedule-tasks";
 import type { ScheduleFrequencyFacts } from "../statistics/schedule-frequency";
 import { latePriorityFrequencyRegressionReasons } from "./late-priority-frequency-balance";
 import {
@@ -27,6 +28,7 @@ import { evaluateWorkloadBalance } from "./workload-balance";
 import { crossWorkdayReservationStatuses } from "./cross-workday-qualification-reservation";
 import { crossFlightPriorityReassignmentReasons } from "../rules/cross-flight-priority";
 import { isDutyReliefPriorityPosition } from "./position-rotation-policy";
+import { dutyFlightCountStatus } from "../assignments/duty-flight-count";
 import {
   halfRestRegressionReasons,
   strictRecoveryHalfRestBackfillCount,
@@ -395,12 +397,41 @@ function plannedAssignmentSafetyReasons(
   ) {
     reasons.push("交换后值班人员没有12点前开始的航班");
   }
-  if (
-    review !== "coverage" &&
-    facts?.currentDutyStaffId &&
-    worsensDutyRelief(state, assignments, planned, facts.currentDutyStaffId)
-  ) {
-    reasons.push("调整会增加值班人员的额外航班、重点岗位或疲劳");
+  if (review !== "coverage" && facts?.currentDutyStaffId) {
+    const countOptions = {
+      dutyStaffId: facts.currentDutyStaffId,
+      halfRestStaffIds: facts.halfRest.activeStaffIds,
+    };
+    const before = dutyFlightCountStatus(state, assignments, countOptions);
+    const after = dutyFlightCountStatus(state, planned, countOptions);
+    if (
+      !intentPolicy.allowDutyFlightCountRegression &&
+      review !== "late-frequency" &&
+      after.shortfall > before.shortfall
+    )
+      reasons.push(
+        "调整会扩大值班人员与普通人员最高航班数的差距，破坏已落实的下午补班"
+      );
+    else if (
+      !(
+        after.shortfall < before.shortfall &&
+        after.dutyCount > before.dutyCount &&
+        !planned.some(
+          (row) =>
+            row.status === "assigned" &&
+            row.staffId === facts.currentDutyStaffId &&
+            isPreNoonFlight(row) &&
+            !assignments.some(
+              (original) =>
+                original.id === row.id &&
+                original.status === "assigned" &&
+                original.staffId === facts.currentDutyStaffId
+            )
+        )
+      ) &&
+      worsensDutyRelief(state, assignments, planned, facts.currentDutyStaffId)
+    )
+      reasons.push("调整会增加值班人员的额外航班、重点岗位或疲劳");
   }
   reasons.push(
     ...halfRestRegressionReasons(

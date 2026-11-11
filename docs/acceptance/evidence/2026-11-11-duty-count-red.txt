@@ -1,0 +1,60 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/domain/duty-flight-count.test.ts (4 tests | 4 failed) 439ms
+     × adds an afternoon flight before duty relief for 0 extra flights 313ms
+     × adds an afternoon flight before duty relief for 2 extra flights 104ms
+     × places the count target before duty rest without imposing an unconditional hard difference 11ms
+     × rejects a later rotation that takes away the afternoon remedy 9ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/domain/duty-flight-count.test.ts > duty afternoon flight count floor > adds an afternoon flight before duty relief for 0 extra flights
+ FAIL  tests/domain/duty-flight-count.test.ts > duty afternoon flight count floor > adds an afternoon flight before duty relief for 2 extra flights
+AssertionError: expected 2 to be less than or equal to 1
+ ❯ tests/domain/duty-flight-count.test.ts:20:54
+     18|     const result = await generateSchedule(state, DUTY_COUNT_DATE);
+     19|     const maximum = Math.max(...state.staff.filter(p=>p.id!=="duty").m…
+     20|     expect(maximum-count(result.assignments,"duty")).toBeLessThanOrEqu…
+       |                                                      ^
+     21|     expect(count(result.assignments,"duty")).toBe(3);
+     22|     expect(result.unfilledCount).toBe(0);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  tests/domain/duty-flight-count.test.ts > duty afternoon flight count floor > places the count target before duty rest without imposing an unconditional hard difference
+AssertionError: expected [ 'duty:morning', …(12) ] to include 'duty-position:flight-count-shortfall'
+ ❯ tests/domain/duty-flight-count.test.ts:32:17
+     30|     const model=buildDailyScheduleModel({state,date:DUTY_COUNT_DATE,pr…
+     31|     const ids=model.problem.objectives.map(o=>o.id);
+     32|     expect(ids).toContain("duty-position:flight-count-shortfall");
+       |                 ^
+     33|     expect(ids.indexOf("duty-position:flight-count-shortfall")).toBeLe…
+     34|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  tests/domain/duty-flight-count.test.ts > duty afternoon flight count floor > rejects a later rotation that takes away the afternoon remedy
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/domain/duty-flight-count.test.ts:43:66
+     41|       primaryAssignmentId:row.id,changes:[{assignmentId:row.id,staffId…
+     42|       facts:createScheduleRunFacts(state,DUTY_COUNT_DATE),intent:{kind…
+     43|     expect(reasons.some(r=>r.includes("值班")&&r.includes("航班数"))).toBe(…
+       |                                                                  ^
+     44|   });
+     45| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed (4)
+   Start at  21:14:31
+   Duration  1.95s (transform 1.06s, setup 0ms, import 1.25s, tests 439ms, environment 0ms)

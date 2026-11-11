@@ -29,6 +29,7 @@ export interface ReassignmentIntentPolicy {
   allowPositionTransitionRegression: boolean;
   allowTr121CooldownRegression: boolean;
   allowDirectGuideReassignment: boolean;
+  allowDutyFlightCountRegression: boolean;
 }
 
 export function reassignmentIntentReview(
@@ -65,12 +66,18 @@ const STRICT_REASSIGNMENT_POLICY: ReassignmentIntentPolicy = {
   allowPositionTransitionRegression: false,
   allowTr121CooldownRegression: false,
   allowDirectGuideReassignment: false,
+  allowDutyFlightCountRegression: false,
 };
 
 export function reassignmentIntentPolicy(
   intent: ReassignmentIntent
 ): ReassignmentIntentPolicy {
   switch (intent.kind) {
+    case "manual-swap-analysis":
+      return {
+        ...STRICT_REASSIGNMENT_POLICY,
+        allowDutyFlightCountRegression: true,
+      };
     case "next-workday-cutoff-recovery":
       return {
         ...STRICT_REASSIGNMENT_POLICY,
@@ -105,7 +112,6 @@ export function reassignmentIntentPolicy(
     case "consecutive-rotation-review":
     case "late-shift-recovery-review":
     case "position-frequency-review":
-    case "manual-swap-analysis":
       return STRICT_REASSIGNMENT_POLICY;
   }
 }

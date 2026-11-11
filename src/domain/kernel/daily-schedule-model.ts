@@ -38,6 +38,7 @@ import type {
 } from "../solver/solver-port";
 import { durationHours } from "../shared/time";
 import type { SchedulePreparation } from "./schedule-preparation";
+import { buildDutyFlightCountModel } from "./daily-duty-flight-count-model";
 import {
   workloadBalanceLoadSnapshots,
   WORKLOAD_BALANCE_MIN_FLIGHTS,
@@ -52,7 +53,10 @@ import {
   isStrictNextWorkdayRecoveryTarget,
 } from "../reviews/cross-day-recovery";
 import { latePriorityFlightInScope } from "../statistics/late-priority-flight-scope";
-import { groupStaffFlightsByNormalizedNumber } from "../statistics/staff-flight-count";
+import {
+  groupStaffFlightsByNormalizedNumber,
+  dailyFlightCountParticipantIds,
+} from "../statistics/staff-flight-count";
 import { exceedsTr121NumberOneAutomaticLimit } from "../statistics/late-priority-frequency";
 import {
   buildDailyCombinationModel,
@@ -1022,25 +1026,17 @@ function dailyFlightCountBalanceModel(
   const eligibleParticipantIds = new Set(
     staffChoices.map((choice) => choice.person.id)
   );
-  const participants = state.staff.filter(
-    (person) =>
-      person.status === "正常" &&
-      person.staffType === "常规" &&
-      eligibleParticipantIds.has(person.id) &&
-      person.id !== dutyStaffId &&
-      !(
-        state.settings.dailyFlightCountBalanceExemptHalfRest &&
-        halfRestStaffIds.has(person.id)
-      ) &&
-      !(
-        state.settings.dailyFlightCountBalanceExemptTeamLeaders &&
-        person.teamLeader
-      )
+  const participantIds = dailyFlightCountParticipantIds(state, {
+    dutyStaffId,
+    halfRestStaffIds,
+    candidateStaffIds: eligibleParticipantIds,
+  });
+  const participants = state.staff.filter((person) =>
+    participantIds.has(person.id)
   );
   if (participants.length < 2)
     return { variables: [], constraints: [], objectives: [] };
 
-  const participantIds = new Set(participants.map((person) => person.id));
   const staffFlightEntries: Array<{
     staffId: string;
     flightNo: string;
@@ -1675,6 +1671,11 @@ export function buildDailyScheduleModel({
     scheduledTasks
   );
   const staffChoices = staffChoiceBuild.choices;
+  const dutyFlightCount = buildDutyFlightCountModel(
+    state,
+    preparation,
+    staffChoices
+  );
   const vacancyChoices = scheduledTasks.map((task, index) => ({
     id: `vacancy:${index}`,
     task,
@@ -1895,7 +1896,7 @@ export function buildDailyScheduleModel({
         strictTransition: strictTransitionObjectives,
         crossFlightPriority: crossFlightPriority.objectives,
         protectedFairness: protectedFairnessObjectives,
-        dutyRelief: duty.reliefObjectives,
+        dutyRelief: [...dutyFlightCount.objectives, ...duty.reliefObjectives],
         recovery: recoveryObjectives,
         halfRest: halfRest.objectives,
         remainingCandidate: remainingCandidateObjectives,
@@ -1927,6 +1928,7 @@ export function buildDailyScheduleModel({
         ...ke166Availability.variables,
         ...halfRest.variables,
         ...duty.variables,
+        ...dutyFlightCount.variables,
       ],
       constraints: [
         ...assignmentConstraints(scheduledTasks, staffChoices, vacancyChoices),
@@ -1941,6 +1943,7 @@ export function buildDailyScheduleModel({
         ...crossFlightPriority.constraints,
         ...ke166Availability.constraints,
         ...duty.constraints,
+        ...dutyFlightCount.constraints,
         ...halfRest.constraints,
       ],
       objectives,

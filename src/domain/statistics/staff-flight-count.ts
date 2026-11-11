@@ -1,3 +1,39 @@
+import type { ScheduleGenerationFacts } from "../shared/scheduling-facts";
+
+export interface DailyFlightCountParticipants {
+  dutyStaffId: string | null;
+  halfRestStaffIds?: ReadonlySet<string>;
+  candidateStaffIds?: ReadonlySet<string>;
+}
+
+export function dailyFlightCountParticipantIds(
+  state: Pick<ScheduleGenerationFacts, "staff" | "settings" | "positionRules">,
+  options: DailyFlightCountParticipants
+): Set<string> {
+  const qualified =
+    options.candidateStaffIds ??
+    new Set(state.positionRules.flatMap((rule) => rule.qualifiedStaffIds));
+  return new Set(
+    state.staff
+      .filter(
+        (person) =>
+          person.status === "正常" &&
+          person.staffType === "常规" &&
+          person.id !== options.dutyStaffId &&
+          qualified.has(person.id) &&
+          !(
+            state.settings.dailyFlightCountBalanceExemptHalfRest &&
+            options.halfRestStaffIds?.has(person.id)
+          ) &&
+          !(
+            state.settings.dailyFlightCountBalanceExemptTeamLeaders &&
+            person.teamLeader
+          )
+      )
+      .map((person) => person.id)
+  );
+}
+
 export interface StaffFlightEntry {
   staffId: string;
   flightNo: string;

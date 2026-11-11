@@ -11,6 +11,7 @@ import type { ScheduleGenerationFacts } from "../shared/scheduling-facts";
 import {
   groupStaffFlightsByNormalizedNumber,
   normalizeStaffFlightNumber,
+  dailyFlightCountParticipantIds,
 } from "../statistics/staff-flight-count";
 import { setAutomaticVacancyEvidence } from "./vacancy-evidence";
 import { clearAutomaticAssignmentEvidence } from "./assignment-evidence";
@@ -29,34 +30,6 @@ export interface DailyFlightCountBalanceEnforcementOptions {
 export interface DailyFlightCountBalanceEnforcementResult {
   spread: number;
   changed: boolean;
-}
-
-function participantIds(
-  state: Pick<ScheduleGenerationFacts, "staff" | "settings" | "positionRules">,
-  options: DailyFlightCountBalanceEnforcementOptions
-): Set<string> {
-  const qualifiedIds =
-    options.candidateStaffIds ??
-    new Set(state.positionRules.flatMap((rule) => rule.qualifiedStaffIds));
-  return new Set(
-    state.staff
-      .filter(
-        (person) =>
-          person.status === "正常" &&
-          person.staffType === "常规" &&
-          person.id !== options.dutyStaffId &&
-          qualifiedIds.has(person.id) &&
-          !(
-            state.settings.dailyFlightCountBalanceExemptHalfRest &&
-            options.halfRestStaffIds?.has(person.id)
-          ) &&
-          !(
-            state.settings.dailyFlightCountBalanceExemptTeamLeaders &&
-            person.teamLeader
-          )
-      )
-      .map((person) => person.id)
-  );
 }
 
 function assignedGroups(
@@ -294,7 +267,7 @@ export function enforceDailyFlightCountBalance(
   assignments: Assignment[],
   options: DailyFlightCountBalanceEnforcementOptions
 ): DailyFlightCountBalanceEnforcementResult {
-  const ids = participantIds(state, options);
+  const ids = dailyFlightCountParticipantIds(state, options);
   if (ids.size < 2) return { spread: 0, changed: false };
   const locked = options.lockedAssignmentIds ?? new Set<string>();
   let changed = false;

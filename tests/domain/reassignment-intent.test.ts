@@ -17,6 +17,7 @@ const STRICT_POLICY: ReassignmentIntentPolicy = {
   allowPositionTransitionRegression: false,
   allowTr121CooldownRegression: false,
   allowDirectGuideReassignment: false,
+  allowDutyFlightCountRegression: false,
 };
 
 const STRICT_INTENTS: readonly ReassignmentIntent[] = [
@@ -27,7 +28,6 @@ const STRICT_INTENTS: readonly ReassignmentIntent[] = [
   { kind: "consecutive-rotation-review" },
   { kind: "late-shift-recovery-review" },
   { kind: "position-frequency-review" },
-  { kind: "manual-swap-analysis" },
 ];
 
 describe("reassignment intent policy", () => {
@@ -55,6 +55,13 @@ describe("reassignment intent policy", () => {
 
   it.each(STRICT_INTENTS)("keeps %j strict", (intent) => {
     expect(reassignmentIntentPolicy(intent)).toEqual(STRICT_POLICY);
+  });
+
+  it("keeps manual swap permissions independent of the automatic duty count target", () => {
+    expect(reassignmentIntentPolicy({ kind: "manual-swap-analysis" })).toEqual({
+      ...STRICT_POLICY,
+      allowDutyFlightCountRegression: true,
+    });
   });
 
   it("only yields workload balance and cutoff protection for next-workday cutoff recovery", () => {

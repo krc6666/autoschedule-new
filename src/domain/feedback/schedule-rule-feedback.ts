@@ -4,6 +4,8 @@ import type { RuleFeedbackKey } from "../rules/schedule-rule-contract";
 import { diagnoseAutomaticAssignmentEligibility } from "../candidates/assignment-eligibility";
 import { conciseAssignmentWarningReason } from "../reviews/schedule-warning-message";
 import { groupStaffFlightsByNormalizedNumber } from "../statistics/staff-flight-count";
+import { dutyFlightCountStatus } from "../assignments/duty-flight-count";
+import { durationHours } from "../shared/time";
 import type { ScheduleFeedbackOptions } from "./schedule-feedback";
 import { compileSchedulingPlan } from "../rules/scheduling-execution-plan";
 import { recentArchivedWorkdays } from "../statistics/fatigue";
@@ -521,9 +523,59 @@ function monthlyCountDifference(counts: number[]): number {
   return counts.length ? Math.max(...counts) - Math.min(...counts) : 0;
 }
 
+function dutyAfternoonBlockerNote(
+  state: ScheduleGenerationFacts,
+  dutyStaffId: string
+): string {
+  const person = state.staff.find((p) => p.id === dutyStaffId);
+  if (!person || person.status !== "正常")
+    return "值班人员当前不在正常在岗状态。";
+  const ownFlights = new Set(
+    state.assignments
+      .filter((r) => r.status === "assigned" && r.staffId === dutyStaffId)
+      .map((r) => r.flightId)
+  );
+  const reasons: string[] = [];
+  let candidates = 0,
+    eligible = 0;
+  for (const flight of state.flights) {
+    if (isPreNoonFlight(flight) || ownFlights.has(flight.id)) continue;
+    for (const rule of state.positionRules.filter(
+      (r) =>
+        r.flightNo === flight.flightNo &&
+        (r.category === "常规" || r.category === "分流") &&
+        !r.manual
+    )) {
+      const row = state.assignments.find(
+        (r) => r.flightId === flight.id && r.positionRuleId === rule.id
+      );
+      if (!row) continue;
+      candidates++;
+      const assignments = state.assignments.filter((r) => r.id !== row.id);
+      const result = diagnoseAutomaticAssignmentEligibility({
+        state,
+        assignments,
+        flight,
+        rule,
+        person,
+        workHours: durationHours(flight.startTime, flight.endTime),
+      });
+      if (result.eligible) eligible++;
+      else
+        reasons.push(
+          `${flight.flightNo}/${rule.name}：${result.violations.map((v) => v.message).join("、")}`
+        );
+    }
+  }
+  if (!candidates) return "当天没有尚未承担的可核验下午普通岗位。";
+  const details = [...new Set(reasons)].slice(0, 3).join("；");
+  return `${details}${details ? "。" : ""}${eligible ? "有岗位通过单岗检查，但整班安排还需结合原人员去向、锁定及前序规则复核，不能据此强行补入。" : "已核验的下午岗位未通过直接安排检查。"}`;
+}
+
 function dutyRosterFeedback(
   state: ScheduleGenerationFacts,
-  date: string
+  date: string,
+  options: ScheduleFeedbackOptions
 ): ScheduleFeedbackItem {
   const roster = getDutyRosterForDate(state, date);
   const rosterIds = [
@@ -534,19 +586,32 @@ function dutyRosterFeedback(
   const cxName = staffName(state, roster.cxPreflightStaffId);
   const dutyName = staffName(state, roster.dutyStaffId);
   const dutyDescription = `值班${dutyName}（+${state.settings.dutyFatiguePoints} 点疲劳）`;
+  const dutyCount = dutyFlightCountStatus(state, state.assignments, {
+    dutyStaffId: roster.dutyStaffId,
+    halfRestStaffIds: new Set(options.halfRestStaffIds ?? []),
+  });
+  const dutyCountNote = dutyCount.applicable
+    ? ` 值班航班数${dutyCount.dutyCount}，普通参与人员最多${dutyCount.maximum}；${
+        dutyCount.shortfall
+          ? `还需补${dutyCount.shortfall}个下午航班才能相差不超过1，保留现有合法安排。${dutyAfternoonBlockerNote(state, roster.dutyStaffId!)}`
+          : "值班未落后超过1班，继续按值班减负安排。"
+      }`
+    : "";
   const protectedDuty = Boolean(
     roster.dutyStaffId &&
     previousWorkdayLateProtection(state, date).protectedStaffIds.has(
       roster.dutyStaffId
     )
   );
-  const dutyRecoveryNote = roster.recoveryAdjusted
-    ? roster.recoveryAdjustmentRole === "future-counterpart"
-      ? ` 自动值班恢复调整：本日原值班${staffName(state, roster.originalDutyStaffId ?? null)}已与 ${roster.recoverySwapDate} 的${dutyName}交换值班日期，月度值班次数不变。`
-      : ` 自动值班恢复调整：原值班${staffName(state, roster.originalDutyStaffId ?? null)}已与未来工作日 ${roster.recoverySwapDate} 的${dutyName}交换值班日期，月度值班次数不变。`
-    : roster.adjusted && protectedDuty
-      ? ` 人工指定值班冲突：${dutyName}属于上一班末班重点岗位人员；人工指定优先，系统未自动调换值班日期。`
-      : "";
+  const dutyRecoveryNote =
+    dutyCountNote +
+    (roster.recoveryAdjusted
+      ? roster.recoveryAdjustmentRole === "future-counterpart"
+        ? ` 自动值班恢复调整：本日原值班${staffName(state, roster.originalDutyStaffId ?? null)}已与 ${roster.recoverySwapDate} 的${dutyName}交换值班日期，月度值班次数不变。`
+        : ` 自动值班恢复调整：原值班${staffName(state, roster.originalDutyStaffId ?? null)}已与未来工作日 ${roster.recoverySwapDate} 的${dutyName}交换值班日期，月度值班次数不变。`
+      : roster.adjusted && protectedDuty
+        ? ` 人工指定值班冲突：${dutyName}属于上一班末班重点岗位人员；人工指定优先，系统未自动调换值班日期。`
+        : "");
   const standbyAssignments = roster.standbyStaffIds.map((staffId) => ({
     name: staffName(state, staffId),
     summary: assignmentSummary(state, staffId),
@@ -682,6 +747,7 @@ function dutyRosterFeedback(
       ? `；${conciseNames(standbyMissingWork)}作为备勤但未安排实际岗位，需要复核`
       : "";
     const level =
+      dutyCount.shortfall > 0 ||
       standbyMissingWork.length ||
       Boolean(monthlyDutyNote) ||
       Boolean(monthlyBalanceNote) ||
@@ -724,6 +790,7 @@ function dutyRosterFeedback(
         ? `最晚航班 ${preferred.flightNo}/${preferred.position}`
         : `倒数第二晚航班 ${preferred.flightNo}/${preferred.position}（值班晚撤规则第二档位）`;
     const level =
+      dutyCount.shortfall > 0 ||
       standbyMissingWork.length ||
       Boolean(monthlyDutyNote) ||
       Boolean(monthlyBalanceNote) ||

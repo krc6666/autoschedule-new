@@ -1,0 +1,55 @@
+{
+  "inputHash": "9e4bd14e3aa57b8d7adaf31fe870c86ea5dec7571ee01d06dd8c529fb0ce31f3",
+  "date": "2026-11-14",
+  "flights": 6,
+  "staff": 24,
+  "elapsedMs": 28451,
+  "dutyCount": 3,
+  "maximum": 4,
+  "ordinaryPeerCounts": [3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4],
+  "shortfall": 0,
+  "dutyFlights": [
+    {
+      "flight": "FD571",
+      "position": "G10",
+      "start": "09:40",
+      "end": "11:40"
+    },
+    {
+      "flight": "AE218",
+      "position": "H03",
+      "start": "14:25",
+      "end": "16:25"
+    },
+    {
+      "flight": "TR121",
+      "position": "H02",
+      "start": "21:55",
+      "end": "23:55"
+    }
+  ],
+  "unfilled": [
+    {
+      "flight": "CX937",
+      "position": "G12"
+    }
+  ],
+  "archivedCount": 3,
+  "halfRestCount": 1,
+  "halfRestViolations": 0,
+  "qualificationViolations": 0,
+  "overHours": 0,
+  "controlWithoutNewObjectives": {
+    "note": "只移除新目标的对照，不冒充旧版本完整复现",
+    "dutyCount": 2,
+    "unfilled": [
+      {
+        "flight": "CX937",
+        "position": "G12"
+      }
+    ]
+  },
+  "safetyCredential": true,
+  "feedbackIncludesDutyCount": true,
+  "sourceUnchanged": true
+}

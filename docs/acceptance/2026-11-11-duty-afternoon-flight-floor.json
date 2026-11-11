@@ -1,0 +1,142 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-11-duty-afternoon-flight-floor",
+  "title": "值班航班数落后超过1时优先补下午航班",
+  "startedFrom": "87d151d5b8e12939d1a8f75c1aeb78053f2bf7f8",
+  "expectation": {
+    "example": "owner的2026-11-14截图：3名普通人员各4班，值班人员2班；另有1名下午半休。真实配置核对值班与半休身份一致，文件历史最新11-12不含当前11-14结果。",
+    "expected": "普通均衡参与者最高4班、值班2班时，有安全下午岗位就优先补至至少3班，再执行值班额外减负；后置轮岗不得把已经补好的差距重新扩大。",
+    "unchanged": "值班上午与晚撤、岗位覆盖、资质、状态、夜班、时间、衔接、工时及前序重点公平/预留保持；普通人员原有差值限制及半休/分队长豁免不改；不新增配置字段或姓名特例，不改变人工权限。",
+    "fallback": "没有合适下午任务时保留合法结果，反馈实际数量及可核验阻塞原因，不为凑数清空其他人或强制新增上午任务。按history的4/2事故检查6航班分支、后置改写和最终独立计数；页面由owner验收。"
+  },
+  "testedVersion": "db8ee110fe88cc6b7f719f6cb91a821100687bbbff1e6fa38d8fcb7cc0d2132e",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "旧合同值班豁免允许2/4；新需求先用4项失败证明缺少补下午目标及后置保护，再以最终测试验证。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-duty-count-red.txt",
+          "summary": "修改前4项失败：4/6航班仍差2，缺少目标及后置保护。",
+          "sha256": "fd9eba8ab4a4a0f248d0cab3bb01496808addd6e795bbe8652dc88da57393ff1"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-duty-count-focused.txt",
+          "summary": "8文件151项定向检查通过，包含11项新规则回归、人工intent和规则页面。最终完整门禁覆盖其后的值班反馈措辞修正。",
+          "sha256": "8af1be430bcb830008ceace5570de85f11efc0a2fd90997cf9f028297c55a529"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "有安全下午岗位时补至3，差1继续减负，保留上午/晚撤和岗位覆盖。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-duty-count-focused.txt",
+          "summary": "8文件151项定向检查通过，包含11项新规则回归、人工intent和规则页面。最终完整门禁覆盖其后的值班反馈措辞修正。",
+          "sha256": "8af1be430bcb830008ceace5570de85f11efc0a2fd90997cf9f028297c55a529"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-duty-count-private-summary.json",
+          "summary": "真实配置11月14日内存生成：值班3，普通最高4且独立计数差1；半休、柜台资质和工时违规0，归档/XLSX往返仍3。移除新目标的对照值班2，两者同一空岗；非旧版本完整复现。原文件不变。",
+          "sha256": "caef329f29ab41ffb5011f90e07081a8e13870e4e368598ddb72d47067da754f"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "6航班不跳过；无资质、真实冲突、值班两任务用满4小时均保留合法结果并解释；半休/分队长豁免及规范航班号去重保持。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-duty-count-focused.txt",
+          "summary": "8文件151项定向检查通过，包含11项新规则回归、人工intent和规则页面。最终完整门禁覆盖其后的值班反馈措辞修正。",
+          "sha256": "8af1be430bcb830008ceace5570de85f11efc0a2fd90997cf9f028297c55a529"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-duty-count-private-summary.json",
+          "summary": "真实配置11月14日内存生成：值班3，普通最高4且独立计数差1；半休、柜台资质和工时违规0，归档/XLSX往返仍3。移除新目标的对照值班2，两者同一空岗；非旧版本完整复现。原文件不变。",
+          "sha256": "caef329f29ab41ffb5011f90e07081a8e13870e4e368598ddb72d47067da754f"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "恢复试图撤走已补下午任务会被共享复核拒绝；恢复不能靠增加上午任务补数量；人工换班权限不因新目标收紧。更高覆盖/末班重点公平继续允许原先必要调整。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-duty-count-focused.txt",
+          "summary": "8文件151项定向检查通过，包含11项新规则回归、人工intent和规则页面。最终完整门禁覆盖其后的值班反馈措辞修正。",
+          "sha256": "8af1be430bcb830008ceace5570de85f11efc0a2fd90997cf9f028297c55a529"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-duty-count-verify.txt",
+          "summary": "VITEST_MAX_WORKERS=4下运行npm.cmd run verify，类型、全部功能、性能和生产构建完成；实际退出码另由执行日志与主agent核对。",
+          "sha256": "8de07558455c80d236c83c2e793c210ab3546cdca408e19cd30df145c6b79c03"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "本目标可让步，不新增拒绝整表硬差值。完整kernel最终结果独立统计值班和普通航班集合，通过原安全凭证、柜台资质/工时/半休核对及实际归档字节往返。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-duty-count-private-summary.json",
+          "summary": "真实配置11月14日内存生成：值班3，普通最高4且独立计数差1；半休、柜台资质和工时违规0，归档/XLSX往返仍3。移除新目标的对照值班2，两者同一空岗；非旧版本完整复现。原文件不变。",
+          "sha256": "caef329f29ab41ffb5011f90e07081a8e13870e4e368598ddb72d47067da754f"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-duty-count-verify.txt",
+          "summary": "VITEST_MAX_WORKERS=4下运行npm.cmd run verify，类型、全部功能、性能和生产构建完成；实际退出码另由执行日志与主agent核对。",
+          "sha256": "8de07558455c80d236c83c2e793c210ab3546cdca408e19cd30df145c6b79c03"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "原普通双向差值、半休、锁定及安全回归通过；只移除新目标的对照仍有同一CX937/G12空岗，未为凑值班数增加空岗。无新持久化字段，沿原归档/Excel保存事实。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-duty-count-private-summary.json",
+          "summary": "真实配置11月14日内存生成：值班3，普通最高4且独立计数差1；半休、柜台资质和工时违规0，归档/XLSX往返仍3。移除新目标的对照值班2，两者同一空岗；非旧版本完整复现。原文件不变。",
+          "sha256": "caef329f29ab41ffb5011f90e07081a8e13870e4e368598ddb72d47067da754f"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-duty-count-verify.txt",
+          "summary": "VITEST_MAX_WORKERS=4下运行npm.cmd run verify，类型、全部功能、性能和生产构建完成；实际退出码另由执行日志与主agent核对。",
+          "sha256": "8de07558455c80d236c83c2e793c210ab3546cdca408e19cd30df145c6b79c03"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "真实文件内存结果及XLSX产物已核对；owner回复暂时无法核对本机58012的11月14日重排，新版浏览器/Worker入口保持未验收，不能以Node测试代替。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-duty-count-private-summary.json",
+          "summary": "真实配置11月14日内存生成：值班3，普通最高4且独立计数差1；半休、柜台资质和工时违规0，归档/XLSX往返仍3。移除新目标的对照值班2，两者同一空岗；非旧版本完整复现。原文件不变。",
+          "sha256": "caef329f29ab41ffb5011f90e07081a8e13870e4e368598ddb72d47067da754f"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-duty-count-private.txt",
+          "summary": "私有配置探针实际运行通过，临时探针删除，未修改原文件或浏览器状态。",
+          "sha256": "fd31aade18085e36b554826d0db05ec4d0549a0b2eab7130dbdf0ebc6220fe0b"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-11-duty-count-verify.txt",
+          "summary": "VITEST_MAX_WORKERS=4下运行npm.cmd run verify，类型、全部功能、性能和生产构建完成；实际退出码另由执行日志与主agent核对。",
+          "sha256": "8de07558455c80d236c83c2e793c210ab3546cdca408e19cd30df145c6b79c03"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "截图2/4由值班豁免和减负合同解释；owner确认改变优先级后，red.txt保留修改前4项失败，focused.txt及完整verify证明新规则落地。",
+    "laterChanges": "覆盖、末班重点公平、恢复、连续/频率轮岗、普通均衡及督导收尾可能改写。共享复核保护已补下午任务并保留前序让步；反向与完整kernel测试、最终独立计数及原安全检查核对。人工调整保留原权限。",
+    "finalArtifact": "private-summary.json记录真实配置6航班11月14日最终值班3/普通最高4、普通差1、半休/资质/工时违规0、归档及XLSX往返3，同空岗对照。新版页面/Worker仍待owner验收，因此当前不得称业务验收完成，也未提交推送。"
+  },
+  "review": {
+    "missedScope": "已检查初排、普通均衡、补缺、恢复/轮岗、督导收尾、人工intent、最终反馈和归档/XLSX；不增加持久化字段。未验证真实浏览器Worker入口及线上部署，等待owner。该真实输入仍有原空岗，不把对照当作空岗原因的完整诊断。",
+    "rootCause": "原差值合同主动排除值班，并先减少其中间额外任务，故值班2对普通4不触发普通均衡；本次是owner明确授权优先级演进，不是已证实的优化删步骤。新增单边缺额目标排在旧减负前，后置复核同步。",
+    "earlyDetection": "确认规则时先区分普通参与者、值班及半休；模型改前用4/6航班和后置撤补红测，提交前独立从最终assignment和XLSX重数，并检查同空岗对照及硬安全。全量并行时验收脚本测试首次5秒超时，单独16项通过；不改阈值，以4并发重跑完整门禁并如实保留首次失败。"
+  }
+}

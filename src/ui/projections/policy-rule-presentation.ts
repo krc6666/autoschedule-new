@@ -55,7 +55,8 @@ const USER_RULE_DESCRIPTIONS: Readonly<Record<SchedulingRuleId, string>> = {
     "所有明确分类为机动督导的顶部岗位都先找独立人选；人手不足时才在规则允许的同航班柜台兼任或安全重排。",
   "ke166-supervisor":
     "仅为 KE166 保留第二真人容量、跨航班重点人员及专属轮岗保护。",
-  "duty-position": "按值班优先项安排晚撤岗位，并只锁定实际安排的岗位。",
+  "duty-position":
+    "保留值班上午与晚撤任务，只锁定实际安排的晚撤岗位；比普通参与人员最高航班数少超过1班时，先尽量补合适下午航班，再减负。无法补足时保留合法班表并说明原因。",
   "scarce-qualification":
     "12 点前先安排可胜任人数更少的岗位，避免稀缺人员被提前占用。",
   "position-compaction":
