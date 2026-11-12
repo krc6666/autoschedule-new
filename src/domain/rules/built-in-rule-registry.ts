@@ -47,6 +47,7 @@ import {
   type SchedulingHookExecutor,
 } from "./rule-registry";
 import { compactRegularAssignments } from "../coverage/schedule-coverage";
+import { balanceRelaxedShifts } from "../reviews/relaxed-shift-balance";
 
 export const CONFIGURABLE_RULE_SETTINGS: Partial<
   Record<
@@ -383,6 +384,9 @@ const RULE_EXECUTION: Readonly<
       positionRotationReview
     ),
   ],
+  "relaxed-shift-balance": [
+    { kind: "final-review", execute: balanceRelaxedShifts },
+  ],
 };
 
 export const BUILT_IN_SCHEDULING_HOOKS: readonly SchedulingHook[] =
@@ -391,7 +395,9 @@ export const BUILT_IN_SCHEDULING_HOOKS: readonly SchedulingHook[] =
     label: rule.label,
     stage: rule.stage,
     defaultEnabled: true,
-    configurable: CONFIGURABLE_RULE_SETTINGS[rule.id] !== undefined,
+    configurable:
+      rule.id === "relaxed-shift-balance" ||
+      CONFIGURABLE_RULE_SETTINGS[rule.id] !== undefined,
     before: [],
     after: [],
     source: "built-in",
@@ -428,7 +434,13 @@ export function builtInRulePreferences(
       ];
     return {
       id: hook.id,
-      enabled: setting ? Boolean(settings[setting]) : true,
+      enabled:
+        hook.id === "relaxed-shift-balance"
+          ? settings.earlyDepartureBalanceEnabled ||
+            settings.afternoonRestBalanceEnabled
+          : setting
+            ? Boolean(settings[setting])
+            : true,
     };
   });
 }

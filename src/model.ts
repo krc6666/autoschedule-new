@@ -209,6 +209,10 @@ export interface ScheduleSettings {
   crossFlightPriorityPolicies: CrossFlightPriorityPolicy[];
   teamLeaderGapFillPositionPolicies: TeamLeaderGapFillPositionPolicy[];
   earlyDepartureCutoffTime: string;
+  earlyDepartureBalanceEnabled: boolean;
+  earlyDepartureMaxDifference: number;
+  afternoonRestBalanceEnabled: boolean;
+  afternoonRestMaxDifference: number;
   morningStatsStartTime: string;
   morningStatsEndTime: string;
   afternoonRestStartTime: string;

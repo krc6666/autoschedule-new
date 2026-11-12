@@ -39,6 +39,10 @@ const POLICY_FIELDS: readonly (keyof SchedulePolicyInput)[] = [
   "maxTodayFatigueDifference",
   "dutyFatiguePoints",
   "earlyDepartureCutoffTime",
+  "earlyDepartureBalanceEnabled",
+  "earlyDepartureMaxDifference",
+  "afternoonRestBalanceEnabled",
+  "afternoonRestMaxDifference",
   "morningStatsStartTime",
   "morningStatsEndTime",
   "afternoonRestStartTime",
@@ -89,6 +93,10 @@ const POLICY_SETTING_SEARCH_TEXT = [
   "最大当日疲劳差",
   "值班疲劳点",
   "提前下班截载节点",
+  "启用提前下班均衡",
+  "提前下班本月次数目标差距",
+  "启用下午无航班均衡",
+  "下午无航班本月次数目标差距",
   "下午统计开始",
   "下午统计结束",
   "统计时段设置",
@@ -164,7 +172,14 @@ export class PolicySettingsFormElement extends LightDomElement {
             ${this.number("maxTodayFatigueDifference", "最大当日疲劳差", 0, 100, 0.5)}
             ${this.number("dutyFatiguePoints", "值班疲劳点", 0, 100, 0.5)}
             ${this.time("earlyDepartureCutoffTime", "提前下班截载节点")}
+            ${this.toggle("earlyDepartureBalanceEnabled", "启用提前下班均衡", "尽量把机会分给本月次数少的人；关闭仍统计")}
+            ${this.number("earlyDepartureMaxDifference", "提前下班本月次数目标差距", 0, 31, 1)}
+            ${this.toggle("afternoonRestBalanceEnabled", "启用下午无航班均衡", "尽量把机会分给本月次数少的人；关闭仍统计")}
+            ${this.number("afternoonRestMaxDifference", "下午无航班本月次数目标差距", 0, 31, 1)}
           </div>
+          <p class="small text-muted mt-3">
+            两项默认开启、目标差距1，保存后重新排班。只参考本月此前已归档完整班表；保留正常排班的休息机会和岗位，资格、锁定、值班、半休及晚班保护优先，无法安全换人时允许超过目标。
+          </p>
           <details data-statistics-periods class="mt-3">
             <summary>统计时段设置（上午／下午／晚上）</summary>
             <p class="small text-muted mt-2">

@@ -1973,6 +1973,9 @@ describe("scheduler domain", { timeout: 15_000 }, () => {
 
   it("prefers a rested worker for a high-load position during the recovery window", async () => {
     const state = createOrdinarySchedulingState();
+    // Isolate recovery on/off; monthly rest balance is tested separately.
+    state.settings.earlyDepartureBalanceEnabled = false;
+    state.settings.afternoonRestBalanceEnabled = false;
     state.settings.minimumRegularTransitionMinutes = 0;
     const [first, second] = state.staff;
     state.staff = [first!, second!];
@@ -2273,6 +2276,8 @@ describe("scheduler domain", { timeout: 15_000 }, () => {
 
   it("protects a worker when projected fatigue exceeds the rolling-window limit", async () => {
     const state = createOrdinarySchedulingState();
+    state.settings.earlyDepartureBalanceEnabled = false;
+    state.settings.afternoonRestBalanceEnabled = false;
     state.settings.minimumRegularTransitionMinutes = 0;
     const [first, second] = state.staff;
     state.staff = [first!, second!];

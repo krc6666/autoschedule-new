@@ -1,0 +1,1 @@
+{"passed":true,"settingsSavedAndReloaded":true,"wideAndNarrow":true,"actualConfigDownloaded":true,"emptyBrowserImportedReloadedAndActuallyScheduled":true,"bothEnabledActualReschedule":true,"independentCount":{"previousRest":{"甲":2,"乙":0},"nextRest":["乙"],"nextEarlyDeparture":["乙"],"covered":3,"historyRows":6},"errors":[]}

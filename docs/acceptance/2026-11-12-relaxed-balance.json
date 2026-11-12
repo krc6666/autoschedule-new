@@ -1,0 +1,172 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-12-relaxed-balance",
+  "title": "提前下班与下午无航班按月尽量均衡",
+  "startedFrom": "35beb5e9060c61aae2536f0475c35d1309a2b57e",
+  "expectation": {
+    "example": "同月甲休2次、乙0次，正常班表继续让甲休；Owner要求能合法换人时优先给乙，两项分别有开关和目标差距，授权自主把关不再停问。",
+    "expected": "默认开启/目标1；自动排班最终阶段尽量缩小两项月累计差，重排应用；只参考此前同月完整历史。关掉某项只停该项偏好，统计保留。",
+    "unchanged": "保留原休息机会数量、岗位完整性、资格、人工/锁定、值班、半休、晚班保护、跨日恢复和原最终安全链；两系统独立，不搬登机口业务规则。历史索引教训：统计存在不代表求解消费、部分末班历史不冒充整班、后置换人须最终复核和清失效证据。",
+    "fallback": "任何候选不安全或不能改善则保留原安排，不清人凑差值；最多300候选、轮数不超过常规人数。旧本机状态和完整恢复缺新字段用默认开启/1（完整恢复明确显示），普通配置局部导入缺字段保留目标；不重写旧历史、不commit/push/发布。"
+  },
+  "testedVersion": "246f2fb7f7c51f26eb59d91becd27fb1f372254f1b724a504f2b8f7ab290af78",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "先运行2/0红测，应乙实际甲；修复后完整路径及连续归档均通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-12-relaxed-balance-reproduction.txt",
+          "summary": "原问题真实失败：甲2乙0却继续给甲",
+          "sha256": "64fd8df1f84cb74298fdf30d3aebcd47cead4451778b512b2f52e189d93d36bd"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-12-relaxed-balance-targeted.txt",
+          "summary": "最后仅补测试：8项专项全部通过，含四班归档追平及原闲置人员比较",
+          "sha256": "3429706a84f6c730178b77b9b35c5ef7d6d276d188298b83586badb8ed1ed8ad"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "完整generateSchedule与安全凭证路径、实际Chrome生成及重排符合期望，归档四班后各3次。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-12-relaxed-balance-functional.txt",
+          "summary": "最终178文件1775项功能测试全部通过",
+          "sha256": "8348716167a9121b899805853b44368d5a02df51cdbd1f4ae965e67477d71ea1"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-12-relaxed-balance-targeted.txt",
+          "summary": "最后仅补测试：8项专项全部通过，含四班归档追平及原闲置人员比较",
+          "sha256": "3429706a84f6c730178b77b9b35c5ef7d6d276d188298b83586badb8ed1ed8ad"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-12-relaxed-balance-browser.txt",
+          "summary": "最终生产成品Chrome：设置保存刷新、配置下载/空环境导入、重启实际排班与两开关开启重新排班；独立时段核对乙获两类机会，3/3覆盖，6行历史保留，无页面异常",
+          "sha256": "6579f79529d1173f82a5d5457ff7b7dd9c8a3243c47e69f067b1f4e53c756f76"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "独立开关、0与3、排除自己/未来/跨月/部分历史；完整Excel实际字节/空状态/存储重启及浏览器真实下载导入都保持值与效果。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-12-relaxed-balance-targeted.txt",
+          "summary": "最后仅补测试：8项专项全部通过，含四班归档追平及原闲置人员比较",
+          "sha256": "3429706a84f6c730178b77b9b35c5ef7d6d276d188298b83586badb8ed1ed8ad"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-12-relaxed-balance-browser.txt",
+          "summary": "最终生产成品Chrome：设置保存刷新、配置下载/空环境导入、重启实际排班与两开关开启重新排班；独立时段核对乙获两类机会，3/3覆盖，6行历史保留，无页面异常",
+          "sha256": "6579f79529d1173f82a5d5457ff7b7dd9c8a3243c47e69f067b1f4e53c756f76"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-12-relaxed-balance-functional.txt",
+          "summary": "最终178文件1775项功能测试全部通过",
+          "sha256": "8348716167a9121b899805853b44368d5a02df51cdbd1f4ae965e67477d71ea1"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "最终补缺/督导/轮岗之后执行均衡，中央登记实际final-review；锁定/人工不动，机会数量和岗位覆盖保持，后续凭证只消费最终安排。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-12-relaxed-balance-ledgerRed.txt",
+          "summary": "收口新增回归先失败：中央规则清单缺最终复核",
+          "sha256": "dc0ab2040d432359872f529469d2cc4bc89e1907171c09edb51b5b16876cdd4b"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-12-relaxed-balance-functional.txt",
+          "summary": "最终178文件1775项功能测试全部通过",
+          "sha256": "8348716167a9121b899805853b44368d5a02df51cdbd1f4ae965e67477d71ea1"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-12-relaxed-balance-targeted.txt",
+          "summary": "最后仅补测试：8项专项全部通过，含四班归档追平及原闲置人员比较",
+          "sha256": "3429706a84f6c730178b77b9b35c5ef7d6d276d188298b83586badb8ed1ed8ad"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "每个候选注入现有assertFinalSafety，通过才采用；拒绝反向回归保留原表，采用后再次检查且最终凭证存在。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-12-relaxed-balance-targeted.txt",
+          "summary": "最后仅补测试：8项专项全部通过，含四班归档追平及原闲置人员比较",
+          "sha256": "3429706a84f6c730178b77b9b35c5ef7d6d276d188298b83586badb8ed1ed8ad"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-12-relaxed-balance-functional.txt",
+          "summary": "最终178文件1775项功能测试全部通过",
+          "sha256": "8348716167a9121b899805853b44368d5a02df51cdbd1f4ae965e67477d71ea1"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "原保护/岗位完整/值班/半休/迁移/架构功能回归及大型性能全通过，未增加空缺。首轮并发负载单项超时未调阈值，降低功能并发最终全通过；生产大块提示保留。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-12-relaxed-balance-functional.txt",
+          "summary": "最终178文件1775项功能测试全部通过",
+          "sha256": "8348716167a9121b899805853b44368d5a02df51cdbd1f4ae965e67477d71ea1"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-12-relaxed-balance-performance.txt",
+          "summary": "最终7文件19项性能测试全部通过",
+          "sha256": "127bd33a98253328bc47d3053bce370f73974d15033493a533c4eceeca744b7d"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-12-relaxed-balance-types.txt",
+          "summary": "最终typecheck退出0",
+          "sha256": "f0e27738b34b12050a8cbb339eca3ab588d2bc04dcafa20fbcb7f519d17e79aa"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-12-relaxed-balance-build.txt",
+          "summary": "最终生产构建成功，保留既有大块提示",
+          "sha256": "6c0e242788d1065d6ed366a0e9532b52ccd309a7af412cd576a543bc3d853503"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-12-relaxed-balance-push-verify.txt",
+          "summary": "Owner授权提交后完整npm run verify退出0：1776功能、19性能、类型和构建通过；仅格式化矩阵，不改业务。",
+          "sha256": "6d512eeb5b783c8ff9c7bbce18a266fe9dd026db0495f193aa9d8f3b4126c42b"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "verified",
+      "reason": "最终dist经实际Chrome1440/390、保存刷新、配置下载到空浏览器导入/刷新/实际生成及两项开启真实重排验证；按时段独立计数乙获机会、覆盖3/3、历史6行不变。截图已审视，仅隔离合成资料，Owner现场与另一设备未人工验收，未线上发布。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-12-relaxed-balance-browser.txt",
+          "summary": "最终生产成品Chrome：设置保存刷新、配置下载/空环境导入、重启实际排班与两开关开启重新排班；独立时段核对乙获两类机会，3/3覆盖，6行历史保留，无页面异常",
+          "sha256": "6579f79529d1173f82a5d5457ff7b7dd9c8a3243c47e69f067b1f4e53c756f76"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-12-relaxed-balance-build.txt",
+          "summary": "最终生产构建成功，保留既有大块提示",
+          "sha256": "6c0e242788d1065d6ed366a0e9532b52ccd309a7af412cd576a543bc3d853503"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-12-relaxed-balance-targeted.txt",
+          "summary": "最后仅补测试：8项专项全部通过，含四班归档追平及原闲置人员比较",
+          "sha256": "3429706a84f6c730178b77b9b35c5ef7d6d276d188298b83586badb8ed1ed8ad"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "reproduction真实红测证明统计未接求解；targeted与functional证明2/0及四班归档后追平，browser证明最终页面结果。",
+    "laterChanges": "补缺/督导/轮岗先执行；均衡每候选经最终安全守卫并保护机会数量/覆盖/锁定，采用后原finalizer再复核与生成凭证。targeted有安全拒绝及锁定，functional覆盖后置与原规则。",
+    "finalArtifact": "build最终dist与browser实际生产预览成品，真实配置下载→空环境导入→刷新→生成→刷新及两开关开启重新排班，独立实际时段确认甲2乙0下一次乙休，覆盖3/3、历史6行；不把局部单测替代真实入口。"
+  },
+  "review": {
+    "missedScope": "重点查配置模板、中央执行清单、原保护关闭分支和导入后实际使用；确实发现模板/中央登记遗漏并补回归。最终8项专项、1775项全量、性能和真实成品通过；现场班表/Owner外观及另一设备未验，不承诺局部搜索全局最优。",
+    "rootCause": "两项已有统计和打印，但自动排班没有读取月度历史，更没有最终休息机会均衡；次数显示不代表参与选人。",
+    "earlyDetection": "需求确定时从规则页追到最终assignments消费者，先用甲2乙0的反例真实失败；配置矩阵同时列内置模板、旧格式、持久化、最终守卫与中央清单；交付前实际文件空环境导入再排班，独立按时段核对。"
+  }
+}

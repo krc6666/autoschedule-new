@@ -108,6 +108,8 @@ const USER_RULE_DESCRIPTIONS: Readonly<Record<SchedulingRuleId, string>> = {
   "workload-balance": "航班密集时比较安排后的工时和疲劳差，避免负荷过度集中。",
   "historical-fatigue": "前面条件相同时，优先选择历史疲劳较低的人。",
   "position-rotation": "最后按重点、高疲劳普通、低疲劳普通的顺序检查连续轮岗。",
+  "relaxed-shift-balance":
+    "最终补缺后，提前下班、下午无航班分别按开关和目标差距尽量均衡本月次数；保留休息人数与已覆盖岗位，通过最终安全检查才换人。",
 };
 
 export const USER_RULE_FLOW = SCHEDULING_STAGE_ORDER.map(

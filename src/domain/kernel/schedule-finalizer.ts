@@ -30,7 +30,11 @@ import {
 import type { AssignmentTask } from "../flights/schedule-tasks";
 import type { DailySchedulePlan } from "./daily-schedule-result";
 import { assertDailyScheduleSafety } from "./daily-schedule-safety";
-import { evaluateAutomaticHardConstraints } from "../rules/built-in-rule-registry";
+import {
+  evaluateAutomaticHardConstraints,
+  BUILT_IN_RULE_REGISTRY,
+  builtInRulePreferences,
+} from "../rules/built-in-rule-registry";
 import { scheduleOptimizationWarning } from "../reviews/schedule-warning-message";
 import {
   halfRestAllowedAssignmentCount,
@@ -322,6 +326,24 @@ export async function finalizeSchedule({
         }
       },
     });
+  }
+  assertFinalSafety(assignments);
+  for (const hook of BUILT_IN_RULE_REGISTRY.executionPlan(
+    builtInRulePreferences(state.settings)
+  )) {
+    if (!hook.enabled) continue;
+    for (const executor of hook.execute) {
+      if (executor.kind !== "final-review") continue;
+      const balancedAssignments = executor.execute({
+        state,
+        date,
+        assignments,
+        lockedAssignmentIds,
+        halfRestStaffIds: runFacts.halfRest.activeStaffIds,
+        assertSafe: assertFinalSafety,
+      });
+      assignments.splice(0, assignments.length, ...balancedAssignments);
+    }
   }
   assertFinalSafety(assignments);
   for (const staffId of runFacts.halfRest.activeStaffIds) {

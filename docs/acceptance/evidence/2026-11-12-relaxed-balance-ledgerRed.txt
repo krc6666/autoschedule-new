@@ -1,0 +1,42 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/domain/relaxed-shift-balance.test.ts (6 tests | 1 failed) 307ms
+     × registers the final review and exposes independent switches in the actual rule ledger 9ms
+npm.cmd : 
+所在位置 行:2 字符: 1
++ npm.cmd exec vitest -- run tests/domain/relaxed-shift-balance.test.ts ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/domain/relaxed-shift-balance.test.ts > monthly relaxed shift balance > registers the final review and expo
+ses independent switches in the actual rule ledger
+AssertionError: expected undefined to deeply equal [ 'final-review' ]
+
+- Expected:
+[
+  "final-review",
+]
+
++ Received:
+undefined
+
+ ❯ tests/domain/relaxed-shift-balance.test.ts:92:56
+     90|     const state = fixture();
+     91|     const definition = BUILT_IN_RULE_REGISTRY.definition("relaxed-shif…
+     92|     expect(definition?.execute.map(item => item.kind)).toEqual(["final…
+       |                                                        ^
+     93|     expect(USER_SCHEDULING_RULES.find(rule => rule.id === "relaxed-shi…
+     94|     state.settings.earlyDepartureBalanceEnabled = false;
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 5 passed (6)
+   Start at  12:42:12
+   Duration  2.07s (transform 1.25s, setup 0ms, import 1.56s, tests 307ms, environment 0ms)
+

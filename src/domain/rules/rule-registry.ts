@@ -16,6 +16,7 @@ import type { ScheduleLedger } from "../kernel/schedule-ledger";
 import type { ScheduleRunFacts } from "../shared/schedule-run-facts";
 import type { AssignmentTask } from "../flights/schedule-tasks";
 import type { SolverPort } from "../solver/solver-port";
+import type { balanceRelaxedShifts } from "../reviews/relaxed-shift-balance";
 
 export interface CandidateComparisonContext {
   task: AssignmentTask;
@@ -79,7 +80,11 @@ export type SchedulingHookExecutor =
   | HardConstraintExecutor
   | CandidatePriorityExecutor
   | DailyModelExecutor
-  | ScheduleMutationExecutor;
+  | ScheduleMutationExecutor
+  | {
+      kind: "final-review";
+      execute: typeof balanceRelaxedShifts;
+    };
 
 export interface SchedulingHook {
   id: string;

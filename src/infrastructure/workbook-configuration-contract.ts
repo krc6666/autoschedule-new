@@ -13,6 +13,10 @@ export const OPTIONAL_CONFIGURATION_SCALARS = new Set([
   "morningStatsEndTime",
   "eveningStatsStartTime",
   "eveningStatsEndTime",
+  "earlyDepartureBalanceEnabled",
+  "earlyDepartureMaxDifference",
+  "afternoonRestBalanceEnabled",
+  "afternoonRestMaxDifference",
 ]);
 
 const CONFIGURATION_SECTIONS = {

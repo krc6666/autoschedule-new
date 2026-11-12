@@ -288,6 +288,13 @@ export const SCHEDULING_RULES = [
     feedbackKey: "position-rotation",
     feedbackOrder: 5,
   },
+  {
+    id: "relaxed-shift-balance",
+    stage: "post-schedule-review",
+    label: "月度轻松班次均衡",
+    feedbackMode: "aggregated",
+    optimization: "best-effort",
+  },
 ] as const satisfies readonly (
   | ({
       id: string;

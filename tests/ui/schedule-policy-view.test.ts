@@ -8,6 +8,53 @@ import "../../src/ui/components/policy-page";
 import { mountElement, settleLit } from "./lit-test-helpers";
 
 describe("rules page", () => {
+  it("saves independent monthly rest switches and target differences through the normal command", async () => {
+    const state = createDefaultState();
+    const element = await mountElement<
+      HTMLElement & { updateComplete: Promise<unknown> }
+    >("autoschedule-policy-page", { model: state });
+    for (const key of [
+      "earlyDepartureBalanceEnabled",
+      "afternoonRestBalanceEnabled",
+    ])
+      expect(
+        element.querySelector<HTMLInputElement>(`[data-policy-setting=${key}]`)!
+          .checked
+      ).toBe(true);
+    const toggle = element.querySelector<HTMLInputElement>(
+      "[data-policy-setting=earlyDepartureBalanceEnabled]"
+    )!;
+    toggle.checked = false;
+    toggle.dispatchEvent(new Event("change", { bubbles: true }));
+    for (const [key, value] of [
+      ["earlyDepartureMaxDifference", "3"],
+      ["afternoonRestMaxDifference", "0"],
+    ]) {
+      const input = element.querySelector<HTMLInputElement>(
+        `[data-policy-setting=${key}]`
+      )!;
+      input.value = value!;
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+    await settleLit();
+    let command: CustomEvent | undefined;
+    element.addEventListener(
+      "autoschedule-command",
+      (event) => (command = event as CustomEvent)
+    );
+    element
+      .querySelector<HTMLButtonElement>(
+        "autoschedule-policy-settings button.btn-primary"
+      )!
+      .click();
+    expect(command?.detail.input).toMatchObject({
+      earlyDepartureBalanceEnabled: false,
+      earlyDepartureMaxDifference: 3,
+      afternoonRestBalanceEnabled: true,
+      afternoonRestMaxDifference: 0,
+    });
+    expect(state.settings.earlyDepartureBalanceEnabled).toBe(true);
+  });
   it("edits all three statistics windows in one compact section and rejects an empty window", async () => {
     const state = createDefaultState();
     const element = await mountElement<
