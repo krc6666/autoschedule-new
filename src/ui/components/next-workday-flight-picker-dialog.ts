@@ -105,6 +105,11 @@ export class NextWorkdayFlightPickerDialogElement extends LightDomElement {
                           aria-label="${candidate.flightNo} 预定人数"
                           title="预定人数"
                           .value=${String(candidate.bookedPassengers)}
+                          @input=${(event: Event) =>
+                            this.updatePassengers(
+                              candidate.id,
+                              (event.currentTarget as HTMLInputElement).value
+                            )}
                           @change=${(event: Event) =>
                             this.updatePassengers(
                               candidate.id,

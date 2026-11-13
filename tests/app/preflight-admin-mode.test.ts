@@ -370,7 +370,7 @@ describe("preflight administrative mode draft", () => {
       await coordinator.handle({ type: entry });
       expect(coordinator.view().dialog).toHaveProperty(
         "adminSupportEnabled",
-        safe
+        true
       );
     }
   );
@@ -424,7 +424,7 @@ describe("preflight administrative mode draft", () => {
       await coordinator.handle({ type: entry });
       expect(coordinator.view().dialog).toHaveProperty(
         "adminSupportEnabled",
-        false
+        true
       );
     }
   );

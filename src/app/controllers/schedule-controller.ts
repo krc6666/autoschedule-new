@@ -42,6 +42,7 @@ import type {
 } from "../../model";
 import { presentScheduleFailure } from "../schedule-failure-presentation";
 import { scheduleRunStopMessage } from "../schedule-run-controller";
+import { preflightDutyRoster } from "../preflight-drafts";
 import type { ScheduleRunOutcome } from "../../infrastructure/schedule-runner";
 
 export class ScheduleController implements UiCommandController {
@@ -377,15 +378,15 @@ export class ScheduleController implements UiCommandController {
 
   private dutyRosterForDialog(
     date: string,
-    staffStatuses: Record<string, StaffStatusSelection>
+    staffStatuses: Record<string, StaffStatusSelection>,
+    remembered?: DutyRosterAssignment
   ): DutyRosterAssignment {
-    const temporaryState = structuredClone(this.context.model());
-    this.applyPreflightStaffStatuses(temporaryState, staffStatuses);
-    const roster = getDutyRosterForDate(temporaryState, date);
-    return {
-      ...roster,
-      standbyStaffIds: [roster.standbyStaffIds[0], roster.standbyStaffIds[1]],
-    };
+    return preflightDutyRoster(
+      this.context.model(),
+      date,
+      staffStatuses,
+      remembered
+    );
   }
 
   private updatePreflightDutyRoster(
@@ -714,22 +715,20 @@ export class ScheduleController implements UiCommandController {
     }
     if (!candidates.length)
       return this.context.toast("没有可选择的本地航班", "warning");
-    this.context.updateView({
-      dialog: {
-        kind: "schedule-preflight",
-        adminSupportEnabled: model.settings.adminSupportEnabled,
-        date: this.context.view().date,
-        groupId: model.activeGroupId,
-        candidates,
-        selectedIds: candidates
-          .filter((candidate) => candidate.selectedByDefault)
-          .map((candidate) => candidate.id),
-        staffStatuses: this.currentStaffStatuses(),
-        dutyRoster: this.dutyRosterForDialog(
-          this.context.view().date,
-          this.currentStaffStatuses()
-        ),
-      },
+    this.context.openPreflightDialog({
+      kind: "schedule-preflight",
+      adminSupportEnabled: model.settings.adminSupportEnabled,
+      date: this.context.view().date,
+      groupId: model.activeGroupId,
+      candidates,
+      selectedIds: candidates
+        .filter((candidate) => candidate.selectedByDefault)
+        .map((candidate) => candidate.id),
+      staffStatuses: this.currentStaffStatuses(),
+      dutyRoster: this.dutyRosterForDialog(
+        this.context.view().date,
+        this.currentStaffStatuses()
+      ),
     });
   }
 
@@ -783,7 +782,11 @@ export class ScheduleController implements UiCommandController {
       dialog: {
         ...dialog,
         staffStatuses: statuses,
-        dutyRoster: this.dutyRosterForDialog(dialog.date, statuses),
+        dutyRoster: this.dutyRosterForDialog(
+          dialog.date,
+          statuses,
+          dialog.dutyRoster
+        ),
       },
     });
   }
@@ -807,7 +810,11 @@ export class ScheduleController implements UiCommandController {
       dialog: {
         ...dialog,
         staffStatuses: statuses,
-        dutyRoster: this.dutyRosterForDialog(dialog.date, statuses),
+        dutyRoster: this.dutyRosterForDialog(
+          dialog.date,
+          statuses,
+          dialog.dutyRoster
+        ),
       },
     });
   }
@@ -908,22 +915,20 @@ export class ScheduleController implements UiCommandController {
     );
     if (!candidates.length)
       return this.context.toast("没有可选择的本地航班", "warning");
-    this.context.updateView({
-      dialog: {
-        kind: "reschedule-flight-picker",
-        adminSupportEnabled: model.settings.adminSupportEnabled,
-        date: this.context.view().date,
-        groupId: model.activeGroupId,
-        candidates,
-        selectedIds: candidates
-          .filter((candidate) => candidate.selectedByDefault)
-          .map((candidate) => candidate.id),
-        staffStatuses: this.currentStaffStatuses(),
-        dutyRoster: this.dutyRosterForDialog(
-          this.context.view().date,
-          this.currentStaffStatuses()
-        ),
-      },
+    this.context.openPreflightDialog({
+      kind: "reschedule-flight-picker",
+      adminSupportEnabled: model.settings.adminSupportEnabled,
+      date: this.context.view().date,
+      groupId: model.activeGroupId,
+      candidates,
+      selectedIds: candidates
+        .filter((candidate) => candidate.selectedByDefault)
+        .map((candidate) => candidate.id),
+      staffStatuses: this.currentStaffStatuses(),
+      dutyRoster: this.dutyRosterForDialog(
+        this.context.view().date,
+        this.currentStaffStatuses()
+      ),
     });
   }
 
@@ -1062,21 +1067,19 @@ export class ScheduleController implements UiCommandController {
     if (!candidates.length)
       return this.context.toast("没有可选择的本地航班", "warning");
     const staffStatuses = this.currentStaffStatuses();
-    this.context.updateView({
-      dialog: {
-        kind: "next-workday-flight-picker",
-        adminSupportEnabled: model.settings.adminSupportEnabled,
-        date: nextDate,
-        sourceDate: currentDate,
-        groupId: model.activeGroupId,
-        weekday: isoWeekdayForDate(nextDate),
-        candidates,
-        selectedIds: candidates
-          .filter((candidate) => candidate.selectedByDefault)
-          .map((candidate) => candidate.id),
-        staffStatuses,
-        dutyRoster: this.dutyRosterForDialog(nextDate, staffStatuses),
-      },
+    this.context.openPreflightDialog({
+      kind: "next-workday-flight-picker",
+      adminSupportEnabled: model.settings.adminSupportEnabled,
+      date: nextDate,
+      sourceDate: currentDate,
+      groupId: model.activeGroupId,
+      weekday: isoWeekdayForDate(nextDate),
+      candidates,
+      selectedIds: candidates
+        .filter((candidate) => candidate.selectedByDefault)
+        .map((candidate) => candidate.id),
+      staffStatuses,
+      dutyRoster: this.dutyRosterForDialog(nextDate, staffStatuses),
     });
   }
 
@@ -1130,7 +1133,11 @@ export class ScheduleController implements UiCommandController {
       dialog: {
         ...dialog,
         staffStatuses: statuses,
-        dutyRoster: this.dutyRosterForDialog(dialog.date, statuses),
+        dutyRoster: this.dutyRosterForDialog(
+          dialog.date,
+          statuses,
+          dialog.dutyRoster
+        ),
       },
     });
   }

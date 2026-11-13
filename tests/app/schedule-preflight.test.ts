@@ -473,7 +473,7 @@ describe.each(entries)("排班前确认：$name", (entry) => {
     }
   );
 
-  it("未选航班不能计算，配置状态重新打开时重新读取", async () => {
+  it("未选航班不能计算，重开优先保留同日确认草稿，正式配置不被草稿改写", async () => {
     const { coordinator, calculate, before } = await setup();
     await coordinator.handle({ type: entry.confirm, selectedIds: [] });
     expect(coordinator.model()).toEqual(before);
@@ -500,7 +500,8 @@ describe.each(entries)("排班前确认：$name", (entry) => {
       reopened?.kind !== "next-workday-flight-picker"
     )
       throw new Error("缺少重开的预检弹窗");
-    expect(reopened.staffStatuses[before.staff[0]!.id]).toBe("病假");
+    expect(reopened.staffStatuses[before.staff[0]!.id]).toBe("休假");
+    expect(coordinator.model().staff[0]!.status).toBe("病假");
   });
 
   it.each(["switch-group", "change-date"] as const)(

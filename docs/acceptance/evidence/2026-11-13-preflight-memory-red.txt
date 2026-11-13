@@ -1,0 +1,409 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/app/preflight-memory.test.ts (10 tests | 10 failed) 152ms
+     × 'generate-schedule' 关闭及刷新后恢复全部准备选项，正式模型不变 40ms
+     × 'open-reschedule-flight-picker' 关闭及刷新后恢复全部准备选项，正式模型不变 11ms
+     × 'archive-next-duty-day' 关闭及刷新后恢复全部准备选项，正式模型不变 15ms
+     × 生成与重新排班共享同一天记忆，后天草稿按目标日供其他入口读取 11ms
+     × 日期及A/B隔离，切回原日期和组仍恢复 19ms
+     × 全不选、0、false和空轮值也保存，重置初始数据清空草稿 9ms
+     × error 后再次打开保留准备内容，正式班表不变 16ms
+     × stop 后再次打开保留准备内容，正式班表不变 12ms
+     × invalid-result 后再次打开保留准备内容，正式班表不变 12ms
+     × 存储不可写时当前页面继续保留并显示跨刷新保存失败 7ms
+
+ Test Files  1 failed (1)
+      Tests  10 failed (10)
+   Start at  20:36:02
+   Duration  2.28s (transform 1.61s, setup 0ms, import 1.90s, tests 152ms, environment 0ms)
+
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 10 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/app/preflight-memory.test.ts > 排班确认窗口按组按日记忆 > 'generate-schedule' 关闭及刷新后恢复全部准备选项，正式模型不变
+AssertionError: expected { kind: 'schedule-preflight', …(7) } to deeply equal { kind: 'schedule-preflight', …(7) }
+
+- Expected
++ Received
+
+@@ -1,10 +1,10 @@
+  {
+-   "adminSupportEnabled": true,
++   "adminSupportEnabled": false,
+    "candidates": [
+      {
+-       "bookedPassengers": 123,
++       "bookedPassengers": 0,
+        "endTime": "19:50",
+        "flightNo": "CX931",
+        "id": "template:template-flight-cx931",
+        "positions": [
+          "督导",
+@@ -92,20 +92,23 @@
+    "date": "2026-11-13",
+    "dutyRoster": {
+      "adjusted": false,
+      "cxPreflightStaffId": null,
+      "date": "2026-11-13",
+-     "dutyStaffId": null,
++     "dutyStaffId": "11",
+      "standbyStaffIds": [
+        "8",
+        "7",
+      ],
+    },
+    "groupId": "A",
+    "kind": "schedule-preflight",
+    "selectedIds": [
+      "template:template-flight-cx931",
++     "template:template-flight-cx937",
++     "template:template-flight-fd573",
++     "template:template-flight-tr121",
+    ],
+    "staffStatuses": {
+      "1": "正常",
+      "10": "正常",
+      "11": "正常",
+
+ ❯ tests/app/preflight-memory.test.ts:72:38
+     70|     await coordinator.handle({ type: "close-dialog" });
+     71|     await coordinator.handle({ type: entry.open });
+     72|     expect(preparation(coordinator)).toEqual(expected);
+       |                                      ^
+     73|     const refreshed = f.create();
+     74|     await refreshed.handle({ type: entry.open });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/10]⎯
+
+ FAIL  tests/app/preflight-memory.test.ts > 排班确认窗口按组按日记忆 > 'open-reschedule-flight-picker' 关闭及刷新后恢复全部准备选项，正式模型不变
+AssertionError: expected { …(8) } to deeply equal { …(8) }
+
+- Expected
++ Received
+
+@@ -1,10 +1,10 @@
+  {
+-   "adminSupportEnabled": true,
++   "adminSupportEnabled": false,
+    "candidates": [
+      {
+-       "bookedPassengers": 123,
++       "bookedPassengers": 0,
+        "endTime": "19:50",
+        "flightNo": "CX931",
+        "id": "template:template-flight-cx931",
+        "positions": [
+          "督导",
+@@ -92,20 +92,23 @@
+    "date": "2026-11-13",
+    "dutyRoster": {
+      "adjusted": false,
+      "cxPreflightStaffId": null,
+      "date": "2026-11-13",
+-     "dutyStaffId": null,
++     "dutyStaffId": "11",
+      "standbyStaffIds": [
+        "8",
+        "7",
+      ],
+    },
+    "groupId": "A",
+    "kind": "reschedule-flight-picker",
+    "selectedIds": [
+      "template:template-flight-cx931",
++     "template:template-flight-cx937",
++     "template:template-flight-fd573",
++     "template:template-flight-tr121",
+    ],
+    "staffStatuses": {
+      "1": "正常",
+      "10": "正常",
+      "11": "正常",
+
+ ❯ tests/app/preflight-memory.test.ts:72:38
+     70|     await coordinator.handle({ type: "close-dialog" });
+     71|     await coordinator.handle({ type: entry.open });
+     72|     expect(preparation(coordinator)).toEqual(expected);
+       |                                      ^
+     73|     const refreshed = f.create();
+     74|     await refreshed.handle({ type: entry.open });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/10]⎯
+
+ FAIL  tests/app/preflight-memory.test.ts > 排班确认窗口按组按日记忆 > 'archive-next-duty-day' 关闭及刷新后恢复全部准备选项，正式模型不变
+AssertionError: expected { …(10) } to deeply equal { …(10) }
+
+- Expected
++ Received
+
+@@ -1,10 +1,10 @@
+  {
+-   "adminSupportEnabled": true,
++   "adminSupportEnabled": false,
+    "candidates": [
+      {
+-       "bookedPassengers": 123,
++       "bookedPassengers": 0,
+        "endTime": "19:50",
+        "flightNo": "CX931",
+        "id": "template:template-flight-cx931",
+        "positions": [
+          "督导",
+@@ -92,21 +92,19 @@
+    "date": "2026-11-15",
+    "dutyRoster": {
+      "adjusted": false,
+      "cxPreflightStaffId": null,
+      "date": "2026-11-15",
+-     "dutyStaffId": null,
++     "dutyStaffId": "10",
+      "standbyStaffIds": [
+        "6",
+        "5",
+      ],
+    },
+    "groupId": "A",
+    "kind": "next-workday-flight-picker",
+-   "selectedIds": [
+-     "template:template-flight-cx931",
+-   ],
++   "selectedIds": [],
+    "sourceDate": "2026-11-13",
+    "staffStatuses": {
+      "1": "正常",
+      "10": "正常",
+      "11": "正常",
+
+ ❯ tests/app/preflight-memory.test.ts:72:38
+     70|     await coordinator.handle({ type: "close-dialog" });
+     71|     await coordinator.handle({ type: entry.open });
+     72|     expect(preparation(coordinator)).toEqual(expected);
+       |                                      ^
+     73|     const refreshed = f.create();
+     74|     await refreshed.handle({ type: entry.open });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/10]⎯
+
+ FAIL  tests/app/preflight-memory.test.ts > 排班确认窗口按组按日记忆 > 生成与重新排班共享同一天记忆，后天草稿按目标日供其他入口读取
+AssertionError: expected { …(8) } to match object { …(8) }
+
+- Expected
++ Received
+
+@@ -1,10 +1,10 @@
+  {
+-   "adminSupportEnabled": true,
++   "adminSupportEnabled": false,
+    "candidates": [
+      {
+-       "bookedPassengers": 123,
++       "bookedPassengers": 0,
+        "endTime": "19:50",
+        "flightNo": "CX931",
+        "id": "template:template-flight-cx931",
+        "positions": [
+          "督导",
+@@ -92,20 +92,23 @@
+    "date": "2026-11-13",
+    "dutyRoster": {
+      "adjusted": false,
+      "cxPreflightStaffId": null,
+      "date": "2026-11-13",
+-     "dutyStaffId": null,
++     "dutyStaffId": "11",
+      "standbyStaffIds": [
+        "8",
+        "7",
+      ],
+    },
+    "groupId": "A",
+    "kind": "reschedule-flight-picker",
+    "selectedIds": [
+      "template:template-flight-cx931",
++     "template:template-flight-cx937",
++     "template:template-flight-fd573",
++     "template:template-flight-tr121",
+    ],
+    "staffStatuses": {
+      "1": "正常",
+      "10": "正常",
+      "11": "正常",
+
+ ❯ tests/app/preflight-memory.test.ts:86:38
+     84|     await coordinator.handle({ type: "close-dialog" });
+     85|     await coordinator.handle({ type: entries[1].open });
+     86|     expect(preparation(coordinator)).toMatchObject({ ...expected, kind…
+       |                                      ^
+     87|     await coordinator.handle({ type: "close-dialog" });
+     88|     const next = await edit(coordinator, entries[2]);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/10]⎯
+
+ FAIL  tests/app/preflight-memory.test.ts > 排班确认窗口按组按日记忆 > 日期及A/B隔离，切回原日期和组仍恢复
+AssertionError: expected { kind: 'schedule-preflight', …(7) } to deeply equal { kind: 'schedule-preflight', …(7) }
+
+- Expected
++ Received
+
+@@ -1,10 +1,10 @@
+  {
+-   "adminSupportEnabled": true,
++   "adminSupportEnabled": false,
+    "candidates": [
+      {
+-       "bookedPassengers": 123,
++       "bookedPassengers": 0,
+        "endTime": "19:50",
+        "flightNo": "CX931",
+        "id": "template:template-flight-cx931",
+        "positions": [
+          "督导",
+@@ -92,20 +92,23 @@
+    "date": "2026-11-13",
+    "dutyRoster": {
+      "adjusted": false,
+      "cxPreflightStaffId": null,
+      "date": "2026-11-13",
+-     "dutyStaffId": null,
++     "dutyStaffId": "11",
+      "standbyStaffIds": [
+        "8",
+        "7",
+      ],
+    },
+    "groupId": "A",
+    "kind": "schedule-preflight",
+    "selectedIds": [
+      "template:template-flight-cx931",
++     "template:template-flight-cx937",
++     "template:template-flight-fd573",
++     "template:template-flight-tr121",
+    ],
+    "staffStatuses": {
+      "1": "正常",
+      "10": "正常",
+      "11": "正常",
+
+ ❯ tests/app/preflight-memory.test.ts:115:38
+    113|     await coordinator.handle({ type: "switch-group", groupId: "A" });
+    114|     await coordinator.handle({ type: entries[0].open });
+    115|     expect(preparation(coordinator)).toEqual(expected);
+       |                                      ^
+    116|   });
+    117|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/10]⎯
+
+ FAIL  tests/app/preflight-memory.test.ts > 排班确认窗口按组按日记忆 > 全不选、0、false和空轮值也保存，重置初始数据清空草稿
+AssertionError: expected { kind: 'schedule-preflight', …(7) } to deeply equal { kind: 'schedule-preflight', …(7) }
+
+- Expected
++ Received
+
+@@ -92,19 +92,24 @@
+    "date": "2026-11-13",
+    "dutyRoster": {
+      "adjusted": false,
+      "cxPreflightStaffId": null,
+      "date": "2026-11-13",
+-     "dutyStaffId": null,
++     "dutyStaffId": "11",
+      "standbyStaffIds": [
+        "8",
+        "7",
+      ],
+    },
+    "groupId": "A",
+    "kind": "schedule-preflight",
+-   "selectedIds": [],
++   "selectedIds": [
++     "template:template-flight-cx931",
++     "template:template-flight-cx937",
++     "template:template-flight-fd573",
++     "template:template-flight-tr121",
++   ],
+    "staffStatuses": {
+      "1": "正常",
+      "10": "正常",
+      "11": "正常",
+      "12": "正常",
+
+ ❯ tests/app/preflight-memory.test.ts:128:36
+    126|     const refreshed = f.create();
+    127|     await refreshed.handle({ type: entries[0].open });
+    128|     expect(preparation(refreshed)).toEqual(expected);
+       |                                    ^
+    129|     await refreshed.handle({ type: "close-dialog" });
+    130|     await refreshed.handle({ type: "reset-all" });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/10]⎯
+
+ FAIL  tests/app/preflight-memory.test.ts > 排班确认窗口按组按日记忆 > error 后再次打开保留准备内容，正式班表不变
+ FAIL  tests/app/preflight-memory.test.ts > 排班确认窗口按组按日记忆 > stop 后再次打开保留准备内容，正式班表不变
+ FAIL  tests/app/preflight-memory.test.ts > 排班确认窗口按组按日记忆 > invalid-result 后再次打开保留准备内容，正式班表不变
+AssertionError: expected { kind: 'schedule-preflight', …(7) } to deeply equal { kind: 'schedule-preflight', …(7) }
+
+- Expected
++ Received
+
+@@ -1,10 +1,10 @@
+  {
+-   "adminSupportEnabled": true,
++   "adminSupportEnabled": false,
+    "candidates": [
+      {
+-       "bookedPassengers": 123,
++       "bookedPassengers": 0,
+        "endTime": "19:50",
+        "flightNo": "CX931",
+        "id": "template:template-flight-cx931",
+        "positions": [
+          "督导",
+@@ -92,20 +92,23 @@
+    "date": "2026-11-13",
+    "dutyRoster": {
+      "adjusted": false,
+      "cxPreflightStaffId": null,
+      "date": "2026-11-13",
+-     "dutyStaffId": null,
++     "dutyStaffId": "11",
+      "standbyStaffIds": [
+        "8",
+        "7",
+      ],
+    },
+    "groupId": "A",
+    "kind": "schedule-preflight",
+    "selectedIds": [
+      "template:template-flight-cx931",
++     "template:template-flight-cx937",
++     "template:template-flight-fd573",
++     "template:template-flight-tr121",
+    ],
+    "staffStatuses": {
+      "1": "正常",
+      "10": "正常",
+      "11": "正常",
+
+ ❯ tests/app/preflight-memory.test.ts:148:38
+    146|     expect(coordinator.model()).toEqual(original);
+    147|     await coordinator.handle({ type: entries[0].open });
+    148|     expect(preparation(coordinator)).toEqual(expected);
+       |                                      ^
+    149|   });
+    150|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/10]⎯
+
+ FAIL  tests/app/preflight-memory.test.ts > 排班确认窗口按组按日记忆 > 存储不可写时当前页面继续保留并显示跨刷新保存失败
+AssertionError: the given combination of arguments (undefined and string) is invalid for this assertion. You can use an array, a map, an object, a set, a string, or a weakset instead of a string
+ ❯ tests/app/preflight-memory.test.ts:156:47
+    154|     const coordinator = createTestApplicationCoordinator(f.store, { pr…
+    155|     const expected = await edit(coordinator, entries[0]);
+    156|     expect(coordinator.view().toast?.message).toContain("准备选项");
+       |                                               ^
+    157|     expect(coordinator.view().toast?.message).toContain("刷新");
+    158|     await coordinator.handle({ type: "close-dialog" });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/10]⎯

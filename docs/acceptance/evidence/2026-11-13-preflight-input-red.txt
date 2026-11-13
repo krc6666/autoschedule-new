@@ -1,0 +1,36 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/ui/preflight-memory.test.ts (3 tests | 3 failed) 169ms
+     × generate-schedule 输入后立即保存，新页面控件恢复相同选项 93ms
+     × open-reschedule-flight-picker 输入后立即保存，新页面控件恢复相同选项 35ms
+     × archive-next-duty-day 输入后立即保存，新页面控件恢复相同选项 39ms
+
+ Test Files  1 failed (1)
+      Tests  3 failed (3)
+   Start at  20:41:07
+   Duration  2.65s (transform 1.63s, setup 0ms, import 1.93s, tests 169ms, environment 351ms)
+
+stderr | tests/ui/preflight-memory.test.ts
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/ui/preflight-memory.test.ts > 准备窗口控件保存与重新挂载 > generate-schedule 输入后立即保存，新页面控件恢复相同选项
+ FAIL  tests/ui/preflight-memory.test.ts > 准备窗口控件保存与重新挂载 > open-reschedule-flight-picker 输入后立即保存，新页面控件恢复相同选项
+ FAIL  tests/ui/preflight-memory.test.ts > 准备窗口控件保存与重新挂载 > archive-next-duty-day 输入后立即保存，新页面控件恢复相同选项
+AssertionError: expected '0' to be '246' // Object.is equality
+
+Expected: "246"
+Received: "0"
+
+ ❯ tests/ui/preflight-memory.test.ts:51:101
+     49|     element = await mountElement("autoschedule-app-dialog", { model: r…
+     50|     await settleLit();
+     51|     expect(element.querySelector<HTMLInputElement>(`input[aria-label="…
+       |                                                                                                     ^
+     52|     expect(element.querySelector<HTMLSelectElement>('select[aria-label…
+     53|     expect(element.querySelector<HTMLInputElement>('input[role="switch…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯

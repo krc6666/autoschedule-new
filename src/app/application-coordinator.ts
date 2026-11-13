@@ -19,6 +19,13 @@ import { todayIso } from "../utils";
 import type { ApplicationPreferences } from "./application-preferences";
 import { isStorageQuotaExceeded } from "../infrastructure/storage";
 import { halfRestSelectionForDate } from "../domain/records/half-rest-selections";
+import {
+  capturePreflightDraft,
+  isPreflightDialog,
+  restorePreflightDraft,
+  type PreflightDraft,
+  type PreflightDialog,
+} from "./preflight-drafts";
 
 export interface ApplicationCoordinatorOptions {
   preferences: ApplicationPreferences;
@@ -108,6 +115,7 @@ export class ApplicationCoordinator implements ApplicationContext {
   private toastId = 0;
   private progressHideTimer: ReturnType<typeof setTimeout> | undefined;
   private scheduleCommandPending = false;
+  private preflightDrafts: PreflightDraft[];
 
   constructor(
     readonly store: AutoscheduleStore,
@@ -115,6 +123,7 @@ export class ApplicationCoordinator implements ApplicationContext {
     dependencies: ApplicationCoordinatorDependencies
   ) {
     this.preferences = options.preferences;
+    this.preflightDrafts = this.preferences.loadPreflightDrafts?.() ?? [];
     this.currentView = initialView(
       this.preferences,
       options.restoredScheduleNotice
@@ -193,8 +202,40 @@ export class ApplicationCoordinator implements ApplicationContext {
   }
 
   updateView(patch: Partial<ApplicationViewState>): void {
+    if (isPreflightDialog(patch.dialog)) {
+      const draft = capturePreflightDraft(patch.dialog);
+      this.preflightDrafts = [
+        ...this.preflightDrafts.filter(
+          (item) => item.groupId !== draft.groupId || item.date !== draft.date
+        ),
+        draft,
+      ];
+    }
     this.currentView = { ...this.currentView, ...patch };
+    if (isPreflightDialog(patch.dialog)) this.savePreflightDrafts();
     this.options.onViewChange?.(this.view());
+  }
+
+  openPreflightDialog(dialog: PreflightDialog): void {
+    const saved = this.preflightDrafts.find(
+      (draft) => draft.groupId === dialog.groupId && draft.date === dialog.date
+    );
+    this.updateView({
+      dialog: saved
+        ? restorePreflightDraft(dialog, saved, this.model())
+        : dialog,
+    });
+  }
+
+  private savePreflightDrafts(): void {
+    try {
+      this.preferences.savePreflightDrafts?.(this.preflightDrafts);
+    } catch {
+      this.toast(
+        "准备选项暂时只保留在当前页面，未能保存到浏览器；刷新或关闭页面后可能丢失，请恢复浏览器存储后重试。",
+        "warning"
+      );
+    }
   }
 
   commit(message?: string): void {
@@ -304,6 +345,9 @@ export class ApplicationCoordinator implements ApplicationContext {
       case "reset-all":
         if (this.confirm("确认恢复初始数据？当前本地数据将被替换。")) {
           this.store.getState().reset();
+          this.preflightDrafts = [];
+          this.savePreflightDrafts();
+          this.updateView({ dialog: null });
           this.commit("已恢复初始数据");
         }
         return true;

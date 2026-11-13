@@ -1,0 +1,3 @@
+Exit: 1
+验收材料检查失败：
+2026-11-13-preflight-memory / finalArtifact：尚未验收通过（unverified）

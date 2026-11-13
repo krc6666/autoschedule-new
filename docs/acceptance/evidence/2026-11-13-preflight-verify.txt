@@ -1,0 +1,75 @@
+Command: npm.cmd run verify
+Exit: 0
+
+> autoschedule@1.0.0 verify
+> npm run typecheck && npm test && npm run test:performance && npm run build
+
+
+> autoschedule@1.0.0 typecheck
+> tsc -b --pretty false
+
+
+> autoschedule@1.0.0 test
+> vitest run --exclude tests/performance/**
+
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+
+ Test Files  181 passed (181)
+      Tests  1822 passed (1822)
+   Start at  20:57:11
+   Duration  95.22s (transform 26.55s, setup 0ms, import 91.07s, tests 323.97s, environment 30.07s)
+
+
+> autoschedule@1.0.0 test:performance
+> vitest run tests/performance
+
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+
+ Test Files  7 passed (7)
+      Tests  19 passed (19)
+   Start at  20:58:47
+   Duration  128.65s (transform 5.96s, setup 0ms, import 8.35s, tests 307.72s, environment 575ms)
+
+
+> autoschedule@1.0.0 build
+> tsc -b && vite build
+
+vite v7.3.6 building client environment for production...
+transforming...
+✓ 335 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                         0.55 kB │ gzip:     0.37 kB
+dist/assets/highs-CE2Fl5Zg.js                          42.30 kB
+dist/assets/highs-BICaJMc_.js                          42.97 kB
+dist/assets/bootstrap-icons-mSm7cUeB.woff2            134.04 kB
+dist/assets/bootstrap-icons-BeopsB42.woff             180.29 kB
+dist/assets/schedule.worker-BbUQhNHN.js               425.34 kB
+dist/assets/highs-D01W9kFF.wasm                     3,651.47 kB │ gzip: 1,097.46 kB
+dist/assets/highs-DEeTqoGR.wasm                     3,674.43 kB │ gzip: 1,092.08 kB
+dist/assets/style-CzPXRm7y.css                        369.39 kB │ gzip:    55.79 kB
+dist/assets/__vite-browser-external-D7Ct-6yo.js         0.19 kB │ gzip:     0.18 kB │ map:     0.21 kB
+dist/assets/excel-worksheet-Cq8BGYkX.js                 0.64 kB │ gzip:     0.41 kB │ map:     2.59 kB
+dist/assets/late-priority-counts-excel-BPOg9Agf.js      2.92 kB │ gzip:     1.61 kB │ map:    11.64 kB
+dist/assets/duty-roster-excel-CePWyYLH.js               7.13 kB │ gzip:     3.31 kB │ map:    25.69 kB
+dist/assets/highs-solver-C0WZy1K0.js                   25.94 kB │ gzip:     6.55 kB │ map:   145.39 kB
+dist/assets/highs-Ch1OeSMh.js                          42.42 kB │ gzip:    15.10 kB │ map:   207.57 kB
+dist/assets/highs-DU_LfEET.js                          43.09 kB │ gzip:    15.33 kB │ map:   211.54 kB
+dist/assets/excel-BQk5vEC6.js                          44.76 kB │ gzip:    15.21 kB │ map:   177.52 kB
+dist/assets/html2canvas.esm-DXEQVQnt.js               201.09 kB │ gzip:    47.47 kB │ map:   602.72 kB
+dist/assets/xlsx.min-_MlJRysO.js                      869.58 kB │ gzip:   322.62 kB │ map: 1,678.38 kB
+dist/assets/index-CdJLzO1y.js                         943.20 kB │ gzip:   258.77 kB │ map: 3,303.44 kB
+✓ built in 6.88s
+[plugin vite:resolve] Module "node:module" has been externalized for browser compatibility, imported by "D:/autoschedule-migrate/autoschedule/node_modules/@bubblyworld/highs-ts/build/highs.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "node:module" has been externalized for browser compatibility, imported by "D:/autoschedule-migrate/autoschedule/node_modules/@autoschedule/highs-ts/build/highs.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "node:module" has been externalized for browser compatibility, imported by "D:/autoschedule-migrate/autoschedule/node_modules/@bubblyworld/highs-ts/build/highs.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "node:module" has been externalized for browser compatibility, imported by "D:/autoschedule-migrate/autoschedule/node_modules/@autoschedule/highs-ts/build/highs.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+
+(!) Some chunks are larger than 900 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.

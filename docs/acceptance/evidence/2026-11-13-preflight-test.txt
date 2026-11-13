@@ -1,0 +1,14 @@
+Command: npm test
+Exit: 0
+
+> autoschedule@1.0.0 test
+> vitest run --exclude tests/performance/**
+
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+
+ Test Files  181 passed (181)
+      Tests  1822 passed (1822)
+   Start at  20:49:44
+   Duration  88.01s (transform 21.69s, setup 0ms, import 83.05s, tests 311.32s, environment 24.94s)

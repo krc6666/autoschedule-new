@@ -1,0 +1,26 @@
+{
+  "scope": "Local production build only; not browser acceptance or deployment",
+  "index": {
+    "path": "dist/index.html",
+    "sha256": "2e4c41a55a1342b090ae615bcbeb7abb389fa1eecfd8e8ebe62a80fa5f1527ba"
+  },
+  "draftStorageKey": "autoschedule.preflightDrafts.v1",
+  "bundles": [
+    {
+      "path": "dist/assets/index-CdJLzO1y.js",
+      "sha256": "0df77dd5a21baac316ad974b4815bcf8281986c8079ac8f42ef8ee273ed2ad54"
+    }
+  ],
+  "checks": {
+    "functionalFiles": 181,
+    "functionalTests": 1822,
+    "typecheckExit": 0,
+    "functionalExit": 0,
+    "buildExit": 0,
+    "verifyExit": 0,
+    "performanceFiles": 7,
+    "performanceTests": 19
+  },
+  "browserAcceptance": "unverified",
+  "deployment": "not performed"
+}

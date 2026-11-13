@@ -1,0 +1,86 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/app/preflight-memory.test.ts (19 tests | 4 failed) 228ms
+     × 全不选、0、false和空轮值也保存，重置初始数据清空草稿 18ms
+     × 'generate-schedule' 逐步调整其他人员状态不会抹掉已选的轮值 8ms
+     × 'open-reschedule-flight-picker' 逐步调整其他人员状态不会抹掉已选的轮值 6ms
+     × 'archive-next-duty-day' 逐步调整其他人员状态不会抹掉已选的轮值 7ms
+
+ Test Files  1 failed (1)
+      Tests  4 failed | 15 passed (19)
+   Start at  20:39:10
+   Duration  2.22s (transform 1.53s, setup 0ms, import 1.79s, tests 228ms, environment 0ms)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/app/preflight-memory.test.ts > 排班确认窗口按组按日记忆 > 全不选、0、false和空轮值也保存，重置初始数据清空草稿
+AssertionError: expected [] to not deeply equal []
+
+Compared values have no visual difference.
+
+ ❯ tests/app/preflight-memory.test.ts:142:52
+    140|     await refreshed.handle({ type: "reset-all" });
+    141|     await refreshed.handle({ type: entries[0].open });
+    142|     expect(preparation(refreshed).selectedIds).not.toEqual([]);
+       |                                                    ^
+    143|   });
+    144|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  tests/app/preflight-memory.test.ts > 排班确认窗口按组按日记忆 > 'generate-schedule' 逐步调整其他人员状态不会抹掉已选的轮值
+ FAIL  tests/app/preflight-memory.test.ts > 排班确认窗口按组按日记忆 > 'open-reschedule-flight-picker' 逐步调整其他人员状态不会抹掉已选的轮值
+AssertionError: expected { date: '2026-11-13', …(3) } to deeply equal { date: '2026-11-13', …(3) }
+
+- Expected
++ Received
+
+  {
+    "cxPreflightStaffId": null,
+    "date": "2026-11-13",
+-   "dutyStaffId": null,
++   "dutyStaffId": "11",
+    "standbyStaffIds": [
+      "8",
+      "7",
+    ],
+  }
+
+ ❯ tests/app/preflight-memory.test.ts:180:58
+    178|     const roster = options(preparation(coordinator)).dutyRoster;
+    179|     await coordinator.handle({ type: `update-${entry.prefix}-staff-sta…
+    180|     expect(options(preparation(coordinator)).dutyRoster).toEqual(roste…
+       |                                                          ^
+    181|   });
+    182|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  tests/app/preflight-memory.test.ts > 排班确认窗口按组按日记忆 > 'archive-next-duty-day' 逐步调整其他人员状态不会抹掉已选的轮值
+AssertionError: expected { date: '2026-11-15', …(3) } to deeply equal { date: '2026-11-15', …(3) }
+
+- Expected
++ Received
+
+  {
+    "cxPreflightStaffId": null,
+    "date": "2026-11-15",
+-   "dutyStaffId": null,
++   "dutyStaffId": "10",
+    "standbyStaffIds": [
+      "6",
+      "5",
+    ],
+  }
+
+ ❯ tests/app/preflight-memory.test.ts:180:58
+    178|     const roster = options(preparation(coordinator)).dutyRoster;
+    179|     await coordinator.handle({ type: `update-${entry.prefix}-staff-sta…
+    180|     expect(options(preparation(coordinator)).dutyRoster).toEqual(roste…
+       |                                                          ^
+    181|   });
+    182|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯

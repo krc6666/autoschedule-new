@@ -1,0 +1,142 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-13-preflight-memory",
+  "title": "全部排班确认入口按组按目标日期保留准备草稿，刷新及重启仍恢复",
+  "startedFrom": "f90f27625233f2623a5edb76e1af75a48a18d721",
+  "expectation": {
+    "example": "Owner提供2026-11-13确认窗口截图；A组该日调整航班、预定人数、人员状态、轮值及行政模式后关闭，从任何入口再开，刷新及关闭浏览器后仍应保留。",
+    "expected": "同组同目标日所有准备入口共享记忆；不同组/日期隔离，显式空选择、0、false及空轮值保留；恢复只使用当前合法目录。",
+    "unchanged": "正式航班、人员、设置、历史和班表只在原安全结果安装后提交；周计划、模板、半休、求解/后置/安全凭证及Excel合同不变。参考history快速索引中的行政支援前置、准备回退和双组隔离案例，矩阵覆盖全部消费者。",
+    "fallback": "取消/失败/停止不采用保留正式模型和准备草稿；存储不可写时本页继续保留并明确警告刷新会丢失。坏草稿使用默认；删除的航班/人员不复活，失效假别沿当前状态，失效轮值使用原领域默认。"
+  },
+  "testedVersion": "8ca2447885c24f721a1eacbf40d8fd553d69414a3d40efdf7cb259961de6c936",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "原实现10项新增回归均因重开丢失选项或无保存失败提示而失败；后续分别保存轮值被状态调整抹掉及人数input未保存的失败日志，最终全量通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-13-preflight-memory-red.txt",
+          "summary": "reproduction: memory-red.txt",
+          "sha256": "5e9d50d36ce144fff2d43270fafc1acef8be4772da50fb6a0e021f097b02ebc7"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-13-preflight-roster-red.txt",
+          "summary": "reproduction: roster-red.txt",
+          "sha256": "1c3fdbe589a86363e769ae4dd03209e721ad3ffcde5120fef99f67ce30a18e74"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-13-preflight-input-red.txt",
+          "summary": "reproduction: input-red.txt",
+          "sha256": "a964a79a6be1479172a75cd886934285b489c402fcdd55325b40ad8e433386ac"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-13-preflight-test.txt",
+          "summary": "reproduction: test.txt",
+          "sha256": "c6dcb2621bdc69a6e134de658b46b9dd5cad0c3ce2546fdc1cae528fd57e1dc8"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "三入口同组同日关闭/重复打开/新coordinator恢复完整选项；Happy DOM实际控件input/change经默认browser-preferences写入localStorage，新实例及控件重挂载逐项相同，航班勾选数独立核对。46项新增回归包含在最终181文件1822项通过结果中。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-13-preflight-test.txt",
+          "summary": "normalPath: test.txt",
+          "sha256": "c6dcb2621bdc69a6e134de658b46b9dd5cad0c3ce2546fdc1cae528fd57e1dc8"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "覆盖跨入口及后天目标日、A/B及日期隔离、空勾选/0/false/空轮值、四槽具体人选、自建假别、模板临时ID变化及删除目录/失效引用、坏存储和写入异常、恢复初始清空。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-13-preflight-test.txt",
+          "summary": "alternatePath: test.txt",
+          "sha256": "c6dcb2621bdc69a6e134de658b46b9dd5cad0c3ce2546fdc1cae528fd57e1dc8"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "三入口恢复后计算一次、安全结果采用后继续保留；错误、停止不采用和无凭证结果拒绝均保留原模型及全部草稿。状态修改保留仍有效轮值；重复打开不会以新默认覆盖记忆。未改变求解、补缺、恢复、轮岗或统计路径。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-13-preflight-test.txt",
+          "summary": "postProcessing: test.txt",
+          "sha256": "c6dcb2621bdc69a6e134de658b46b9dd5cad0c3ce2546fdc1cae528fd57e1dc8"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "正式安装仍走原安全凭证和入口组别/日期守卫；新增三入口坏凭证反向回归，原有停止采用/不采用和陈旧上下文回归继续通过。只恢复当前本季候选及合法人员选择，不新增安全判断。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-13-preflight-test.txt",
+          "summary": "finalGuard: test.txt",
+          "sha256": "c6dcb2621bdc69a6e134de658b46b9dd5cad0c3ce2546fdc1cae528fd57e1dc8"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "正式模型、dirty状态、原子提交/归档、安全凭证、周计划、模板、半休及Excel原合同均保留；准备记忆不进入AppState或Excel。9文件169项定向及181文件1822项功能、类型检查和生产构建退出0；owner随后授权开发提交，完整npm.cmd run verify退出0，包含181文件1822项功能、7文件19项性能、类型检查和生产构建。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-13-preflight-typecheck.txt",
+          "summary": "unchanged: typecheck.txt",
+          "sha256": "9ac02f75204cd0f5962b0b1b4d20aacd0bc91ad6869ee54fc7c79381c46a861b"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-13-preflight-test.txt",
+          "summary": "unchanged: test.txt",
+          "sha256": "c6dcb2621bdc69a6e134de658b46b9dd5cad0c3ce2546fdc1cae528fd57e1dc8"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-13-preflight-build.txt",
+          "summary": "unchanged: build.txt",
+          "sha256": "9f806d2b5dceb60952b4549c3436f917be07d7d694b0fa8b0817fc837333648c"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-13-preflight-verify.txt",
+          "summary": "Complete commit verification: 1822 functional and 19 performance tests, typecheck and build",
+          "sha256": "f124b1bc1760d7e39136166b92058ac1e2db37ad9cbb3c7c99935ac42702d2f5"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "已生成本地dist并验证唯一入口bundle包含草稿存储键，记录index及bundle哈希；实际UI控件自动测试通过。尚未取得owner本地新版真实浏览器关闭/刷新/重启后的页面证据，按AGENTS人复现、机器查代码保持未验收；owner随后授权开发提交，未push或发布，截图中的GitHub Pages未更新。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-13-preflight-artifact.json",
+          "summary": "finalArtifact: artifact.json",
+          "sha256": "f4581cfaced6f72b4bf11af1b29f351a7fdaf551d4816943f26d73d7f7a88606"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-13-preflight-build.txt",
+          "summary": "finalArtifact: build.txt",
+          "sha256": "9f806d2b5dceb60952b4549c3436f917be07d7d694b0fa8b0817fc837333648c"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-13-preflight-test.txt",
+          "summary": "finalArtifact: test.txt",
+          "sha256": "c6dcb2621bdc69a6e134de658b46b9dd5cad0c3ce2546fdc1cae528fd57e1dc8"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "原10项红测与轮值/人数输入后续红测见本任务evidence引用；最终全量1822项通过，所有新回归已包含。",
+    "laterChanges": "状态调整、同入口重开、跨入口/组/日期、新实例恢复、目录变化、计算错误/停止/安全拒绝和安全采用都可能改坏记忆，均有长期回归；求解及后置没有新增草稿消费点，最终安装继续原安全链。",
+    "finalArtifact": "本地dist的index及含草稿键的唯一入口bundle哈希见preflight-artifact.json，类型/全量功能/生产构建日志可复核；尚无owner真实浏览器产物证据，不能宣称最终页面验收完成。"
+  },
+  "review": {
+    "missedScope": "逐项查三入口、四轮值槽、人数未失焦、显式空值、同入口重复打开、跨组日期、恢复初始、目录失效及失败回退。未执行真实浏览器刷新/关闭后重启，也未部署线上；这两项不能由Happy DOM或bundle哈希替代。准备记忆不随Excel跨设备迁移，按已确认的本浏览器草稿边界处理。",
+    "rootCause": "dialog同时承担唯一草稿和临时显示，关闭后即消失且三个入口重建默认；状态更改重建轮值及只监听change分别造成中途选择与未失焦人数丢失。初稿通过dialog种类猜是否开窗仍遗漏同入口重复打开，最终改为显式统一openPreflightDialog。",
+    "earlyDetection": "设计准备表单时先列打开/编辑/关闭/刷新/确认失败/再次打开的生命周期；用用户可见控件及新coordinator往返作失败测试，并在写入前填写按组/目标日消费者矩阵。人数输入要在未失焦即重建页面时核对，轮值先选择再修改其他状态，不能只比默认。"
+  }
+}
