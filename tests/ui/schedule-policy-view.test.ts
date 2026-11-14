@@ -8,6 +8,41 @@ import "../../src/ui/components/policy-page";
 import { mountElement, settleLit } from "./lit-test-helpers";
 
 describe("rules page", () => {
+  it("shows duty afternoon relief and finds it by its rule name", async () => {
+    const state = createDefaultState();
+    const before = structuredClone(state);
+    const element = await mountElement<
+      HTMLElement & { updateComplete: Promise<unknown> }
+    >("autoschedule-policy-page", { model: state });
+    const ruleRow = () =>
+      [
+        ...element.querySelectorAll<HTMLTableRowElement>(
+          ".policy-ledger tbody tr"
+        ),
+      ].find((row) => row.textContent?.includes("值班岗位锁定与下午避排"));
+
+    expect(
+      element.querySelector<HTMLDetailsElement>(".policy-ledger")?.open
+    ).toBe(true);
+    expect(ruleRow()).toBeDefined();
+    expect(ruleRow()?.textContent).toContain("按航班开始时间联动下午起止设置");
+    expect(ruleRow()?.textContent).toContain("缺员才用值班兜底");
+    expect(ruleRow()?.textContent).toContain("尽量补非下午航班");
+    expect(ruleRow()?.textContent).toContain("不为凑数增加下午任务");
+
+    const search = element.querySelector<HTMLInputElement>(
+      'input[type="search"]'
+    )!;
+    search.value = "下午避排";
+    search.dispatchEvent(new Event("input", { bubbles: true }));
+    await settleLit();
+
+    expect(element.querySelectorAll(".policy-ledger tbody tr")).toHaveLength(1);
+    expect(ruleRow()?.textContent).toContain("始终执行");
+    expect(ruleRow()?.textContent).toContain("保留值班上午与晚撤任务");
+    expect(state).toEqual(before);
+  });
+
   it("saves independent monthly rest switches and target differences through the normal command", async () => {
     const state = createDefaultState();
     const element = await mountElement<

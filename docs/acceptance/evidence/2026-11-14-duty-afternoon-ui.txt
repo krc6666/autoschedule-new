@@ -1,0 +1,12 @@
+Command: npm.cmd exec vitest -- run tests/ui/schedule-policy-view.test.ts
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+
+ Test Files  1 passed (1)
+      Tests  21 passed (21)
+   Start at  14:42:31
+   Duration  2.90s (transform 835ms, setup 0ms, import 993ms, tests 1.35s, environment 349ms)
+
+
+Exit code: 0

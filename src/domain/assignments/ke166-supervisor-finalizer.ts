@@ -547,6 +547,7 @@ export async function finalizeMobileSupervisors({
       "automatic",
       {
         ignoreSafeRegularCandidate: preferredConfiguredFill,
+        dutyStaffId: preparation.dutyStaffId,
         validateRegularAssignments,
       }
     );

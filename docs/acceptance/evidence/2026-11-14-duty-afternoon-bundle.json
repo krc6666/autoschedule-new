@@ -1,0 +1,17 @@
+{
+  "scope": "Production bundle inspection only; no browser interaction",
+  "objective": "duty-position:avoid-afternoon",
+  "assets": [
+    {
+      "path": "dist/assets/index-BJ11do28.js",
+      "bytes": 944937,
+      "sha256": "e5ae248e713dd32f40d83e34fbc7167dcfeae4c723b168f49b5c8b231d066264"
+    },
+    {
+      "path": "dist/assets/schedule.worker-BZ9KTn72.js",
+      "bytes": 426467,
+      "sha256": "f78788bec03b80d2c076b87761022d31416ab91e02500bc8e9b4640a6da553d0"
+    }
+  ],
+  "htmlSha256": "c40c9359278dd17fd9b1299f24a53a9e57ca4b73c86cf7f2d8e66777b3045957"
+}

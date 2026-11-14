@@ -1,0 +1,177 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-14-duty-afternoon-relief",
+  "title": "值班下午按航班开始时间避排，缺员兜底，傍晚保留公平补班",
+  "startedFrom": "0949af2241284898f3afe13121fa69364dcaa9ee",
+  "expectation": {
+    "example": "Owner确认：下午跟随系统现有起止时间，按Flight.startTime判断；CX931 17:55只是例子。若下午12:00—17:30，17:55允许公平补班；若结束改18:00，则17:55优先其他人员。",
+    "expected": "开始时间在下午起止范围内（包含起点、不含终点）的航班优先不用值班人员，不为普通最高4班/值班2班补下午凑数；下午外仍尽量将数量差补到不超过1。初排、补缺、恢复、轮岗和最终月度复核同源。 规则页默认展开显示值班岗位锁定与下午避排，可搜索下午避排定位完整说明。",
+    "unchanged": "上午与晚撤要求、原前序公平/预留及安全、普通人员硬差值、岗位完整性、人工权限、实际出勤统计口径；无新配置/迁移/Excel表。保留owner已有PROJECT_MAP.md改动。",
+    "fallback": "无其他完整安全安排时允许值班承担下午任务兜底，不制造空岗、不突破资质/时间/工时等硬约束；未补数量保留合法结果并反馈。未取得owner真实页面结果保持未验收。"
+  },
+  "testedVersion": "394ee65b83a9fe735686b2c8e3467a18895c6b9102a3b9e740a6ec98b8ab4bfa",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "先见5项真实新合同失败，再见独立直填路径失败；改后116项定向及最终完整门禁通过。 另保留规则页标题缺失红测，改后页面21项通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-duty-afternoon-red.txt",
+          "summary": "修改前8项新行为测试5失败：下午4/2被补班、17:55不联动、后置添加/撤销下午均违反新期望。",
+          "sha256": "683d0f0e35ecbd6f0b52ee407213f71be10f945e306ed357258e2b3c5729e5cd"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-duty-afternoon-supervisor-red.txt",
+          "summary": "传播追查的独立红测：最终配置督导补位后的普通柜台直填选了duty，预期peer-a。",
+          "sha256": "df232ae7f65a6677d15153b9ae3b218285f15c4deb92a03698675629bdf6e838"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-duty-afternoon-focused.txt",
+          "summary": "8文件116项通过，覆盖新行为、原数量/上午/晚撤、督导收尾、重排与月度最终均衡；含Node宿主Worker模块/真实WASM、Excel字节和保存恢复。",
+          "sha256": "77058b22e12c23ffda0af1b0eec43330b3fc56d3b0b8837f86edbafaf2909ce4"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-duty-afternoon-verify.txt",
+          "summary": "npm.cmd run verify退出0：183文件1845项功能、7文件19项性能、类型检查与生产构建通过。",
+          "sha256": "097f143b1a10fe719ec7055cfbb158d224d25d895f9d802d51ef58fb77c5ea47"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-duty-afternoon-ui-red.txt",
+          "summary": "规则页21项中1失败：目标标题缺失，实际DOM找不到值班岗位锁定与下午避排。",
+          "sha256": "6a5023c6324ddd180f7da0f332cfb225cf14efd345e88597f57bddbbd140af1a"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-duty-afternoon-ui.txt",
+          "summary": "规则页21项通过；默认展开、说明、搜索下午避排唯一命中、不改输入状态。Happy DOM测试不等于真实浏览器验收。",
+          "sha256": "44ccf8ddfb8d27b7bfb7b578084efedd62d522cdb0e73f1e32358bab035ad55d"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "4/6航班均不为4/2补下午；下午结束17:30时17:55可补到3，18:00时不补；资质缺员仍填满，上午与晚撤保留。 页面默认可见并可搜索，说明覆盖开始时间、时段联动、缺员兜底及不为凑数排下午。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-duty-afternoon-focused.txt",
+          "summary": "8文件116项通过，覆盖新行为、原数量/上午/晚撤、督导收尾、重排与月度最终均衡；含Node宿主Worker模块/真实WASM、Excel字节和保存恢复。",
+          "sha256": "77058b22e12c23ffda0af1b0eec43330b3fc56d3b0b8837f86edbafaf2909ce4"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-duty-afternoon-verify.txt",
+          "summary": "npm.cmd run verify退出0：183文件1845项功能、7文件19项性能、类型检查与生产构建通过。",
+          "sha256": "097f143b1a10fe719ec7055cfbb158d224d25d895f9d802d51ef58fb77c5ea47"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-duty-afternoon-ui.txt",
+          "summary": "规则页21项通过；默认展开、说明、搜索下午避排唯一命中、不改输入状态。Happy DOM测试不等于真实浏览器验收。",
+          "sha256": "44ccf8ddfb8d27b7bfb7b578084efedd62d522cdb0e73f1e32358bab035ad55d"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "覆盖起点/终点/跨午夜、开始早于下午但岗位实际重叠、岗位时段不同仍读Flight、无普通均衡参与者、6航班及真实Worker模块/配置XLSX/重启/Store/结果字节往返；导出按人员编号独立去重核对。Worker使用Node模拟self宿主，非浏览器线程。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-duty-afternoon-focused.txt",
+          "summary": "8文件116项通过，覆盖新行为、原数量/上午/晚撤、督导收尾、重排与月度最终均衡；含Node宿主Worker模块/真实WASM、Excel字节和保存恢复。",
+          "sha256": "77058b22e12c23ffda0af1b0eec43330b3fc56d3b0b8837f86edbafaf2909ce4"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-duty-afternoon-verify.txt",
+          "summary": "npm.cmd run verify退出0：183文件1845项功能、7文件19项性能、类型检查与生产构建通过。",
+          "sha256": "097f143b1a10fe719ec7055cfbb158d224d25d895f9d802d51ef58fb77c5ea47"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "重排反向拒绝新增下午；允许释放下午即使旧缺额增长；非下午补班仍保护，真实补缺可兜底；机动督导、独立普通柜台直填及最终月度均衡均有回归。人工允许由唯一intent编译。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-duty-afternoon-supervisor-red.txt",
+          "summary": "传播追查的独立红测：最终配置督导补位后的普通柜台直填选了duty，预期peer-a。",
+          "sha256": "df232ae7f65a6677d15153b9ae3b218285f15c4deb92a03698675629bdf6e838"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-duty-afternoon-focused.txt",
+          "summary": "8文件116项通过，覆盖新行为、原数量/上午/晚撤、督导收尾、重排与月度最终均衡；含Node宿主Worker模块/真实WASM、Excel字节和保存恢复。",
+          "sha256": "77058b22e12c23ffda0af1b0eec43330b3fc56d3b0b8837f86edbafaf2909ce4"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-duty-afternoon-verify.txt",
+          "summary": "npm.cmd run verify退出0：183文件1845项功能、7文件19项性能、类型检查与生产构建通过。",
+          "sha256": "097f143b1a10fe719ec7055cfbb158d224d25d895f9d802d51ef58fb77c5ea47"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "完整生成/Worker返回原最终安全凭证并成功安装Store；已有安全守卫全量回归通过。下午是允许缺员兜底的偏好，不新增拒整表硬约束；月度最终复核保护既成避排。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-duty-afternoon-focused.txt",
+          "summary": "8文件116项通过，覆盖新行为、原数量/上午/晚撤、督导收尾、重排与月度最终均衡；含Node宿主Worker模块/真实WASM、Excel字节和保存恢复。",
+          "sha256": "77058b22e12c23ffda0af1b0eec43330b3fc56d3b0b8837f86edbafaf2909ce4"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-duty-afternoon-verify.txt",
+          "summary": "npm.cmd run verify退出0：183文件1845项功能、7文件19项性能、类型检查与生产构建通过。",
+          "sha256": "097f143b1a10fe719ec7055cfbb158d224d25d895f9d802d51ef58fb77c5ea47"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "完整功能与性能门禁通过，原资质/状态/夜班/时间/衔接/工时/值班上午晚撤/KE166/普通硬差值/人工权限继续执行。实际出勤统计仍按重叠；无新配置字段/迁移/工作表。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-duty-afternoon-focused.txt",
+          "summary": "8文件116项通过，覆盖新行为、原数量/上午/晚撤、督导收尾、重排与月度最终均衡；含Node宿主Worker模块/真实WASM、Excel字节和保存恢复。",
+          "sha256": "77058b22e12c23ffda0af1b0eec43330b3fc56d3b0b8837f86edbafaf2909ce4"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-duty-afternoon-verify.txt",
+          "summary": "npm.cmd run verify退出0：183文件1845项功能、7文件19项性能、类型检查与生产构建通过。",
+          "sha256": "097f143b1a10fe719ec7055cfbb158d224d25d895f9d802d51ef58fb77c5ea47"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "自动证据已覆盖实际Worker模块/WASM输出、最终Store安装、XLSX字节人员航班核对及生产主包/Worker哈希；owner真实班表页面尚未重新排班确认，未授权agent自行操作浏览器。不能用自动测试或构建代替现场结果。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-duty-afternoon-focused.txt",
+          "summary": "8文件116项通过，覆盖新行为、原数量/上午/晚撤、督导收尾、重排与月度最终均衡；含Node宿主Worker模块/真实WASM、Excel字节和保存恢复。",
+          "sha256": "77058b22e12c23ffda0af1b0eec43330b3fc56d3b0b8837f86edbafaf2909ce4"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-duty-afternoon-verify.txt",
+          "summary": "npm.cmd run verify退出0：183文件1845项功能、7文件19项性能、类型检查与生产构建通过。",
+          "sha256": "097f143b1a10fe719ec7055cfbb158d224d25d895f9d802d51ef58fb77c5ea47"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-duty-afternoon-bundle.json",
+          "summary": "生产主入口与Worker bundle均包含duty-position:avoid-afternoon，保存实际文件长度及SHA256；不是浏览器验收。",
+          "sha256": "3a4f3e424fe26343287ecd701f0eacb36f38e65f6fa7b1cd8ed0324005eba64f"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-duty-afternoon-ui.txt",
+          "summary": "规则页21项通过；默认展开、说明、搜索下午避排唯一命中、不改输入状态。Happy DOM测试不等于真实浏览器验收。",
+          "sha256": "44ccf8ddfb8d27b7bfb7b578084efedd62d522cdb0e73f1e32358bab035ad55d"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "原先固定12点以后的补班目标与后置缺额保护覆盖新避排期望，首份红测5项失败；传播追查再用第二份红测捕获普通柜台直填遗漏。116项定向和最终verify均通过，见reproduction证据。 页面标题缺失由ui-red证据发现，改后ui证据通过。",
+    "laterChanges": "风险路径包含恢复/频率/连续轮岗、机动督导收尾、督导普通柜台直填及最后月度轻松班次换人。各路径消费单一下午开始事实或统一重排保护，保留缺员兜底；反向测试与完整门禁见postProcessing。",
+    "finalArtifact": "生产主包和Worker最新文件哈希见bundle证据；自动测试对实际Worker结果、Store安装、Excel字节独立核对通过。规则页实际DOM显示和搜索通过，见ui证据。owner真实页面/私人班表尚无最终产物证据，因此保持unverified。"
+  },
+  "review": {
+    "missedScope": "传播矩阵查出并补上独立普通柜台直填；页面中央label同步且DOM可见/搜索已覆盖。仍未验证owner真实浏览器、私人输入和另一设备；Node Worker模块执行不等于浏览器线程。owner已授权开发提交，未授权push/发布；原PROJECT_MAP.md不纳入提交。",
+    "rootCause": "旧目标要求先补下午数量，下午固定按12点后，后置保护又不允许撤掉；新目标需要按现有可配窗口的真实Flight开始时间先避排。督导补位普通柜台直填另按人员顺序选择，是独立消费漏点。",
+    "earlyDetection": "确认业务例子后、写实现前列传播矩阵；沿最终assignments所有写入口逐一找消费者。先测17:55与17:30/18:00联动，再反向测后置加回下午；对直接填岗单独红测，最后核对Worker/Store/真实XLSX和owner页面。 规则说明改动同时测试中央标题和实际页面搜索，避免文字存在但不易找到。"
+  }
+}

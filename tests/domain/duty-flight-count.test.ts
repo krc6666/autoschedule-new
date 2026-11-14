@@ -24,7 +24,7 @@ function count(
   ).size;
 }
 
-describe("duty afternoon flight count floor", () => {
+describe("duty non-afternoon flight count floor", () => {
   it("keeps the daily hours limit when afternoon catch-up would exceed it", async () => {
     const { state } = dutyFlightCountScenario();
     state.settings.maxDailyHours = 4;
@@ -115,9 +115,11 @@ describe("duty afternoon flight count floor", () => {
     expect(result.unfilledCount).toBe(0);
   });
   it.each(["qualification", "time"])(
-    "keeps the valid schedule and explains %s when afternoon catch-up is impossible",
+    "keeps the valid schedule and explains %s when non-afternoon catch-up is impossible",
     async (why) => {
       const { state } = dutyFlightCountScenario();
+      state.flights.find((f) => f.flightNo === "TEST1")!.startTime = "18:00";
+      state.flights.find((f) => f.flightNo === "TEST1")!.endTime = "19:00";
       if (why === "time") {
         state.flights.find((f) => f.flightNo === "TEST2")!.endTime = "22:00";
         state.settings.dutyPositionPriorities[0]!.flightNo = "TEST2";
@@ -151,7 +153,8 @@ describe("duty afternoon flight count floor", () => {
         (f) => f.key === "duty-roster"
       )!;
       expect(feedback.level).toBe("attention");
-      expect(feedback.evidence).toContain("还需补1个下午航班");
+      expect(feedback.evidence).toContain("数量缺额1班");
+      expect(feedback.evidence).toContain("非下午航班补差");
       expect(feedback.evidence).toContain(why === "time" ? "冲突" : "资质");
     }
   );
@@ -176,9 +179,11 @@ describe("duty afternoon flight count floor", () => {
     ).toBe(false);
   });
   it.each([0, 2])(
-    "adds an afternoon flight before duty relief for %s extra flights",
+    "adds a non-afternoon flight before duty relief for %s extra flights",
     async (extra) => {
       const { state } = dutyFlightCountScenario(extra);
+      state.flights.find((f) => f.flightNo === "TEST2")!.startTime = "18:00";
+      state.flights.find((f) => f.flightNo === "TEST2")!.endTime = "19:00";
       const result = await generateSchedule(state, DUTY_COUNT_DATE);
       const maximum = Math.max(
         ...state.staff
@@ -201,7 +206,7 @@ describe("duty afternoon flight count floor", () => {
       ).toBe("duty");
       expect(
         result.assignments.some(
-          (r) => r.staffId === "duty" && ["TEST1", "TEST2"].includes(r.flightNo)
+          (r) => r.staffId === "duty" && r.flightNo === "TEST2"
         )
       ).toBe(true);
     }
@@ -220,13 +225,26 @@ describe("duty afternoon flight count floor", () => {
       timeoutMs: 10000,
     })!;
     const ids = model.problem.objectives.map((o) => o.id);
+    expect(ids.indexOf("duty-position:avoid-afternoon")).toBeGreaterThanOrEqual(
+      0
+    );
+    expect(ids.indexOf("duty-position:avoid-afternoon")).toBeLessThan(
+      ids.indexOf("duty-position:flight-count-shortfall")
+    );
     expect(ids).toContain("duty-position:flight-count-shortfall");
     expect(ids.indexOf("duty-position:flight-count-shortfall")).toBeLessThan(
       ids.indexOf("duty:between-target-rest")
     );
   });
-  it("rejects a later rotation that takes away the afternoon remedy", () => {
+  it("rejects a later rotation that takes away the non-afternoon remedy", () => {
     const { state, rows } = dutyFlightCountScenario();
+    const flight = state.flights.find((f) => f.flightNo === "TEST1")!;
+    flight.startTime = "18:00";
+    flight.endTime = "19:00";
+    for (const row of rows.filter((r) => r.flightId === flight.id)) {
+      row.startTime = flight.startTime;
+      row.endTime = flight.endTime;
+    }
     const row = rows.find(
       (r) => r.flightNo === "TEST1" && r.staffId === "peer-a"
     )!;

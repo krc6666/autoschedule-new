@@ -11,6 +11,7 @@ import {
 } from "../statistics/staff-flight-count";
 import type { SchedulePreparation } from "./schedule-preparation";
 import { isPreNoonFlight } from "../flights/schedule-tasks";
+import { isDutyAfternoonFlight } from "../assignments/duty-afternoon-relief";
 
 export function buildDutyFlightCountModel(
   state: ScheduleGenerationFacts,
@@ -30,12 +31,24 @@ export function buildDutyFlightCountModel(
   const dutyStaffId = preparation.dutyStaffId;
   if (!dutyStaffId || !choices.some((c) => c.person.id === dutyStaffId))
     return { variables, constraints, objectives: [] };
+  const afternoonRelief: LexicographicObjective = {
+    id: "duty-position:avoid-afternoon",
+    direction: "minimize",
+    terms: choices
+      .filter(
+        (c) =>
+          c.person.id === dutyStaffId &&
+          isDutyAfternoonFlight(c.task.flight, state.settings)
+      )
+      .map((c) => ({ variableId: c.id, coefficient: 1 })),
+  };
   const participants = dailyFlightCountParticipantIds(state, {
     dutyStaffId,
     halfRestStaffIds: preparation.runFacts.halfRest.activeStaffIds,
     candidateStaffIds: new Set(choices.map((c) => c.person.id)),
   });
-  if (!participants.size) return { variables, constraints, objectives: [] };
+  if (!participants.size)
+    return { variables, constraints, objectives: [afternoonRelief] };
   const grouped = groupStaffFlightsByNormalizedNumber(
     choices
       .filter(
@@ -105,12 +118,14 @@ export function buildDutyFlightCountModel(
       upperBound: 1,
     });
   // Freeze the minimum extra morning work required by higher-priority coverage.
-  // Catch-up may then add afternoon work, not create extra morning work to count.
+  // Catch-up may use work outside the configured afternoon, never extra morning
+  // work merely to count. Higher-priority coverage can still require duty work.
   const morningKey = preparation.preferredDutyMorningTaskKey;
   return {
     variables,
     constraints,
     objectives: [
+      afternoonRelief,
       {
         id: "duty-position:avoid-extra-morning",
         direction: "minimize",

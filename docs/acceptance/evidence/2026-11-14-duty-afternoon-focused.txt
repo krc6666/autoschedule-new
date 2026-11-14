@@ -1,0 +1,12 @@
+Command: npm.cmd exec vitest -- run tests/domain/duty-afternoon-relief.test.ts tests/domain/duty-flight-count.test.ts tests/domain/relaxed-shift-balance.test.ts tests/domain/reassignment-intent.test.ts tests/domain/mobile-supervisor-scheduling.test.ts tests/domain/rotation-review-safety.test.ts tests/domain/scheduling-execution-plan.test.ts tests/infrastructure/duty-afternoon-relief.test.ts
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+
+ Test Files  8 passed (8)
+      Tests  116 passed (116)
+   Start at  14:31:18
+   Duration  4.77s (transform 7.98s, setup 0ms, import 11.22s, tests 9.37s, environment 1ms)
+
+
+Exit code: 0

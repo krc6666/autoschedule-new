@@ -298,6 +298,7 @@ export async function finalizeSchedule({
     )
       continue;
     fillConfiguredSupervisorTargets(state, assignments, source, "automatic", {
+      dutyStaffId: runFacts.currentDutyStaffId,
       regularOnly: true,
       validateRegularAssignments: (proposed) => {
         if (

@@ -5,6 +5,10 @@ import { diagnoseAutomaticAssignmentEligibility } from "../candidates/assignment
 import { conciseAssignmentWarningReason } from "../reviews/schedule-warning-message";
 import { groupStaffFlightsByNormalizedNumber } from "../statistics/staff-flight-count";
 import { dutyFlightCountStatus } from "../assignments/duty-flight-count";
+import {
+  dutyAfternoonFlightIds,
+  isDutyAfternoonFlight,
+} from "../assignments/duty-afternoon-relief";
 import { durationHours } from "../shared/time";
 import type { ScheduleFeedbackOptions } from "./schedule-feedback";
 import { compileSchedulingPlan } from "../rules/scheduling-execution-plan";
@@ -523,7 +527,7 @@ function monthlyCountDifference(counts: number[]): number {
   return counts.length ? Math.max(...counts) - Math.min(...counts) : 0;
 }
 
-function dutyAfternoonBlockerNote(
+function dutyCatchUpBlockerNote(
   state: ScheduleGenerationFacts,
   dutyStaffId: string
 ): string {
@@ -539,7 +543,12 @@ function dutyAfternoonBlockerNote(
   let candidates = 0,
     eligible = 0;
   for (const flight of state.flights) {
-    if (isPreNoonFlight(flight) || ownFlights.has(flight.id)) continue;
+    if (
+      isPreNoonFlight(flight) ||
+      isDutyAfternoonFlight(flight, state.settings) ||
+      ownFlights.has(flight.id)
+    )
+      continue;
     for (const rule of state.positionRules.filter(
       (r) =>
         r.flightNo === flight.flightNo &&
@@ -567,9 +576,9 @@ function dutyAfternoonBlockerNote(
         );
     }
   }
-  if (!candidates) return "当天没有尚未承担的可核验下午普通岗位。";
+  if (!candidates) return "当天没有尚未承担的可核验非下午普通岗位。";
   const details = [...new Set(reasons)].slice(0, 3).join("；");
-  return `${details}${details ? "。" : ""}${eligible ? "有岗位通过单岗检查，但整班安排还需结合原人员去向、锁定及前序规则复核，不能据此强行补入。" : "已核验的下午岗位未通过直接安排检查。"}`;
+  return `${details}${details ? "。" : ""}${eligible ? "有岗位通过单岗检查，但整班安排还需结合原人员去向、锁定及前序规则复核，不能据此强行补入。" : "已核验的非下午岗位未通过直接安排检查。"}`;
 }
 
 function dutyRosterFeedback(
@@ -590,10 +599,23 @@ function dutyRosterFeedback(
     dutyStaffId: roster.dutyStaffId,
     halfRestStaffIds: new Set(options.halfRestStaffIds ?? []),
   });
+  const dutyAfternoon = roster.dutyStaffId
+    ? dutyAfternoonFlightIds(state, state.assignments, roster.dutyStaffId)
+    : new Set<string>();
+  const dutyAfternoonNote = roster.dutyStaffId
+    ? ` 下午避排优先，按航班开始时间判断${state.settings.afternoonRestStartTime}—${state.settings.afternoonRestEndTime}（含起点、不含终点）；${
+        dutyAfternoon.size
+          ? `最终仍承担${state.flights
+              .filter((f) => dutyAfternoon.has(f.id))
+              .map((f) => `${f.flightNo}（${f.startTime}）`)
+              .join("、")}，保留合法安排，请结合缺员及上午/晚撤等前序要求复核。`
+          : "未安排下午开始的航班。"
+      }`
+    : "";
   const dutyCountNote = dutyCount.applicable
     ? ` 值班航班数${dutyCount.dutyCount}，普通参与人员最多${dutyCount.maximum}；${
         dutyCount.shortfall
-          ? `还需补${dutyCount.shortfall}个下午航班才能相差不超过1，保留现有合法安排。${dutyAfternoonBlockerNote(state, roster.dutyStaffId!)}`
+          ? `数量缺额${dutyCount.shortfall}班，尽量使用非下午航班补差，不为凑数增加下午任务；保留现有合法安排。${dutyCatchUpBlockerNote(state, roster.dutyStaffId!)}`
           : "值班未落后超过1班，继续按值班减负安排。"
       }`
     : "";
@@ -604,6 +626,7 @@ function dutyRosterFeedback(
     )
   );
   const dutyRecoveryNote =
+    dutyAfternoonNote +
     dutyCountNote +
     (roster.recoveryAdjusted
       ? roster.recoveryAdjustmentRole === "future-counterpart"

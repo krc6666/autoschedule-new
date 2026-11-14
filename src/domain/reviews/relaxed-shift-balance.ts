@@ -9,6 +9,7 @@ import { getDutyRosterForDate } from "../duty-roster/roster";
 import { assignmentRule } from "../flights/schedule-position-rules";
 import { clearAutomaticAssignmentEvidence } from "../assignments/assignment-evidence";
 import { ScheduleGuardError } from "../kernel/schedule-guard";
+import { dutyAfternoonFlightIds } from "../assignments/duty-afternoon-relief";
 
 export function balanceRelaxedShifts(options: {
   state: ScheduleGenerationFacts;
@@ -138,7 +139,10 @@ export function balanceRelaxedShifts(options: {
     if (
       !improves(next) ||
       counts(result).some((n, i) => n !== budget[i]) ||
-      spread(proposal) > spreadBefore
+      spread(proposal) > spreadBefore ||
+      (duty !== null &&
+        dutyAfternoonFlightIds(state, proposal, duty).size >
+          dutyAfternoonFlightIds(state, current, duty).size)
     )
       return false;
     try {

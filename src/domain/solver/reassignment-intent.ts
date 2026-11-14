@@ -30,6 +30,7 @@ export interface ReassignmentIntentPolicy {
   allowTr121CooldownRegression: boolean;
   allowDirectGuideReassignment: boolean;
   allowDutyFlightCountRegression: boolean;
+  allowDutyAfternoonRegression: boolean;
 }
 
 export function reassignmentIntentReview(
@@ -67,6 +68,7 @@ const STRICT_REASSIGNMENT_POLICY: ReassignmentIntentPolicy = {
   allowTr121CooldownRegression: false,
   allowDirectGuideReassignment: false,
   allowDutyFlightCountRegression: false,
+  allowDutyAfternoonRegression: false,
 };
 
 export function reassignmentIntentPolicy(
@@ -77,6 +79,7 @@ export function reassignmentIntentPolicy(
       return {
         ...STRICT_REASSIGNMENT_POLICY,
         allowDutyFlightCountRegression: true,
+        allowDutyAfternoonRegression: true,
       };
     case "next-workday-cutoff-recovery":
       return {

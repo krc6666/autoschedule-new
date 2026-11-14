@@ -18,6 +18,7 @@ const STRICT_POLICY: ReassignmentIntentPolicy = {
   allowTr121CooldownRegression: false,
   allowDirectGuideReassignment: false,
   allowDutyFlightCountRegression: false,
+  allowDutyAfternoonRegression: false,
 };
 
 const STRICT_INTENTS: readonly ReassignmentIntent[] = [
@@ -61,6 +62,7 @@ describe("reassignment intent policy", () => {
     expect(reassignmentIntentPolicy({ kind: "manual-swap-analysis" })).toEqual({
       ...STRICT_POLICY,
       allowDutyFlightCountRegression: true,
+      allowDutyAfternoonRegression: true,
     });
   });
 

@@ -1,0 +1,33 @@
+Command: npm.cmd exec vitest -- run tests/domain/duty-afternoon-relief.test.ts -t final configured-supervisor repair
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/domain/duty-afternoon-relief.test.ts (20 tests | 1 failed | 18 skipped) 308ms
+     × prefers other safe people when final configured-supervisor repair fills a regular counter 13ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/domain/duty-afternoon-relief.test.ts > duty afternoon relief by flight start > prefers other safe people when final configured-supervisor repair fills a regular counter
+AssertionError: expected 'duty' to be 'peer-a' // Object.is equality
+
+Expected: "peer-a"
+Received: "duty"
+
+ ❯ tests/domain/duty-afternoon-relief.test.ts:39:28
+     37|       dutyStaffId: "duty", regularOnly: true, validateRegularAssignmen…
+     38|     });
+     39|     expect(target.staffId).toBe("peer-a");
+       |                            ^
+     40|   });
+     41|   it.each([0, 2])(
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 1 passed | 18 skipped (20)
+   Start at  14:30:49
+   Duration  1.95s (transform 1.20s, setup 0ms, import 1.41s, tests 308ms, environment 0ms)
+
+
+Exit code: 1

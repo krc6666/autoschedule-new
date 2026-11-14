@@ -75,7 +75,7 @@ export const SCHEDULING_RULES = [
   {
     id: "duty-position",
     stage: "reserved-assignment",
-    label: "值班岗位锁定",
+    label: "值班岗位锁定与下午避排",
     feedbackMode: "dedicated",
     feedbackKey: "duty-roster",
     feedbackOrder: 8,

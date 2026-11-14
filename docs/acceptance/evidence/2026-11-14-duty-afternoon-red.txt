@@ -1,0 +1,92 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/domain/duty-afternoon-relief.test.ts (8 tests | 5 failed) 1045ms
+     × keeps afternoon free rather than catching up a 4/2 gap (0 extra flights) 334ms
+     × keeps afternoon free rather than catching up a 4/2 gap (2 extra flights) 142ms
+     × links a 17:55 flight to afternoon end 18:00 (catch-up false) 131ms
+     × rejects later recovery adding afternoon work merely to improve the count 7ms
+     × allows later recovery to release afternoon duty work even if the old count gap grows 3ms
+System.Management.Automation.RemoteException
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+System.Management.Automation.RemoteException
+ FAIL  tests/domain/duty-afternoon-relief.test.ts > duty afternoon relief by flight start > keeps afternoon free rather than catching up a 4/2 gap (0 extra flights)
+ FAIL  tests/domain/duty-afternoon-relief.test.ts > duty afternoon relief by flight start > keeps afternoon free rather than catching up a 4/2 gap (2 extra flights)
+AssertionError: expected Set{ 'TEST0', 'TEST2', 'TEST3' } to deeply equal Set{ 'TEST0', 'TEST3' }
+System.Management.Automation.RemoteException
+- Expected
++ Received
+System.Management.Automation.RemoteException
+  Set {
+    "TEST0",
++   "TEST2",
+    "TEST3",
+  }
+System.Management.Automation.RemoteException
+ ❯ tests/domain/duty-afternoon-relief.test.ts:14:49
+     12|     const own = result.assignments.filter((a) => a.staffId === "duty");
+     13|     expect(result.unfilledCount).toBe(0);
+     14|     expect(new Set(own.map((a) => a.flightNo))).toEqual(new Set(["TEST…
+       |                                                 ^
+     15|     const feedback = buildScheduleFeedback({ ...state, assignments: re…
+     16|       .find((f) => f.key === "duty-roster")!;
+System.Management.Automation.RemoteException
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+System.Management.Automation.RemoteException
+ FAIL  tests/domain/duty-afternoon-relief.test.ts > duty afternoon relief by flight start > links a 17:55 flight to afternoon end 18:00 (catch-up false)
+AssertionError: expected true to be false // Object.is equality
+System.Management.Automation.RemoteException
+- Expected
++ Received
+System.Management.Automation.RemoteException
+- false
++ true
+System.Management.Automation.RemoteException
+ ❯ tests/domain/duty-afternoon-relief.test.ts:39:92
+     37|     const result = await generateSchedule(state, DUTY_COUNT_DATE);
+     38|     expect(result.unfilledCount).toBe(0);
+     39|     expect(result.assignments.some((a) => a.staffId === "duty" && a.fl…
+       |                                                                                            ^
+     40|   });
+     41|
+System.Management.Automation.RemoteException
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+System.Management.Automation.RemoteException
+ FAIL  tests/domain/duty-afternoon-relief.test.ts > duty afternoon relief by flight start > rejects later recovery adding afternoon work merely to improve the count
+AssertionError: expected [] to include '调整会增加值班人员的下午航班，下午避排优先于航班数补差'
+ ❯ tests/domain/duty-afternoon-relief.test.ts:61:21
+     59|       facts: createScheduleRunFacts(state, DUTY_COUNT_DATE), intent: {…
+     60|     });
+     61|     expect(reasons).toContain("调整会增加值班人员的下午航班，下午避排优先于航班数补差");
+       |                     ^
+     62|   });
+     63|
+System.Management.Automation.RemoteException
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+System.Management.Automation.RemoteException
+ FAIL  tests/domain/duty-afternoon-relief.test.ts > duty afternoon relief by flight start > allows later recovery to release afternoon duty work even if the old count gap grows
+AssertionError: expected [ '调整会扩大值班人员与普通人员最高航班数的差距，破坏已落实的下午补班' ] to deeply equal []
+System.Management.Automation.RemoteException
+- Expected
++ Received
+System.Management.Automation.RemoteException
+- []
++ [
++   "调整会扩大值班人员与普通人员最高航班数的差距，破坏已落实的下午补班",
++ ]
+System.Management.Automation.RemoteException
+ ❯ tests/domain/duty-afternoon-relief.test.ts:74:21
+     72|       facts: createScheduleRunFacts(state, DUTY_COUNT_DATE), intent: {…
+     73|     });
+     74|     expect(reasons).toEqual([]);
+       |                     ^
+     75|   });
+     76| });
+System.Management.Automation.RemoteException
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+System.Management.Automation.RemoteException
+
+ Test Files  1 failed (1)
+      Tests  5 failed | 3 passed (8)
+   Start at  14:18:18
+   Duration  2.70s (transform 1.21s, setup 0ms, import 1.42s, tests 1.05s, environment 0ms)

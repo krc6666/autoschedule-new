@@ -89,6 +89,28 @@ function fixture() {
 }
 
 describe("monthly relaxed shift balance", () => {
+  it("does not give duty an afternoon flight to balance monthly rest counts", () => {
+    const state = fixture();
+    state.settings.earlyDepartureBalanceEnabled = false;
+    state.staff[0]!.dutyQualified = true;
+    state.dutyRosterOverrides = [
+      {
+        date: state.activeScheduleDate!,
+        dutyStaffId: "p0",
+        cxPreflightStaffId: null,
+        standbyStaffIds: ["p1", null],
+      },
+    ];
+    const result = balanceRelaxedShifts({
+      state,
+      date: state.activeScheduleDate!,
+      assignments: state.assignments,
+      lockedAssignmentIds: new Set(),
+      assertSafe: () => undefined,
+    });
+    expect(result.find((a) => a.flightId === "pm")?.staffId).toBe("p1");
+    expect(result).toEqual(state.assignments);
+  });
   it("does not hide the recipient from the comparison by swapping in an originally idle person", () => {
     const state = fixture();
     state.staff.push({

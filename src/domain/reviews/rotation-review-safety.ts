@@ -29,6 +29,7 @@ import { crossWorkdayReservationStatuses } from "./cross-workday-qualification-r
 import { crossFlightPriorityReassignmentReasons } from "../rules/cross-flight-priority";
 import { isDutyReliefPriorityPosition } from "./position-rotation-policy";
 import { dutyFlightCountStatus } from "../assignments/duty-flight-count";
+import { dutyAfternoonFlightIds } from "../assignments/duty-afternoon-relief";
 import {
   halfRestRegressionReasons,
   strictRecoveryHalfRestBackfillCount,
@@ -397,7 +398,22 @@ function plannedAssignmentSafetyReasons(
   ) {
     reasons.push("交换后值班人员没有12点前开始的航班");
   }
-  if (review !== "coverage" && facts?.currentDutyStaffId) {
+  const dutyStaffId = facts?.currentDutyStaffId;
+  const afternoonChange = dutyStaffId
+    ? dutyAfternoonFlightIds(state, planned, dutyStaffId).size -
+      dutyAfternoonFlightIds(state, assignments, dutyStaffId).size
+    : 0;
+  if (
+    !intentPolicy.allowDutyAfternoonRegression &&
+    plannedAssigned <= originalAssigned &&
+    afternoonChange > 0
+  )
+    reasons.push("调整会增加值班人员的下午航班，下午避排优先于航班数补差");
+  if (
+    review !== "coverage" &&
+    facts?.currentDutyStaffId &&
+    afternoonChange >= 0
+  ) {
     const countOptions = {
       dutyStaffId: facts.currentDutyStaffId,
       halfRestStaffIds: facts.halfRest.activeStaffIds,
@@ -410,7 +426,7 @@ function plannedAssignmentSafetyReasons(
       after.shortfall > before.shortfall
     )
       reasons.push(
-        "调整会扩大值班人员与普通人员最高航班数的差距，破坏已落实的下午补班"
+        "调整会扩大值班人员与普通人员最高航班数的差距，破坏已落实的非下午补班"
       );
     else if (
       !(

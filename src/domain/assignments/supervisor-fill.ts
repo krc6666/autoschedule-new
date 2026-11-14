@@ -21,6 +21,7 @@ import { schedulingDecision } from "../rules/schedule-rule-contract";
 import { durationHours } from "../shared/time";
 import type { ScheduleRunFacts } from "../shared/schedule-run-facts";
 import { optimizeReassignment } from "../solver/reassignment-optimizer";
+import { isDutyAfternoonFlight } from "./duty-afternoon-relief";
 import type { SolverPort } from "../solver/solver-port";
 import {
   isSupervisorFillTarget,
@@ -616,6 +617,8 @@ export function fillConfiguredSupervisorTargets(
   mode: "automatic" | "manual",
   options: {
     ignoreSafeRegularCandidate?: boolean;
+    /** Current run fact; eligibility facts deliberately do not own duty selection. */
+    dutyStaffId?: string | null;
     /** Automatic callers validate all run-specific rules before filling a regular vacancy. */
     validateRegularAssignments?: (assignments: Assignment[]) => boolean;
     /** Final vacancy repair must not recreate a supervisor link removed by a guard. */
@@ -644,7 +647,16 @@ export function fillConfiguredSupervisorTargets(
         target.status === "unfilled" &&
         options.validateRegularAssignments
       ) {
-        for (const person of evaluation.safeRegularCandidates ?? []) {
+        const flight = state.flights.find((f) => f.id === target.flightId);
+        const avoidDuty = Boolean(
+          flight && isDutyAfternoonFlight(flight, state.settings)
+        );
+        const candidates = [...(evaluation.safeRegularCandidates ?? [])].sort(
+          (left, right) =>
+            Number(avoidDuty && left.id === options.dutyStaffId) -
+            Number(avoidDuty && right.id === options.dutyStaffId)
+        );
+        for (const person of candidates) {
           const proposed = structuredClone(assignments);
           const proposedTarget = proposed.find((row) => row.id === target.id)!;
           placeStaffOnAssignment(state, proposedTarget, person);

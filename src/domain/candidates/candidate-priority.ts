@@ -44,6 +44,7 @@ import {
   isOrdinaryPriorityPosition,
 } from "../reviews/position-rotation-policy";
 import { intervalsOverlap } from "../shared/time";
+import { isDutyAfternoonFlight } from "../assignments/duty-afternoon-relief";
 import { isKe166MobileSupervisor } from "../flights/schedule-tasks";
 import {
   workloadBalancePriority,
@@ -424,7 +425,10 @@ export function buildCandidatePriority(
             dutyStaffId,
             currentDutyTargetTaskKeys
           )
-        : "unrelated",
+        : person.id === dutyStaffId &&
+            isDutyAfternoonFlight(flight, state.settings)
+          ? "reserved-elsewhere"
+          : "unrelated",
     strictTransitionViolations: positionTransitionInsertionCost(
       assignments,
       person.id,
