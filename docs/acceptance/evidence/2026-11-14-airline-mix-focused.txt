@@ -1,0 +1,47 @@
+Command: npm.cmd exec vitest -- run tests/domain/staff-airline-mix.test.ts tests/infrastructure/airline-mix-settings.test.ts tests/ui/airline-mix-settings.test.ts tests/infrastructure/airline-mix-worker.test.ts tests/domain/staff-work-continuity.test.ts tests/domain/scheduling-execution-plan.test.ts tests/domain/reassignment-intent.test.ts tests/domain/schedule-feedback.test.ts tests/app/policy-actions.test.ts tests/app/policy-collection-actions.test.ts tests/architecture/policy-actions-module-seams.test.ts tests/infrastructure/excel.test.ts tests/infrastructure/policy-diagnostics-roundtrip.test.ts tests/domain/policy-configuration-diagnostics.test.ts
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/infrastructure/airline-mix-settings.test.ts (8 tests | 1 failed) 325ms
+   × keeps A/B preferences isolated and applies custom Excel bytes only to the active group 204ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/infrastructure/airline-mix-settings.test.ts > keeps A/B preferences isolated and applies custom Excel bytes only to the active group
+AssertionError: expected [ { id: 'airline-mix-fd-ak', …(2) } ] to deeply equal [ { id: 'custom', …(2) } ]
+
+- Expected
++ Received
+
+  [
+    {
+      "airlineCodes": [
+-       "KE",
+-       "TR",
++       "FD",
++       "AK",
+      ],
+      "enabled": true,
+-     "id": "custom",
++     "id": "airline-mix-fd-ak",
+    },
+  ]
+
+ ❯ tests/infrastructure/airline-mix-settings.test.ts:98:62
+     96|   store.getState().switchGroup("B");
+     97|   store.getState().records.applyWorkbookImport(parseWorkbook(XLSX.read…
+     98|   expect(store.getState().model.settings.airlineMixPolicies).toEqual(s…
+       |                                                              ^
+     99|   store.getState().switchGroup("A");
+    100|   expect(store.getState().model.settings.airlineMixPolicies).toEqual(o…
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+ Test Files  1 failed | 13 passed (14)
+      Tests  1 failed | 210 passed (211)
+   Start at  16:33:06
+   Duration  14.12s (transform 18.69s, setup 0ms, import 24.94s, tests 22.05s, environment 1.56s)
+
+
+Exit code: 1

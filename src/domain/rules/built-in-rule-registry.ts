@@ -49,6 +49,8 @@ import {
 import { compactRegularAssignments } from "../coverage/schedule-coverage";
 import { balanceRelaxedShifts } from "../reviews/relaxed-shift-balance";
 import { improveStaffWorkContinuity } from "../reviews/staff-work-continuity";
+import { improveStaffAirlineMix } from "../reviews/staff-airline-mix";
+import { enabledAirlineMixPolicies } from "./airline-mix-policy";
 
 export const CONFIGURABLE_RULE_SETTINGS: Partial<
   Record<
@@ -391,6 +393,9 @@ const RULE_EXECUTION: Readonly<
   "staff-work-continuity": [
     { kind: "final-review", execute: improveStaffWorkContinuity },
   ],
+  "staff-airline-mix": [
+    { kind: "final-review", execute: improveStaffAirlineMix },
+  ],
 };
 
 export const BUILT_IN_SCHEDULING_HOOKS: readonly SchedulingHook[] =
@@ -400,6 +405,7 @@ export const BUILT_IN_SCHEDULING_HOOKS: readonly SchedulingHook[] =
     stage: rule.stage,
     defaultEnabled: true,
     configurable:
+      rule.id === "staff-airline-mix" ||
       rule.id === "relaxed-shift-balance" ||
       CONFIGURABLE_RULE_SETTINGS[rule.id] !== undefined,
     before: [],
@@ -439,12 +445,14 @@ export function builtInRulePreferences(
     return {
       id: hook.id,
       enabled:
-        hook.id === "relaxed-shift-balance"
-          ? settings.earlyDepartureBalanceEnabled ||
-            settings.afternoonRestBalanceEnabled
-          : setting
-            ? Boolean(settings[setting])
-            : true,
+        hook.id === "staff-airline-mix"
+          ? enabledAirlineMixPolicies(settings).length > 0
+          : hook.id === "relaxed-shift-balance"
+            ? settings.earlyDepartureBalanceEnabled ||
+              settings.afternoonRestBalanceEnabled
+            : setting
+              ? Boolean(settings[setting])
+              : true,
     };
   });
 }

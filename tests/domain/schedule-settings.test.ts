@@ -53,6 +53,7 @@ describe("schedule settings module", () => {
       "crossFlightPriorityPolicies",
       "teamLeaderGapFillPositionPolicies",
       "sameFlightStaffExclusions",
+      "airlineMixPolicies",
       "latePriorityFlightNumbers",
       "ordinaryPriorityPositions",
     ]);

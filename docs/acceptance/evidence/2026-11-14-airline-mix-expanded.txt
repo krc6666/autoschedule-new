@@ -1,0 +1,58 @@
+Command: npm.cmd exec vitest -- run tests/domain/staff-airline-mix.test.ts tests/infrastructure/airline-mix-settings.test.ts tests/ui/airline-mix-settings.test.ts
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/infrastructure/airline-mix-settings.test.ts (8 tests | 2 failed) 117ms
+   × keeps A/B preferences isolated and applies custom Excel bytes only to the active group 40ms
+   × ships the same default in the downloadable configuration template 29ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/infrastructure/airline-mix-settings.test.ts > keeps A/B preferences isolated and applies custom Excel bytes only to the active group
+TypeError: Cannot read properties of undefined (reading 'apply')
+ ❯ tests/infrastructure/airline-mix-settings.test.ts:97:20
+     95|   const originalA = structuredClone(store.getState().model.settings.ai…
+     96|   store.getState().switchGroup("B");
+     97|   store.getState().workbook.apply(parseWorkbook(XLSX.read(bytes, { typ…
+       |                    ^
+     98|   expect(store.getState().model.settings.airlineMixPolicies).toEqual(s…
+     99|   store.getState().switchGroup("A");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/infrastructure/airline-mix-settings.test.ts > ships the same default in the downloadable configuration template
+AssertionError: expected undefined to deeply equal [ { id: 'airline-mix-fd-ak', …(2) } ]
+
+- Expected:
+[
+  {
+    "airlineCodes": [
+      "FD",
+      "AK",
+    ],
+    "enabled": true,
+    "id": "airline-mix-fd-ak",
+  },
+]
+
++ Received:
+undefined
+
+ ❯ tests/infrastructure/airline-mix-settings.test.ts:107:64
+    105| it("ships the same default in the downloadable configuration template"…
+    106|   const book = XLSX.read(readFileSync(join(process.cwd(), "public", "t…
+    107|   expect(parseWorkbook(book, []).settings?.airlineMixPolicies).toEqual…
+       |                                                                ^
+    108| });
+    109|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  2 failed | 28 passed (30)
+   Start at  16:31:21
+   Duration  4.28s (transform 5.83s, setup 0ms, import 7.23s, tests 825ms, environment 534ms)
+
+
+Exit code: 1

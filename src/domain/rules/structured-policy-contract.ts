@@ -1,3 +1,9 @@
+export interface AirlineMixPolicy {
+  id: string;
+  enabled: boolean;
+  airlineCodes: string[];
+}
+
 export interface PositionTransitionPolicy {
   id: string;
   name: string;
@@ -87,6 +93,7 @@ export interface TeamLeaderGapFillPositionPolicy {
 }
 
 export interface StructuredSchedulePolicies {
+  airlineMixPolicies: AirlineMixPolicy[];
   sameFlightStaffExclusions: SameFlightStaffExclusion[];
   positionTransitionPolicies: PositionTransitionPolicy[];
   dutyPositionPriorities: DutyPositionPriority[];

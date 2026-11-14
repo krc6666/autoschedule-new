@@ -1,0 +1,212 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-14-airline-mix",
+  "title": "长期优先避免同一天只承担FD、AK航班",
+  "startedFrom": "429ad0b0e2b406a6a814967fe62dbbdd9cbe6275",
+  "expectation": {
+    "example": "Owner确认FD、AK视为同组，FD与AK互换不算改善；当天有多班且全在此组时，有安全替代就搭配组外航司（CX、TR只是例子）。未提供具体日期或私有班表。",
+    "expected": "所有自动生成与安全快照在最后同源复核，整体换人改善目标且不新增其他人的同类组合。Owner随后确认规则页可持续维护，新增结构化航司组配置，默认FD/AK，可增删改/启停；当天仅有组内航班自然允许原搭配。配置保存、A/B与Excel往返闭环，反馈按最终事实重算。",
+    "unchanged": "每人规范航班数、可动岗位数、覆盖、资格、锁定、恢复、重点公平、值班下午保护和月度休息公平保持；不增加普通员工的跨度/最长空挡、不新增早晚割裂。只新增航司组合设置及其Excel表，加法字段不升schema；保留owner原PROJECT_MAP.md改动。",
+    "fallback": "无合格组外岗位、无完整安全方案、超时或最终守卫拒绝时保留原合法班表，反馈区分现象与尚未找到方案，不声称证明无解。人工安排不自动覆盖；真实页面仍由owner验收。"
+  },
+  "testedVersion": "75041c805f1ede5c51552817af105b606b52b91370d609922407d65f00b0d242",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "原行为红测3项失败；改后定向与完整门禁通过。保留两轮全量失败，字段漏项已补，并发超时经原时限单跑和限制并发验证，不放宽门槛。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-airline-mix-red.txt",
+          "summary": "改前4项中3失败：搭配未改善、中央缺最终阶段、默认配置不存在。",
+          "sha256": "dae6b7ac97afef13e54256824c8abe75a1a41a11ca243899181d1092b0538ff5"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-airline-mix-focused-final.txt",
+          "summary": "14文件211项通过；领域20、配置8、实际DOM/controller/Store及相邻规则、Excel与Worker回归。",
+          "sha256": "6de5f3b915b2f1aa764b901cf4cd8836b103622fe35f5740dd25d2e7f842a6ea"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-airline-mix-verify.txt",
+          "summary": "首次完整功能1903过/2失败：标量清单漏新字段与验收工具5秒超时；保留原失败。",
+          "sha256": "d631583dd1a1d78e40f28e00b0d6c75db5caf968dcfca1ea5626cb8e938d81dc"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-airline-mix-verify-final.txt",
+          "summary": "补齐字段后全量1904过/1失败，另一验收工具用例5秒超时；未进入性能构建。",
+          "sha256": "839ea10b76c3509a485dbecc143921e7226cc7ad8ce08229fafcdc69cfa28845"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-airline-mix-settings-gate.txt",
+          "summary": "单独运行设置与验收工具2文件24项通过，原5秒时限保持。",
+          "sha256": "24405b9dfa497252b87d0db85a97c461afbb4f0bc176125d8beb505bf7715989"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-airline-mix-verify-bounded.txt",
+          "summary": "VITEST_MAX_WORKERS=2运行npm.cmd run verify退出0：189文件1905项功能、7文件19项性能、类型与生产构建通过。",
+          "sha256": "8211dad5b8510a253282f225eb3407441b115d9bca7e60147740670d1814035a"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "默认FD/AK有安全组外任务时，通过整体换人改善；每人航班数保持且不转嫁。实际Worker最终XLSX独立核对通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-airline-mix-focused-final.txt",
+          "summary": "14文件211项通过；领域20、配置8、实际DOM/controller/Store及相邻规则、Excel与Worker回归。",
+          "sha256": "6de5f3b915b2f1aa764b901cf4cd8836b103622fe35f5740dd25d2e7f842a6ea"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-airline-mix-worker-artifact.txt",
+          "summary": "Node宿主实际Worker模块/WASM→安全凭证→Store→XLSX字节独立重算：FD/CX和AK/TR，每人2班，跨度390/330分钟，4岗位全覆盖；不是浏览器线程验收。",
+          "sha256": "8a044c38ff5f3a12bd60746f76edb8f89ac3abde8dd34aee3c47eb8270c7f6d8"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-airline-mix-verify-bounded.txt",
+          "summary": "VITEST_MAX_WORKERS=2运行npm.cmd run verify退出0：189文件1905项功能、7文件19项性能、类型与生产构建通过。",
+          "sha256": "8211dad5b8510a253282f225eb3407441b115d9bca7e60147740670d1814035a"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "自定义三航司/非CXTR组外、当天仅组内、空/停用/草稿、重复岗位/零工时/行政排除、锁定/资格/人工/关联/超时、6航班12人均覆盖；A/B、本地旧数据、局部缺表/空表/坏行/重复ID、完整恢复及模板同源往返。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-airline-mix-focused-final.txt",
+          "summary": "14文件211项通过；领域20、配置8、实际DOM/controller/Store及相邻规则、Excel与Worker回归。",
+          "sha256": "6de5f3b915b2f1aa764b901cf4cd8836b103622fe35f5740dd25d2e7f842a6ea"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-airline-mix-preview.txt",
+          "summary": "3文件15项通过，包括航司组导入预览、停用与空表清空。",
+          "sha256": "f64624e74847f1facc3e63ffdbc3d9d442d5009bac6c58f3461a5f5be7514dce"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-airline-mix-template.txt",
+          "summary": "内置模板仅追加航司搭配表和三处链接，原其他29个ZIP部分字节保持；最终配置测试验证默认一致。",
+          "sha256": "d3f834aba8090857ce4629d53e9ebe8c6a24bb9d0e05d014be73bcf3196908e7"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-airline-mix-worker-artifact.txt",
+          "summary": "Node宿主实际Worker模块/WASM→安全凭证→Store→XLSX字节独立重算：FD/CX和AK/TR，每人2班，跨度390/330分钟，4岗位全覆盖；不是浏览器线程验收。",
+          "sha256": "8a044c38ff5f3a12bd60746f76edb8f89ac3abde8dd34aee3c47eb8270c7f6d8"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-airline-mix-verify-bounded.txt",
+          "summary": "VITEST_MAX_WORKERS=2运行npm.cmd run verify退出0：189文件1905项功能、7文件19项性能、类型与生产构建通过。",
+          "sha256": "8211dad5b8510a253282f225eb3407441b115d9bca7e60147740670d1814035a"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "中央最后final-review在任务集中之后；实际恢复重排先把合法混合结果改坏，再最终复核修回。普通员工个人跨度/空挡不增、无新割裂和多配置组合问题，月度休息不额外让步；之后仅说明/排序/凭证。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-airline-mix-focused-final.txt",
+          "summary": "14文件211项通过；领域20、配置8、实际DOM/controller/Store及相邻规则、Excel与Worker回归。",
+          "sha256": "6de5f3b915b2f1aa764b901cf4cd8836b103622fe35f5740dd25d2e7f842a6ea"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-airline-mix-worker-artifact.txt",
+          "summary": "Node宿主实际Worker模块/WASM→安全凭证→Store→XLSX字节独立重算：FD/CX和AK/TR，每人2班，跨度390/330分钟，4岗位全覆盖；不是浏览器线程验收。",
+          "sha256": "8a044c38ff5f3a12bd60746f76edb8f89ac3abde8dd34aee3c47eb8270c7f6d8"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-airline-mix-verify-bounded.txt",
+          "summary": "VITEST_MAX_WORKERS=2运行npm.cmd run verify退出0：189文件1905项功能、7文件19项性能、类型与生产构建通过。",
+          "sha256": "8211dad5b8510a253282f225eb3407441b115d9bca7e60147740670d1814035a"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "复用严格continuity重排策略、共享安全与最终assertSafe；守卫拒绝完整方案则保留原表。Worker安全凭证经Store安装，不将软组合做成拒整表硬约束。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-airline-mix-focused-final.txt",
+          "summary": "14文件211项通过；领域20、配置8、实际DOM/controller/Store及相邻规则、Excel与Worker回归。",
+          "sha256": "6de5f3b915b2f1aa764b901cf4cd8836b103622fe35f5740dd25d2e7f842a6ea"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-airline-mix-worker-artifact.txt",
+          "summary": "Node宿主实际Worker模块/WASM→安全凭证→Store→XLSX字节独立重算：FD/CX和AK/TR，每人2班，跨度390/330分钟，4岗位全覆盖；不是浏览器线程验收。",
+          "sha256": "8a044c38ff5f3a12bd60746f76edb8f89ac3abde8dd34aee3c47eb8270c7f6d8"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-airline-mix-verify-bounded.txt",
+          "summary": "VITEST_MAX_WORKERS=2运行npm.cmd run verify退出0：189文件1905项功能、7文件19项性能、类型与生产构建通过。",
+          "sha256": "8211dad5b8510a253282f225eb3407441b115d9bca7e60147740670d1814035a"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "完整功能、性能、类型、构建通过；覆盖、每人规范航班数和可动岗位数、资格/锁定/恢复/值班下午/原公平保持。模板其余29部分保持；owner PROJECT_MAP.md未暂存。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-airline-mix-focused-final.txt",
+          "summary": "14文件211项通过；领域20、配置8、实际DOM/controller/Store及相邻规则、Excel与Worker回归。",
+          "sha256": "6de5f3b915b2f1aa764b901cf4cd8836b103622fe35f5740dd25d2e7f842a6ea"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-airline-mix-template.txt",
+          "summary": "内置模板仅追加航司搭配表和三处链接，原其他29个ZIP部分字节保持；最终配置测试验证默认一致。",
+          "sha256": "d3f834aba8090857ce4629d53e9ebe8c6a24bb9d0e05d014be73bcf3196908e7"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-airline-mix-worker-artifact.txt",
+          "summary": "Node宿主实际Worker模块/WASM→安全凭证→Store→XLSX字节独立重算：FD/CX和AK/TR，每人2班，跨度390/330分钟，4岗位全覆盖；不是浏览器线程验收。",
+          "sha256": "8a044c38ff5f3a12bd60746f76edb8f89ac3abde8dd34aee3c47eb8270c7f6d8"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-airline-mix-verify-bounded.txt",
+          "summary": "VITEST_MAX_WORKERS=2运行npm.cmd run verify退出0：189文件1905项功能、7文件19项性能、类型与生产构建通过。",
+          "sha256": "8211dad5b8510a253282f225eb3407441b115d9bca7e60147740670d1814035a"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "自动Worker/WASM到实际XLSX字节、规则页DOM操作/搜索及生产包已验证；没有owner真实页面或私人班表现场证据，未获自行运行浏览器授权，保持待验收。开发提交不代表业务现场验收或发布。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-airline-mix-worker-artifact.txt",
+          "summary": "Node宿主实际Worker模块/WASM→安全凭证→Store→XLSX字节独立重算：FD/CX和AK/TR，每人2班，跨度390/330分钟，4岗位全覆盖；不是浏览器线程验收。",
+          "sha256": "8a044c38ff5f3a12bd60746f76edb8f89ac3abde8dd34aee3c47eb8270c7f6d8"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-airline-mix-focused-final.txt",
+          "summary": "14文件211项通过；领域20、配置8、实际DOM/controller/Store及相邻规则、Excel与Worker回归。",
+          "sha256": "6de5f3b915b2f1aa764b901cf4cd8836b103622fe35f5740dd25d2e7f842a6ea"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-airline-mix-preview.txt",
+          "summary": "3文件15项通过，包括航司组导入预览、停用与空表清空。",
+          "sha256": "f64624e74847f1facc3e63ffdbc3d9d442d5009bac6c58f3461a5f5be7514dce"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-airline-mix-bundle.json",
+          "summary": "最终生产主包与Worker包含规则ID，主包含编辑器名称；实际字节长度、SHA256及验证并发环境。",
+          "sha256": "1867eef414be91d32679c118336ee21112820f1fba766388dd4ce97f340a12cb"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-airline-mix-verify-bounded.txt",
+          "summary": "VITEST_MAX_WORKERS=2运行npm.cmd run verify退出0：189文件1905项功能、7文件19项性能、类型与生产构建通过。",
+          "sha256": "8211dad5b8510a253282f225eb3407441b115d9bca7e60147740670d1814035a"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "red证据直接捕获默认缺失、搭配不改善、末阶段未接入；focused和最终verify证明新行为及相邻规则。保留标量测试清单漏项、验收工具并发超时的完整失败输出与原时限单跑通过证据。",
+    "laterChanges": "补缺、恢复、轮岗、督导收尾、月度均衡、任务集中均可能先改人；中央最后同源复核并保护前序结果。真实恢复求解器改坏后修回、多配置不转嫁和舒适性拒绝回归证明；人工班表不自动覆写，反馈从最终事实重算。",
+    "finalArtifact": "worker-artifact是本次Node宿主Worker/WASM结果经Store和实际XLSX字节独立核对，FD/CX、AK/TR各2班，跨度390/330分钟；bundle保存本次生产包指纹。页面DOM编辑/搜索/预览通过，但owner真实页面仍未取得，finalArtifact保持unverified。"
+  },
+  "review": {
+    "missedScope": "重点查配置易漏的内置模板、局部与完整恢复差异、导入预览、标量清单、A/B及Worker。扩展测试确实抓到模板漏表和测试接口误用；完整测试抓到标量清单漏项。已补回归并保留29个旧模板ZIP部分；真实页面和私人班表仍未覆盖。",
+    "rootCause": "原同岗跨日轮换不能表达FD/AK为同一偏好组，且新行为需在所有改人阶段之后复核。配置是多消费者字段，仅加算法不能满足可维护/往返要求。两轮额外门禁失败分别为测试结构化字段清单遗漏、并发资源争用触发原5秒时限，均有独立输出核对。",
+    "earlyDetection": "编码前列字段与机制传播矩阵并先红测；首次扩展即核对内置模板和真实Store命令；完整门禁按标量清单抓漏。后置实际重排反向回归、最终XLSX独立计数和多配置不转嫁作为长期保护；并发超时先原时限单跑，再限制并发完整验证，不先放宽门槛。"
+  }
+}

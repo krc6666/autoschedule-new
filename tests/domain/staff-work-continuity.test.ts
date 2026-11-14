@@ -116,7 +116,10 @@ describe("ordinary staff work continuity", () => {
     )
       .filter((h) => h.execute.some((e) => e.kind === "final-review"))
       .map((h) => h.id);
-    expect(ids.at(-1)).toBe("staff-work-continuity");
+    expect(ids.slice(-2)).toEqual([
+      "staff-work-continuity",
+      "staff-airline-mix",
+    ]);
   });
   it("retains locked assignments when no safe improvement exists", async () => {
     const state = continuityScenario();

@@ -5,10 +5,12 @@ import {
   type ScalarScheduleSettingKey,
 } from "../domain/rules/schedule-settings";
 import { STRUCTURED_POLICY_DEFINITIONS } from "../domain/rules/structured-policy-settings";
+import { normalizeAirlineMixCodes } from "../domain/rules/airline-mix-policy";
 import type { StructuredPolicyKey } from "../domain/rules/structured-policy-contract";
 import { normalizeTime } from "../domain/shared/time";
 import type { AppState, ScheduleSettings, Staff } from "../model";
 import type {
+  AirlineMixPolicy,
   CrossWorkdayQualificationReservation,
   CrossFlightPriorityPolicy,
   DutyPositionPriority,
@@ -651,11 +653,41 @@ function parseTeamLeaderGapFillPositionPolicies(
   );
 }
 
+function parseAirlineMixPolicies(
+  workbook: XLSX.WorkBook
+): ParsedRuleSheet<AirlineMixPolicy> {
+  const ids = new Set<string>();
+  return parseRuleSheet(
+    workbook,
+    structuredPolicySheet("airlineMixPolicies"),
+    (row, header) => {
+      const id = cell(row, header, ["规则编号"], 0);
+      const enabled = parseBoolean(cell(row, header, ["启用"], 1));
+      const codes = normalizeAirlineMixCodes(
+        cell(row, header, ["航司组合"], 2)
+      );
+      const errors = [
+        !id || ids.has(id) ? "规则编号不能为空或重复" : "",
+        enabled === undefined ? "启用必须填写是或否" : "",
+        codes === null ? "航司组合须为2至3位航司代码，以逗号分隔" : "",
+      ].filter(Boolean);
+      ids.add(id);
+      return errors.length || enabled === undefined || codes === null
+        ? { errors }
+        : {
+            errors: [],
+            value: { id, enabled, airlineCodes: codes },
+          };
+    }
+  );
+}
+
 export function parseScheduleRuleSettings(
   workbook: XLSX.WorkBook,
   staff: readonly Staff[] = []
 ): ParsedScheduleRuleSettings {
   const scalar = parseScalarSettings(workbook);
+  const airlineMix = parseAirlineMixPolicies(workbook);
   const transitions = parseTransitionPolicies(workbook);
   const dutyPriorities = parseDutyPriorities(workbook);
   const recoveryTargets = parseRecoveryTargets(workbook);
@@ -672,6 +704,7 @@ export function parseScheduleRuleSettings(
   const teamLeaderGapFillPositionPolicies =
     parseTeamLeaderGapFillPositionPolicies(workbook);
   const recognized =
+    airlineMix.present ||
     scalar.present ||
     transitions.present ||
     dutyPriorities.present ||
@@ -685,6 +718,7 @@ export function parseScheduleRuleSettings(
     sameFlightStaffExclusions.present ||
     teamLeaderGapFillPositionPolicies.present;
   const hasImportableSettings =
+    airlineMix.value !== undefined ||
     Boolean(scalar.settings && Object.keys(scalar.settings).length) ||
     transitions.value !== undefined ||
     dutyPriorities.value !== undefined ||
@@ -712,6 +746,8 @@ export function parseScheduleRuleSettings(
   }
   if (settings && transitions.value)
     settings.positionTransitionPolicies = transitions.value;
+  if (settings && airlineMix.value !== undefined)
+    settings.airlineMixPolicies = airlineMix.value;
   if (settings && dutyPriorities.value)
     settings.dutyPositionPriorities = dutyPriorities.value;
   if (settings && recoveryTargets.value)
@@ -738,6 +774,7 @@ export function parseScheduleRuleSettings(
     settings,
     recognized,
     warnings: [
+      ...airlineMix.warnings,
       ...scalar.warnings,
       ...transitions.warnings,
       ...dutyPriorities.warnings,
@@ -758,6 +795,19 @@ export function appendScheduleRuleSheets(
   workbook: XLSX.WorkBook,
   state: AppState
 ): void {
+  append(
+    workbook,
+    structuredPolicySheet("airlineMixPolicies"),
+    [
+      ["规则编号", "启用", "航司组合"],
+      ...state.settings.airlineMixPolicies.map((p) => [
+        p.id,
+        p.enabled ? "是" : "否",
+        p.airlineCodes.join(","),
+      ]),
+    ],
+    [30, 12, 36]
+  );
   append(
     workbook,
     "规则参数",

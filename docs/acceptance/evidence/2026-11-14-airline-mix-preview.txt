@@ -1,0 +1,12 @@
+Command: npm.cmd exec vitest -- run tests/ui/airline-mix-settings.test.ts tests/ui/app-dialog-view.test.ts tests/ui/flight-restore-dialog.test.ts
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+
+ Test Files  3 passed (3)
+      Tests  15 passed (15)
+   Start at  16:40:14
+   Duration  3.49s (transform 3.89s, setup 0ms, import 5.25s, tests 932ms, environment 1.29s)
+
+
+Exit code: 0

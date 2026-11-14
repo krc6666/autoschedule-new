@@ -1,0 +1,89 @@
+Command: npm.cmd exec vitest -- run tests/domain/staff-airline-mix.test.ts tests/infrastructure/airline-mix-settings.test.ts
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/infrastructure/airline-mix-settings.test.ts (1 test | 1 failed) 12ms
+   × defaults FD/AK and keeps editable disabled/custom groups through config and restart 10ms
+ ❯ tests/domain/staff-airline-mix.test.ts (3 tests | 2 failed) 26ms
+   × mixes FD/AK-only work with outside carriers without adding flights or transferring the combination 16ms
+   × registers the final mix review after work continuity 5ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/domain/staff-airline-mix.test.ts > mixes FD/AK-only work with outside carriers without adding flights or transferring the combination
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/domain/staff-airline-mix.test.ts:22:59
+     20|     const flights = new Set(result.filter((a) => a.staffId === p.id).m…
+     21|     expect(flights.size).toBe(2);
+     22|     expect([...flights].some((f) => !/^(FD|AK)/.test(f))).toBe(true);
+       |                                                           ^
+     23|   }
+     24|   expect(state.assignments[1]!.staffId).toBe("peer-a");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  tests/domain/staff-airline-mix.test.ts > registers the final mix review after work continuity
+AssertionError: expected [ 'relaxed-shift-balance', …(1) ] to deeply equal [ 'staff-work-continuity', …(1) ]
+
+- Expected
++ Received
+
+  [
++   "relaxed-shift-balance",
+    "staff-work-continuity",
+-   "staff-airline-mix",
+  ]
+
+ ❯ tests/domain/staff-airline-mix.test.ts:30:25
+     28| it("registers the final mix review after work continuity", () => {
+     29|   const ids = BUILT_IN_RULE_REGISTRY.executionPlan().filter((h) => h.e…
+     30|   expect(ids.slice(-2)).toEqual(["staff-work-continuity", "staff-airli…
+       |                         ^
+     31| });
+     32|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  tests/infrastructure/airline-mix-settings.test.ts > defaults FD/AK and keeps editable disabled/custom groups through config and restart
+AssertionError: expected undefined to deeply equal [ { id: 'airline-mix-fd-ak', …(2) } ]
+
+- Expected:
+[
+  {
+    "airlineCodes": [
+      "FD",
+      "AK",
+    ],
+    "enabled": true,
+    "id": "airline-mix-fd-ak",
+  },
+]
+
++ Received:
+undefined
+
+ ❯ tests/infrastructure/airline-mix-settings.test.ts:8:45
+      6| it("defaults FD/AK and keeps editable disabled/custom groups through c…
+      7|   const state = createDefaultState();
+      8|   expect(state.settings.airlineMixPolicies).toEqual([{ id: "airline-mi…
+       |                                             ^
+      9|   state.settings.airlineMixPolicies = [{ id: "custom", enabled: false,…
+     10|   const book = buildConfigWorkbook(state);
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+ Test Files  2 failed (2)
+      Tests  3 failed | 1 passed (4)
+   Start at  16:21:27
+   Duration  1.22s (transform 1.33s, setup 0ms, import 1.84s, tests 38ms, environment 0ms)
+
+
+Exit code: 1

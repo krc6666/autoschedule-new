@@ -1,0 +1,73 @@
+Command: npm.cmd run verify
+
+> autoschedule@1.0.0 verify
+> npm run typecheck && npm test && npm run test:performance && npm run build
+
+
+> autoschedule@1.0.0 typecheck
+> tsc -b --pretty false
+
+
+> autoschedule@1.0.0 test
+> vitest run --exclude tests/performance/**
+
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/architecture/acceptance-gate.test.ts (16 tests | 1 failed) 33504ms
+     × keeps completed historical records while requiring current-version evidence 6411ms
+ ❯ tests/domain/schedule-settings.test.ts (8 tests | 1 failed) 37ms
+     × owns every scalar setting default and validation rule 14ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/architecture/acceptance-gate.test.ts > acceptance release gate > keeps completed historical records while requiring current-version evidence
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ tests/architecture/acceptance-gate.test.ts:253:3
+    251|   });
+    252|
+    253|   it("keeps completed historical records while requiring current-versi…
+       |   ^
+    254|     const root = fixture();
+    255|     save(root, record(root, "previous"));
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/domain/schedule-settings.test.ts > schedule settings module > owns every scalar setting default and validation rule
+AssertionError: expected [ Array(38) ] to deeply equal [ Array(39) ]
+
+- Expected
++ Received
+
+@@ -1,11 +1,10 @@
+  [
+    "afternoonRestBalanceEnabled",
+    "afternoonRestEndTime",
+    "afternoonRestMaxDifference",
+    "afternoonRestStartTime",
+-   "airlineMixPolicies",
+    "consecutiveDayPenalty",
+    "dailyFlightCountBalanceExemptHalfRest",
+    "dailyFlightCountBalanceExemptTeamLeaders",
+    "dailyPrimaryPositionUniqueEnabled",
+    "dutyFatiguePoints",
+
+ ❯ tests/domain/schedule-settings.test.ts:64:7
+     62|     expect(
+     63|       SCHEDULE_SETTING_DEFINITIONS.map((definition) => definition.key)…
+     64|     ).toEqual(scalarKeys);
+       |       ^
+     65|     expect(
+     66|       SCHEDULE_SETTING_DEFINITIONS.find(
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+ Test Files  2 failed | 187 passed (189)
+      Tests  2 failed | 1903 passed (1905)
+   Start at  16:40:58
+   Duration  104.08s (transform 25.50s, setup 0ms, import 93.03s, tests 370.45s, environment 27.30s)
+
+
+Exit code: 1

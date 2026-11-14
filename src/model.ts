@@ -1,5 +1,6 @@
 import type { SchedulingDecision } from "./domain/rules/schedule-rule-contract";
 import type {
+  AirlineMixPolicy,
   CrossWorkdayQualificationReservation,
   CrossFlightPriorityPolicy,
   DutyPositionPriority,
@@ -173,6 +174,7 @@ export interface OrdinaryPriorityFrequencyAdjustment {
 }
 
 export interface ScheduleSettings {
+  airlineMixPolicies: AirlineMixPolicy[];
   sameFlightStaffExclusions: SameFlightStaffExclusion[];
   maxDailyHours: number;
   historyWindowDays: number;

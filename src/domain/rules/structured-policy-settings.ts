@@ -1,5 +1,7 @@
 import { isSameFlightSupervisorFillRule } from "../coverage/supervisor-fill-configuration";
+import { normalizeAirlineMixCodes } from "./airline-mix-policy";
 import type {
+  AirlineMixPolicy,
   CrossWorkdayQualificationReservation,
   CrossFlightPriorityPolicy,
   DutyPositionPriority,
@@ -17,6 +19,9 @@ import type {
 const CLOCK_PATTERN = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
 
 const DEFAULT_STRUCTURED_POLICIES: StructuredSchedulePolicies = {
+  airlineMixPolicies: [
+    { id: "airline-mix-fd-ak", enabled: true, airlineCodes: ["FD", "AK"] },
+  ],
   sameFlightStaffExclusions: [],
   crossWorkdayQualificationReservations: [],
   crossFlightPriorityPolicies: [],
@@ -196,6 +201,24 @@ function normalizeSameFlightStaffExclusions(
       });
     });
   return [...unique.values()];
+}
+
+function normalizeAirlineMixPolicies(
+  value: unknown,
+  fallback: AirlineMixPolicy[]
+): AirlineMixPolicy[] {
+  return sourceArray(value, fallback).flatMap((item, index) => {
+    if (!item || typeof item !== "object") return [];
+    const codes = normalizeAirlineMixCodes(item.airlineCodes);
+    if (codes === null) return [];
+    return [
+      {
+        id: String(item.id ?? "").trim() || `airline-mix-${index + 1}`,
+        enabled: item.enabled !== false,
+        airlineCodes: codes,
+      },
+    ];
+  });
 }
 
 function sourceArray<T>(value: unknown, fallback: T[]): T[] {
@@ -462,6 +485,15 @@ type StructuredPolicyDefinitionMap = {
 };
 
 export const STRUCTURED_POLICY_DEFINITIONS = {
+  airlineMixPolicies: {
+    key: "airlineMixPolicies",
+    createDefault: () =>
+      structuredClone(DEFAULT_STRUCTURED_POLICIES.airlineMixPolicies),
+    normalize: normalizeAirlineMixPolicies,
+    excelSheet: "航司搭配偏好",
+    uiCollection: "airline-mix",
+    uiEntity: "airline-mix",
+  },
   sameFlightStaffExclusions: {
     key: "sameFlightStaffExclusions",
     createDefault: () =>

@@ -215,6 +215,7 @@ export class WorkbookImportDialogElement extends LightDomElement {
           ${this.summary(
             "结构化规则",
             `${
+              settings.airlineMixPolicies.length +
               settings.positionTransitionPolicies.length +
               settings.dutyPositionPriorities.length +
               settings.nextWorkdayRecoveryTargets.length +
@@ -223,6 +224,17 @@ export class WorkbookImportDialogElement extends LightDomElement {
               settings.crossWorkdayQualificationReservations.length +
               settings.crossFlightPriorityPolicies.length
             } 条`
+          )}
+          ${this.summary(
+            "航司搭配偏好",
+            imported.settings?.airlineMixPolicies === undefined
+              ? "文件未包含；普通导入保留当前组合，完整恢复按上方默认提示执行"
+              : settings.airlineMixPolicies
+                  .map(
+                    (p) =>
+                      `${p.airlineCodes.join("、") || "未填写航司"}（${p.enabled ? "启用" : "停用"}）`
+                  )
+                  .join("；") || "空表：清空全部组合偏好"
           )}
         </div>
         ${

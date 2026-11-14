@@ -4,6 +4,7 @@ import type {
   UiCommandController,
 } from "../application-context";
 import { diagnoseSupervisorFillRuleConfiguration } from "../../domain/coverage/supervisor-fill-facts";
+import { normalizeAirlineMixCodes } from "../../domain/rules/airline-mix-policy";
 
 export class PolicyController implements UiCommandController {
   constructor(private readonly context: ApplicationContext) {}
@@ -32,6 +33,17 @@ export class PolicyController implements UiCommandController {
         return true;
       case "update-policy":
         {
+          if (
+            command.entity === "airline-mix" &&
+            command.field === "airlineCodes" &&
+            normalizeAirlineMixCodes(command.value) === null
+          ) {
+            this.context.toast(
+              "请填写航司代码，例如 FD, AK，不填完整航班号；原设置未更改",
+              "warning"
+            );
+            return true;
+          }
           const result = policy.updateEntity(
             command.entity,
             command.id,
@@ -95,7 +107,8 @@ export class PolicyController implements UiCommandController {
           );
         return true;
       case "add-policy-item":
-        if (command.collection === "same-flight-staff-exclusion")
+        if (command.collection === "airline-mix") policy.addAirlineMix();
+        else if (command.collection === "same-flight-staff-exclusion")
           policy.addSameFlightStaffExclusion();
         else if (command.collection === "duty") policy.addDutyPriority();
         else if (command.collection === "recovery-target")
@@ -142,23 +155,25 @@ export class PolicyController implements UiCommandController {
     if (!this.context.confirm("确认删除这条规则配置？")) return true;
     const policy = this.context.store.getState().policy;
     const deleted =
-      collection === "same-flight-staff-exclusion"
-        ? policy.deleteSameFlightStaffExclusion(id)
-        : collection === "duty"
-          ? policy.deleteDutyPriority(id)
-          : collection === "recovery-target"
-            ? policy.deleteRecoveryTarget(id)
-            : collection === "cross-workday-reservation"
-              ? policy.deleteCrossWorkdayReservation(id)
-              : collection === "cross-flight-priority"
-                ? policy.deleteCrossFlightPriority(id)
-                : collection === "late-position"
-                  ? policy.deleteLateShiftPosition(id)
-                  : collection === "supervisor"
-                    ? policy.deleteSupervisorCoverage(id)
-                    : collection === "supervisor-fill"
-                      ? policy.deleteSupervisorFill(id)
-                      : policy.deleteTransition(id);
+      collection === "airline-mix"
+        ? policy.deleteAirlineMix(id)
+        : collection === "same-flight-staff-exclusion"
+          ? policy.deleteSameFlightStaffExclusion(id)
+          : collection === "duty"
+            ? policy.deleteDutyPriority(id)
+            : collection === "recovery-target"
+              ? policy.deleteRecoveryTarget(id)
+              : collection === "cross-workday-reservation"
+                ? policy.deleteCrossWorkdayReservation(id)
+                : collection === "cross-flight-priority"
+                  ? policy.deleteCrossFlightPriority(id)
+                  : collection === "late-position"
+                    ? policy.deleteLateShiftPosition(id)
+                    : collection === "supervisor"
+                      ? policy.deleteSupervisorCoverage(id)
+                      : collection === "supervisor-fill"
+                        ? policy.deleteSupervisorFill(id)
+                        : policy.deleteTransition(id);
     if (deleted) this.context.commit("规则配置已删除");
     return true;
   }

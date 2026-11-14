@@ -1,5 +1,6 @@
 import type { AppState } from "../model";
 import { markActiveScheduleStale } from "../domain/kernel/schedule-lifecycle";
+import { normalizeAirlineMixCodes } from "../domain/rules/airline-mix-policy";
 import {
   normalizeOrdinaryPriorityPositions,
   ordinaryPriorityPositionKey,
@@ -207,6 +208,40 @@ export function addSameFlightStaffExclusion(
     state,
     state.settings.sameFlightStaffExclusions,
     exclusion
+  );
+}
+
+export function addAirlineMixPolicy(state: AppState) {
+  return appendPolicyItem(state, state.settings.airlineMixPolicies, {
+    id: createId("airline-mix"),
+    enabled: true,
+    airlineCodes: [] as string[],
+  });
+}
+
+export function deleteAirlineMixPolicy(state: AppState, id: string): boolean {
+  return deletePolicyItem(state, state.settings.airlineMixPolicies, id);
+}
+
+function updateAirlineMixPolicy(
+  state: AppState,
+  id: string,
+  field: string,
+  value: PolicyValue
+): boolean {
+  return updatePolicyItem(
+    state,
+    state.settings.airlineMixPolicies,
+    id,
+    (rule) => {
+      if (field === "enabled")
+        return replacePolicyValue(rule, "enabled", Boolean(value));
+      if (field !== "airlineCodes") return "invalid";
+      const codes = normalizeAirlineMixCodes(value);
+      if (codes === null) return "invalid";
+      if (codes.join(",") === rule.airlineCodes.join(",")) return "unchanged";
+      return replacePolicyValue(rule, "airlineCodes", codes);
+    }
   );
 }
 
@@ -844,6 +879,7 @@ type PolicyEntityUpdater = (
 const POLICY_ENTITY_UPDATERS: Readonly<
   Record<PolicyEntity, PolicyEntityUpdater>
 > = {
+  "airline-mix": updateAirlineMixPolicy,
   "same-flight-staff-exclusion": updateSameFlightStaffExclusion,
   "duty-priority": updateDutyPriority,
   "recovery-target": updateNextWorkdayRecoveryTarget,

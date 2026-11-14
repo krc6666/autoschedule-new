@@ -8,6 +8,7 @@ import { normalizeLatePriorityFlightNumbers } from "../statistics/late-priority-
 export type ScalarScheduleSettingKey = Exclude<
   keyof ScheduleSettings,
   | "adminSupportEnabled"
+  | "airlineMixPolicies"
   | "positionTransitionPolicies"
   | "dutyPositionPriorities"
   | "nextWorkdayRecoveryTargets"
@@ -358,6 +359,7 @@ export const STATISTICS_TIME_WINDOWS = [
 function scalarDefaults(): Omit<
   ScheduleSettings,
   | "adminSupportEnabled"
+  | "airlineMixPolicies"
   | "positionTransitionPolicies"
   | "dutyPositionPriorities"
   | "nextWorkdayRecoveryTargets"

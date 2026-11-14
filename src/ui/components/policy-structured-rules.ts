@@ -32,11 +32,59 @@ export class PolicyStructuredRulesElement extends LightDomElement {
 
   protected override render() {
     return html`
-      ${this.sameFlightStaffExclusions()} ${this.dutyPriorities()}
-      ${this.crossFlightPriorities()} ${this.crossWorkdayReservations()}
-      ${this.recoveryRules()} ${this.supervisorFillRules()}
-      ${this.supervisorRules()} ${this.transitionRules()}
+      ${this.airlineMixPolicies()} ${this.sameFlightStaffExclusions()}
+      ${this.dutyPriorities()} ${this.crossFlightPriorities()}
+      ${this.crossWorkdayReservations()} ${this.recoveryRules()}
+      ${this.supervisorFillRules()} ${this.supervisorRules()}
+      ${this.transitionRules()}
     `;
+  }
+
+  private airlineMixPolicies() {
+    const items = this.model.settings.airlineMixPolicies;
+    if (
+      !matchesPolicySearch(
+        this.query,
+        "航司搭配偏好",
+        "软约束",
+        "航司组合",
+        items.map((p) => p.airlineCodes)
+      )
+    )
+      return nothing;
+    return html`<details
+      class="policy-rule-card"
+      data-airline-mix-policies
+      ?open=${Boolean(normalizePolicySearchQuery(this.query))}
+    >
+      <summary>
+        <span
+          ><strong>航司搭配偏好</strong
+          ><small
+            >${items.filter((p) => p.enabled).length}/${items.length} 条启用 ·
+            有安全替代才轮换</small
+          ></span
+        ><i class="bi bi-chevron-down"></i>
+      </summary>
+      <div class="policy-rule-content">
+        <p class="text-muted small">
+          同一天有多班且全在某条航司组内时，尽量搭配组外航司。组内互换不算改善；当天只有组内航班或没有安全替代时允许原搭配，不留空岗。每条填写至少两个航司代码，用逗号分隔；不足两个暂不执行。修改后重新排班生效。
+        </p>
+        ${this.addButton("airlineMixPolicies", "新增航司组合")}
+        ${items.map(
+          (item) =>
+            html`<div
+              class="d-flex flex-wrap gap-2 align-items-end mt-2"
+              data-airline-mix-id=${item.id}
+            >
+              ${this.toggle("airline-mix", item.id, "enabled", item.enabled, "启用")}
+              ${this.field("airline-mix", item.id, "airlineCodes", item.airlineCodes.join(", "), "尽量避免只在这些航司内搭配", "FD, AK")}
+              ${this.deleteButton("airlineMixPolicies", item.id)}
+              ${this.diagnostics("airlineMixPolicies", item.id)}
+            </div>`
+        )}
+      </div>
+    </details>`;
   }
 
   private sameFlightStaffExclusions() {

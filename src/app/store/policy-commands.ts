@@ -1,4 +1,6 @@
 import {
+  addAirlineMixPolicy,
+  deleteAirlineMixPolicy,
   addCrossWorkdayQualificationReservation,
   addCrossFlightPriorityPolicy,
   addDutyPriority,
@@ -35,6 +37,9 @@ import type { MobileSupervisorFillRule } from "../../domain/rules/structured-pol
 
 export function createPolicyCommands(command: StateCommand) {
   return {
+    addAirlineMix: () => command(addAirlineMixPolicy),
+    deleteAirlineMix: (id: string) =>
+      command((state) => deleteAirlineMixPolicy(state, id)),
     apply: (input: SchedulePolicyInput) =>
       command((state) => applySchedulePolicy(state, input)),
     addSameFlightStaffExclusion: () => command(addSameFlightStaffExclusion),

@@ -1,0 +1,12 @@
+Command: npm.cmd exec vitest -- run tests/domain/staff-airline-mix.test.ts tests/infrastructure/airline-mix-settings.test.ts tests/ui/airline-mix-settings.test.ts tests/infrastructure/airline-mix-worker.test.ts tests/domain/staff-work-continuity.test.ts tests/domain/scheduling-execution-plan.test.ts tests/domain/reassignment-intent.test.ts tests/domain/schedule-feedback.test.ts tests/app/policy-actions.test.ts tests/app/policy-collection-actions.test.ts tests/architecture/policy-actions-module-seams.test.ts tests/infrastructure/excel.test.ts tests/infrastructure/policy-diagnostics-roundtrip.test.ts tests/domain/policy-configuration-diagnostics.test.ts
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+
+ Test Files  14 passed (14)
+      Tests  211 passed (211)
+   Start at  16:38:05
+   Duration  13.89s (transform 17.55s, setup 0ms, import 24.22s, tests 22.90s, environment 1.52s)
+
+
+Exit code: 0

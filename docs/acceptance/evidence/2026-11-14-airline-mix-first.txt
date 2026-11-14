@@ -1,0 +1,70 @@
+Command: npm.cmd exec vitest -- run tests/domain/staff-airline-mix.test.ts tests/infrastructure/airline-mix-settings.test.ts
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/domain/staff-airline-mix.test.ts (3 tests | 1 failed) 118ms
+   × allows the combination if the day only contains those carriers 11ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/domain/staff-airline-mix.test.ts > allows the combination if the day only contains those carriers
+AssertionError: expected [ { id: 'row-0', …(14) }, …(1) ] to deeply equal [ { id: 'row-0', …(13) }, …(1) ]
+
+- Expected
++ Received
+
+@@ -1,7 +1,15 @@
+  [
+    {
++     "decisionTrace": [
++       {
++         "message": "FD、AK：保留原搭配；没有可安全移动的组外航班岗位（当天仅有组内航班、组外尚未安排或岗位受保护）。软偏好允许此安排，有限搜索不代表已证明无解。",
++         "outcome": "fallback",
++         "ruleId": "staff-airline-mix",
++         "stage": "post-schedule-review",
++       },
++     ],
+      "endTime": "10:00",
+      "fatiguePoints": 1,
+      "flightId": "flight-0",
+      "flightNo": "FD101",
+      "id": "row-0",
+@@ -13,11 +21,19 @@
+      "staffName": "peer-a",
+      "startTime": "08:00",
+      "status": "assigned",
+      "workHours": 2,
+    },
++   {
++     "decisionTrace": [
+        {
++         "message": "FD、AK：保留原搭配；没有可安全移动的组外航班岗位（当天仅有组内航班、组外尚未安排或岗位受保护）。软偏好允许此安排，有限搜索不代表已证明无解。",
++         "outcome": "fallback",
++         "ruleId": "staff-airline-mix",
++         "stage": "post-schedule-review",
++       },
++     ],
+      "endTime": "14:30",
+      "fatiguePoints": 1,
+      "flightId": "flight-1",
+      "flightNo": "AK102",
+      "id": "row-1",
+
+ ❯ tests/domain/staff-airline-mix.test.ts:37:40
+     35|   state.flights = state.flights.slice(0, 2);
+     36|   state.assignments = state.assignments.slice(0, 2);
+     37|   expect(await finalAirlineMix(state)).toEqual(state.assignments);
+       |                                        ^
+     38| });
+     39|
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 3 passed (4)
+   Start at  16:25:11
+   Duration  1.57s (transform 1.67s, setup 0ms, import 2.29s, tests 144ms, environment 1ms)
+
+
+Exit code: 1

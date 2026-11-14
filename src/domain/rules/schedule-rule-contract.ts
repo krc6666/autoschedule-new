@@ -304,6 +304,15 @@ export const SCHEDULING_RULES = [
     feedbackOrder: 10,
     optimization: "best-effort",
   },
+  {
+    id: "staff-airline-mix",
+    stage: "post-schedule-review",
+    label: "航司搭配偏好",
+    feedbackMode: "dedicated",
+    feedbackKey: "staff-airline-mix",
+    feedbackOrder: 11,
+    optimization: "best-effort",
+  },
 ] as const satisfies readonly (
   | ({
       id: string;

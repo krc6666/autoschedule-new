@@ -1,0 +1,24 @@
+{
+  "validationEnvironment": {
+    "platform": "win32",
+    "node": "v24.21.0",
+    "VITEST_MAX_WORKERS": 2,
+    "note": "仅本轮验证进程限制并发；原测试、5秒超时和性能门槛均未修改。"
+  },
+  "bundles": [
+    {
+      "path": "dist/assets/index-BYb_aZSU.js",
+      "bytes": 962508,
+      "sha256": "1fa81a72f24feba75ab684b9f9275b8a44238cd978e354c87fe6e460ccb9ed0b",
+      "containsRuleId": true,
+      "containsEditorName": true
+    },
+    {
+      "path": "dist/assets/schedule.worker-ZdQqs24G.js",
+      "bytes": 437721,
+      "sha256": "6e53ba20f87a6fc69e1c46d3f32aeb74e14b7626bc2d31d2848f721ab062fbc5",
+      "containsRuleId": true,
+      "containsEditorName": true
+    }
+  ]
+}

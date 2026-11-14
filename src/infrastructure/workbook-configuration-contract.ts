@@ -99,6 +99,13 @@ export function compileWorkbookConfigurationRestore(input: WorkbookImport): {
 } {
   const imported = { ...input, settings: { ...input.settings } };
   const restoreDefaults: string[] = [];
+  if (imported.settings.airlineMixPolicies === undefined) {
+    const definition = STRUCTURED_POLICY_DEFINITIONS.airlineMixPolicies;
+    imported.settings.airlineMixPolicies = definition.createDefault();
+    restoreDefaults.push(
+      `${definition.excelSheet}：文件未记录，采用默认FD、AK软偏好；无安全替代时允许原搭配`
+    );
+  }
   if (imported.flightSeasonOverrides === undefined) {
     imported.flightSeasonOverrides = {};
     restoreDefaults.push("本季航班状态：文件未记录，按岗位配置确定本季航班");

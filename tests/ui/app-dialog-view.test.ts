@@ -106,6 +106,7 @@ describe("application dialog", () => {
       },
     ];
     const expectedCount =
+      model.settings.airlineMixPolicies.length +
       model.settings.positionTransitionPolicies.length +
       model.settings.dutyPositionPriorities.length +
       model.settings.nextWorkdayRecoveryTargets.length +

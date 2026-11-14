@@ -161,6 +161,19 @@ export function diagnosePolicyConfiguration(
       issues.push(unmatchedPosition(field, keyword, matchField));
   };
   switch (key) {
+    case "airlineMixPolicies": {
+      const rule = state.settings.airlineMixPolicies.find((p) => p.id === id)!;
+      return rule.airlineCodes.length >= 2
+        ? []
+        : [
+            policyDiagnostic(
+              "airline-group-incomplete",
+              "请填写至少两个航司代码",
+              "不足两个航司时暂不执行本条搭配偏好。",
+              ["填写航司代码，例如 FD, AK，再重新排班。"]
+            ),
+          ];
+    }
     case "sameFlightStaffExclusions": {
       const rule = state.settings.sameFlightStaffExclusions.find(
         (item) => item.id === id

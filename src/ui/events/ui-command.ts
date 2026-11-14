@@ -197,6 +197,7 @@ export type UiCommand =
   | {
       type: "add-policy-item";
       collection:
+        | "airline-mix"
         | "same-flight-staff-exclusion"
         | "duty"
         | "recovery-target"
@@ -210,6 +211,7 @@ export type UiCommand =
   | {
       type: "delete-policy-item";
       collection:
+        | "airline-mix"
         | "same-flight-staff-exclusion"
         | "duty"
         | "recovery-target"

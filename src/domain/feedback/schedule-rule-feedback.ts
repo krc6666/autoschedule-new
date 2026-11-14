@@ -2,6 +2,11 @@ import type { Assignment } from "../../model";
 import type { ScheduleGenerationFacts } from "../shared/scheduling-facts";
 import type { RuleFeedbackKey } from "../rules/schedule-rule-contract";
 import { staffWorkContinuity } from "../reviews/staff-work-continuity";
+import {
+  staffAirlineMix,
+  applicableAirlineMixPolicies,
+} from "../reviews/staff-airline-mix";
+import { enabledAirlineMixPolicies } from "../rules/airline-mix-policy";
 import { diagnoseAutomaticAssignmentEligibility } from "../candidates/assignment-eligibility";
 import { conciseAssignmentWarningReason } from "../reviews/schedule-warning-message";
 import { groupStaffFlightsByNormalizedNumber } from "../statistics/staff-flight-count";
@@ -868,6 +873,36 @@ type RuleFeedbackBuilder = (
 const RULE_FEEDBACK_BUILDERS: Readonly<
   Record<RuleFeedbackKey, RuleFeedbackBuilder>
 > = {
+  "staff-airline-mix": (state) => {
+    const policies = enabledAirlineMixPolicies(state.settings);
+    const targets = staffAirlineMix(state, state.assignments).filter(
+      (p) => p.policyIds.length
+    );
+    const details = targets.map((p) => {
+      const name = state.staff.find((s) => s.id === p.staffId)!.name;
+      const decisions = assignmentDecisionMessages(
+        state.assignments.filter((a) => a.staffId === p.staffId),
+        {
+          ruleIds: new Set(["staff-airline-mix"]),
+          outcomes: new Set(["fallback"]),
+        }
+      );
+      return `${name}：${p.flightNumbers.join("、")}；${decisions.join("；") || "尚未落实安全的组外搭配，请核对资格、锁定、时间和公平保护"}`;
+    });
+    return feedbackItem(
+      "rule-execution",
+      "staff-airline-mix",
+      "航司搭配偏好",
+      targets.length ? "attention" : "ok",
+      !policies.length
+        ? "没有启用且完整的航司组合偏好，本次不限制搭配。"
+        : !applicableAirlineMixPolicies(state, state.assignments).length
+          ? "本次只有配置组内航班或没有航班岗位，搭配偏好不适用，允许原搭配。"
+          : targets.length
+            ? `${details.join("；")}。允许保留原搭配，不留空岗；人工调整后按最终事实重算。`
+            : "最终班表没有发现多班全部落在已配置航司组内的人员；单班不强行增加任务。"
+    );
+  },
   "staff-work-continuity": (state, date) => {
     const split = staffWorkContinuity(
       state,

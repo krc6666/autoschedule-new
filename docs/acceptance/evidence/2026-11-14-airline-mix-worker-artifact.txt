@@ -1,0 +1,14 @@
+Command: npm.cmd exec vitest -- run tests/infrastructure/airline-mix-worker.test.ts --reporter=verbose --disableConsoleIntercept
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+AIRLINE_MIX_WORKER_XLSX [{"staff":"peer-a","flights":["FD101","CX103"],"spanMinutes":390},{"staff":"peer-b","flights":["AK102","TR104"],"spanMinutes":330}]
+ ✓ tests/infrastructure/airline-mix-worker.test.ts > uses restored editable preferences in real Worker/WASM and independently checks final XLSX carrier mixes 329ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  16:45:47
+   Duration  2.59s (transform 1.68s, setup 0ms, import 2.05s, tests 330ms, environment 0ms)
+
+
+Exit code: 0
