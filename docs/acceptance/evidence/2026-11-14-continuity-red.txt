@@ -1,0 +1,46 @@
+Command: npm.cmd exec vitest -- run tests/domain/staff-work-continuity.test.ts
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/domain/staff-work-continuity.test.ts (3 tests | 2 failed) 18ms
+     × shortens an isolated morning/last shift without adding flights or transferring the split 9ms
+     × runs after monthly rest balancing, so later finalization cannot undo it 6ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/domain/staff-work-continuity.test.ts > ordinary staff work continuity > shortens an isolated morning/last shift without adding flights or transferring the split
+AssertionError: expected 900 to be less than 900
+ ❯ tests/domain/staff-work-continuity.test.ts:27:36
+     25|     const state = continuityScenario();
+     26|     const result = await finalContinuity(state);
+     27|     expect(span(result, "peer-a")).toBeLessThan(15*60);
+       |                                    ^
+     28|     expect(Math.max(...state.staff.map(p => span(result, p.id)))).toBe…
+     29|     for (const p of state.staff) expect(new Set(result.filter(a => a.s…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/domain/staff-work-continuity.test.ts > ordinary staff work continuity > runs after monthly rest balancing, so later finalization cannot undo it
+AssertionError: expected 'relaxed-shift-balance' to be 'staff-work-continuity' // Object.is equality
+
+Expected: "staff-work-continuity"
+Received: "relaxed-shift-balance"
+
+ ❯ tests/domain/staff-work-continuity.test.ts:35:24
+     33|   it("runs after monthly rest balancing, so later finalization cannot …
+     34|     const ids = BUILT_IN_RULE_REGISTRY.executionPlan(builtInRulePrefer…
+     35|     expect(ids.at(-1)).toBe("staff-work-continuity");
+       |                        ^
+     36|   });
+     37|   it("retains locked assignments when no safe improvement exists", asy…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 1 passed (3)
+   Start at  15:00:31
+   Duration  1.14s (transform 775ms, setup 0ms, import 916ms, tests 18ms, environment 0ms)
+
+
+Exit code: 1

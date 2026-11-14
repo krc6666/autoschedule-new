@@ -40,6 +40,7 @@ export interface ReassignmentModelInput {
   excludedSelections: readonly ReadonlySet<string>[];
   leadingObjectives?: readonly LexicographicObjective[];
   timeoutMs: number;
+  staffAssignmentCounts?: readonly { staffId: string; count: number }[];
 }
 
 function assignmentConstraints(
@@ -197,6 +198,16 @@ export function buildReassignmentProblem(
     variables: input.choices.map((choice) => ({ id: choice.id })),
     constraints: [
       ...assignmentConstraints(input),
+      ...(input.staffAssignmentCounts ?? []).map(
+        ({ staffId, count }, index) => ({
+          id: `staff-assignment-count:${index}`,
+          terms: input.choices
+            .filter((c) => c.staffId === staffId)
+            .map((c) => ({ variableId: c.id, coefficient: 1 })),
+          lowerBound: count,
+          upperBound: count,
+        })
+      ),
       ...incompatibilityConstraints(input),
       ...capacityConstraints(input),
       ...choiceRequirementConstraints(input),

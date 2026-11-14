@@ -16,7 +16,6 @@ import type { ScheduleLedger } from "../kernel/schedule-ledger";
 import type { ScheduleRunFacts } from "../shared/schedule-run-facts";
 import type { AssignmentTask } from "../flights/schedule-tasks";
 import type { SolverPort } from "../solver/solver-port";
-import type { balanceRelaxedShifts } from "../reviews/relaxed-shift-balance";
 
 export interface CandidateComparisonContext {
   task: AssignmentTask;
@@ -41,6 +40,17 @@ export interface ScheduleMutationContext {
 export interface ScheduleMutationProposal {
   assignments?: readonly Assignment[];
   warnings: readonly string[];
+}
+
+export interface FinalScheduleReviewContext {
+  state: ScheduleGenerationFacts;
+  date: string;
+  assignments: readonly Assignment[];
+  lockedAssignmentIds: ReadonlySet<string>;
+  halfRestStaffIds?: ReadonlySet<string>;
+  solver: SolverPort;
+  facts: ScheduleRunFacts;
+  assertSafe(assignments: readonly Assignment[]): void;
 }
 
 export interface HardConstraintExecutor {
@@ -83,7 +93,9 @@ export type SchedulingHookExecutor =
   | ScheduleMutationExecutor
   | {
       kind: "final-review";
-      execute: typeof balanceRelaxedShifts;
+      execute(
+        context: FinalScheduleReviewContext
+      ): Assignment[] | Promise<Assignment[]>;
     };
 
 export interface SchedulingHook {

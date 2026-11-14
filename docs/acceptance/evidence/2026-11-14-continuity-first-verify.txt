@@ -1,0 +1,75 @@
+Command: npm.cmd run verify
+
+> autoschedule@1.0.0 verify
+> npm run typecheck && npm test && npm run test:performance && npm run build
+
+
+> autoschedule@1.0.0 typecheck
+> tsc -b --pretty false
+
+
+> autoschedule@1.0.0 test
+> vitest run --exclude tests/performance/**
+
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/domain/schedule-feedback.test.ts (16 tests | 1 failed) 13752ms
+     × returns concise evidence-based items including duty arrangements and a missing history baseline 12953ms
+ ❯ tests/domain/scheduling-execution-plan.test.ts (4 tests | 1 failed) 31ms
+     × derives objective policy and feedback order from rule definitions 17ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/domain/schedule-feedback.test.ts > schedule feedback > returns concise evidence-based items including duty arrangements and a missing history baseline
+AssertionError: expected [ …(15) ] to have a length of 14 but got 15
+
+- Expected
++ Received
+
+- 14
++ 15
+
+ ❯ tests/domain/schedule-feedback.test.ts:237:22
+    235|     ).assignments;
+    236|     const feedback = buildScheduleFeedback(state, "2026-07-20");
+    237|     expect(feedback).toHaveLength(14);
+       |                      ^
+    238|     expect(feedback.map((item) => item.label)).toEqual([
+    239|       "人员覆盖",
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/domain/scheduling-execution-plan.test.ts > compiled scheduling execution plan > derives objective policy and feedback order from rule definitions
+AssertionError: expected [ 'morning-priority', …(10) ] to deeply equal [ 'morning-priority', …(9) ]
+
+- Expected
++ Received
+
+@@ -7,6 +7,7 @@
+    "position-rotation",
+    "previous-late",
+    "current-late",
+    "duty-roster",
+    "daily-flight-count-balance",
++   "staff-work-continuity",
+  ]
+
+ ❯ tests/domain/scheduling-execution-plan.test.ts:76:31
+     74|       false
+     75|     );
+     76|     expect(plan.feedbackKeys).toEqual([
+       |                               ^
+     77|       "morning-priority",
+     78|       "cross-workday-qualification-reservation",
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+ Test Files  2 failed | 183 passed (185)
+      Tests  2 failed | 1867 passed (1869)
+   Start at  15:11:19
+   Duration  100.48s (transform 24.99s, setup 0ms, import 89.99s, tests 353.39s, environment 25.21s)
+
+
+Exit code: 1

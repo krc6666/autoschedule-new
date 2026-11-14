@@ -133,6 +133,7 @@ describe("rotation review safety", () => {
   it("requires an explicit safety policy for every review purpose", () => {
     expect(Object.keys(ROTATION_REVIEW_POLICIES).sort()).toEqual([
       "consecutive",
+      "continuity",
       "coverage",
       "frequency",
       "late-frequency",

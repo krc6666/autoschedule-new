@@ -84,6 +84,7 @@ describe("compiled scheduling execution plan", () => {
       "current-late",
       "duty-roster",
       "daily-flight-count-balance",
+      "staff-work-continuity",
     ]);
   });
 

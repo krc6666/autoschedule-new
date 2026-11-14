@@ -295,6 +295,15 @@ export const SCHEDULING_RULES = [
     feedbackMode: "aggregated",
     optimization: "best-effort",
   },
+  {
+    id: "staff-work-continuity",
+    stage: "post-schedule-review",
+    label: "普通员工早晚任务集中",
+    feedbackMode: "dedicated",
+    feedbackKey: "staff-work-continuity",
+    feedbackOrder: 10,
+    optimization: "best-effort",
+  },
 ] as const satisfies readonly (
   | ({
       id: string;

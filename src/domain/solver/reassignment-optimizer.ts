@@ -101,6 +101,12 @@ export async function optimizeReassignment(
       buildReassignmentProblem({
         choices: choices.map(({ choice }) => choice),
         assignmentIds: movable.map((assignment) => assignment.id),
+        staffAssignmentCounts: options.preserveStaffAssignmentCounts
+          ? options.state.staff.map((person) => ({
+              staffId: person.id,
+              count: movable.filter((a) => a.staffId === person.id).length,
+            }))
+          : undefined,
         incompatibilities,
         capacities: options.state.staff.map((person) => ({
           staffId: person.id,

@@ -1,0 +1,182 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-14-staff-work-continuity",
+  "title": "普通员工上午与末班之间无任务时优先集中安排",
+  "startedFrom": "0631b3d8c2a2519d74d5b25d520b41c8b42f3cf2",
+  "expectation": {
+    "example": "Owner描述CX937八点多开始、十点多结束后一直空到AK151二十点多开始、二十三点结束，确认先改善普通员工上午与末班之间没有其他任务的安排，值班例外；未提供具体日期或现场班表文件。",
+    "expected": "最终统一检查并通过整体安全换人缩短目标员工当天跨度，不靠增加航班或塞中间一班掩盖，不新增其他人的同类早晚割裂。按实际出勤、现有上午窗口和当天最晚航班识别，无固定4小时门槛。规则页与最终反馈同源，独自完成并commit。",
+    "unchanged": "安全、覆盖、原重点公平/连续高疲劳岗位、恢复、每人航班数/岗位数、值班下午避排和补差、人工权限保持；只允许实际缩短跨度的目标人员让出当天下午休息计次，其他休息预算和调整后基线月度公平保持。不新增配置/迁移/工作表，不处理owner原PROJECT_MAP.md差异。",
+    "fallback": "找不到安全改善方案、锁定或计算超时时保留原合法班表并提示仍需核对，不拒整表、不宣称已证明无解。真实页面由owner操作，未取得证据保持未验收，不push或发布。"
+  },
+  "testedVersion": "7b62fa086fdee643554476c0d0849d56064efe8a8a9300bee994580ec1fb27ae",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "先保留普通员工15小时未改善/缺最后阶段红测，再捕获默认月度开关阻止缩短跨度；修后定向及最终完整门禁通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-continuity-red.txt",
+          "summary": "修改前3项中2失败：900分钟跨度未缩短、最终执行器没有普通员工任务集中阶段。",
+          "sha256": "37d580e495aac1d634d84d8d03240cbf011bb6f252494048b258926fe42f0548"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-continuity-monthly-red.txt",
+          "summary": "17项中1失败：默认两月度开关启用后900分钟跨度仍未改善，发现空等被下午休息计次保护。",
+          "sha256": "bbed345c9603260a9f030b5ea1da26861336599b3298f520cea62bd248d744e3"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-continuity-first-verify.txt",
+          "summary": "首次完整功能185文件1869项中2失败；只缺新增反馈条数/顺序，另1867项通过；未进入性能和构建。",
+          "sha256": "5a0a64e712de94ced7e22bd83a03405e29e4e3b0465498b836f9a11a852abfd8"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-continuity-policy-list-verify.txt",
+          "summary": "完整功能185文件1871项中1失败：旧安全策略键清单未含continuity，另1870项通过；已同步断言。",
+          "sha256": "d8dc14cf8736b65fe70bcb557c9886b211a803cb9c755fedfbf06cb315a7f4be"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-continuity-focused.txt",
+          "summary": "10文件132项通过，含实际恢复重排先改坏集中结果、最终阶段修回、默认开关有限让步、连续重岗保护、真实求解计数、零工时/跨午夜/6航班12人、页面搜索和Worker/XLSX。",
+          "sha256": "75e0503ca8a6bfc03fdd3b262247b205ed264311f006715dcfa4b51d308ecdf1"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-continuity-verify.txt",
+          "summary": "最终npm.cmd run verify退出0，功能、性能、类型检查和生产构建通过；计数和耗时见原日志。",
+          "sha256": "95b21281ded24d2a59785cfbd768065ab3743224cb80e8eda486710c5cf5ff5a"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "实际Worker/WASM最终每人仍2班，上午/下午与下午/末班分别集中，独立Excel跨度390/420分钟，岗位全覆盖；默认月度两开关也可改善。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-continuity-focused.txt",
+          "summary": "10文件132项通过，含实际恢复重排先改坏集中结果、最终阶段修回、默认开关有限让步、连续重岗保护、真实求解计数、零工时/跨午夜/6航班12人、页面搜索和Worker/XLSX。",
+          "sha256": "75e0503ca8a6bfc03fdd3b262247b205ed264311f006715dcfa4b51d308ecdf1"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-continuity-artifact.txt",
+          "summary": "实际Worker模块/WASM、Store安装与XLSX字节独立核对：每人2航班、跨度390/420分钟、全覆盖和安全凭证有效；Node宿主，不是浏览器线程。",
+          "sha256": "65d8315f13416e27a32e3ff652b9c89c1c1dab6634636fd0c47d219d9e7d239c"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-continuity-verify.txt",
+          "summary": "最终npm.cmd run verify退出0，功能、性能、类型检查和生产构建通过；计数和耗时见原日志。",
+          "sha256": "95b21281ded24d2a59785cfbd768065ab3743224cb80e8eda486710c5cf5ff5a"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "凌晨末班、系统上午窗口联动、实际出勤而非模板、重叠/零工时复用、直接相接无空挡、值班豁免、6航班12人、锁定/无资质/超时/守卫拒绝均有回归；配置字节/恢复/Node Worker与最终结果XLSX往返。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-continuity-focused.txt",
+          "summary": "10文件132项通过，含实际恢复重排先改坏集中结果、最终阶段修回、默认开关有限让步、连续重岗保护、真实求解计数、零工时/跨午夜/6航班12人、页面搜索和Worker/XLSX。",
+          "sha256": "75e0503ca8a6bfc03fdd3b262247b205ed264311f006715dcfa4b51d308ecdf1"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-continuity-artifact.txt",
+          "summary": "实际Worker模块/WASM、Store安装与XLSX字节独立核对：每人2航班、跨度390/420分钟、全覆盖和安全凭证有效；Node宿主，不是浏览器线程。",
+          "sha256": "65d8315f13416e27a32e3ff652b9c89c1c1dab6634636fd0c47d219d9e7d239c"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-continuity-verify.txt",
+          "summary": "最终npm.cmd run verify退出0，功能、性能、类型检查和生产构建通过；计数和耗时见原日志。",
+          "sha256": "95b21281ded24d2a59785cfbd768065ab3743224cb80e8eda486710c5cf5ff5a"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "先生成集中结果，再经实际optimizeReassignment恢复策略制造早晚割裂，最后中央执行器修回。中央执行顺序在月度均衡及全部收尾后；continuity策略保留频率/连续重岗/恢复/值班/工时约束，精确个人岗位数由唯一模型编译，最终再验规范航班数。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-continuity-focused.txt",
+          "summary": "10文件132项通过，含实际恢复重排先改坏集中结果、最终阶段修回、默认开关有限让步、连续重岗保护、真实求解计数、零工时/跨午夜/6航班12人、页面搜索和Worker/XLSX。",
+          "sha256": "75e0503ca8a6bfc03fdd3b262247b205ed264311f006715dcfa4b51d308ecdf1"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-continuity-verify.txt",
+          "summary": "最终npm.cmd run verify退出0，功能、性能、类型检查和生产构建通过；计数和耗时见原日志。",
+          "sha256": "95b21281ded24d2a59785cfbd768065ab3743224cb80e8eda486710c5cf5ff5a"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "所有改善方案经共享重排安全和最终整表assertSafe后采用，反向守卫拒绝时返回完整原表；实际Worker结果安全凭证经Store安装。软舒适目标无可行改善时允许保留，不新增拒整表硬约束。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-continuity-focused.txt",
+          "summary": "10文件132项通过，含实际恢复重排先改坏集中结果、最终阶段修回、默认开关有限让步、连续重岗保护、真实求解计数、零工时/跨午夜/6航班12人、页面搜索和Worker/XLSX。",
+          "sha256": "75e0503ca8a6bfc03fdd3b262247b205ed264311f006715dcfa4b51d308ecdf1"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-continuity-artifact.txt",
+          "summary": "实际Worker模块/WASM、Store安装与XLSX字节独立核对：每人2航班、跨度390/420分钟、全覆盖和安全凭证有效；Node宿主，不是浏览器线程。",
+          "sha256": "65d8315f13416e27a32e3ff652b9c89c1c1dab6634636fd0c47d219d9e7d239c"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-continuity-verify.txt",
+          "summary": "最终npm.cmd run verify退出0，功能、性能、类型检查和生产构建通过；计数和耗时见原日志。",
+          "sha256": "95b21281ded24d2a59785cfbd768065ab3743224cb80e8eda486710c5cf5ff5a"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "完整功能/性能/类型/构建通过；原恢复、公平、覆盖及值班下午规则保持。月度比较复用原目标，仅允许真正缩短跨度的目标人员让出当天空等下午计次，统计仍真实、其他休息预算保留。无新存储字段/迁移/Excel表。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-continuity-focused.txt",
+          "summary": "10文件132项通过，含实际恢复重排先改坏集中结果、最终阶段修回、默认开关有限让步、连续重岗保护、真实求解计数、零工时/跨午夜/6航班12人、页面搜索和Worker/XLSX。",
+          "sha256": "75e0503ca8a6bfc03fdd3b262247b205ed264311f006715dcfa4b51d308ecdf1"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-continuity-verify.txt",
+          "summary": "最终npm.cmd run verify退出0，功能、性能、类型检查和生产构建通过；计数和耗时见原日志。",
+          "sha256": "95b21281ded24d2a59785cfbd768065ab3743224cb80e8eda486710c5cf5ff5a"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "最终自动Worker/WASM/Store与XLSX字节产物及规则页DOM/搜索已验证，生产bundle已核对；owner真实页面与私人班表尚未取得现场证据，未获明确自行运行浏览器授权，保持未验收。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-continuity-artifact.txt",
+          "summary": "实际Worker模块/WASM、Store安装与XLSX字节独立核对：每人2航班、跨度390/420分钟、全覆盖和安全凭证有效；Node宿主，不是浏览器线程。",
+          "sha256": "65d8315f13416e27a32e3ff652b9c89c1c1dab6634636fd0c47d219d9e7d239c"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-continuity-focused.txt",
+          "summary": "10文件132项通过，含实际恢复重排先改坏集中结果、最终阶段修回、默认开关有限让步、连续重岗保护、真实求解计数、零工时/跨午夜/6航班12人、页面搜索和Worker/XLSX。",
+          "sha256": "75e0503ca8a6bfc03fdd3b262247b205ed264311f006715dcfa4b51d308ecdf1"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-continuity-verify.txt",
+          "summary": "最终npm.cmd run verify退出0，功能、性能、类型检查和生产构建通过；计数和耗时见原日志。",
+          "sha256": "95b21281ded24d2a59785cfbd768065ab3743224cb80e8eda486710c5cf5ff5a"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-14-continuity-bundle.json",
+          "summary": "最终生产主包与Worker均含staff-work-continuity，主包含规则页名称；实际字节长度与SHA256。",
+          "sha256": "529f397d95dedf133b5bbcd638cad0f14d22fa804a801735e5ae6a0c5071957d"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "red证据直接发现900分钟跨度不变及最终阶段缺失；monthly-red发现默认统计保护与舒适性相反。改后132项定向及最终verify通过，保留首次全量2项旧反馈断言失败及修正事实。",
+    "laterChanges": "前序覆盖、恢复、频率、轮岗、督导直填、月度复核都能改人；最后中央final-review统一改善，安全快照也走同一finalizeDailyPlan。实际恢复求解器先改坏、最后修回的反向测试保留；之后仅说明/排序/凭证，不再改人。",
+    "finalArtifact": "artifact记录实际Node宿主Worker/WASM的最终结果经Store安装与真实XLSX字节独立重算，每人2班、跨度390/420分钟；bundle记录最终主包/Worker指纹，页面DOM搜索通过。真实owner页面尚无证据，因此finalArtifact保持unverified。"
+  },
+  "review": {
+    "missedScope": "已查中央登记、最终异步接口、共享安全/模型计数、月度目标及反馈/页面/Worker/Store/Excel全部消费路径；仅处理已确认的上午结束后直等末班形态，不宣称所有长空挡或任意约束下全局最优。真实浏览器/私人班表仍未验收。PROJECT_MAP.md保持原改动，不纳入提交；只获commit授权，无push/发布。",
+    "rootCause": "旧防割裂仅限上一班重点人员，普通员工未被检查；默认月度下午休息人数保护又将空等当成应保留机会。新增最终同源出勤判断及有界完整交换，并仅对确实缩短跨度者让出当日计次，不能靠塞中间一班或转嫁给别人蒙混过关。",
+    "earlyDetection": "业务例子确认后先读history的4/2事故、后置改坏与局部验证教训，列传播矩阵；先红测900分钟，再开默认全部月度开关测真实冲突。实现后先让真实后置重排改坏，再检最后复核；最后从XLSX字节独立数航班和跨度、核对实际Worker与页面。"
+  }
+}

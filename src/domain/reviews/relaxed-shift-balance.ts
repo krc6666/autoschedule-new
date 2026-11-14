@@ -10,6 +10,111 @@ import { assignmentRule } from "../flights/schedule-position-rules";
 import { clearAutomaticAssignmentEvidence } from "../assignments/assignment-evidence";
 import { ScheduleGuardError } from "../kernel/schedule-guard";
 import { dutyAfternoonFlightIds } from "../assignments/duty-afternoon-relief";
+import type { MonthlyRelaxedShiftStatistics } from "../statistics/relaxed-shift-statistics";
+
+function relaxedShiftScore(
+  state: ScheduleGenerationFacts,
+  value: MonthlyRelaxedShiftStatistics,
+  eligibleIds: ReadonlySet<string>,
+  duty: string | null
+): [number, number] {
+  let excess = 0,
+    squares = 0;
+  for (const kind of ["earlyDeparture", "afternoonRest"] as const) {
+    if (!state.settings[`${kind}BalanceEnabled`]) continue;
+    const values = value.rows
+      .filter(
+        (row) =>
+          row.staff.status === "正常" &&
+          row.staff.staffType === "常规" &&
+          !row.staff.teamLeader &&
+          eligibleIds.has(row.staff.id) &&
+          (kind !== "earlyDeparture" || row.staff.id !== duty)
+      )
+      .map((row) =>
+        kind === "earlyDeparture"
+          ? row.earlyDepartures.length
+          : row.afternoonRestDates.length
+      );
+    for (let i = 0; i < values.length; i++) {
+      squares += values[i]! * values[i]!;
+      for (const second of values.slice(i + 1))
+        excess += Math.max(
+          0,
+          Math.abs(values[i]! - second) - state.settings[`${kind}MaxDifference`]
+        );
+    }
+  }
+  return [excess, squares];
+}
+
+/** Same fairness and rest budgets used by monthly balancing, for later reviews. */
+export function preservesRelaxedShiftBalance(
+  state: ScheduleGenerationFacts,
+  date: string,
+  before: readonly Assignment[],
+  after: readonly Assignment[],
+  afternoonRestYieldStaffIds: ReadonlySet<string> = new Set()
+): boolean {
+  if (
+    !state.settings.earlyDepartureBalanceEnabled &&
+    !state.settings.afternoonRestBalanceEnabled
+  )
+    return true;
+  const eligibleIds = new Set(
+    before.flatMap((a) =>
+      a.status === "assigned" && a.staffId ? [a.staffId] : []
+    )
+  );
+  const report = (assignments: readonly Assignment[]) =>
+    buildMonthlyRelaxedShiftStatistics(
+      {
+        ...state,
+        history: state.history.filter(
+          (r) => r.date < date && r.date.slice(0, 7) === date.slice(0, 7)
+        ),
+        assignments: [...assignments],
+        activeScheduleDate: date,
+      },
+      date
+    );
+  const first = report(before),
+    second = report(after);
+  // A verified shorter working day may replace the target's idle afternoon.
+  // Keep the real statistics unchanged; only this comparison baseline yields.
+  const actualYieldIds = new Set(
+    first.currentAfternoonRest
+      .filter(
+        (p) =>
+          afternoonRestYieldStaffIds.has(p.staffId) &&
+          !second.currentAfternoonRest.some(
+            (next) => next.staffId === p.staffId
+          )
+      )
+      .map((p) => p.staffId)
+  );
+  first.currentAfternoonRest = first.currentAfternoonRest.filter(
+    (p) => !actualYieldIds.has(p.staffId)
+  );
+  first.rows = first.rows.map((row) =>
+    actualYieldIds.has(row.staff.id)
+      ? {
+          ...row,
+          afternoonRestDates: row.afternoonRestDates.filter((d) => d !== date),
+        }
+      : row
+  );
+  if (
+    first.currentEarlyDepartures.length !==
+      second.currentEarlyDepartures.length ||
+    first.currentAfternoonRest.length !== second.currentAfternoonRest.length
+  )
+    return false;
+  const duty = getDutyRosterForDate(state, date).dutyStaffId;
+  const a = relaxedShiftScore(state, first, eligibleIds, duty);
+  const b = relaxedShiftScore(state, second, eligibleIds, duty);
+  return b[0] < a[0] || (b[0] === a[0] && b[1] <= a[1]);
+}
 
 export function balanceRelaxedShifts(options: {
   state: ScheduleGenerationFacts;
@@ -56,28 +161,7 @@ export function balanceRelaxedShifts(options: {
   );
   const duty = getDutyRosterForDate(state, date).dutyStaffId;
   const score = (value: ReturnType<typeof report>): [number, number] => {
-    let excess = 0,
-      squares = 0;
-    for (const kind of kinds) {
-      const values = value.rows
-        .filter(
-          (row) =>
-            participantIds.has(row.staff.id) &&
-            eligibleIds.has(row.staff.id) &&
-            (kind !== "earlyDeparture" || row.staff.id !== duty)
-        )
-        .map((row) => count(row, kind));
-      for (let i = 0; i < values.length; i++) {
-        squares += values[i]! * values[i]!;
-        for (const second of values.slice(i + 1))
-          excess += Math.max(
-            0,
-            Math.abs(values[i]! - second) -
-              state.settings[`${kind}MaxDifference`]
-          );
-      }
-    }
-    return [excess, squares];
+    return relaxedShiftScore(state, value, eligibleIds, duty);
   };
   if (
     !kinds.some(

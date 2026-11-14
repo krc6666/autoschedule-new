@@ -1,6 +1,7 @@
 import type { Assignment } from "../../model";
 import type { ScheduleGenerationFacts } from "../shared/scheduling-facts";
 import type { RuleFeedbackKey } from "../rules/schedule-rule-contract";
+import { staffWorkContinuity } from "../reviews/staff-work-continuity";
 import { diagnoseAutomaticAssignmentEligibility } from "../candidates/assignment-eligibility";
 import { conciseAssignmentWarningReason } from "../reviews/schedule-warning-message";
 import { groupStaffFlightsByNormalizedNumber } from "../statistics/staff-flight-count";
@@ -867,6 +868,34 @@ type RuleFeedbackBuilder = (
 const RULE_FEEDBACK_BUILDERS: Readonly<
   Record<RuleFeedbackKey, RuleFeedbackBuilder>
 > = {
+  "staff-work-continuity": (state, date) => {
+    const split = staffWorkContinuity(
+      state,
+      state.assignments,
+      getDutyRosterForDate(state, date).dutyStaffId
+    ).filter((p) => p.split);
+    const details = split.map((p) => {
+      const person = state.staff.find((s) => s.id === p.staffId)!;
+      const ids = new Set([...p.morningAssignmentIds, ...p.lastAssignmentIds]);
+      const flights = [
+        ...new Set(
+          state.assignments
+            .filter((a) => ids.has(a.id))
+            .map((a) => `${a.flightNo}（${a.startTime}—${a.endTime}）`)
+        ),
+      ];
+      return `${person.name}：${flights.join("、")}，最长连续空挡${p.maximumGapMinutes}分钟、当天跨度${p.spanMinutes}分钟`;
+    });
+    return feedbackItem(
+      "rule-execution",
+      "staff-work-continuity",
+      "普通员工早晚任务集中",
+      split.length ? "attention" : "ok",
+      split.length
+        ? `${details.join("；")}。保留合法班表；尚未落实兼顾资格、锁定、覆盖及公平的集中方案，请结合现场安排核对，有限搜索不代表已证明无解。值班人员豁免。`
+        : "最终班表未发现普通员工上午做完后直等末班、中间没有其他任务的安排；值班人员豁免。人工调整后按最终实际出勤重新检查。"
+    );
+  },
   "morning-priority": (state) => morningPriorityFeedback(state),
   "cross-workday-qualification-reservation": (state) =>
     crossWorkdayQualificationReservationFeedback(state),

@@ -40,6 +40,7 @@ export type RotationReview =
   | "late-frequency"
   | "frequency"
   | "recovery"
+  | "continuity"
   | "coverage";
 
 export interface RotationReviewSafetyPolicy {
@@ -63,6 +64,17 @@ export interface LatePriorityFatigueReliefPolicy {
 export const ROTATION_REVIEW_POLICIES: Readonly<
   Record<RotationReview, RotationReviewSafetyPolicy>
 > = {
+  continuity: {
+    transitionMode: "prefer",
+    assignedCount: "preserve",
+    consecutive: "preserve",
+    frequency: "preserve-priority",
+    protectPreviousWorkdayLoad: false,
+    protectLatePriorityFrequency: true,
+    preventStaffWithoutWork: true,
+    protectDutyMorning: true,
+    protectWorkloadBalance: true,
+  },
   consecutive: {
     transitionMode: "forbid",
     assignedCount: "preserve",

@@ -1,0 +1,29 @@
+Command: npm.cmd exec vitest -- run tests/domain/staff-work-continuity.test.ts
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/domain/staff-work-continuity.test.ts (17 tests | 1 failed) 292ms
+     × still concentrates work with both monthly rest switches enabled 26ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/domain/staff-work-continuity.test.ts > ordinary staff work continuity > still concentrates work with both monthly rest switches enabled
+AssertionError: expected 900 to be less than 900
+ ❯ tests/domain/staff-work-continuity.test.ts:49:57
+     47|     state.settings.earlyDepartureBalanceEnabled=true;
+     48|     state.settings.afternoonRestBalanceEnabled=true;
+     49|     expect(span(await finalContinuity(state),"peer-a")).toBeLessThan(9…
+       |                                                         ^
+     50|   });
+     51|   it("exempts the selected duty worker while still inspecting ordinary…
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 16 passed (17)
+   Start at  15:06:27
+   Duration  1.86s (transform 1.17s, setup 0ms, import 1.37s, tests 292ms, environment 0ms)
+
+
+Exit code: 1

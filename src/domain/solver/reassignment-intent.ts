@@ -12,6 +12,7 @@ export type ReassignmentIntent =
   | { kind: "consecutive-rotation-review" }
   | { kind: "late-shift-recovery-review" }
   | { kind: "position-frequency-review" }
+  | { kind: "staff-work-continuity-review" }
   | { kind: "manual-swap-analysis" }
   | { kind: "next-workday-cutoff-recovery" }
   | {
@@ -50,6 +51,8 @@ export function reassignmentIntentReview(
       return "consecutive";
     case "position-frequency-review":
       return "frequency";
+    case "staff-work-continuity-review":
+      return "continuity";
     case "late-shift-recovery-review":
     case "manual-swap-analysis":
     case "next-workday-cutoff-recovery":
@@ -115,6 +118,8 @@ export function reassignmentIntentPolicy(
     case "consecutive-rotation-review":
     case "late-shift-recovery-review":
     case "position-frequency-review":
+      return STRICT_REASSIGNMENT_POLICY;
+    case "staff-work-continuity-review":
       return STRICT_REASSIGNMENT_POLICY;
   }
 }

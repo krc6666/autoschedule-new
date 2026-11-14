@@ -1,0 +1,14 @@
+Command: npm.cmd exec vitest -- run tests/infrastructure/staff-work-continuity.test.ts --reporter=verbose --disableConsoleIntercept
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+CONTINUITY_WORKER_XLSX [{"staff":"peer-a","flights":["TEST0","TEST1"],"spanMinutes":390},{"staff":"peer-b","flights":["TEST2","TEST3"],"spanMinutes":420}]
+ ✓ tests/infrastructure/staff-work-continuity.test.ts > keeps final compact work through configuration bytes, restart, real Worker/WASM, Store and schedule XLSX 418ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  15:24:10
+   Duration  3.11s (transform 2.03s, setup 0ms, import 2.45s, tests 419ms, environment 0ms)
+
+
+Exit code: 0

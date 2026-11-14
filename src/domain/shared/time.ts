@@ -13,6 +13,23 @@ export function normalizeTime(value: string): string {
   return `${String(Math.floor(minutes / 60)).padStart(2, "0")}:${String(minutes % 60).padStart(2, "0")}`;
 }
 
+/** Put after-midnight work on the same operational day as the preceding evening. */
+export function operationalInterval(
+  startTime: string,
+  endTime: string,
+  nightEnd: string
+): [number, number] | null {
+  const start = timeToMinutes(startTime);
+  const end = timeToMinutes(endTime);
+  const dayStart = timeToMinutes(nightEnd);
+  if (![start, end, dayStart].every(Number.isFinite)) return null;
+  const operationalStart = start < dayStart ? start + 1440 : start;
+  let operationalEnd = end;
+  if (operationalStart >= 1440 || operationalEnd <= operationalStart)
+    operationalEnd += 1440;
+  return [operationalStart, operationalEnd];
+}
+
 export function addIsoDays(value: string, days: number): string {
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
   if (!match) return value;

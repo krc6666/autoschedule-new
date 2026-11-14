@@ -22,6 +22,7 @@ const STRICT_POLICY: ReassignmentIntentPolicy = {
 };
 
 const STRICT_INTENTS: readonly ReassignmentIntent[] = [
+  { kind: "staff-work-continuity-review" },
   { kind: "mobile-supervisor-counter-coverage" },
   { kind: "team-leader-concurrent-gap-fill" },
   { kind: "late-priority-frequency-review" },
@@ -44,6 +45,7 @@ describe("reassignment intent policy", () => {
     [{ kind: "consecutive-rotation-review" }, "consecutive"],
     [{ kind: "late-shift-recovery-review" }, "recovery"],
     [{ kind: "position-frequency-review" }, "frequency"],
+    [{ kind: "staff-work-continuity-review" }, "continuity"],
     [{ kind: "manual-swap-analysis" }, "recovery"],
     [{ kind: "next-workday-cutoff-recovery" }, "recovery"],
     [

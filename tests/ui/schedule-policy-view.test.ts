@@ -8,6 +8,29 @@ import "../../src/ui/components/policy-page";
 import { mountElement, settleLit } from "./lit-test-helpers";
 
 describe("rules page", () => {
+  it("finds the ordinary staff continuity rule with its exception and fallback", async () => {
+    const element = await mountElement<
+      HTMLElement & { updateComplete: Promise<unknown> }
+    >("autoschedule-policy-page", { model: createDefaultState() });
+    expect(
+      element.querySelector<HTMLDetailsElement>(".policy-ledger")?.open
+    ).toBe(true);
+    const search = element.querySelector<HTMLInputElement>(
+      'input[type="search"]'
+    )!;
+    search.value = "早晚任务集中";
+    search.dispatchEvent(new Event("input", { bubbles: true }));
+    await settleLit();
+    expect(element.querySelectorAll(".policy-ledger tbody tr")).toHaveLength(1);
+    for (const text of [
+      "普通员工早晚任务集中",
+      "值班人员豁免",
+      "不靠加航班填空",
+      "其他人员休息机会继续保护",
+      "保留原班表",
+    ])
+      expect(element.textContent).toContain(text);
+  });
   it("shows duty afternoon relief and finds it by its rule name", async () => {
     const state = createDefaultState();
     const before = structuredClone(state);

@@ -41,6 +41,8 @@ const USER_RULE_STAGES: Readonly<
 };
 
 const USER_RULE_DESCRIPTIONS: Readonly<Record<SchedulingRuleId, string>> = {
+  "staff-work-continuity":
+    "优先改善普通员工上午做完任务后一直等到末班的安排，按实际岗位出勤与系统上午时段检查，值班人员豁免。所有补缺和轮岗后统一尝试安全换人，缩短当天跨度，不靠加航班填空，不把早晚割裂转给别人；保留资格、覆盖、锁定、恢复和公平要求。目标人员为缩短全天跨度可让出当天的下午无航班计次，统计按实际重算，其他人员休息机会继续保护。没有安全改善方案时保留原班表，并在最终反馈提示。",
   "staff-eligibility":
     "人员状态、岗位资质、夜班能力、时间冲突和每日工时都必须符合要求。",
   "same-flight-staff-exclusion":

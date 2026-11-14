@@ -335,13 +335,15 @@ export async function finalizeSchedule({
     if (!hook.enabled) continue;
     for (const executor of hook.execute) {
       if (executor.kind !== "final-review") continue;
-      const balancedAssignments = executor.execute({
+      const balancedAssignments = await executor.execute({
         state,
         date,
         assignments,
         lockedAssignmentIds,
         halfRestStaffIds: runFacts.halfRest.activeStaffIds,
         assertSafe: assertFinalSafety,
+        solver,
+        facts: runFacts,
       });
       assignments.splice(0, assignments.length, ...balancedAssignments);
     }

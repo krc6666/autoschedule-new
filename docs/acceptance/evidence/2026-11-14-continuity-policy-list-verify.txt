@@ -1,0 +1,55 @@
+Command: npm.cmd run verify
+
+> autoschedule@1.0.0 verify
+> npm run typecheck && npm test && npm run test:performance && npm run build
+
+
+> autoschedule@1.0.0 typecheck
+> tsc -b --pretty false
+
+
+> autoschedule@1.0.0 test
+> vitest run --exclude tests/performance/**
+
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/domain/rotation-review-safety.test.ts (12 tests | 1 failed) 146ms
+     × requires an explicit safety policy for every review purpose 14ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/domain/rotation-review-safety.test.ts > rotation review safety > requires an explicit safety policy for every review purpose
+AssertionError: expected [ 'consecutive', 'continuity', …(5) ] to deeply equal [ 'consecutive', 'coverage', …(4) ]
+
+- Expected
++ Received
+
+@@ -1,7 +1,8 @@
+  [
+    "consecutive",
++   "continuity",
+    "coverage",
+    "frequency",
+    "late-frequency",
+    "mobile-supervisor",
+    "recovery",
+
+ ❯ tests/domain/rotation-review-safety.test.ts:134:58
+    132|   });
+    133|   it("requires an explicit safety policy for every review purpose", ()…
+    134|     expect(Object.keys(ROTATION_REVIEW_POLICIES).sort()).toEqual([
+       |                                                          ^
+    135|       "consecutive",
+    136|       "coverage",
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 184 passed (185)
+      Tests  1 failed | 1870 passed (1871)
+   Start at  15:18:11
+   Duration  100.51s (transform 23.56s, setup 0ms, import 87.40s, tests 354.33s, environment 24.79s)
+
+
+Exit code: 1

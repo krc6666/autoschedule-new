@@ -1,5 +1,5 @@
 import { getDutyRosterForDate } from "../duty-roster/roster";
-import { timeToMinutes } from "../shared/time";
+import { operationalInterval, timeToMinutes } from "../shared/time";
 import type { Assignment, HistoryRecord, Staff } from "../../model";
 import type { SchedulingFacts } from "../shared/scheduling-facts";
 import { isCountedWorkloadAssignment } from "../shared/workload-accounting";
@@ -44,22 +44,6 @@ export interface MonthlyRelaxedShiftStatistics {
     staffName: string;
     monthlyCount: number;
   }>;
-}
-
-function operationalInterval(
-  startTime: string,
-  endTime: string,
-  nightEnd: string
-): [number, number] | null {
-  const start = timeToMinutes(startTime);
-  const end = timeToMinutes(endTime);
-  const dayStart = timeToMinutes(nightEnd);
-  if (![start, end, dayStart].every(Number.isFinite)) return null;
-  const operationalStart = start < dayStart ? start + 1440 : start;
-  let operationalEnd = end;
-  if (operationalStart >= 1440 || operationalEnd <= operationalStart)
-    operationalEnd += 1440;
-  return [operationalStart, operationalEnd];
 }
 
 function fromAssignment(

@@ -48,6 +48,7 @@ import {
 } from "./rule-registry";
 import { compactRegularAssignments } from "../coverage/schedule-coverage";
 import { balanceRelaxedShifts } from "../reviews/relaxed-shift-balance";
+import { improveStaffWorkContinuity } from "../reviews/staff-work-continuity";
 
 export const CONFIGURABLE_RULE_SETTINGS: Partial<
   Record<
@@ -386,6 +387,9 @@ const RULE_EXECUTION: Readonly<
   ],
   "relaxed-shift-balance": [
     { kind: "final-review", execute: balanceRelaxedShifts },
+  ],
+  "staff-work-continuity": [
+    { kind: "final-review", execute: improveStaffWorkContinuity },
   ],
 };
 

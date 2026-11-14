@@ -46,6 +46,8 @@ export interface ReassignmentOptimizationOptions {
   maxChangedAssignments?: number;
   timeoutMs?: number;
   acceptTimeLimitedFeasible?: boolean;
+  /** Preserve each worker's number of movable assignments during an exchange. */
+  preserveStaffAssignmentCounts?: boolean;
 }
 
 export interface ReassignmentOptimizationResult {

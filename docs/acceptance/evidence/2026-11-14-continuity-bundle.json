@@ -1,0 +1,17 @@
+{
+  "scope": "Production artifact inspection; no browser interaction",
+  "ruleId": "staff-work-continuity",
+  "rulePageLabel": "普通员工早晚任务集中",
+  "assets": [
+    {
+      "path": "dist/assets/index-DaRNNBQ6.js",
+      "bytes": 952603,
+      "sha256": "32ca261c89c61229771e3e71ce99b46fe6b832e10148364172d4a7dace6104cd"
+    },
+    {
+      "path": "dist/assets/schedule.worker-DnLEPTwZ.js",
+      "bytes": 432615,
+      "sha256": "00cd601af6fee4ec52e1d41be80cdf2b52a3c8d8a0a5e590b654956fb5864372"
+    }
+  ]
+}

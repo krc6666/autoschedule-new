@@ -234,7 +234,7 @@ describe("schedule feedback", () => {
       await generateSchedule(state, "2026-07-20")
     ).assignments;
     const feedback = buildScheduleFeedback(state, "2026-07-20");
-    expect(feedback).toHaveLength(14);
+    expect(feedback).toHaveLength(15);
     expect(feedback.map((item) => item.label)).toEqual([
       "人员覆盖",
       "负荷均衡",
@@ -250,6 +250,7 @@ describe("schedule feedback", () => {
       "本班末班人员预告",
       "值班与轮值",
       "同一工作班航班数均衡",
+      "普通员工早晚任务集中",
     ]);
     expect(
       feedback.slice(0, 3).every((item) => item.group === "flight-staff")
