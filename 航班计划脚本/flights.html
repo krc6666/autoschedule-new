@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>武汉天河机场 - 国际航班筛选</title>
+    <link rel="stylesheet" href="flights.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>武汉天河机场 - 国际航班筛选工具</h1>
+        </header>
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="date">日期：</label>
+                <input type="date" id="date">
+            </div>
+            <button id="loadBtn" class="btn">加载航班计划</button>
+            <button id="filterBtn" class="btn btn-primary">筛选国际航班</button>
+        </div>
+
+        <div class="status" id="status"></div>
+
+        <div id="resultContainer">
+            <h2>国际航班列表</h2>
+            <div id="flightsList"></div>
+        </div>
+
+        <div class="instructions">
+            <h3>使用说明：</h3>
+            <ol>
+                <li>选择日期（默认明天）</li>
+                <li>点击"加载航班计划"按钮</li>
+                <li>在新窗口打开的网站中，等待航班数据加载完成</li>
+                <li>复制新窗口中的所有航班数据（Ctrl+A, Ctrl+C）</li>
+                <li>回到本工具，点击"筛选国际航班"按钮</li>
+                <li>将复制的数据粘贴到弹出的提示框中</li>
+                <li>系统会自动筛选出所有国际航班</li>
+            </ol>
+        </div>
+    </div>
+
+    <script src="flights.js"></script>
+</body>
+</html>
