@@ -1,0 +1,30 @@
+{
+  "scope": "Real project read-only connectivity checks; no login, DB installation or data upload",
+  "checkedAt": "2026-11-15T02:31:41.669Z",
+  "configuration": {
+    "projectUrl": "https://dsadghxfsxdlpkpxmxhq.supabase.co",
+    "publicKeyPresent": true,
+    "gitIgnored": true
+  },
+  "results": [
+    {
+      "endpoint": "/auth/v1/health",
+      "status": 200,
+      "body": {
+        "version": "v2.197.0",
+        "name": "GoTrue",
+        "description": "GoTrue is a user registration and authentication API"
+      }
+    },
+    {
+      "endpoint": "/rest/v1/rpc/cloud_read_publication",
+      "status": 404,
+      "body": {
+        "code": "PGRST202",
+        "details": "Searched for the function public.cloud_read_publication with parameter p_token or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.",
+        "hint": null,
+        "message": "Could not find the function public.cloud_read_publication(p_token) in the schema cache"
+      }
+    }
+  ]
+}

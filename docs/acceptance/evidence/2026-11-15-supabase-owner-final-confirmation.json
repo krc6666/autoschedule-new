@@ -1,0 +1,16 @@
+{
+  "recordedAt": "2026-11-15T03:20:38.3925000+00:00",
+  "latestGoal": "配置保存在云端，避免频繁导入导出；班表按原方式自行发送。公开查看与手机流量不是本次目标。",
+  "scopeSource": "Owner latest clarification after deployment",
+  "verificationPrompt": "打开公网管理入口，用同一管理员账号登录，确认是否能看到刚才保存的人员和规则配置，不需要再次导入。",
+  "ownerReply": "能看到刚才保存的配置",
+  "administratorWebsite": "https://krc6666.github.io/autoschedule-new/",
+  "realCloudSaveAndNewOriginRead": "owner_confirmed",
+  "passwordReceived": false,
+  "publicSharingAcceptance": "not_required_by_owner",
+  "physicalMobileNetwork": "not_tested_outside_final_scope",
+  "sourceWorkspaceCommitted": false,
+  "deployedArtifactBranch": "gh-pages",
+  "deployedArtifactCommit": "a2aed7529b853b290c438160784e52e964b611e2",
+  "historicalAcceptance": "36 old pending records retained; owner explicitly waived only this release"
+}

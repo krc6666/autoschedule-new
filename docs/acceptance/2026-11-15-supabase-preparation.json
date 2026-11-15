@@ -1,0 +1,317 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-15-supabase-preparation",
+  "title": "Supabase 单管理员配置云端保存与公网管理入口",
+  "startedFrom": "13b9119ff6723a0dc0932a64fb70e7056ceaf783",
+  "expectation": {
+    "example": "管理员导入原配置并保存到云端后，在公网管理入口以同一账号登录，直接读取刚才的人员和规则配置；班表沿原方式导出发送，不需要频繁导入导出。",
+    "expected": "唯一管理员登录与权限、完整A/B及共用工作区保存、版本冲突保护、恢复副本及公网管理入口可用；owner确认真实保存后从新入口读取同一配置。公开分享保留为可选功能，不作为本次完成条件。",
+    "unchanged": "排班规则、Worker/WASM安全链、Excel和原本地资料合同不变；准备表单仍是浏览器草稿；不处理owner的PROJECT_MAP.md。公开注册按owner要求暂不处理；历史36个待验收记录保留，本次发布有明确一次性放行。先前仅推送独立静态发布分支；owner随后授权本轮源码本地commit，本次不push或重新部署，无付费操作。",
+    "fallback": "云端读失败不开默认编辑器，保存失败保留修改，旧版本拒绝覆盖；本机恢复副本与原存储隔离。网页发布失败可恢复API保存的原Pages来源；原数据仍在Supabase，网页更新不要求重新导入。"
+  },
+  "testedVersion": "46acffa42e2b705067a5071f40334be615dd2d8a0baec9c1e712681385ac53ec",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "保留最初缺模块/SQL红测、顶层坏状态红测和本次完整verify的1项失败；补齐云端入口结构校验后，当前完整1946项功能、19项性能和构建通过。旧verify日志仅为历史时点，不能证明后来新增的断言通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supabase-red.txt",
+          "summary": "实现前配置模块与数据库脚本缺失，两个测试文件失败；用于证明原仓未提供目标行为。",
+          "sha256": "cc6f26e9ee202664e7e2f8eaed2c64c24a4c539eb1d82366f0ec080e317ef591"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supabase-root-shape-red.txt",
+          "summary": "新增云端数据结构校验在实现前失败，防止坏状态被默认数据补盖。",
+          "sha256": "492e5d292f4a77a627d12eb72e48df409adc01d044a7bd0ca7f88deba1cadde5"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supabase-commit-verify-final.txt",
+          "summary": "提交前最终完整verify退出0：类型检查、196文件1946项功能、7文件19项性能及生产构建通过；并发2，保留原时限与门槛。包含顶层缺失资料和坏恢复副本回归。",
+          "sha256": "03d9e89d7626b196ace151e14f5857c9533676c06ee44417e478652e2a424194"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supabase-commit-verify.txt",
+          "summary": "本地commit前重验发现顶层staff缺失仍被恢复：1941项功能通过、1项失败，verify退出1；保留为实际漏检证据。",
+          "sha256": "8265bef091b9785855adcfff420101208a092e244d43a49c62aa5269bfd8e709"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "本地SQL/SDK/DOM普通路径通过；owner实际完成管理员登录、保存，随后在公网新入口重新登录并看到同一配置，证明不是依赖原浏览器本地模型。两组及共用资料完整性另有SQL与恢复往返回归。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supabase-commit-verify-final.txt",
+          "summary": "提交前最终完整verify退出0：类型检查、196文件1946项功能、7文件19项性能及生产构建通过；并发2，保留原时限与门槛。包含顶层缺失资料和坏恢复副本回归。",
+          "sha256": "03d9e89d7626b196ace151e14f5857c9533676c06ee44417e478652e2a424194"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supabase-final-checks.json",
+          "summary": "独立重算云端产物和SQL哈希，并核对完整门禁摘要；记录本地SQL/SDK/DOM边界及未部署事实。",
+          "sha256": "6971accc6cced8ec3f2bbbb9875c3e9deed35228a188ce976a056918a265ac30"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supabase-browser.json",
+          "summary": "隔离Chrome打开现有云端生产包：真实表单/SDK/保存/退出及两种宽度公开页通过，无页面异常；外部接口全部模拟，未连接真实项目。",
+          "sha256": "ad9b87994c10f6e5b5898baf586b25a6a8ffe1fd747cea5619726cc2a8557dcb"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supabase-owner-final-confirmation.json",
+          "summary": "Owner明确收口到配置云端保存，已在公网管理入口重新登录并确认看到刚才保存的配置；不需要重新导入，公开查看/流量不作为本次条件。",
+          "sha256": "586e26c02b5541774d74b5dd645eefc0fa778d6b8600b20bfcba5dd11ff11317"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "覆盖匿名与其他账号拒绝、首次/后续旧版本、空云端、失败保存、坏数据、恢复文件往返、配额失败、项目/账号/准备表单隔离、无配置本地路径和错误配置。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supabase-commit-verify-final.txt",
+          "summary": "提交前最终完整verify退出0：类型检查、196文件1946项功能、7文件19项性能及生产构建通过；并发2，保留原时限与门槛。包含顶层缺失资料和坏恢复副本回归。",
+          "sha256": "03d9e89d7626b196ace151e14f5857c9533676c06ee44417e478652e2a424194"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supabase-secret-guard.txt",
+          "summary": "合成私密key在构建前被拒绝，预期退出码1，未写出网页产物。",
+          "sha256": "ccdf0e636d0ad57355823b985f3adb6bcd511ce5f49408019267daa8e8532284"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "先发布合法快照，再尝试过期班表发布及旧版本保存，拒绝后旧发布保持；历史编辑/计算中不可转移，退出会话后迟到发布回执不可重新暴露链接。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supabase-commit-verify-final.txt",
+          "summary": "提交前最终完整verify退出0：类型检查、196文件1946项功能、7文件19项性能及生产构建通过；并发2，保留原时限与门槛。包含顶层缺失资料和坏恢复副本回归。",
+          "sha256": "03d9e89d7626b196ace151e14f5857c9533676c06ee44417e478652e2a424194"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "数据库RPC校验唯一管理员与CAS，撤销直接表权且RLS在误授SELECT后仍拒绝行；公开投影仅白名单，DOM按文本展示，不回退到可编辑本地页；私密key构建拒绝。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supabase-commit-verify-final.txt",
+          "summary": "提交前最终完整verify退出0：类型检查、196文件1946项功能、7文件19项性能及生产构建通过；并发2，保留原时限与门槛。包含顶层缺失资料和坏恢复副本回归。",
+          "sha256": "03d9e89d7626b196ace151e14f5857c9533676c06ee44417e478652e2a424194"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supabase-secret-guard.txt",
+          "summary": "合成私密key在构建前被拒绝，预期退出码1，未写出网页产物。",
+          "sha256": "ccdf0e636d0ad57355823b985f3adb6bcd511ce5f49408019267daa8e8532284"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supabase-browser.json",
+          "summary": "隔离Chrome打开现有云端生产包：真实表单/SDK/保存/退出及两种宽度公开页通过，无页面异常；外部接口全部模拟，未连接真实项目。",
+          "sha256": "ad9b87994c10f6e5b5898baf586b25a6a8ffe1fd747cea5619726cc2a8557dcb"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supabase-live-migration.json",
+          "summary": "真实迁移后只读检查：发布读取RPC返回200/null，匿名管理读取返回401/42501；Auth健康与设置200，当前仍允许注册。未登录或上传数据。",
+          "sha256": "ab0d99f7d9bdfab0428164cdd62f947dfe5f7bed38ac81b7cda4e1f8dfda162e"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supabase-real-public.json",
+          "summary": "真实Supabase匿名快照44行与独立Chrome两种宽度展示一致，仅调用公开读取RPC，无编辑入口；截图已遮住实际岗位行。",
+          "sha256": "2bae528e7bd5fdcf512b3080657d62d32bd6ca3e6206b07ff99c5f48d33c0d77"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "原排班领域/求解/Worker和Excel实现未修改，完整原功能与19项性能测试通过；无配置入口维持本地系统。原本地存储未被迁移覆盖，PROJECT_MAP.md保留owner改动。性能为本机单次检查，不声明改善。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supabase-commit-verify-final.txt",
+          "summary": "提交前最终完整verify退出0：类型检查、196文件1946项功能、7文件19项性能及生产构建通过；并发2，保留原时限与门槛。包含顶层缺失资料和坏恢复副本回归。",
+          "sha256": "03d9e89d7626b196ace151e14f5857c9533676c06ee44417e478652e2a424194"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supabase-final-checks.json",
+          "summary": "独立重算云端产物和SQL哈希，并核对完整门禁摘要；记录本地SQL/SDK/DOM边界及未部署事实。",
+          "sha256": "6971accc6cced8ec3f2bbbb9875c3e9deed35228a188ce976a056918a265ac30"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "verified",
+      "reason": "按owner最终配置云端保存目标，公网管理入口已上线；真实保存和新入口读取同一配置由owner确认。静态发布提交、GitHub built、43个公网构建文件哈希、真实浏览器入口均有证据。公开分享和手机流量已由owner明确移出本次完成条件；没有把未实测的运营商网络标为通过。 本地提交前新增顶层坏模型拒绝校验，当前源码的完整验证见commit-verify-final；线上包保持原发布版本，该边界修复未重新部署或重新做浏览器现场验收。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supabase-cloud-build.txt",
+          "summary": "合成公开项目配置的云端生产构建成功，无真实网络连接或账号。",
+          "sha256": "95ca7d3f5fd1d388f4512d30f5103e317c9216cff449baca4c9dc25288cf8575"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supabase-artifacts.json",
+          "summary": "云端生产包、SQL及管理员脚本SHA-256，真实Supabase和手机网络标记为未验证。",
+          "sha256": "de4bf8b0c9ad5c5e543401fc3ccc814aa6bd97e61b167e50aa5e2f5d1baf9b1f"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supabase-final-checks.json",
+          "summary": "独立重算云端产物和SQL哈希，并核对完整门禁摘要；记录本地SQL/SDK/DOM边界及未部署事实。",
+          "sha256": "6971accc6cced8ec3f2bbbb9875c3e9deed35228a188ce976a056918a265ac30"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supabase-browser.json",
+          "summary": "隔离Chrome打开现有云端生产包：真实表单/SDK/保存/退出及两种宽度公开页通过，无页面异常；外部接口全部模拟，未连接真实项目。",
+          "sha256": "ad9b87994c10f6e5b5898baf586b25a6a8ffe1fd747cea5619726cc2a8557dcb"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supabase-browser-desktop.png",
+          "summary": "1440×900桌面公开页截图，合成班表与恶意备注按文字显示，已人工查看。",
+          "sha256": "e9eb8713c7988f04715122ff6018db123962f0499e878af4733b115c60a8f5e7"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supabase-browser-mobile.png",
+          "summary": "390×844手机宽度公开页截图，表格容器可横向滚动而整页不溢出，已人工查看；不是实际手机网络。",
+          "sha256": "710e4e3ed93536c81b5509bccbd008117a4869057c63731ea07ba060f203fbde"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supabase-live-initial.json",
+          "summary": "真实项目只读探测：公开密钥可用，GoTrue健康接口200；发布RPC返回404/PGRST202，尚未安装目标函数或未进入schema缓存。未登录、未上传。",
+          "sha256": "ea479d5a9e919036ce210c0e6a08747e012a4ecc3767d2890eb95ee40ed4aec2"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supabase-live-build.txt",
+          "summary": "真实项目公开配置的完整生产构建退出0，Vite构建7.38秒；没有部署网页。",
+          "sha256": "004d5c9a0f19fb5080c1a0480f7f19a50faf693ed5f033d698206f91884c08a8"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supabase-live-migration.json",
+          "summary": "真实迁移后只读检查：发布读取RPC返回200/null，匿名管理读取返回401/42501；Auth健康与设置200，当前仍允许注册。未登录或上传数据。",
+          "sha256": "ab0d99f7d9bdfab0428164cdd62f947dfe5f7bed38ac81b7cda4e1f8dfda162e"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supabase-live-login.json",
+          "summary": "本机Vite真实配置的Chrome登录页已检查，有邮箱/密码框，无登录前编辑器和页面异常；未登录，管理员绑定以owner执行成功报告为准。",
+          "sha256": "34c1dd5b440130cee7d144e8a46a91b9a6df903ab0b0890a9cb5e015b0b927d4"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supabase-live-login.png",
+          "summary": "本机Vite真实配置的Chrome登录页已检查，有邮箱/密码框，无登录前编辑器和页面异常；未登录，管理员绑定以owner执行成功报告为准。",
+          "sha256": "7ba881c49d3c244b4a1a4c1c00d8364391aea8a573eebcd5b3cba749231973d1"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supabase-progress.json",
+          "summary": "Owner确认管理员可进入，页面目前为初始数据，尚待导入真实配置并验证保存。只读检查现有Pages及构建变量，整体发布材料检查仍失败；未改远端设置。",
+          "sha256": "0153267f5bb3c272a542849a0c13128a8bd8ca7eb9cb1c17c362014e900ae9f9"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supabase-owner-cloud-save.json",
+          "summary": "Owner报告真实应用云端保存成功；保存内容与公开发布尚待核对。",
+          "sha256": "dc9664236ed4471d9e643db2ccf526d84e18999700fc5aa8aaec84d8f377dcb7"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supabase-hosting-preparation.json",
+          "summary": "GitHub两项公开构建变量已创建并回读一致；未推送、未部署、未改变Pages托管方式。",
+          "sha256": "7b98c7a43c6c333a52f8870d3ce7af660545ef1b50d513ec66c5c6cc71acff38"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supabase-real-public.json",
+          "summary": "真实Supabase匿名快照44行与独立Chrome两种宽度展示一致，仅调用公开读取RPC，无编辑入口；截图已遮住实际岗位行。",
+          "sha256": "2bae528e7bd5fdcf512b3080657d62d32bd6ca3e6206b07ff99c5f48d33c0d77"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supabase-real-public-desktop.png",
+          "summary": "真实Supabase匿名快照44行与独立Chrome两种宽度展示一致，仅调用公开读取RPC，无编辑入口；截图已遮住实际岗位行。",
+          "sha256": "e69ca5c5cdb20bdea7742a47de87222ac68665a9f549254f0ec969a57faba315"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supabase-real-public-mobile.png",
+          "summary": "真实Supabase匿名快照44行与独立Chrome两种宽度展示一致，仅调用公开读取RPC，无编辑入口；截图已遮住实际岗位行。",
+          "sha256": "546f6837a3facdad157bd36b7c58bb2afa0de06ae9376bf2dc677fb72cba6f05"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supabase-release-candidate.json",
+          "summary": "真实配置生产包在预览入口实际读取44行发布班表，桌面/手机宽度无页面异常；记录43个构建文件哈希。",
+          "sha256": "d4f9316017c26e3131d491ca7110fed7fef856fc1191d4d4648c910f8a14b550"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supabase-release-proposal.json",
+          "summary": "44文件待发布目录及回退方案；原43个生产文件字节保持，源分支标签已从切换前API快照纠正。实际发布结果另附deployment-complete。",
+          "sha256": "ac93040b07d836eb41f59069da3c4a5fe68bf2fd24b6dad744104eec7618f4c6"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supabase-release-gate.txt",
+          "summary": "整体发布材料检查退出1：当前任务及36个历史任务尚未全部验收，未绕过或删除历史记录。",
+          "sha256": "0ccaf8c3465171e64511c682cd5395ad9edb34b2bfdb0773c4383b78c7d0d274"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supabase-owner-final-confirmation.json",
+          "summary": "Owner明确收口到配置云端保存，已在公网管理入口重新登录并确认看到刚才保存的配置；不需要重新导入，公开查看/流量不作为本次条件。",
+          "sha256": "586e26c02b5541774d74b5dd645eefc0fa778d6b8600b20bfcba5dd11ff11317"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supabase-release-authorization.json",
+          "summary": "Owner明确允许创建/推送独立发布分支、更新Pages，并仅对本次上线放行历史验收；旧记录保留。",
+          "sha256": "7bd9768374f9636d3aebf1929e8571481b3dbfa441ab34e5dc2325a440cd285c"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supabase-deployment-plan.json",
+          "summary": "实际API保存的原Pages来源及回退信息；待发布文件已匹配原验证包。",
+          "sha256": "df8b8fa83bb2cf943013435c0e84f1521ce21c9465e54a9de3edc34e748460e3"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supabase-artifact-commit.json",
+          "summary": "独立gh-pages发布提交a2aed7529b853b290c438160784e52e964b611e2已推送，44个提交文件逐个匹配已验证产物，未提交源码工作区。",
+          "sha256": "d1f6ac9964cd13a7cf8c615f945648d358e43b26a307eb443fbb6054f4d4886b"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supabase-pages-deployment.json",
+          "summary": "Pages来源更新及构建请求记录，保留旧来源以回退。",
+          "sha256": "19b197194356a7dabf89ae9344dc702534fd962b10fd03ccfc3e0745b9154ce7"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supabase-public-entry-check.json",
+          "summary": "公网首页HTTP200，字节SHA-256匹配发布产物。",
+          "sha256": "de9006500f70a651cb173c6fc80c9d44b956db6bc90e3c96b29c8aae677ac3fc"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supabase-public-assets.json",
+          "summary": "公网43个可访问构建文件逐个HTTP读取并核对SHA-256，全部匹配；包含动态模块、Worker/WASM、模板及样式。",
+          "sha256": "a8c3fcf847dd374b1aca8a346fc6da6a2884f6d3200f00aa262ed1e363403059"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supabase-online-verification.json",
+          "summary": "正式网址独立Chrome验证真实Supabase匿名快照44行，桌面/手机宽度正常；管理员入口为登录页，登录前无编辑器。",
+          "sha256": "e5b48a4b06be230d0884759d35e9ca7691bc485886cd612bd03d08b24ceab914"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supabase-online-login.png",
+          "summary": "正式公网管理员登录页截图已查看，不含账号或密码。",
+          "sha256": "f1d571d8b98812f7f45ba660dbdfa48dc973887d64a2758baf60b643f72ae62d"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supabase-online-desktop.png",
+          "summary": "正式公网班表桌面截图，实际岗位行已遮挡以保留个人资料。",
+          "sha256": "e69ca5c5cdb20bdea7742a47de87222ac68665a9f549254f0ec969a57faba315"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supabase-online-mobile.png",
+          "summary": "正式公网手机宽度截图已查看，实际岗位行已遮挡；不是运营商流量测试。",
+          "sha256": "546f6837a3facdad157bd36b7c58bb2afa0de06ae9376bf2dc677fb72cba6f05"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supabase-deployment-complete.json",
+          "summary": "GitHub最终确认gh-pages为来源，目标提交构建built且HTTPS启用；旧任务保留。",
+          "sha256": "c8c4ca44332fc3bb740f1ddba38152d8df95859001635f52a79be55381f6c91f"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "原系统缺服务端保存，最初red证明模块/SQL缺失；本次commit前完整验证另捕获顶层staff缺失仍恢复，见commit-verify的1失败及root-shape-red。云端入口校验顶层必需类型后，commit-verify-final证明当前1946项功能及19项性能、类型和构建通过。owner已确认公网新入口登录读回之前保存配置。",
+    "laterChanges": "旧设备保存、坏恢复副本、jsonb键顺序、计算/历史编辑和会话结束后的异步回执可能破坏数据，SQL/SDK/app/DOM反向与往返回归覆盖。正式发布前逐一比较静态提交和验证产物，发布后比较43个公网文件并检查真实入口，防止部署时漏动态模块或更新错版本。真实双设备冲突和断网现场未做，不伪称已实测。",
+    "finalArtifact": "deployment-complete绑定gh-pages提交a2aed7529b853b290c438160784e52e964b611e2及built状态，public-assets验证公网43文件字节，online-verification证明正式管理员登录入口及真实Supabase连接，owner-final-confirmation证明公网重新登录读回已保存配置。该链条满足owner最终配置云端保存目标。 本次源码commit的新增严格恢复边界只做了自动验证与构建，未push或替换线上包；实际线上证据仍绑定原静态发布提交。"
+  },
+  "review": {
+    "missedScope": "逐项核对Auth/RPC/RLS、两组/共用模型、CAS、恢复/首次迁移、Excel与准备表单、计算/历史编辑、生产模块及公网文件；owner确认真实云存和公网新入口读取。真实另一设备冲突、断网和普通Auth账号尝试仍仅有离线/模拟回归；公开注册按owner要求保留。公开查看/手机流量非最终目标，不添加验收要求。36个历史任务仍待验收，本次有明确放行，不改其状态。 提交前重新完整verify发现旧通过记录未覆盖当前顶层缺失断言，已修复并增加缓存/JSON文件消费者回归。新增拒绝边界没有新的浏览器现场证据，未冒充已经更新线上。",
+    "rootCause": "原系统没有服务端账号、版本和持久化，必须增加隔离的远端工作区；本地保存不能当作上传成功。接入还需保护jsonb键顺序、坏输入与旧版本恢复。开发中遇到测试文字定位及PowerShell编码问题，已修正并保留回归/证据；owner后续明确以配置保存为核心，最终按该工作流收口。 提交前失败的直接根因是云端适配器只检查组内形状，通用恢复器却会从顶层构造活动A组，并用默认值补缺；旧通过日志不能替代新增断言后的当前版本重验。",
+    "earlyDetection": "需求初期先确认管理员日常操作与完成条件，区分明确上传和可选公开发布；写实现前列传播矩阵并运行角色/CAS/恢复红测。上线前验证产物字节和真实SDK/页面；上线后用新入口登录读取同一配置完成跨本地存储核对。元数据直接序列化API来源、文本统一UTF-8；发布前列出旧验收阻塞并取得明确裁决。 所有新增断言必须在最终变更版本的完整验证中实际执行；完整云端模型在调用允许缺省的本地恢复器前先检查顶层、组内及共用资料，坏副本跨全部消费者验证拒绝且保留原字节。"
+  }
+}

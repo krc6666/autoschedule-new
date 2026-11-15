@@ -1,0 +1,29 @@
+{
+  "scope": "Offline cloud build only; synthetic public configuration, no remote connection",
+  "cloudBuildDirectory": "C:\\Users\\19598\\AppData\\Local\\Temp\\autoschedule-supabase-preparation-20261115",
+  "manifestSha256": "574584d38005c20dfe05c6f52ce5e2a7c499bdc7bde9fe4058e54d4161cc5812",
+  "artifacts": [
+    {
+      "entry": "_supabase-backend-5XxEM144.js",
+      "file": "assets/supabase-backend-5XxEM144.js",
+      "sha256": "ab2906c133547bbedd794bcbd417c3c094aa2094218e7fc6d91cf9e10088a2e8"
+    },
+    {
+      "entry": "index.html",
+      "file": "assets/index-m-Al6d7v.js",
+      "sha256": "c61899d50e46ed28f50bbd93b9ed1908203a5707140f759df52619c9fc52c891"
+    },
+    {
+      "entry": "src/app/cloud-application.ts",
+      "file": "assets/cloud-application-DNICGWLa.js",
+      "sha256": "85ebf4735cad4584f426a5b7bb4d8e25b50d8dca245c978a9682941f61a0f79c"
+    }
+  ],
+  "includesPublicSchedule": true,
+  "includesCloudSaveRpc": true,
+  "includesPrivateSyntheticGuardKey": false,
+  "sqlSha256": "4182b5b351f259a759f75cdb283d5691b87f4a92a8bfcace84a5ea964003e03d",
+  "adminSetupSha256": "ca602bd27ad3861be1d3afa94e96e860d4a586b8902379e4e8918fd6bbb4ecb5",
+  "liveSupabaseVerified": false,
+  "mobileNetworkVerified": false
+}

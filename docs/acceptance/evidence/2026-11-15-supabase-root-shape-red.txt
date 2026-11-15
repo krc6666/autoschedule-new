@@ -1,0 +1,32 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/infrastructure/supabase-backend.test.ts (5 tests | 1 failed) 76ms
+     × rejects corrupted workspace without silently falling back to default people or dropping records 19ms
+npm.cmd :
+所在位置 行:2 字符: 1
++ npm.cmd exec vitest -- run tests/infrastructure/supabase-backend.test ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/infrastructure/supabase-backend.test.ts > official Supabase SDK adapter > rejects corrupted workspace with
+out silently falling back to default people or dropping records
+AssertionError: expected [Function] to throw an error
+ ❯ tests/infrastructure/supabase-backend.test.ts:77:50
+     75|     const missingRoot = JSON.parse(JSON.stringify(model));
+     76|     delete missingRoot.staff;
+     77|     expect(() => restoreCloudModel(missingRoot)).toThrow();
+       |                                                  ^
+     78|     const broken = JSON.parse(JSON.stringify(model));
+     79|     delete broken.groups.A.staff;
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 4 passed (5)
+   Start at  10:05:15
+   Duration  1.78s (transform 1.22s, setup 0ms, import 1.46s, tests 76ms, environment 0ms)

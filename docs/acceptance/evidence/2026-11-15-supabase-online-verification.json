@@ -1,0 +1,41 @@
+{
+  "checkedAt": "2026-11-15T03:11:33.671Z",
+  "website": "https://krc6666.github.io/autoschedule-new/",
+  "backend": "Actual hosted Supabase; no mocked responses",
+  "publicViewer": [
+    {
+      "viewport": "desktop",
+      "width": 1440,
+      "height": 900,
+      "httpStatus": 200,
+      "rows": 44,
+      "rowsMatchCloudPublication": true,
+      "privateUiCount": 0,
+      "bodyOverflow": false,
+      "pageErrors": [],
+      "cloudCalls": ["/rest/v1/rpc/cloud_read_publication"]
+    },
+    {
+      "viewport": "mobile",
+      "width": 390,
+      "height": 844,
+      "httpStatus": 200,
+      "rows": 44,
+      "rowsMatchCloudPublication": true,
+      "privateUiCount": 0,
+      "bodyOverflow": false,
+      "pageErrors": [],
+      "cloudCalls": ["/rest/v1/rpc/cloud_read_publication"]
+    }
+  ],
+  "loginGate": {
+    "httpStatus": 200,
+    "emailPasswordInputsVisible": true,
+    "editorBeforeLogin": 0,
+    "pageErrors": []
+  },
+  "personalScheduleDetailsRecorded": false,
+  "screenshots": "Roster body masked",
+  "physicalMobileNetworkVerified": false,
+  "adminLoginOnNewOrigin": "Not attempted; owner must enter password locally"
+}

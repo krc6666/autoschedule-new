@@ -1,0 +1,354 @@
+{
+  "checkedAt": "2026-11-15T03:11:30.719Z",
+  "scope": "Public GitHub Pages assets compared to authorized release package",
+  "verifiedFiles": 43,
+  "expectedFiles": 43,
+  "allMatch": true,
+  "totalBytes": 21243786,
+  "results": [
+    {
+      "path": "航班计划脚本/flight-filter.user.js",
+      "status": 200,
+      "sha256": "ca3023c239982eeabd21240aeaa7ba7a27b3f373ed827d3ac7973da2d0962d3e",
+      "matches": true,
+      "sizeBytes": 13213,
+      "contentType": "application/javascript; charset=utf-8"
+    },
+    {
+      "path": "航班计划脚本/flights.css",
+      "status": 200,
+      "sha256": "21e3ed47604b6620b02caef9d47f86ff09a7ae1b8f7de0d0b021f3e93d359423",
+      "matches": true,
+      "sizeBytes": 4264,
+      "contentType": "text/css; charset=utf-8"
+    },
+    {
+      "path": "航班计划脚本/flights.html",
+      "status": 200,
+      "sha256": "0d435a2cca4fea9d76529fdd97e9cad46799bb2fad91a076bed36cd4b9998677",
+      "matches": true,
+      "sizeBytes": 1635,
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "path": "航班计划脚本/flights.js",
+      "status": 200,
+      "sha256": "447d49634ca2353baf7964e90ba11e2aaae01892e7455e291a9d9792a99001af",
+      "matches": true,
+      "sizeBytes": 7450,
+      "contentType": "application/javascript; charset=utf-8"
+    },
+    {
+      "path": "assets/__vite-browser-external-D7Ct-6yo.js",
+      "status": 200,
+      "sha256": "80b82acfeb87bf2cb6a47b0aa48e078951b8a2616fe5059cec7bc46dd650621d",
+      "matches": true,
+      "sizeBytes": 191,
+      "contentType": "application/javascript; charset=utf-8"
+    },
+    {
+      "path": "assets/__vite-browser-external-D7Ct-6yo.js.map",
+      "status": 200,
+      "sha256": "0fadc89673a49fed87ee19c0a87ca6a19074ed5c9052ee7d869cfe6c68686c71",
+      "matches": true,
+      "sizeBytes": 240,
+      "contentType": "application/json; charset=utf-8"
+    },
+    {
+      "path": "assets/bootstrap-icons-BeopsB42.woff",
+      "status": 200,
+      "sha256": "f55513b7b591cb84a3b87ff0e34ea24d4831d6fedc22e54b911ca64b5b544a15",
+      "matches": true,
+      "sizeBytes": 180288,
+      "contentType": "font/woff"
+    },
+    {
+      "path": "assets/bootstrap-icons-mSm7cUeB.woff2",
+      "status": 200,
+      "sha256": "6c75710364a1ca5604267716f6d28997b26319fdb078cf11e0b42ab66ff2ea61",
+      "matches": true,
+      "sizeBytes": 134044,
+      "contentType": "font/woff2"
+    },
+    {
+      "path": "assets/cloud-application-DKEobWab.js",
+      "status": 200,
+      "sha256": "1682a0ae3497fad84161ea228056fd02a4b176549a5c1d3add2e2d4a0c14baf8",
+      "matches": true,
+      "sizeBytes": 16522,
+      "contentType": "application/javascript; charset=utf-8"
+    },
+    {
+      "path": "assets/cloud-application-DKEobWab.js.map",
+      "status": 200,
+      "sha256": "365145ab306c37bd6fedaec3e01bff9639a22faed9a6226ceabbf81d573298da",
+      "matches": true,
+      "sizeBytes": 44291,
+      "contentType": "application/json; charset=utf-8"
+    },
+    {
+      "path": "assets/duty-roster-excel-w5lteVE3.js",
+      "status": 200,
+      "sha256": "1452a3343529e53a531489454794cc23820f7dec6b35bf4524d58ca97531ebdc",
+      "matches": true,
+      "sizeBytes": 7128,
+      "contentType": "application/javascript; charset=utf-8"
+    },
+    {
+      "path": "assets/duty-roster-excel-w5lteVE3.js.map",
+      "status": 200,
+      "sha256": "f99fa9a62d4976381420f1877151bff28e65caaffd5eb1b6f5a9dc5a7d73aabc",
+      "matches": true,
+      "sizeBytes": 25717,
+      "contentType": "application/json; charset=utf-8"
+    },
+    {
+      "path": "assets/excel-BRIqU0mm.js",
+      "status": 200,
+      "sha256": "b9d27300d5c9e76a283e1ba0f155a5160396cebfdde3bea57928d21030c60c7c",
+      "matches": true,
+      "sizeBytes": 45517,
+      "contentType": "application/javascript; charset=utf-8"
+    },
+    {
+      "path": "assets/excel-BRIqU0mm.js.map",
+      "status": 200,
+      "sha256": "730511b826351ead9eb1ea3675b469f8606f42f55b56d12f4d640e08c33ee3b3",
+      "matches": true,
+      "sizeBytes": 180541,
+      "contentType": "application/json; charset=utf-8"
+    },
+    {
+      "path": "assets/excel-worksheet-C30b9pTp.js",
+      "status": 200,
+      "sha256": "201a27d1ed2834da8fd5a32af2e4d8054f34288f5ead86a22b0500f115ba0b89",
+      "matches": true,
+      "sizeBytes": 636,
+      "contentType": "application/javascript; charset=utf-8"
+    },
+    {
+      "path": "assets/excel-worksheet-C30b9pTp.js.map",
+      "status": 200,
+      "sha256": "344f92bb78acdca3c78806c2f64a0454694873b5efe93383152bd3146348f16b",
+      "matches": true,
+      "sizeBytes": 2621,
+      "contentType": "application/json; charset=utf-8"
+    },
+    {
+      "path": "assets/highs-BC-phg6l.js",
+      "status": 200,
+      "sha256": "d0e6f76ac8f7c9edcaca283a53e34699f70f3d2bb6a4875b9461375a16b6b06e",
+      "matches": true,
+      "sizeBytes": 42423,
+      "contentType": "application/javascript; charset=utf-8"
+    },
+    {
+      "path": "assets/highs-BC-phg6l.js.map",
+      "status": 200,
+      "sha256": "3d0d092ca49a53beb6d8e6d71cf4f27cecdf2a8224888b9dbe39b42323b7d76d",
+      "matches": true,
+      "sizeBytes": 207597,
+      "contentType": "application/json; charset=utf-8"
+    },
+    {
+      "path": "assets/highs-BWKFkgAM.js",
+      "status": 200,
+      "sha256": "96ee84d0132f812e21943c82fa0b005e0a0e8346bff87393714a39c1d3f1218d",
+      "matches": true,
+      "sizeBytes": 42303,
+      "contentType": "application/javascript; charset=utf-8"
+    },
+    {
+      "path": "assets/highs-BWKFkgAM.js.map",
+      "status": 200,
+      "sha256": "613e5d299b910267798f226c4993a4dd22fa5dbaade928c67891f4ecce656469",
+      "matches": true,
+      "sizeBytes": 207785,
+      "contentType": "application/json; charset=utf-8"
+    },
+    {
+      "path": "assets/highs-D01W9kFF.wasm",
+      "status": 200,
+      "sha256": "2a95cbf93774622cf4b9ba7650017159aedcec83223f9f1ae5f486818f53a08a",
+      "matches": true,
+      "sizeBytes": 3651465,
+      "contentType": "application/wasm"
+    },
+    {
+      "path": "assets/highs-DEeTqoGR.wasm",
+      "status": 200,
+      "sha256": "36e68fe5cdd886bedb12c39ab498b6f316bc38936bc11a94ea956face8b85fe2",
+      "matches": true,
+      "sizeBytes": 3674431,
+      "contentType": "application/wasm"
+    },
+    {
+      "path": "assets/highs-DN70-a7y.js",
+      "status": 200,
+      "sha256": "dba6b4d193b8af20ad46b6f087a3c11ddbce46ac62101e673f5b10fe17364942",
+      "matches": true,
+      "sizeBytes": 42968,
+      "contentType": "application/javascript; charset=utf-8"
+    },
+    {
+      "path": "assets/highs-DN70-a7y.js.map",
+      "status": 200,
+      "sha256": "73a0dd6e80e1561f8df64ecbd98040a1400ec47592cead9aef1e31f7aa124dc9",
+      "matches": true,
+      "sizeBytes": 211726,
+      "contentType": "application/json; charset=utf-8"
+    },
+    {
+      "path": "assets/highs-solver-CdMgLv0o.js",
+      "status": 200,
+      "sha256": "819eb074cf44030804e1fec5a9526554f6779e8de5b107f2b9937059c1a2c15a",
+      "matches": true,
+      "sizeBytes": 25943,
+      "contentType": "application/javascript; charset=utf-8"
+    },
+    {
+      "path": "assets/highs-solver-CdMgLv0o.js.map",
+      "status": 200,
+      "sha256": "441440ba5233ce03ea17a73b388688a55cb7d5409b28a3dac90774f59cf2eb00",
+      "matches": true,
+      "sizeBytes": 145458,
+      "contentType": "application/json; charset=utf-8"
+    },
+    {
+      "path": "assets/highs-xOAHumeT.js",
+      "status": 200,
+      "sha256": "304a37b22cd6d4ccb137ff5a68f27f53bb138a24e5cdd3c12014418b8653110f",
+      "matches": true,
+      "sizeBytes": 43088,
+      "contentType": "application/javascript; charset=utf-8"
+    },
+    {
+      "path": "assets/highs-xOAHumeT.js.map",
+      "status": 200,
+      "sha256": "75d4f17b259637cacb712294625cf0ecad1927e7a4ec34a972d0693483876642",
+      "matches": true,
+      "sizeBytes": 211545,
+      "contentType": "application/json; charset=utf-8"
+    },
+    {
+      "path": "assets/html2canvas.esm-DXEQVQnt.js",
+      "status": 200,
+      "sha256": "8c46cc1bb52e600a4f397027529ced15488e01a9ca234cbf3649596841edf983",
+      "matches": true,
+      "sizeBytes": 201094,
+      "contentType": "application/javascript; charset=utf-8"
+    },
+    {
+      "path": "assets/html2canvas.esm-DXEQVQnt.js.map",
+      "status": 200,
+      "sha256": "8083194f8c8c35ae39fd30a2eba662c5be99b4faefd5b2a4197bc655f3c3ef17",
+      "matches": true,
+      "sizeBytes": 602748,
+      "contentType": "application/json; charset=utf-8"
+    },
+    {
+      "path": "assets/index-CgXxUXPL.js",
+      "status": 200,
+      "sha256": "e238a36d3ed284ccaaff0327e54b8f68212f90841c2aa9d10ab7c3c41ec68a7c",
+      "matches": true,
+      "sizeBytes": 964868,
+      "contentType": "application/javascript; charset=utf-8"
+    },
+    {
+      "path": "assets/index-CgXxUXPL.js.map",
+      "status": 200,
+      "sha256": "497b9f0676c5648df3c1f22603ba64b2023088b94afd3518812b895e6277f4d7",
+      "matches": true,
+      "sizeBytes": 3381475,
+      "contentType": "application/json; charset=utf-8"
+    },
+    {
+      "path": "assets/late-priority-counts-excel-BnOmnG32.js",
+      "status": 200,
+      "sha256": "d6921a25276bb7bb202e3585a909d4667d44790e40f7305874f1050aea1db3ba",
+      "matches": true,
+      "sizeBytes": 2932,
+      "contentType": "application/javascript; charset=utf-8"
+    },
+    {
+      "path": "assets/late-priority-counts-excel-BnOmnG32.js.map",
+      "status": 200,
+      "sha256": "44af56ab19a63823b8fb40eab519adc8a5e579ee72f70a4e558f891c1a410b2e",
+      "matches": true,
+      "sizeBytes": 11671,
+      "contentType": "application/json; charset=utf-8"
+    },
+    {
+      "path": "assets/schedule.worker-ZdQqs24G.js",
+      "status": 200,
+      "sha256": "6e53ba20f87a6fc69e1c46d3f32aeb74e14b7626bc2d31d2848f721ab062fbc5",
+      "matches": true,
+      "sizeBytes": 437721,
+      "contentType": "application/javascript; charset=utf-8"
+    },
+    {
+      "path": "assets/schedule.worker-ZdQqs24G.js.map",
+      "status": 200,
+      "sha256": "0e088a31c1f0e73676230cf1e38a1a7b97fd2959981cd3d6c85cd8a7cb86e428",
+      "matches": true,
+      "sizeBytes": 1990483,
+      "contentType": "application/json; charset=utf-8"
+    },
+    {
+      "path": "assets/style-CzPXRm7y.css",
+      "status": 200,
+      "sha256": "0ea1fe890c1f3ba5fcb121832ae7c6a711548cc3b2adc65aab4fc2d8d08443a7",
+      "matches": true,
+      "sizeBytes": 369387,
+      "contentType": "text/css; charset=utf-8"
+    },
+    {
+      "path": "assets/supabase-backend-DWLOdSW1.js",
+      "status": 200,
+      "sha256": "b0e2a55838f3b83b09ee16aaae8d9553220816d94a69c187e9aec4cb5d74a542",
+      "matches": true,
+      "sizeBytes": 230140,
+      "contentType": "application/javascript; charset=utf-8"
+    },
+    {
+      "path": "assets/supabase-backend-DWLOdSW1.js.map",
+      "status": 200,
+      "sha256": "c7a89e4d1d83acbd709f1ba328e193ad7f7e55d2d871e7f29a34c08db7e4c2d7",
+      "matches": true,
+      "sizeBytes": 1249791,
+      "contentType": "application/json; charset=utf-8"
+    },
+    {
+      "path": "assets/xlsx.min-DYF2L--I.js",
+      "status": 200,
+      "sha256": "c4ce47940dc49a8b66b9eb42238fac621630c5def9d3d4aa18eef4cbff4ea1b5",
+      "matches": true,
+      "sizeBytes": 869585,
+      "contentType": "application/javascript; charset=utf-8"
+    },
+    {
+      "path": "assets/xlsx.min-DYF2L--I.js.map",
+      "status": 200,
+      "sha256": "cda9151fd44a435123cddd42f3128307d2ddb08fed0ad76d287c7318d58576d5",
+      "matches": true,
+      "sizeBytes": 1678438,
+      "contentType": "application/json; charset=utf-8"
+    },
+    {
+      "path": "index.html",
+      "status": 200,
+      "sha256": "c4bf6ef10fae2b38ea08b12496ccc015886e852416943092bcbbd688ebf21720",
+      "matches": true,
+      "sizeBytes": 553,
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "path": "template/排班工具配置模板.xlsx",
+      "status": 200,
+      "sha256": "f9f0c50f02c1cd57f77bba8ae32ddb80d71f6f5082271e2c3c83cb3d4510deca",
+      "matches": true,
+      "sizeBytes": 81870,
+      "contentType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    }
+  ]
+}

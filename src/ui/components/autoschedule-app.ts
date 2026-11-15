@@ -37,10 +37,12 @@ export class AutoscheduleAppElement extends LightDomElement {
     model: { attribute: false },
     view: { attribute: false },
     commandHandler: { attribute: false },
+    cloud: { type: Boolean },
   };
   model!: AppState;
   view!: ApplicationViewState;
   commandHandler!: UiCommandHandler;
+  cloud = false;
   private readonly workbookInput: Ref<HTMLInputElement> = createRef();
   private pendingImport: PendingImport = { mode: "all" };
 
@@ -88,7 +90,9 @@ export class AutoscheduleAppElement extends LightDomElement {
           </div>
           <div class="me-auto min-w-0">
             <h1 class="h5 mb-0 text-truncate">自动排班</h1>
-            <div class="small text-secondary">机场地勤 · 本地工作台</div>
+            <div class="small text-secondary">
+              机场地勤 · ${this.cloud ? "云端工作台" : "本地工作台"}
+            </div>
           </div>
           <label class="date-control d-flex align-items-center gap-2">
             <i class="bi bi-calendar3 text-secondary"></i>
@@ -101,7 +105,8 @@ export class AutoscheduleAppElement extends LightDomElement {
             />
           </label>
           <span class="save-state small text-secondary d-none d-md-inline"
-            ><i class="bi bi-check-circle me-1"></i>已保存</span
+            ><i class="bi bi-check-circle me-1"></i
+            >${this.cloud ? "云端保存状态见上方" : "已保存"}</span
           >
         </div>
       </header>

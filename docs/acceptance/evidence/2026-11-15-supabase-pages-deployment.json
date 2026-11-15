@@ -1,0 +1,36 @@
+{
+  "startedAt": "2026-11-15T03:09:41.470Z",
+  "previousPages": {
+    "buildType": "legacy",
+    "source": {
+      "branch": "服务器版",
+      "path": "/"
+    },
+    "htmlUrl": "https://krc6666.github.io/autoschedule-new/",
+    "httpsEnforced": true
+  },
+  "branch": "gh-pages",
+  "commit": "a2aed7529b853b290c438160784e52e964b611e2",
+  "settingsUpdated": true,
+  "buildRequested": true,
+  "sourceUpdateStatus": 204,
+  "currentPages": {
+    "source": {
+      "branch": "gh-pages",
+      "path": "/"
+    },
+    "status": "built",
+    "buildType": "legacy",
+    "htmlUrl": "https://krc6666.github.io/autoschedule-new/",
+    "httpsEnforced": true
+  },
+  "buildRequestStatus": 201,
+  "latestBuild": {
+    "status": "building",
+    "commit": "a2aed7529b853b290c438160784e52e964b611e2",
+    "error": {
+      "message": null
+    },
+    "updatedAt": "2026-11-15T03:10:08Z"
+  }
+}

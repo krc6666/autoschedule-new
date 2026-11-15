@@ -8,20 +8,34 @@ import { getLastRestorationReport } from "./infrastructure/state-restoration";
 import { browserStatePersistence } from "./infrastructure/storage";
 import { createBrowserScheduleRunController } from "./app/schedule-run-controller";
 import { installBrowserExitWarning } from "./app/browser-exit-warning";
+import type { AutoscheduleStore } from "./app/store/autoschedule-store";
+import type { ApplicationPreferences } from "./app/application-preferences";
 
 export interface MountedAutoscheduleApp {
   dispose(): void;
+  canTransferWorkspace(): boolean;
 }
 
 export function mountAutoscheduleApp(
-  root: HTMLElement
+  root: HTMLElement,
+  options: {
+    store?: AutoscheduleStore;
+    cloud?: boolean;
+    preferences?: ApplicationPreferences;
+    shouldWarnOnExit?: () => boolean;
+  } = {}
 ): MountedAutoscheduleApp {
   const errorBoundary = installGlobalErrorBoundary(root);
-  const store = createAutoscheduleStore({
-    persistence: browserStatePersistence,
-  });
-  const removeBrowserExitWarning = installBrowserExitWarning(window, () =>
-    store.getState().hasUnexportedChanges()
+  const store =
+    options.store ??
+    createAutoscheduleStore({
+      persistence: browserStatePersistence,
+    });
+  const removeBrowserExitWarning = installBrowserExitWarning(
+    window,
+    () =>
+      (options.shouldWarnOnExit?.() ?? false) ||
+      store.getState().hasUnexportedChanges()
   );
   const restoredScheduleNotice = store.getState().model.assignments.length > 0;
   const restorationIssues = getLastRestorationReport().issues;
@@ -30,7 +44,7 @@ export function mountAutoscheduleApp(
   const coordinator = new ApplicationCoordinator(
     store,
     {
-      preferences: createBrowserPreferences(),
+      preferences: options.preferences ?? createBrowserPreferences(),
       restoredScheduleNotice,
       onViewChange: (view) => {
         element.view = view;
@@ -41,6 +55,7 @@ export function mountAutoscheduleApp(
     }
   );
   element.commandHandler = coordinator;
+  element.cloud = options.cloud ?? false;
   element.model = store.getState().model;
   const unsubscribe = store.subscribe((state) => {
     element.model = state.model;
@@ -54,7 +69,9 @@ export function mountAutoscheduleApp(
     );
   }
   return {
+    canTransferWorkspace: () => coordinator.canTransferWorkspace(),
     dispose: () => {
+      coordinator.scheduleRunner.stopWithoutResult();
       removeBrowserExitWarning();
       unsubscribe();
       element.remove();

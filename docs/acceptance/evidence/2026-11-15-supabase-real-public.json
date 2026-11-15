@@ -1,0 +1,36 @@
+{
+  "checkedAt": "2026-11-15T03:01:40.643Z",
+  "scope": "Real hosted Supabase publication read anonymously and rendered in local Chrome app; no mock, login or write",
+  "publicationHttpStatus": 200,
+  "publicFieldWhitelistVerified": true,
+  "publicationRows": 44,
+  "runs": [
+    {
+      "viewport": "desktop",
+      "width": 1440,
+      "height": 900,
+      "renderedRows": 44,
+      "rowsMatchPublication": true,
+      "privateUiCount": 0,
+      "pageErrors": [],
+      "cloudCalls": ["/rest/v1/rpc/cloud_read_publication"],
+      "bodyOverflow": false,
+      "storageState": "Fresh isolated context; no administrator session"
+    },
+    {
+      "viewport": "mobile",
+      "width": 390,
+      "height": 844,
+      "renderedRows": 44,
+      "rowsMatchPublication": true,
+      "privateUiCount": 0,
+      "pageErrors": [],
+      "cloudCalls": ["/rest/v1/rpc/cloud_read_publication"],
+      "bodyOverflow": false,
+      "storageState": "Fresh isolated context; no administrator session"
+    }
+  ],
+  "screenshots": "Publication tbody masked to avoid recording personal names or schedule contents",
+  "publicFrontendDeployed": false,
+  "physicalMobileNetworkVerified": false
+}

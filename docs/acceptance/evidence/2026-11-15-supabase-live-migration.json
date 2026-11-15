@@ -1,0 +1,39 @@
+{
+  "scope": "Read-only checks after owner reported migration success; no login, writes or data uploads",
+  "checkedAt": "2026-11-15T02:39:16.296Z",
+  "results": [
+    {
+      "endpoint": "/auth/v1/health",
+      "status": 200,
+      "body": {
+        "version": "v2.197.0",
+        "name": "GoTrue",
+        "description": "GoTrue is a user registration and authentication API"
+      }
+    },
+    {
+      "endpoint": "/rest/v1/rpc/cloud_read_publication",
+      "status": 200,
+      "body": null
+    },
+    {
+      "endpoint": "/rest/v1/rpc/cloud_load_workspace",
+      "status": 401,
+      "body": {
+        "code": "42501",
+        "details": null,
+        "hint": null,
+        "message": "permission denied for function cloud_load_workspace"
+      }
+    },
+    {
+      "endpoint": "/auth/v1/settings",
+      "status": 200,
+      "body": {
+        "disable_signup": false,
+        "email_autoconfirm": false,
+        "email_login_enabled": true
+      }
+    }
+  ]
+}

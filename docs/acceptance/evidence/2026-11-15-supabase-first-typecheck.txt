@@ -1,0 +1,10 @@
+
+> autoschedule@1.0.0 verify
+> npm run typecheck && npm test && npm run test:performance && npm run build
+
+
+> autoschedule@1.0.0 typecheck
+> tsc -b --pretty false
+
+src/infrastructure/supabase-config.ts(38,39): error TS2550: Property 'replaceAll' does not exist on type 'string'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2021' or later.
+vite.config.ts(3,40): error TS6307: File 'D:/autoschedule-migrate/autoschedule/src/infrastructure/supabase-config.ts' is not listed within the file list of project 'D:/autoschedule-migrate/autoschedule/tsconfig.node.json'. Projects must list all files or use an 'include' pattern.

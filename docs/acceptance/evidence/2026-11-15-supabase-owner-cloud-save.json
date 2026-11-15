@@ -1,0 +1,10 @@
+{
+  "recordedAt": "2026-11-15T02:58:15.8712860+00:00",
+  "source": "Owner supplied the success message from the real application",
+  "message": "已保存到云端。公开班表仍需单独发布。",
+  "cloudSave": "owner_confirmed",
+  "savedDatasetContents": "not_independently_verified",
+  "publication": "awaiting_owner_generated_link_or_message",
+  "signupSetting": "deferred_at_owner_request",
+  "publicDeployment": false
+}

@@ -1,0 +1,41 @@
+Source commit verification after Prettier; VITEST_MAX_WORKERS=2
+
+> autoschedule@1.0.0 verify
+> npm run typecheck && npm test && npm run test:performance && npm run build
+
+
+> autoschedule@1.0.0 typecheck
+> tsc -b --pretty false
+
+
+> autoschedule@1.0.0 test
+> vitest run --exclude tests/performance/**
+
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/infrastructure/supabase-backend.test.ts (5 tests | 1 failed) 80ms
+     × rejects corrupted workspace without silently falling back to default people or dropping records 20ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/infrastructure/supabase-backend.test.ts > official Supabase SDK adapter > rejects corrupted workspace without silently falling back to default people or dropping records
+AssertionError: expected [Function] to throw an error
+ ❯ tests/infrastructure/supabase-backend.test.ts:77:50
+     75|     const missingRoot = JSON.parse(JSON.stringify(model));
+     76|     delete missingRoot.staff;
+     77|     expect(() => restoreCloudModel(missingRoot)).toThrow();
+       |                                                  ^
+     78|     const broken = JSON.parse(JSON.stringify(model));
+     79|     delete broken.groups.A.staff;
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 195 passed (196)
+      Tests  1 failed | 1941 passed (1942)
+   Start at  11:29:10
+   Duration  152.76s (transform 9.52s, setup 0ms, import 45.68s, tests 201.41s, environment 14.46s)
+
+
+Verification exit code: 1

@@ -1,0 +1,11 @@
+{
+  "url": "http://127.0.0.1:5173/",
+  "runtime": "Isolated Chrome; actual Vite app and real Supabase configuration",
+  "loginEmailField": 1,
+  "loginPasswordField": 1,
+  "editorBeforeLogin": 0,
+  "pageErrors": [],
+  "adminBinding": "Owner reported SQL success; login verification pending",
+  "signupSetting": "Owner explicitly deferred; unchanged",
+  "publicDeployment": false
+}

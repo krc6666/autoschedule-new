@@ -1,0 +1,7 @@
+{
+  "checkedAt": "2026-11-15T03:10:36.110Z",
+  "status": 200,
+  "entryHashMatchesRelease": true,
+  "entrySha256": "c4bf6ef10fae2b38ea08b12496ccc015886e852416943092bcbbd688ebf21720",
+  "expectedSha256": "c4bf6ef10fae2b38ea08b12496ccc015886e852416943092bcbbd688ebf21720"
+}

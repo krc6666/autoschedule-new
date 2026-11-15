@@ -201,6 +201,14 @@ export class ApplicationCoordinator implements ApplicationContext {
     return this.store.getState().model;
   }
 
+  canTransferWorkspace(): boolean {
+    return (
+      !this.scheduleCommandPending &&
+      !this.scheduleRunner.isRunning() &&
+      !this.currentView.historyEditDate
+    );
+  }
+
   updateView(patch: Partial<ApplicationViewState>): void {
     if (isPreflightDialog(patch.dialog)) {
       const draft = capturePreflightDraft(patch.dialog);

@@ -1,0 +1,30 @@
+{
+  "recordedAt": "2026-11-15T02:53:12.3946889+00:00",
+  "administratorLogin": {
+    "status": "owner_confirmed",
+    "source": "Owner replied that the administrator can enter the workspace; agent did not receive a password."
+  },
+  "displayedData": {
+    "status": "initial_data",
+    "source": "Owner confirmed the initial dataset is displayed and their actual configuration still needs import."
+  },
+  "actualConfigurationUpload": "not_yet_verified",
+  "registrationSetting": "unchanged_at_owner_explicit_request",
+  "githubInspection": {
+    "authenticatedReadOnly": true,
+    "canPush": true,
+    "defaultBranch": "服务器版",
+    "pagesUrl": "https://krc6666.github.io/autoschedule-new/",
+    "pagesBuildType": "legacy",
+    "pagesSourceBranch": "服务器版",
+    "pagesSourcePath": "/",
+    "cloudUrlBuildVariable": false,
+    "cloudKeyBuildVariable": false
+  },
+  "releaseCheck": {
+    "command": "node scripts/check-acceptance.mjs",
+    "exitCode": 1,
+    "result": "Existing historical acceptance tasks and the current cloud final artifact remain unverified. No tasks were deleted or marked passed."
+  },
+  "remoteChangesMade": false
+}

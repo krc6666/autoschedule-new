@@ -1,0 +1,19 @@
+{
+  "scope": "Reversible preparation of public build variables only",
+  "checkedAt": "2026-11-15T02:57:15.349Z",
+  "results": [
+    {
+      "name": "VITE_SUPABASE_URL",
+      "action": "created",
+      "verified": true
+    },
+    {
+      "name": "VITE_SUPABASE_PUBLISHABLE_KEY",
+      "action": "created",
+      "verified": true
+    }
+  ],
+  "deployed": false,
+  "pushed": false,
+  "pagesConfigurationChanged": false
+}

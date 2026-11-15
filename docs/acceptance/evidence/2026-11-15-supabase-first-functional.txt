@@ -1,0 +1,75 @@
+
+> autoschedule@1.0.0 verify
+> npm run typecheck && npm test && npm run test:performance && npm run build
+
+
+> autoschedule@1.0.0 typecheck
+> tsc -b --pretty false
+
+
+> autoschedule@1.0.0 test
+> vitest run --exclude tests/performance/**
+
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+npm.cmd : stderr | tests/ui/cloud-application.test.ts
+所在位置 行:3 字符: 1
++ npm.cmd run verify *> docs/acceptance/evidence/2026-11-15-supabase-ve ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (stderr | tests/...ication.test.ts:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+
+ ❯ tests/ui/cloud-application.test.ts (10 tests | 3 failed) 501ms
+     × actual save button uploads edited model and reports failure without marking it saved 30ms
+     × actual publish button returns a stable static-site link and leaves it intact on failure 15ms
+     × mounts the real editor and keeps its ordinary local save distinct from explicit cloud upload 299ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/ui/cloud-application.test.ts > cloud entry controls and public view > actual save button uploads edited mo
+del and reports failure without marking it saved
+TypeError: Cannot read properties of undefined (reading 'click')
+ ❯ tests/ui/cloud-application.test.ts:97:10
+     95|       (b) => b.textContent === "保存到云端"
+     96|     )!;
+     97|     save.click();
+       |          ^
+     98|     await settle();
+     99|     expect(app.root.textContent).toContain("保存网络失败");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  tests/ui/cloud-application.test.ts > cloud entry controls and public view > actual publish button returns a stab
+le static-site link and leaves it intact on failure
+TypeError: Cannot read properties of undefined (reading 'click')
+ ❯ tests/ui/cloud-application.test.ts:194:13
+    192|       (b) => b.textContent === "发布当前组班表"
+    193|     )!;
+    194|     publish.click();
+       |             ^
+    195|     await settle();
+    196|     const link =
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  tests/ui/cloud-application.test.ts > cloud entry controls and public view > mounts the real editor and keeps its
+ ordinary local save distinct from explicit cloud upload
+TypeError: Cannot read properties of undefined (reading 'click')
+ ❯ tests/ui/cloud-application.test.ts:265:55
+    263|     expect(fixture.backend.save).toHaveBeenCalledTimes(before);
+    264|     [...root.querySelectorAll("button")]
+    265|       .find((button) => button.textContent === "保存到云端")!
+       |                                                       ^
+    266|       .click();
+    267|     await settle();
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+ Test Files  1 failed | 194 passed (195)
+      Tests  3 failed | 1936 passed (1939)
+   Start at  09:58:30
+   Duration  149.92s (transform 9.42s, setup 0ms, import 44.66s, tests 198.80s, environment 13.75s)

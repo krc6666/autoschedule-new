@@ -1,0 +1,237 @@
+{
+  "createdAt": "2026-11-15T03:04:34.096Z",
+  "releaseDirectory": "C:\\Users\\19598\\AppData\\Local\\Temp\\autoschedule-cloud-release-20261115T030433185Z",
+  "files": [
+    {
+      "path": ".nojekyll",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "assets/__vite-browser-external-D7Ct-6yo.js",
+      "sha256": "80b82acfeb87bf2cb6a47b0aa48e078951b8a2616fe5059cec7bc46dd650621d"
+    },
+    {
+      "path": "assets/__vite-browser-external-D7Ct-6yo.js.map",
+      "sha256": "0fadc89673a49fed87ee19c0a87ca6a19074ed5c9052ee7d869cfe6c68686c71"
+    },
+    {
+      "path": "assets/bootstrap-icons-BeopsB42.woff",
+      "sha256": "f55513b7b591cb84a3b87ff0e34ea24d4831d6fedc22e54b911ca64b5b544a15"
+    },
+    {
+      "path": "assets/bootstrap-icons-mSm7cUeB.woff2",
+      "sha256": "6c75710364a1ca5604267716f6d28997b26319fdb078cf11e0b42ab66ff2ea61"
+    },
+    {
+      "path": "assets/cloud-application-DKEobWab.js",
+      "sha256": "1682a0ae3497fad84161ea228056fd02a4b176549a5c1d3add2e2d4a0c14baf8"
+    },
+    {
+      "path": "assets/cloud-application-DKEobWab.js.map",
+      "sha256": "365145ab306c37bd6fedaec3e01bff9639a22faed9a6226ceabbf81d573298da"
+    },
+    {
+      "path": "assets/duty-roster-excel-w5lteVE3.js",
+      "sha256": "1452a3343529e53a531489454794cc23820f7dec6b35bf4524d58ca97531ebdc"
+    },
+    {
+      "path": "assets/duty-roster-excel-w5lteVE3.js.map",
+      "sha256": "f99fa9a62d4976381420f1877151bff28e65caaffd5eb1b6f5a9dc5a7d73aabc"
+    },
+    {
+      "path": "assets/excel-BRIqU0mm.js",
+      "sha256": "b9d27300d5c9e76a283e1ba0f155a5160396cebfdde3bea57928d21030c60c7c"
+    },
+    {
+      "path": "assets/excel-BRIqU0mm.js.map",
+      "sha256": "730511b826351ead9eb1ea3675b469f8606f42f55b56d12f4d640e08c33ee3b3"
+    },
+    {
+      "path": "assets/excel-worksheet-C30b9pTp.js",
+      "sha256": "201a27d1ed2834da8fd5a32af2e4d8054f34288f5ead86a22b0500f115ba0b89"
+    },
+    {
+      "path": "assets/excel-worksheet-C30b9pTp.js.map",
+      "sha256": "344f92bb78acdca3c78806c2f64a0454694873b5efe93383152bd3146348f16b"
+    },
+    {
+      "path": "assets/highs-BC-phg6l.js",
+      "sha256": "d0e6f76ac8f7c9edcaca283a53e34699f70f3d2bb6a4875b9461375a16b6b06e"
+    },
+    {
+      "path": "assets/highs-BC-phg6l.js.map",
+      "sha256": "3d0d092ca49a53beb6d8e6d71cf4f27cecdf2a8224888b9dbe39b42323b7d76d"
+    },
+    {
+      "path": "assets/highs-BWKFkgAM.js",
+      "sha256": "96ee84d0132f812e21943c82fa0b005e0a0e8346bff87393714a39c1d3f1218d"
+    },
+    {
+      "path": "assets/highs-BWKFkgAM.js.map",
+      "sha256": "613e5d299b910267798f226c4993a4dd22fa5dbaade928c67891f4ecce656469"
+    },
+    {
+      "path": "assets/highs-D01W9kFF.wasm",
+      "sha256": "2a95cbf93774622cf4b9ba7650017159aedcec83223f9f1ae5f486818f53a08a"
+    },
+    {
+      "path": "assets/highs-DEeTqoGR.wasm",
+      "sha256": "36e68fe5cdd886bedb12c39ab498b6f316bc38936bc11a94ea956face8b85fe2"
+    },
+    {
+      "path": "assets/highs-DN70-a7y.js",
+      "sha256": "dba6b4d193b8af20ad46b6f087a3c11ddbce46ac62101e673f5b10fe17364942"
+    },
+    {
+      "path": "assets/highs-DN70-a7y.js.map",
+      "sha256": "73a0dd6e80e1561f8df64ecbd98040a1400ec47592cead9aef1e31f7aa124dc9"
+    },
+    {
+      "path": "assets/highs-solver-CdMgLv0o.js",
+      "sha256": "819eb074cf44030804e1fec5a9526554f6779e8de5b107f2b9937059c1a2c15a"
+    },
+    {
+      "path": "assets/highs-solver-CdMgLv0o.js.map",
+      "sha256": "441440ba5233ce03ea17a73b388688a55cb7d5409b28a3dac90774f59cf2eb00"
+    },
+    {
+      "path": "assets/highs-xOAHumeT.js",
+      "sha256": "304a37b22cd6d4ccb137ff5a68f27f53bb138a24e5cdd3c12014418b8653110f"
+    },
+    {
+      "path": "assets/highs-xOAHumeT.js.map",
+      "sha256": "75d4f17b259637cacb712294625cf0ecad1927e7a4ec34a972d0693483876642"
+    },
+    {
+      "path": "assets/html2canvas.esm-DXEQVQnt.js",
+      "sha256": "8c46cc1bb52e600a4f397027529ced15488e01a9ca234cbf3649596841edf983"
+    },
+    {
+      "path": "assets/html2canvas.esm-DXEQVQnt.js.map",
+      "sha256": "8083194f8c8c35ae39fd30a2eba662c5be99b4faefd5b2a4197bc655f3c3ef17"
+    },
+    {
+      "path": "assets/index-CgXxUXPL.js",
+      "sha256": "e238a36d3ed284ccaaff0327e54b8f68212f90841c2aa9d10ab7c3c41ec68a7c"
+    },
+    {
+      "path": "assets/index-CgXxUXPL.js.map",
+      "sha256": "497b9f0676c5648df3c1f22603ba64b2023088b94afd3518812b895e6277f4d7"
+    },
+    {
+      "path": "assets/late-priority-counts-excel-BnOmnG32.js",
+      "sha256": "d6921a25276bb7bb202e3585a909d4667d44790e40f7305874f1050aea1db3ba"
+    },
+    {
+      "path": "assets/late-priority-counts-excel-BnOmnG32.js.map",
+      "sha256": "44af56ab19a63823b8fb40eab519adc8a5e579ee72f70a4e558f891c1a410b2e"
+    },
+    {
+      "path": "assets/schedule.worker-ZdQqs24G.js",
+      "sha256": "6e53ba20f87a6fc69e1c46d3f32aeb74e14b7626bc2d31d2848f721ab062fbc5"
+    },
+    {
+      "path": "assets/schedule.worker-ZdQqs24G.js.map",
+      "sha256": "0e088a31c1f0e73676230cf1e38a1a7b97fd2959981cd3d6c85cd8a7cb86e428"
+    },
+    {
+      "path": "assets/style-CzPXRm7y.css",
+      "sha256": "0ea1fe890c1f3ba5fcb121832ae7c6a711548cc3b2adc65aab4fc2d8d08443a7"
+    },
+    {
+      "path": "assets/supabase-backend-DWLOdSW1.js",
+      "sha256": "b0e2a55838f3b83b09ee16aaae8d9553220816d94a69c187e9aec4cb5d74a542"
+    },
+    {
+      "path": "assets/supabase-backend-DWLOdSW1.js.map",
+      "sha256": "c7a89e4d1d83acbd709f1ba328e193ad7f7e55d2d871e7f29a34c08db7e4c2d7"
+    },
+    {
+      "path": "assets/xlsx.min-DYF2L--I.js",
+      "sha256": "c4ce47940dc49a8b66b9eb42238fac621630c5def9d3d4aa18eef4cbff4ea1b5"
+    },
+    {
+      "path": "assets/xlsx.min-DYF2L--I.js.map",
+      "sha256": "cda9151fd44a435123cddd42f3128307d2ddb08fed0ad76d287c7318d58576d5"
+    },
+    {
+      "path": "index.html",
+      "sha256": "c4bf6ef10fae2b38ea08b12496ccc015886e852416943092bcbbd688ebf21720"
+    },
+    {
+      "path": "template/排班工具配置模板.xlsx",
+      "sha256": "f9f0c50f02c1cd57f77bba8ae32ddb80d71f6f5082271e2c3c83cb3d4510deca"
+    },
+    {
+      "path": "航班计划脚本/flight-filter.user.js",
+      "sha256": "ca3023c239982eeabd21240aeaa7ba7a27b3f373ed827d3ac7973da2d0962d3e"
+    },
+    {
+      "path": "航班计划脚本/flights.css",
+      "sha256": "21e3ed47604b6620b02caef9d47f86ff09a7ae1b8f7de0d0b021f3e93d359423"
+    },
+    {
+      "path": "航班计划脚本/flights.html",
+      "sha256": "0d435a2cca4fea9d76529fdd97e9cad46799bb2fad91a076bed36cd4b9998677"
+    },
+    {
+      "path": "航班计划脚本/flights.js",
+      "sha256": "447d49634ca2353baf7964e90ba11e2aaae01892e7455e291a9d9792a99001af"
+    }
+  ],
+  "existingCandidateFilesUnchanged": true,
+  "publicRowsVerified": 44,
+  "githubPagesPlan": {
+    "newArtifactBranch": "gh-pages",
+    "currentSourceBranch": "服务器版",
+    "currentSourcePath": "/",
+    "newSourcePath": "/",
+    "website": "https://krc6666.github.io/autoschedule-new/",
+    "rollback": "Restore previous Pages source branch and path; keep release branch for review"
+  },
+  "gate": {
+    "exitCode": 1,
+    "totalBlockedRecords": 37,
+    "olderBlockedRecords": 36,
+    "olderBlockers": [
+      "2026-10-05-unsaved-export-exit-warning / finalArtifact：尚未验收通过（unverified）",
+      "2026-10-12-local-vacancy-recovery / finalArtifact：尚未验收通过（unverified）",
+      "2026-10-12-policy-diagnostics / finalArtifact：尚未验收通过（unverified）",
+      "2026-10-12-schedule-failure-language / finalArtifact：尚未验收通过（unverified）",
+      "2026-10-12-vacancy-toast-only / finalArtifact：尚未验收通过（unverified）",
+      "2026-10-13-supervisor-coverage-performance / finalArtifact：尚未验收通过（unverified）",
+      "2026-10-13-vacancy-toast-reasons / finalArtifact：尚未验收通过（unverified）",
+      "2026-10-14-supervisor-gap-fill / finalArtifact：尚未验收通过（unverified）",
+      "2026-10-15-history-manual-corrections / finalArtifact：尚未验收通过（unverified）",
+      "2026-10-15-mobile-supervisor-statistics / finalArtifact：尚未验收通过（unverified）",
+      "2026-10-15-qualification-count-display / finalArtifact：尚未验收通过（unverified）",
+      "2026-10-16-actionable-warning-reasons / finalArtifact：尚未验收通过（unverified）",
+      "2026-10-16-category-independent-statistics / finalArtifact：尚未验收通过（unverified）",
+      "2026-10-17-manual-cx-duty-overlap / finalArtifact：尚未验收通过（unverified）",
+      "2026-10-17-weekly-plan-generate-default / reproduction：必须说明验证结果或不适用原因",
+      "2026-10-26-group-specific-scheduling-config / finalArtifact：尚未验收通过（unverified）",
+      "2026-10-26-template-position-rules-sync / finalArtifact：尚未验收通过（unverified）",
+      "2026-10-27-import-flow-usability / finalArtifact：尚未验收通过（unverified）",
+      "2026-10-27-position-rule-flights-to-template / finalArtifact：尚未验收通过（unverified）",
+      "2026-10-27-weekly-plan-config-import / finalArtifact：尚未验收通过（unverified）",
+      "2026-10-27-weekly-plan-import-safety / finalArtifact：尚未验收通过（unverified）",
+      "2026-11-08-template-orphan-cleanup / finalArtifact：尚未验收通过（unverified）",
+      "2026-11-10-monthly-staff-fatigue / finalArtifact：尚未验收通过（unverified）",
+      "2026-11-10-schedule-timeout-adopt / finalArtifact：尚未验收通过（unverified）",
+      "2026-11-11-duty-afternoon-flight-floor / finalArtifact：尚未验收通过（unverified）",
+      "2026-11-11-flight-config-device-restore / finalArtifact：尚未验收通过（unverified）",
+      "2026-11-11-flight-season-review / finalArtifact：尚未验收通过（unverified）",
+      "2026-11-11-position-summary-compact / finalArtifact：尚未验收通过（unverified）",
+      "2026-11-11-season-sync-preserve-positions / finalArtifact：尚未验收通过（unverified）",
+      "2026-11-13-preflight-memory / finalArtifact：尚未验收通过（unverified）",
+      "2026-11-14-airline-mix / finalArtifact：尚未验收通过（unverified）",
+      "2026-11-14-duty-afternoon-relief / finalArtifact：尚未验收通过（unverified）",
+      "2026-11-14-staff-work-continuity / finalArtifact：尚未验收通过（unverified）",
+      "flights-page-weekly-plan-layout-20261008 / reproduction：已验证项必须附证据",
+      "schedule-preflight-duty-status-20261007 / finalArtifact：尚未验收通过（unverified）",
+      "schedule-preflight-roster-default-20261008 / finalArtifact：尚未验收通过（unverified）"
+    ]
+  },
+  "approvalNeeded": "Existing AGENTS.md requires all old acceptance tasks before release; one-release exception or completion of old acceptance is required. No deployment, artifact commit or push has happened.",
+  "metadataCorrection": "Prior source-branch label corrected using API snapshot; published artifact bytes unchanged"
+}

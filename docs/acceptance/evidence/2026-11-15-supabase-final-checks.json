@@ -1,0 +1,29 @@
+{
+  "functional": {
+    "files": 196,
+    "tests": 1942,
+    "seconds": 146.51
+  },
+  "performance": {
+    "files": 7,
+    "tests": 19,
+    "seconds": 193.44,
+    "workers": 2,
+    "scope": "Single local Windows run; no performance improvement claimed"
+  },
+  "typecheck": "passed before tests in the verify chain",
+  "productionBuild": {
+    "status": "passed",
+    "seconds": 7.11,
+    "entrySha256": "547db1f7c16db100a32fa3801db10287f85c6d7fac5584eca731a493822781c7"
+  },
+  "cloudArtifactsRehashed": true,
+  "sqlScriptsRehashed": true,
+  "privateKeyGuard": "Build rejection exit 1 as expected; synthetic key only",
+  "sqlRuntime": "PGlite with simulated auth role claims",
+  "authTransport": "Official SDK with simulated HTTP",
+  "ui": "Happy DOM controls and actual editor mounting",
+  "liveSupabase": false,
+  "realDeviceAndMobileNetwork": false,
+  "deployed": false
+}

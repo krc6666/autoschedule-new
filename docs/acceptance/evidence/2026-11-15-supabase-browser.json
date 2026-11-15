@@ -1,0 +1,18 @@
+{
+  "status": "passed",
+  "runtime": "Installed Chrome, isolated contexts, production cloud bundle",
+  "backend": "Intercepted synthetic Auth/RPC responses; no hosted Supabase, no remote requests",
+  "checks": [
+    "login gate",
+    "real login form through official SDK",
+    "explicit cloud save preserves both group containers",
+    "logout removes editor",
+    "anonymous public read uses only publication RPC",
+    "1440x900 and 390x844 public view without body overflow",
+    "untrusted remark rendered as text, no img element"
+  ],
+  "pageErrors": [],
+  "liveSupabase": false,
+  "mobileNetwork": false,
+  "deployed": false
+}

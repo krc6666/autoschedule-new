@@ -1,0 +1,15 @@
+{
+  "recordedAt": "2026-11-15T03:08:13.6033014+00:00",
+  "source": "Owner reply to the concrete release approval question",
+  "reply": "允许本次上线，保留历史待验收",
+  "scope": [
+    "创建并推送独立静态发布分支",
+    "更新现有GitHub Pages来源",
+    "仅对本次上线放行历史验收阻塞",
+    "保留全部历史待验收记录",
+    "失败时恢复原Pages来源"
+  ],
+  "currentCloudPreview": "44行真实快照，独立匿名浏览器及生产预览通过",
+  "futureReleases": "本次放行不修改后续发布门禁",
+  "remoteChanged": false
+}
