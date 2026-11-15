@@ -356,6 +356,10 @@ describe("schedule page", () => {
         status: "assigned",
       },
     ];
+    state.assignments.push({
+      ...state.assignments[0]!,
+      id: "second-candidate-target",
+    });
     const commands: UiCommandEvent["detail"][] = [];
     const element = await mountElement<
       HTMLElement & { updateComplete: Promise<unknown> }
@@ -399,6 +403,53 @@ describe("schedule page", () => {
     await settleLit();
     expect(element.querySelector(".schedule-candidate-menu")).toBeTruthy();
 
+    const beforeDismiss = structuredClone(state);
+    const outsideTargets = [
+      element.querySelector<HTMLElement>(".schedule-flight-head")!,
+      element.querySelector<HTMLElement>(".schedule-name-input")!,
+      document.body,
+    ];
+    for (const target of outsideTargets) {
+      target.click();
+      await settleLit();
+      expect(element.querySelector(".schedule-candidate-menu")).toBeNull();
+      expect(commands).toEqual([]);
+      expect(state).toEqual(beforeDismiss);
+      candidateTrigger?.querySelector<HTMLElement>("i")?.click();
+      await settleLit();
+      expect(element.querySelector(".schedule-candidate-menu")).toBeTruthy();
+    }
+
+    // A click inside the menu must leave the options available for selection.
+    element.querySelector<HTMLElement>(".schedule-candidate-menu")?.click();
+    await settleLit();
+    expect(element.querySelector(".schedule-candidate-menu")).toBeTruthy();
+
+    // Document capture must also see clicks whose bubble phase is stopped.
+    const outsideButton = document.createElement("button");
+    outsideButton.addEventListener("click", (event) => event.stopPropagation());
+    document.body.append(outsideButton);
+    outsideButton.click();
+    await settleLit();
+    expect(element.querySelector(".schedule-candidate-menu")).toBeNull();
+    candidateTrigger?.click();
+    await settleLit();
+
+    const otherTrigger = element.querySelectorAll<HTMLButtonElement>(
+      ".schedule-position-cell .schedule-candidate-trigger"
+    )[1]!;
+    otherTrigger.click();
+    await settleLit();
+    expect(element.querySelectorAll(".schedule-candidate-menu")).toHaveLength(
+      1
+    );
+    expect(
+      element.querySelector(".schedule-candidate-menu")?.closest("article")
+        ?.dataset.assignmentId
+    ).toBe("second-candidate-target");
+    candidateTrigger?.click();
+    await settleLit();
+
     element
       .querySelector<HTMLButtonElement>(".schedule-candidate-option")
       ?.click();
@@ -407,6 +458,8 @@ describe("schedule page", () => {
       assignmentId: "target-assignment",
       staffId: available!.id,
     });
+    await settleLit();
+    expect(element.querySelector(".schedule-candidate-menu")).toBeNull();
 
     element
       .querySelector<HTMLButtonElement>('button[aria-label="清空人员"]')
@@ -416,6 +469,21 @@ describe("schedule page", () => {
       assignmentId: "target-assignment",
       staffId: "",
     });
+
+    candidateTrigger?.click();
+    await settleLit();
+    const grid = element.querySelector("autoschedule-schedule-grid")!;
+    const gridParent = grid.parentElement!;
+    grid.remove();
+    gridParent.append(grid);
+    await settleLit();
+    expect(element.querySelector(".schedule-candidate-menu")).toBeNull();
+    candidateTrigger?.click();
+    await settleLit();
+    expect(element.querySelector(".schedule-candidate-menu")).toBeTruthy();
+    document.body.click();
+    await settleLit();
+    expect(element.querySelector(".schedule-candidate-menu")).toBeNull();
   });
 
   it("selects multiple regular staff as current-date half-rest preferences", async () => {

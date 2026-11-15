@@ -34,6 +34,43 @@ export class ScheduleGridElement extends LightDomElement {
   >();
   private candidateAssignmentId: string | null = null;
 
+  override connectedCallback(): void {
+    super.connectedCallback();
+    this.ownerDocument.addEventListener(
+      "click",
+      this.outsideCandidateClick,
+      true
+    );
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this.ownerDocument.removeEventListener(
+      "click",
+      this.outsideCandidateClick,
+      true
+    );
+    this.candidateAssignmentId = null;
+    this.requestUpdate();
+  }
+
+  private readonly outsideCandidateClick = (event: MouseEvent): void => {
+    if (this.candidateAssignmentId === null) return;
+    const inside = event
+      .composedPath()
+      .some(
+        (node) =>
+          node instanceof Element &&
+          this.contains(node) &&
+          (node.classList.contains("schedule-candidate-menu") ||
+            node.getAttribute("data-candidate-assignment-id") ===
+              this.candidateAssignmentId)
+      );
+    if (inside) return;
+    this.candidateAssignmentId = null;
+    this.requestUpdate();
+  };
+
   protected override render() {
     const groups = this.view.groups;
     return html`<div class="table-responsive schedule-board">
@@ -183,6 +220,7 @@ export class ScheduleGridElement extends LightDomElement {
               class="schedule-candidate-trigger"
               title="查看当前合格空闲人员"
               aria-label="查看${assignment.position}当前合格空闲人员"
+              data-candidate-assignment-id=${assignment.id}
               @click=${() => this.toggleCandidates(assignment.id)}
             >
               <i class="bi bi-person-plus" aria-hidden="true"></i>
@@ -224,6 +262,7 @@ export class ScheduleGridElement extends LightDomElement {
                     type="button"
                     title="查看当前可用人员"
                     aria-label="查看${assignment.position}可用人员"
+                    data-candidate-assignment-id=${assignment.id}
                     @click=${() => this.toggleCandidates(assignment.id)}
                   >
                     ${guide ? html`<span class="guide-tag">引</span>` : administrative ? html`<span class="admin-support-tag">行</span>` : diversion ? html`<span class="diversion-tag">流</span>` : null}${assignment.position}
@@ -272,6 +311,7 @@ export class ScheduleGridElement extends LightDomElement {
               class="schedule-candidate-trigger legacy-hidden-trigger"
               title="查看当前合格空闲人员"
               aria-label="查看${assignment.position}当前合格空闲人员"
+              data-candidate-assignment-id=${assignment.id}
               @pointerdown=${(event: Event) => event.stopPropagation()}
               @click=${() => this.toggleCandidates(assignment.id)}
             >
@@ -377,6 +417,7 @@ export class ScheduleGridElement extends LightDomElement {
 
   private selectCandidate(assignmentId: string, staffId: string): void {
     this.candidateAssignmentId = null;
+    this.requestUpdate();
     dispatchUiCommand(this, {
       type: "assign-staff",
       assignmentId,

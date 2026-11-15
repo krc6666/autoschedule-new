@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-15-candidate-menu-dismiss",
+  "title": "空闲人员候选列表点击外部收起",
+  "startedFrom": "cf633c8765d4bcbb8e5b5c303cd995e5a4dcf05f",
+  "expectation": {
+    "example": "点击空白岗位加号展开合格空闲人员，再点击班表其他单元格、标题或页面其他区域。",
+    "expected": "点击列表外部立即收起；原加号仍可切换展开/收起；另一岗位直接切换列表；点击列表内部不误关，选人正常提交并收起。",
+    "unchanged": "只改ScheduleGrid临时视图；候选资格、人工分配命令、求解、最终安全、工时疲劳、配置及存储合同保持。原PROJECT_MAP.md改动保留。",
+    "fallback": "关闭只丢弃列表展开状态，不派人、不保存、不清空班表；选人仍由原应用入口及安全检查处理。"
+  },
+  "testedVersion": "07d6c1d905ec39e7a18fe2f129dec6a70d3429c446775db6b83e46d1aefd23f2",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "先运行目标组件测试证明原故障，再实现外部点击关闭；回归已通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-candidate-menu-dismiss-before.txt",
+          "summary": "改前目标测试退出1：点班表标题列表仍可见。",
+          "sha256": "90b5c9a3db307978a732607849be6d480bc9849755afc0fcfca90ca9223cec84"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-candidate-menu-dismiss-regression.txt",
+          "summary": "4文件99项通过：SchedulePage组件及人工分配/清空相关App链路。",
+          "sha256": "842271d7ee190bb52796f70661622c376b583cd1c2b9ae80d680f2ab33e2ebd9"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "班表标题、同一岗位姓名框及页面body点击均关闭；无业务命令，完整AppState保持。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-candidate-menu-dismiss-regression.txt",
+          "summary": "4文件99项通过：SchedulePage组件及人工分配/清空相关App链路。",
+          "sha256": "842271d7ee190bb52796f70661622c376b583cd1c2b9ae80d680f2ab33e2ebd9"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "图标内部及原入口开关、另一岗位切换、列表内部、停止冒泡外部按钮、移除重连、选择姓名并收起均验证。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-candidate-menu-dismiss-regression.txt",
+          "summary": "4文件99项通过：SchedulePage组件及人工分配/清空相关App链路。",
+          "sha256": "842271d7ee190bb52796f70661622c376b583cd1c2b9ae80d680f2ab33e2ebd9"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "not_applicable",
+      "reason": "只改UI临时展开状态；未进入求解、补位、轮岗或历史后置流程。",
+      "evidence": []
+    },
+    "finalGuard": {
+      "status": "not_applicable",
+      "reason": "关闭菜单不写业务数据；选人仍发同一assign-staff命令，未修改应用最终安全入口。相关App回归已验证。",
+      "evidence": []
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "原候选过滤、人工分配/清空命令、App动作均通过；类型检查通过。未改领域、存储、统计及样式，PROJECT_MAP原哈希保持。 Owner授权提交后完整verify亦通过；并发2，原时限不变。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-candidate-menu-dismiss-regression.txt",
+          "summary": "4文件99项通过：SchedulePage组件及人工分配/清空相关App链路。",
+          "sha256": "842271d7ee190bb52796f70661622c376b583cd1c2b9ae80d680f2ab33e2ebd9"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-candidate-menu-dismiss-typecheck.txt",
+          "summary": "tsc -b --pretty false退出0。",
+          "sha256": "9cc4a4b068d1967e69a81958f6488618050290e631ae37970b64d0a1e0f0dd1a"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-candidate-menu-dismiss-commit-verify.txt",
+          "summary": "完整verify退出0：206文件2033项功能、7文件19项性能、类型检查和生产构建通过。",
+          "sha256": "8d7e1b7220afb4692abd69fd35e62c28a42fc435ad9ea59fed6c3c8fc5cb8673"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "源码位于Owner指定D:/autoschedule-migrate/autoschedule；未主动打开或操作真实浏览器，等待原页面刷新后确认外部点击收起及正常选人。DOM通过不能代替现场。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-candidate-menu-dismiss-regression.txt",
+          "summary": "4文件99项通过：SchedulePage组件及人工分配/清空相关App链路。",
+          "sha256": "842271d7ee190bb52796f70661622c376b583cd1c2b9ae80d680f2ab33e2ebd9"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "before日志记录点击标题后列表未消失；regression日志记录同一真实组件及相关App共99项通过。",
+    "laterChanges": "三个入口都标记同一岗位ID，事件捕获保护列表内部和当前入口；测试覆盖另一岗位切换、停止冒泡、组件重连及选人闭合。求解及存储不拥有此临时状态。",
+    "finalArtifact": "Owner授权commit后完整verify及本仓dist生产构建通过；真实页面仍未验收，不宣称现场通过，未push或部署。"
+  },
+  "review": {
+    "missedScope": "排查了岗位名、可见加号及原隐藏加号三个入口，测试覆盖图标内部/同表其他格/页面外部/重连；实际浏览器显示仍未验证。",
+    "rootCause": "候选列表只有开关及选人状态，缺少外部点击的生命周期监听；选人后也缺少自主重新渲染。",
+    "earlyDetection": "新增弹出列表时就通过组件公共点击测试外部关闭、内部选择、当前入口再次点击和另一入口切换，并检查卸载监听清理。"
+  }
+}

@@ -1,0 +1,60 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+stderr | tests/ui/schedule-view.test.ts
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+
+ ❯ tests/ui/schedule-view.test.ts (23 tests | 1 failed | 18 skipped) 8828ms
+     × shows only qualified idle staff when a position is selected 160ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/ui/schedule-view.test.ts > schedule page > shows only qualified idle staff when a position is selected
+AssertionError: expected <div …(3)>…(1)</div> to be null
+
+- Expected:
+null
+
++ Received:
+<div
+  aria-label="督导可用人员"
+  class="schedule-candidate-menu"
+  role="listbox"
+>
+
+
+  <!--?lit$092243129$-->
+  <!---->
+  <button
+    class="schedule-candidate-option"
+    role="option"
+    type="button"
+  >
+
+
+    <!--?lit$092243129$-->
+    刘红
+
+
+  </button>
+  <!---->
+
+
+</div>
+
+ ❯ tests/ui/schedule-view.test.ts:411:65
+    409|       target.click();
+    410|       await settleLit();
+    411|       expect(element.querySelector(".schedule-candidate-menu")).toBeNu…
+       |                                                                 ^
+    412|       expect(commands).toEqual([]);
+    413|       expect(state).toEqual(beforeDismiss);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 11 skipped (12)
+      Tests  1 failed | 4 passed | 103 skipped (108)
+   Start at  21:15:32
+   Duration  11.18s (transform 5.00s, setup 0ms, import 7.78s, tests 8.83s, environment 1.66s)
+Exit code: 1
