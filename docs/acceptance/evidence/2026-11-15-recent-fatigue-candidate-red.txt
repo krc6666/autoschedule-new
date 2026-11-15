@@ -1,0 +1,32 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/domain/recent-fatigue-balance.test.ts (10 tests | 1 failed) 675ms
+     × retains the daily target in small-day candidate selection while catching up 16ms
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 9 passed (10)
+   Start at  17:48:05
+   Duration  2.72s (transform 1.55s, setup 0ms, import 1.76s, tests 675ms, environment 0ms)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/domain/recent-fatigue-balance.test.ts > supplemental recent fatigue balance > retains the daily target in small-day candidate selection while catching up
+AssertionError: expected +0 to be 4 // Object.is equality
+
+- Expected
++ Received
+
+- 4
++ 0
+
+ ❯ tests/domain/recent-fatigue-balance.test.ts:34:41
+     32|       1, 4, null, date, analyzeWorkloadPressure(state)
+     33|     );
+     34|     expect(priority.todayFatigueExcess).toBe(4);
+       |                                         ^
+     35|   });
+     36|   it("uses actual saved points, retaining zero and excluding current/f…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯

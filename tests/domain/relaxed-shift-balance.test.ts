@@ -89,6 +89,29 @@ function fixture() {
 }
 
 describe("monthly relaxed shift balance", () => {
+  it("shares recent fatigue protection instead of undoing it to balance monthly rest", () => {
+    const state = fixture();
+    state.history.forEach((r) => {
+      r.fatiguePoints = r.staffId === "p0" ? 6 : 1;
+    });
+    const run = () =>
+      balanceRelaxedShifts({
+        state,
+        date: state.activeScheduleDate!,
+        assignments: state.assignments,
+        lockedAssignmentIds: new Set(),
+        assertSafe: () => undefined,
+      });
+    expect(run()).toEqual(state.assignments);
+    state.settings.workloadBalanceEnabled = false;
+    const result = run();
+    expect(
+      buildMonthlyRelaxedShiftStatistics(
+        { ...state, assignments: result },
+        state.activeScheduleDate!
+      ).currentAfternoonRest.map((p) => p.staffName)
+    ).toEqual(["乙"]);
+  });
   it("does not give duty an afternoon flight to balance monthly rest counts", () => {
     const state = fixture();
     state.settings.earlyDepartureBalanceEnabled = false;

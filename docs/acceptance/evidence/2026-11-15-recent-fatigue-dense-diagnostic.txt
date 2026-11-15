@@ -1,0 +1,52 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/domain/recent-fatigue-balance.test.ts (7 tests | 2 failed) 643ms
+     × uses the daily target budget for catch-up instead of forcing today's exact equality 260ms
+     × keeps daily overload protection when catching up on a small day 71ms
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 5 passed (7)
+   Start at  17:36:39
+   Duration  2.23s (transform 1.20s, setup 0ms, import 1.38s, tests 643ms, environment 0ms)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/domain/recent-fatigue-balance.test.ts > supplemental recent fatigue balance > uses the daily target budget for catch-up instead of forcing today's exact equality
+AssertionError: [{"id":"assignment-mwhn4alr-qofsoo","flightId":"f0","flightNo":"AB100","positionRuleId":"f0-r1","position":"岗2","staffId":null,"staffName":"","startTime":"08:00","endTime":"09:00","workHours":1,"fatiguePoints":3,"remark":"","manualRemark":"","status":"unfilled","systemNotes":["空岗：航班最小衔接 1 人；当前时段冲突 1 人","甲与下一航班间隔只有 60 分钟，少于要求的 90 分钟。涉及航班：AB100→AB101","乙 时间冲突：AB100/岗1 08:00–09:00已有排班","以上为本次候选限制与当前直接检查；不代表多岗换人一定无解。"]},{"id":"assignment-mwhn4alr-08jwu8","flightId":"f1","flightNo":"AB101","positionRuleId":"f1-r1","position":"岗2","staffId":null,"staffName":"","startTime":"10:00","endTime":"11:00","workHours":1,"fatiguePoints":3,"remark":"","manualRemark":"","status":"unfilled","systemNotes":["空岗：当前时段冲突 1 人；航班最小衔接 1 人","甲 时间冲突：AB101/岗1 10:00–11:00已有排班","乙与下一航班间隔只有 60 分钟，少于要求的 90 分钟。涉及航班：AB101→AB102","以上为本次候选限制与当前直接检查；不代表多岗换人一定无解。"]},{"id":"assignment-mwhn4alr-lclwxx","flightId":"f2","flightNo":"AB102","positionRuleId":"f2-r1","position":"岗2","staffId":null,"staffName":"","startTime":"12:00","endTime":"13:00","workHours":1,"fatiguePoints":1,"remark":"","manualRemark":"","status":"unfilled","vacancyEvidence":{"reason":"daily-flight-count-balance","blockers":["候选人员 2 人均未形成安全替代","岗位只能在航班数均衡阶段保留空缺"]},"systemNotes":["空岗：航班最小衔接 1 人；当前时段冲突 1 人","甲与下一航班间隔只有 60 分钟，少于要求的 90 分钟。涉及航班：AB102→AB103","乙 时间冲突：AB102/岗1 12:00–13:00已有排班","求解阶段记录：航班数均衡回退；候选人员 2 人均未形成安全替代；岗位只能在航班数均衡阶段保留空缺","以上为本次候选限制与当前直接检查；不代表多岗换人一定无解。"]},{"id":"assignment-mwhn4alr-nkvm2u","flightId":"f3","flightNo":"AB103","positionRuleId":"f3-r1","position":"岗2","staffId":null,"staffName":"","startTime":"14:00","endTime":"15:00","workHours":1,"fatiguePoints":1,"remark":"","manualRemark":"","status":"unfilled","vacancyEvidence":{"reason":"daily-flight-count-balance","blockers":["候选人员 2 人均未形成安全替代","岗位只能在航班数均衡阶段保留空缺"]},"systemNotes":["空岗：当前时段冲突 1 人；航班最小衔接 1 人","甲 时间冲突：AB103/岗1 14:00–15:00已有排班","乙与上一航班间隔只有 60 分钟，少于要求的 90 分钟。涉及航班：AB102→AB103","求解阶段记录：航班数均衡回退；候选人员 2 人均未形成安全替代；岗位只能在航班数均衡阶段保留空缺","以上为本次候选限制与当前直接检查；不代表多岗换人一定无解。"]}]: expected 4 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 4
+
+ ❯ tests/domain/recent-fatigue-balance.test.ts:71:109
+     69|     const state = denseRecentFatigueScenario();
+     70|     const result = await generateSchedule(state, date);
+     71|     expect(result.unfilledCount, JSON.stringify(result.assignments.fil…
+       |                                                                                                             ^
+     72|     const points = state.staff.map((p) => result.assignments.filter((a…
+     73|     expect(points).toEqual([4, 8]);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/domain/recent-fatigue-balance.test.ts > supplemental recent fatigue balance > keeps daily overload protection when catching up on a small day
+AssertionError: [{"id":"assignment-mwhn4apl-5wiygb","flightId":"f0","flightNo":"AB100","positionRuleId":"f0-r0","position":"岗1","staffId":null,"staffName":"","startTime":"08:00","endTime":"09:00","workHours":1,"fatiguePoints":1,"remark":"","manualRemark":"","status":"unfilled","vacancyEvidence":{"reason":"daily-flight-count-balance","blockers":["候选人员 2 人均未形成安全替代","岗位只能在航班数均衡阶段保留空缺"]},"systemNotes":["空岗：航班最小衔接 2 人","甲与下一航班间隔只有 60 分钟，少于要求的 90 分钟。涉及航班：AB100→AB101","乙与下一航班间隔只有 60 分钟，少于要求的 90 分钟。涉及航班：AB100→AB101","求解阶段记录：航班数均衡回退；候选人员 2 人均未形成安全替代；岗位只能在航班数均衡阶段保留空缺","以上为本次候选限制与当前直接检查；不代表多岗换人一定无解。"]},{"id":"assignment-mwhn4apl-cup126","flightId":"f0","flightNo":"AB100","positionRuleId":"f0-r1","position":"岗2","staffId":null,"staffName":"","startTime":"08:00","endTime":"09:00","workHours":1,"fatiguePoints":5,"remark":"","manualRemark":"","status":"unfilled","vacancyEvidence":{"reason":"daily-flight-count-balance","blockers":["候选人员 2 人均未形成安全替代","岗位只能在航班数均衡阶段保留空缺"]},"systemNotes":["空岗：航班最小衔接 2 人","甲与下一航班间隔只有 60 分钟，少于要求的 90 分钟。涉及航班：AB100→AB101","乙与下一航班间隔只有 60 分钟，少于要求的 90 分钟。涉及航班：AB100→AB101","求解阶段记录：航班数均衡回退；候选人员 2 人均未形成安全替代；岗位只能在航班数均衡阶段保留空缺","以上为本次候选限制与当前直接检查；不代表多岗换人一定无解。"]}]: expected 2 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 2
+
+ ❯ tests/domain/recent-fatigue-balance.test.ts:98:109
+     96|     state.positionRules.forEach((rule, index) => { rule.fatiguePoints …
+     97|     const result = await generateSchedule(state, date);
+     98|     expect(result.unfilledCount, JSON.stringify(result.assignments.fil…
+       |                                                                                                             ^
+     99|     const points = state.staff.map((p) => result.assignments.filter((a…
+    100|     expect(points).toEqual([6, 6]);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯

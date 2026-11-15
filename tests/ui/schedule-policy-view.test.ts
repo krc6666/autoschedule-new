@@ -8,6 +8,24 @@ import "../../src/ui/components/policy-page";
 import { mountElement, settleLit } from "./lit-test-helpers";
 
 describe("rules page", () => {
+  it("finds the recent actual fatigue supplement through the existing workload rule", async () => {
+    const element = await mountElement<
+      HTMLElement & { updateComplete: Promise<unknown> }
+    >("autoschedule-policy-page", { model: createDefaultState() });
+    const search = element.querySelector<HTMLInputElement>(
+      'input[type="search"]'
+    )!;
+    search.value = "近期累计";
+    search.dispatchEvent(new Event("input", { bubbles: true }));
+    await settleLit();
+    const rows = element.querySelectorAll(".policy-ledger tbody tr");
+    expect(rows).toHaveLength(1);
+    expect(rows[0]!.textContent).toContain("工时与疲劳均衡");
+    expect(rows[0]!.textContent).toContain("默认7天");
+    expect(rows[0]!.textContent).toContain(
+      "后续休息均衡和舒适性换人使用同一负荷复核"
+    );
+  });
   it("finds the ordinary staff continuity rule with its exception and fallback", async () => {
     const element = await mountElement<
       HTMLElement & { updateComplete: Promise<unknown> }

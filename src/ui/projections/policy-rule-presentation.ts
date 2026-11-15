@@ -109,7 +109,8 @@ const USER_RULE_DESCRIPTIONS: Readonly<Record<SchedulingRuleId, string>> = {
   "position-frequency": "先比较本月重点岗位次数，再比较最近几个工作班的次数。",
   "position-frequency-review":
     "班表完成后整体检查重点岗位频率，存在安全方案时进行连续换位。",
-  "workload-balance": "航班密集时比较安排后的工时和疲劳差，避免负荷过度集中。",
+  "workload-balance":
+    "航班紧张或密集时比较当日工时和疲劳差；在原保护和当天目标内，按历史统计天数（默认7天）已保存岗位点数加本班，尽量拉近近期累计疲劳差。近期调节也适用于宽松班，不强求相等；后续休息均衡和舒适性换人使用同一负荷复核。",
   "historical-fatigue": "前面条件相同时，优先选择历史疲劳较低的人。",
   "position-rotation": "最后按重点、高疲劳普通、低疲劳普通的顺序检查连续轮岗。",
   "relaxed-shift-balance":

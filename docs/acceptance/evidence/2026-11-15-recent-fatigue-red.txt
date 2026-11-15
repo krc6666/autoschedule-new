@@ -1,0 +1,75 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/domain/recent-fatigue-balance.test.ts (5 tests | 4 failed) 361ms
+     × uses actual saved points, retaining zero and excluding current/future/out-of-window records 12ms
+     × adds a real cumulative points objective even for fewer than four flights 28ms
+     × rejects a later comfort review that reverses a balanced pair 7ms
+     × shows the actual window and final cumulative difference after manual changes 7ms
+
+ Test Files  1 failed (1)
+      Tests  4 failed | 1 passed (5)
+   Start at  17:31:19
+   Duration  1.96s (transform 1.20s, setup 0ms, import 1.38s, tests 361ms, environment 0ms)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/domain/recent-fatigue-balance.test.ts > supplemental recent fatigue balance > uses actual saved points, retaining zero and excluding current/future/out-of-window records
+AssertionError: expected [ undefined, undefined ] to deeply equal [ 12, 6 ]
+
+- Expected
++ Received
+
+  [
+-   12,
+-   6,
++   undefined,
++   undefined,
+  ]
+
+ ❯ tests/domain/recent-fatigue-balance.test.ts:25:47
+     23|     state.settings.consecutiveDayPenalty = 100;
+     24|     const loads = workloadBalanceLoadSnapshots(state, fatigueAssignmen…
+     25|     expect(loads.map((p) => p.recentFatigue)).toEqual([12, 6]);
+       |                                               ^
+     26|     expect(evaluateWorkloadBalance(state, date, fatigueAssignments(sta…
+     27|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  tests/domain/recent-fatigue-balance.test.ts > supplemental recent fatigue balance > adds a real cumulative points objective even for fewer than four flights
+AssertionError: expected undefined to be defined
+ ❯ tests/domain/recent-fatigue-balance.test.ts:33:111
+     31|     const preparation = prepareSchedule(state, date, evaluateAutomatic…
+     32|     const model = buildDailyScheduleModel({ state, date, preparation, …
+     33|     expect(model.problem.objectives.find((o) => o.id === "candidate:wo…
+       |                                                                                                               ^
+     34|     state.settings.workloadBalanceEnabled = false;
+     35|     const disabled = buildDailyScheduleModel({ state, date, preparatio…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  tests/domain/recent-fatigue-balance.test.ts > supplemental recent fatigue balance > rejects a later comfort review that reverses a balanced pair
+AssertionError: expected [ '交换后违反滚动负荷保护' ] to include '调整会扩大工时或疲劳差'
+ ❯ tests/domain/recent-fatigue-balance.test.ts:47:21
+     45|       primaryAssignmentId: before[0]!.id, intent: { kind: "staff-work-…
+     46|     });
+     47|     expect(reasons).toContain("调整会扩大工时或疲劳差");
+       |                     ^
+     48|   });
+     49|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  tests/domain/recent-fatigue-balance.test.ts > supplemental recent fatigue balance > shows the actual window and final cumulative difference after manual changes
+AssertionError: the given combination of arguments (undefined and string) is invalid for this assertion. You can use an array, a map, an object, a set, a string, or a weakset instead of a string
+ ❯ tests/domain/recent-fatigue-balance.test.ts:72:40
+     70|     state.assignments = fatigueAssignments(state, [6, 10]);
+     71|     const feedback = () => buildScheduleFeedback(state, date).find((f)…
+     72|     expect(JSON.stringify(feedback())).toContain("近期累计疲劳差 0.0 点");
+       |                                        ^
+     73|     state.assignments = fatigueAssignments(state, [10, 6]);
+     74|     expect(JSON.stringify(feedback())).toContain("近期累计疲劳差 8.0 点");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯

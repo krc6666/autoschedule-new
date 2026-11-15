@@ -1622,6 +1622,7 @@ describe("daily schedule solver performance model", () => {
       "candidate:workload-balance:today-fatigue-excess",
       "candidate:workload-balance:today-hours-spread",
       "candidate:workload-balance:rolling-hours-spread",
+      "candidate:workload-balance:recent-fatigue-spread",
       "candidate:workload-balance:today-fatigue-spread",
       "candidate:historical-fatigue",
     ]);

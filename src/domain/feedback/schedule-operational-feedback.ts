@@ -179,6 +179,9 @@ function fatigueFeedback(
   const target = state.settings.workloadBalanceEnabled
     ? `规则目标为工时差不超过 ${state.settings.maxWorkHoursDifference.toFixed(1)} 小时、当日疲劳差不超过 ${state.settings.maxTodayFatigueDifference.toFixed(1)} 点`
     : "当日负荷均衡规则已停用";
+  const recentTarget = state.settings.workloadBalanceEnabled
+    ? "作为补充尽量拉近，不要求相等，资格、覆盖、恢复和重点公平优先"
+    : "统计保留，近期补充均衡已停用";
   const evidence = `航班负荷${workload.pressure}；工时差 ${hoursDifference.toFixed(1)} 小时（${lowestHours.staff.name} ${lowestHours.workHours.toFixed(1)}h，${highestHours.staff.name} ${highestHours.workHours.toFixed(1)}h）；滚动工时差 ${workload.rollingWorkHoursDifference.toFixed(1)} 小时；当日疲劳差 ${fatigueDifference.toFixed(1)} 点（${lowestTodayFatigue.staff.name} ${lowestTodayFatigue.todayFatigue.toFixed(1)}，${highestTodayFatigue.staff.name} ${highestTodayFatigue.todayFatigue.toFixed(1)}）；总疲劳最高为${highestTotal.staff.name} ${highestTotal.totalFatigue.toFixed(1)} 点。${target}。`;
   return feedbackItem(
     "flight-staff",
@@ -189,7 +192,7 @@ function fatigueFeedback(
         ? "attention"
         : "ok"
       : "info",
-    `${evidence}${exceeded ? "本次未达到均衡目标；具体换人阻塞原因未记录。" : ""}`
+    `${evidence}最近${state.settings.historyWindowDays}天已保存岗位点数加本班，近期累计疲劳差 ${workload.recentFatigueDifference.toFixed(1)} 点；${recentTarget}。${exceeded ? "本次未达到均衡目标；具体换人阻塞原因未记录。" : ""}`
   );
 }
 

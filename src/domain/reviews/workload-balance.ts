@@ -34,6 +34,7 @@ export interface WorkloadBalanceMetrics {
   workHoursDifference: number;
   rollingWorkHoursDifference: number;
   todayFatigueDifference: number;
+  recentFatigueDifference: number;
   withinConfiguredTargets: boolean;
   shortageTasks: number;
   summary: string;
@@ -58,6 +59,7 @@ export interface WorkloadBalancePriority {
   todayFatigueExcess: number;
   todayHoursSpread: number;
   rollingHoursSpread: number;
+  recentFatigueSpread: number;
   todayFatigueSpread: number;
 }
 
@@ -68,6 +70,7 @@ const EMPTY_WORKLOAD_PRIORITY: WorkloadBalancePriority = {
   todayFatigueExcess: 0,
   todayHoursSpread: 0,
   rollingHoursSpread: 0,
+  recentFatigueSpread: 0,
   todayFatigueSpread: 0,
 };
 
@@ -179,6 +182,14 @@ export interface WorkloadBalanceLoadSnapshot {
   todayHours: number;
   rollingHours: number;
   todayFatigue: number;
+  recentFatigue: number;
+}
+
+/** Actual saved points, separate from historyFatigue and its penalties. */
+export function recentFatigueBalanceApplicable(
+  loads: readonly WorkloadBalanceLoadSnapshot[]
+): boolean {
+  return new Set(loads.map((load) => load.recentFatigue)).size > 1;
 }
 
 export function workloadBalanceLoadSnapshots(
@@ -210,6 +221,9 @@ export function workloadBalanceLoadSnapshots(
             record.historyCoverage !== "late-priority-only"
         )
         .reduce((sum, record) => sum + record.workHours, 0),
+      recentFatigue: history
+        .filter((record) => record.staffId === person.id)
+        .reduce((sum, record) => sum + (record.fatiguePoints ?? 0), 0),
       todayFatigue:
         countedAssignments
           .filter(
@@ -242,11 +256,15 @@ export function evaluateWorkloadBalance(
   const workHours = loads.map((load) => load.todayHours);
   const rollingHours = loads.map((load) => load.todayHours + load.rollingHours);
   const todayFatigue = loads.map((load) => load.todayFatigue);
+  const recentFatigue = loads.map(
+    (load) => load.recentFatigue + load.todayFatigue
+  );
   const difference = (values: number[]): number =>
     values.length ? Math.max(...values) - Math.min(...values) : 0;
   const workHoursDifference = difference(workHours);
   const rollingWorkHoursDifference = difference(rollingHours);
   const todayFatigueDifference = difference(todayFatigue);
+  const recentFatigueDifference = difference(recentFatigue);
   const withinConfiguredTargets =
     workHoursDifference <= state.settings.maxWorkHoursDifference &&
     rollingWorkHoursDifference <=
@@ -256,16 +274,40 @@ export function evaluateWorkloadBalance(
   const enabled = state.settings.workloadBalanceEnabled;
   const summary = !enabled
     ? "工时均衡已停用"
-    : `${pressure.pressure}：当日工时差 ${workHoursDifference.toFixed(1)} 小时，滚动工时差 ${rollingWorkHoursDifference.toFixed(1)} 小时，疲劳差 ${todayFatigueDifference.toFixed(1)} 点`;
+    : `${pressure.pressure}：当日工时差 ${workHoursDifference.toFixed(1)} 小时，滚动工时差 ${rollingWorkHoursDifference.toFixed(1)} 小时，疲劳差 ${todayFatigueDifference.toFixed(1)} 点，最近${state.settings.historyWindowDays}天加本班近期累计疲劳差 ${recentFatigueDifference.toFixed(1)} 点（尽量拉近）`;
   return {
     enabled,
     ...pressure,
     workHoursDifference,
     rollingWorkHoursDifference,
     todayFatigueDifference,
+    recentFatigueDifference,
     withinConfiguredTargets,
     summary,
   };
+}
+
+/** Shared by later reviews; recent improvement may use the daily target budget. */
+export function preservesWorkloadBalance(
+  state: WorkloadFacts,
+  date: string,
+  before: readonly Assignment[],
+  after: readonly Assignment[],
+  dutyStaffId?: string | null
+): boolean {
+  if (!state.settings.workloadBalanceEnabled) return true;
+  const first = evaluateWorkloadBalance(state, date, [...before], dutyStaffId);
+  const second = evaluateWorkloadBalance(state, date, [...after], dutyStaffId);
+  const dailyMayYield =
+    second.todayFatigueDifference <= state.settings.maxTodayFatigueDifference &&
+    second.recentFatigueDifference < first.recentFatigueDifference;
+  return (
+    second.workHoursDifference <= first.workHoursDifference &&
+    second.rollingWorkHoursDifference <= first.rollingWorkHoursDifference &&
+    second.recentFatigueDifference <= first.recentFatigueDifference &&
+    (second.todayFatigueDifference <= first.todayFatigueDifference ||
+      dailyMayYield)
+  );
 }
 
 export function workloadBalancePriority(
@@ -302,6 +344,10 @@ export function workloadBalancePriority(
       load.todayHours +
       (load.id === person.id ? targetHours : 0),
     fatigue: load.todayFatigue + (load.id === person.id ? targetFatigue : 0),
+    recentFatigue:
+      load.recentFatigue +
+      load.todayFatigue +
+      (load.id === person.id ? targetFatigue : 0),
   }));
   const spread = (values: number[]): number =>
     Math.max(...values) - Math.min(...values);
@@ -313,9 +359,11 @@ export function workloadBalancePriority(
   const compareWithinTargets =
     state.flights.length >= WORKLOAD_BALANCE_MIN_FLIGHTS &&
     pressure.pressure !== "宽松";
-  const todayFatigueExcess = compareWithinTargets
-    ? Math.max(0, fatigueSpread - configuredFatigueTarget)
-    : 0;
+  const balanceRecent = recentFatigueBalanceApplicable(loads);
+  const todayFatigueExcess =
+    compareWithinTargets || balanceRecent
+      ? Math.max(0, fatigueSpread - configuredFatigueTarget)
+      : 0;
   return {
     violatesConfiguredTarget:
       todayHoursExcess > 0 || rollingHoursExcess > 0 || todayFatigueExcess > 0,
@@ -324,6 +372,9 @@ export function workloadBalancePriority(
     todayFatigueExcess,
     todayHoursSpread: compareWithinTargets ? todaySpread : 0,
     rollingHoursSpread: compareWithinTargets ? rollingSpread : 0,
+    recentFatigueSpread: balanceRecent
+      ? spread(projected.map((load) => load.recentFatigue))
+      : 0,
     todayFatigueSpread: compareWithinTargets ? fatigueSpread : 0,
   };
 }

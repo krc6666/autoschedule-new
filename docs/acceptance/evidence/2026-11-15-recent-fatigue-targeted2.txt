@@ -1,0 +1,52 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/domain/recent-fatigue-balance.test.ts (7 tests | 2 failed) 952ms
+     × uses the daily target budget for catch-up instead of forcing today's exact equality 357ms
+     × keeps daily overload protection when catching up on a small day 89ms
+
+ Test Files  1 failed | 3 passed (4)
+      Tests  2 failed | 43 passed (45)
+   Start at  17:36:15
+   Duration  3.73s (transform 2.74s, setup 0ms, import 3.78s, tests 1.98s, environment 1ms)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/domain/recent-fatigue-balance.test.ts > supplemental recent fatigue balance > uses the daily target budget for catch-up instead of forcing today's exact equality
+AssertionError: expected 4 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 4
+
+ ❯ tests/domain/recent-fatigue-balance.test.ts:71:34
+     69|     const state = denseRecentFatigueScenario();
+     70|     const result = await generateSchedule(state, date);
+     71|     expect(result.unfilledCount).toBe(0);
+       |                                  ^
+     72|     const points = state.staff.map((p) => result.assignments.filter((a…
+     73|     expect(points).toEqual([4, 8]);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/domain/recent-fatigue-balance.test.ts > supplemental recent fatigue balance > keeps daily overload protection when catching up on a small day
+AssertionError: expected 2 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 2
+
+ ❯ tests/domain/recent-fatigue-balance.test.ts:98:34
+     96|     state.positionRules.forEach((rule, index) => { rule.fatiguePoints …
+     97|     const result = await generateSchedule(state, date);
+     98|     expect(result.unfilledCount).toBe(0);
+       |                                  ^
+     99|     const points = state.staff.map((p) => result.assignments.filter((a…
+    100|     expect(points).toEqual([6, 6]);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯

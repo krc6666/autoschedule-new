@@ -1,0 +1,127 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-15-recent-fatigue-balance",
+  "title": "近期岗位疲劳作为现有均衡的补充",
+  "startedFrom": "6b04762ed1422e22649f25a08f89a6d6f053bea7",
+  "expectation": {
+    "example": "甲上一班10点、乙6点，下一班有条件时甲6点、乙10点；Owner确认沿现有最近7天累计调节，强调和原均衡互补、防多处漏接，明确路径D:/autoschedule-migrate/autoschedule。",
+    "expected": "使用已保存实际岗位疲劳，优先满足原当天负荷目标，在原安全/覆盖/恢复/重点公平/航班数结果内尽量缩小近期加本班点数差；小班和宽松班仍可补充，连续几班验证最终结果。",
+    "unchanged": "原资格/状态/锁定/衔接/工时、值班/半休、重点公平与恢复、航班数和人工权限保留；不把点数差变硬限制，不改月度展示或原历史疲劳惩罚。无新增持久化字段，沿用负荷开关和历史统计天数。",
+    "fallback": "不能安全改善/软层到时保留原完整合法结果，不清岗凑点数；最终按真实班表反馈。真实页面由Owner验收；Owner随后授权仅本地commit，不push/发布，PROJECT_MAP.md原改动保持。"
+  },
+  "testedVersion": "8765e5ce93f1911613247162f17a4e9d6c6e00455c315b1b9d0615596e73c98e",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "先保留实际快照/模型缺目标/后置反改的有效失败；首轮反馈测试误用id字段后改为key，不把夹具错误当产品故障。随后补小班候选未保护当日目标的精确失败，最终通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-recent-fatigue-red.txt",
+          "summary": "初始失败：快照/模型/后置3项有效缺失，反馈另为夹具字段错误",
+          "sha256": "02a9231135e3254f9e2c8dae43984dff5d626d2961d3b64fc23fd3febf139ae3"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-recent-fatigue-candidate-red.txt",
+          "summary": "传播查漏：小班候选当日超目标差应4实际0",
+          "sha256": "c6412e1900a83dfb9515c8c76343c7a9f93a10c7a821cc0e4f9a6b67270801a8"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-recent-fatigue-verify-complete.txt",
+          "summary": "最终源码完整npm.cmd run verify：功能、性能、类型检查和生产构建",
+          "sha256": "3dfac84aafe49c6800c1d974a076501651e93781a402c3b35cb2e1877d31dafe"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "连续工作班真实生成并归档；密集四航班在当天4点目标内得到4/8，累计14/14；最终安全凭证有效。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-recent-fatigue-verify-complete.txt",
+          "summary": "最终源码完整npm.cmd run verify：功能、性能、类型检查和生产构建",
+          "sha256": "3dfac84aafe49c6800c1d974a076501651e93781a402c3b35cb2e1877d31dafe"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-recent-fatigue-artifact.json",
+          "summary": "最终生产包指纹及实际求解XLSX字节独立核对：历史10/6、本班4/8、累计14/14",
+          "sha256": "cc8e65143e2812da47b89bd6f203994ed34b7f3e8afbeee7f917a4ddd77bdbec"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "小班/宽松补充、开关关闭、零点/窗口首尾/同日未来、资格优先、人工软取舍通过；实际配置字节导入空状态、9天窗口保存重启、真实Worker/WASM到Store和XLSX、归档重启累计16/16，B组保持。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-recent-fatigue-verify-complete.txt",
+          "summary": "最终源码完整npm.cmd run verify：功能、性能、类型检查和生产构建",
+          "sha256": "3dfac84aafe49c6800c1d974a076501651e93781a402c3b35cb2e1877d31dafe"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "月度休息反向换人和舒适性换人均消费同一负荷比较；原恢复/覆盖/重点公平让步合同保持，后置反改回归及连续归档最终结果通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-recent-fatigue-verify-complete.txt",
+          "summary": "最终源码完整npm.cmd run verify：功能、性能、类型检查和生产构建",
+          "sha256": "3dfac84aafe49c6800c1d974a076501651e93781a402c3b35cb2e1877d31dafe"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "资格唯一时仍保持覆盖，近期差不成为硬失败；原整表安全凭证与Worker到Store安装验证通过，人工交换保留软取舍。原安全、恢复、重点公平和性能全量回归通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-recent-fatigue-verify-complete.txt",
+          "summary": "最终源码完整npm.cmd run verify：功能、性能、类型检查和生产构建",
+          "sha256": "3dfac84aafe49c6800c1d974a076501651e93781a402c3b35cb2e1877d31dafe"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "完整原功能/性能回归通过，无新增持久化字段或独立账本；A/B、旧历史、配置导入导出和原人工权限不变。PROJECT_MAP.md原字节哈希保持；Owner随后授权仅本地commit，不push/发布。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-recent-fatigue-verify-complete.txt",
+          "summary": "最终源码完整npm.cmd run verify：功能、性能、类型检查和生产构建",
+          "sha256": "3dfac84aafe49c6800c1d974a076501651e93781a402c3b35cb2e1877d31dafe"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-recent-fatigue-artifact.json",
+          "summary": "最终生产包指纹及实际求解XLSX字节独立核对：历史10/6、本班4/8、累计14/14",
+          "sha256": "cc8e65143e2812da47b89bd6f203994ed34b7f3e8afbeee7f917a4ddd77bdbec"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "生产构建及Node/WASM实际班表XLSX已核对，原启动脚本从本仓源码运行。Owner真实浏览器/现场班表尚未验收；AGENTS.md规定仅Owner明确说“你自己跑”才可自行浏览器复现，本轮没有该授权，不以自动测试替代现场。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-recent-fatigue-verify-complete.txt",
+          "summary": "最终源码完整npm.cmd run verify：功能、性能、类型检查和生产构建",
+          "sha256": "3dfac84aafe49c6800c1d974a076501651e93781a402c3b35cb2e1877d31dafe"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-recent-fatigue-artifact.json",
+          "summary": "最终生产包指纹及实际求解XLSX字节独立核对：历史10/6、本班4/8、累计14/14",
+          "sha256": "cc8e65143e2812da47b89bd6f203994ed34b7f3e8afbeee7f917a4ddd77bdbec"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "red.txt证明原模型/后置/事实/反馈均缺近期点数；candidate-red.txt另外抓到小班候选漏消费。最终verify-complete.txt包含所有修复后的回归。",
+    "laterChanges": "补缺、恢复、重点轮岗按原优先级可让步；需保护负荷的后续复核和月度休息换人共用preservesWorkloadBalance，反向改坏测试及真实连续归档验证。人工软取舍不禁用，最终反馈重算。",
+    "finalArtifact": "artifact.json绑定生产包SHA256和.tmp/recent-fatigue/final-result.xlsx原字节哈希，按导出的人员编号和疲劳点数独立求和4/8，历史10/6累计14/14、8岗覆盖。真实Worker集成另验证6/10归档16/16；真实页面待Owner验收。"
+  },
+  "review": {
+    "missedScope": "逐项追踪初排候选、整体模型、后置负荷保护、月度换人和最终反馈；第二轮查漏发现小班候选仍沿旧门槛忽略当天超目标差，先红后绿补齐。配置/历史/存储/Worker/Store/XLSX显式往返，真实浏览器未自行操作。",
+    "rootCause": "原历史疲劳末层排序没有预计累计差目标，且当天追求相等和后置只看当天的检查会抵消动态互补；重复内联类型及旧小班门槛是潜在漏接点。",
+    "earlyDetection": "新增均衡前列所有生产者消费者，直接引用领域类型；用小班与密集班的双入口、先合法再后置改坏、连续生成归档及配置字节/Worker实际输出校验，在代码交付前捕获漏接。"
+  }
+}

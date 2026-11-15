@@ -1,0 +1,59 @@
+
+> autoschedule@1.0.0 verify
+> npm run typecheck && npm test && npm run test:performance && npm run build
+
+
+> autoschedule@1.0.0 typecheck
+> tsc -b --pretty false
+
+
+> autoschedule@1.0.0 test
+> vitest run --exclude tests/performance/**
+
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/domain/daily-schedule-optimizer.test.ts (63 tests | 1 failed) 3789ms
+     × marks recovery and later fairness goals as best effort 17ms
+npm.cmd :
+所在位置 行:2 字符: 114
++ ... :TEMP; $env:VITEST_MAX_WORKERS = '2'; npm.cmd run verify 2>&1 | Tee-O ...
++                                           ~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/domain/daily-schedule-optimizer.test.ts > daily schedule solver performance model > marks recovery and lat
+er fairness goals as best effort
+AssertionError: expected [ 'candidate:staff-coverage', …(11) ] to deeply equal [ 'candidate:staff-coverage', …(10) ]
+
+- Expected
++ Received
+
+@@ -6,8 +6,9 @@
+    "candidate:workload-balance:today-hours-excess",
+    "candidate:workload-balance:rolling-hours-excess",
+    "candidate:workload-balance:today-fatigue-excess",
+    "candidate:workload-balance:today-hours-spread",
+    "candidate:workload-balance:rolling-hours-spread",
++   "candidate:workload-balance:recent-fatigue-spread",
+    "candidate:workload-balance:today-fatigue-spread",
+    "candidate:historical-fatigue",
+  ]
+
+ ❯ tests/domain/daily-schedule-optimizer.test.ts:1615:27
+    1613|       .map((objective) => objective.id);
+    1614|
+    1615|     expect(bestEffortIds).toEqual([
+       |                           ^
+    1616|       "candidate:staff-coverage",
+    1617|       "candidate:daily-flight-count-balance",
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 198 passed (199)
+      Tests  1 failed | 1981 passed (1982)
+   Start at  17:41:45
+   Duration  161.06s (transform 9.42s, setup 0ms, import 48.38s, tests 210.42s, environment 15.49s)

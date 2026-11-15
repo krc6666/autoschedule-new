@@ -1,0 +1,85 @@
+{
+  "input": "Synthetic four-flight, two-person fixture; Node/WASM actual solver, not owner browser",
+  "date": "2026-11-07",
+  "historyWindowDays": 7,
+  "prior": [10, 6],
+  "independentlyReadTodayFromXlsx": [4, 8],
+  "cumulative": [14, 14],
+  "dailyDifference": 4,
+  "recentDifference": 0,
+  "coveredPositions": 8,
+  "safetyCredentialPresent": true,
+  "outputPath": ".tmp/recent-fatigue/final-result.xlsx",
+  "xlsxSha256": "b7ac296fb1dd781f3260a02eefea591a026d3d9ae58e0b7d5b8448dab8c03e31",
+  "assets": [
+    {
+      "path": "dist/assets/cloud-application-Blo46j7Z.js",
+      "sha256": "a3885ab16ed667ddffb7e174e1752079e4abf890cd0af29ac339eb75b28be383"
+    },
+    {
+      "path": "dist/assets/duty-roster-excel-kqL9epnr.js",
+      "sha256": "b11d9e5c8b118484297d04d5a8df194c8c54454ab31658cd1f34e994cc64e690"
+    },
+    {
+      "path": "dist/assets/excel-BLRKTq0m.js",
+      "sha256": "1eefd68026ff11ae2a03e69363958fcfe28b32b19832f24bf6f7f768df056aaf"
+    },
+    {
+      "path": "dist/assets/excel-worksheet-B25TDsI-.js",
+      "sha256": "18858d941f7c56a42ef50b19e586c3ac177fa401a293d2a4b85c53d72648e4a6"
+    },
+    {
+      "path": "dist/assets/highs-4RgOMqXY.js",
+      "sha256": "3fc44e88b558b07237594f6891417098a9ab23d0598232dcd4486240c18132b2"
+    },
+    {
+      "path": "dist/assets/highs-BVbYVQRk.js",
+      "sha256": "e367a1e7b792e9893a5218107cf08647107c45be32eeaa6c12647489ecda38bc"
+    },
+    {
+      "path": "dist/assets/highs-Cr1sm8uB.js",
+      "sha256": "16e15adf0637840e4f164c4cac3d2ab57cd77551d99507590b74a6c7c67e23b5"
+    },
+    {
+      "path": "dist/assets/highs-Cspndjj4.js",
+      "sha256": "e6f15151a19d0313dc8be7f6b05f92317731b22a831074a87939521406779d5a"
+    },
+    {
+      "path": "dist/assets/highs-solver-UyWdTJE1.js",
+      "sha256": "7378a5f472dead95f4637f73c8182a5b88694225cb4a02ad6ffa4d5a0605f2d5"
+    },
+    {
+      "path": "dist/assets/html2canvas.esm-DXEQVQnt.js",
+      "sha256": "8c46cc1bb52e600a4f397027529ced15488e01a9ca234cbf3649596841edf983"
+    },
+    {
+      "path": "dist/assets/index-BfQE_9J5.js",
+      "sha256": "6532f2b0c13375f966b9acaf4d8cda128a9efc8383c848f565d1cd2dd32bb414"
+    },
+    {
+      "path": "dist/assets/late-priority-counts-excel-BI1Te46L.js",
+      "sha256": "41576091e83362b377e65dd8bce60912bc4590afb3707f40e13406ab6440d7c6"
+    },
+    {
+      "path": "dist/assets/schedule.worker-Cuynz3xA.js",
+      "sha256": "3ac6b8de7bad9705219b29f1dfc498135a690971cb786dac2a0d36346fb916df"
+    },
+    {
+      "path": "dist/assets/supabase-backend-zh9pqKdy.js",
+      "sha256": "a2edee82fee18f2722588520c15607ed7feb424dc12560bd0dfa3667e50d3e5f"
+    },
+    {
+      "path": "dist/assets/xlsx.min-DB1A8uyy.js",
+      "sha256": "02a8c4b15d082cb2e8895b7f2162834a9520f7521de73a7262cbc8ae85251aba"
+    },
+    {
+      "path": "dist/assets/__vite-browser-external-D7Ct-6yo.js",
+      "sha256": "80b82acfeb87bf2cb6a47b0aa48e078951b8a2616fe5059cec7bc46dd650621d"
+    }
+  ],
+  "ownerProjectMapSha256": "49f304c96afd07eb7d784593ae87fcaa18832a015406f475656df6bdc77b0cfd",
+  "entry": "start-autoschedule.bat -> dev.py -> this repository Vite source; dist built separately",
+  "browserAcceptance": "Not performed; owner-controlled under AGENTS.md",
+  "gitActions": "No commit, push or deployment",
+  "probeInterop": "Independent Node SSR probe normalizes xlsx-js-style namespace imports to standard CJS default imports in memory only; product source unchanged"
+}

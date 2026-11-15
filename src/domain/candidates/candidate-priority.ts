@@ -49,6 +49,7 @@ import { isKe166MobileSupervisor } from "../flights/schedule-tasks";
 import {
   workloadBalancePriority,
   type WorkloadBalanceLoadSnapshot,
+  type WorkloadBalancePriority,
 } from "../reviews/workload-balance";
 import {
   compareTr121H02Cooldown as compareTr121H02CooldownProfile,
@@ -76,15 +77,7 @@ export interface CandidatePriority {
     currentMonthCount: number;
     recentWorkdayCount: number;
   };
-  workloadBalance: {
-    violatesConfiguredTarget: boolean;
-    todayHoursExcess: number;
-    rollingHoursExcess: number;
-    todayFatigueExcess: number;
-    todayHoursSpread: number;
-    rollingHoursSpread: number;
-    todayFatigueSpread: number;
-  };
+  workloadBalance: WorkloadBalancePriority;
   historicalFatigue: number;
 }
 
@@ -197,6 +190,8 @@ export function compareWorkloadBalance(
       right.workloadBalance.todayHoursSpread ||
     left.workloadBalance.rollingHoursSpread -
       right.workloadBalance.rollingHoursSpread ||
+    left.workloadBalance.recentFatigueSpread -
+      right.workloadBalance.recentFatigueSpread ||
     left.workloadBalance.todayFatigueSpread -
       right.workloadBalance.todayFatigueSpread
   );

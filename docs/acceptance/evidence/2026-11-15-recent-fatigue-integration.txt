@@ -1,0 +1,26 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/infrastructure/recent-fatigue-worker.test.ts (1 test | 1 failed) 317ms
+   × keeps input settings/history through configuration bytes and restart, then real Worker/WASM, Store, archive and schedule XLSX 316ms
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  1 failed | 31 passed (32)
+   Start at  17:39:21
+   Duration  3.95s (transform 3.07s, setup 0ms, import 3.88s, tests 2.55s, environment 590ms)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/infrastructure/recent-fatigue-worker.test.ts > keeps input settings/history through configuration bytes and restart, then real Worker/WASM, Store, archive and schedule XLSX
+TypeError: Cannot assign to read only property 'history' of object '#<Object>'
+ ❯ replaceHistoryForDate src/app/history-actions.ts:213:9
+    211|   records: HistoryRecord[]
+    212| ): void {
+    213|   state.history = [
+       |         ^
+    214|     ...state.history.filter((item) => item.date !== date),
+    215|     ...records,
+ ❯ tests/infrastructure/recent-fatigue-worker.test.ts:54:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯

@@ -49,7 +49,7 @@ export const SCHEDULE_SETTING_DEFINITIONS: readonly ScheduleSettingDefinition[] 
       key: "historyWindowDays",
       label: "历史统计天数",
       type: "number",
-      description: "历史疲劳统计窗口",
+      description: "历史疲劳及近期实际岗位点数补充均衡窗口",
       defaultValue: 7,
       min: 1,
       max: 90,
@@ -307,7 +307,7 @@ export const SCHEDULE_SETTING_DEFINITIONS: readonly ScheduleSettingDefinition[] 
       key: "workloadBalanceEnabled",
       label: "启用工时疲劳均衡",
       type: "boolean",
-      description: "是否执行人员负荷均衡",
+      description: "执行当日负荷与近期累计岗位疲劳补充均衡",
       defaultValue: true,
     },
     {

@@ -11,6 +11,7 @@ import { clearAutomaticAssignmentEvidence } from "../assignments/assignment-evid
 import { ScheduleGuardError } from "../kernel/schedule-guard";
 import { dutyAfternoonFlightIds } from "../assignments/duty-afternoon-relief";
 import type { MonthlyRelaxedShiftStatistics } from "../statistics/relaxed-shift-statistics";
+import { preservesWorkloadBalance } from "./workload-balance";
 
 function relaxedShiftScore(
   state: ScheduleGenerationFacts,
@@ -224,6 +225,7 @@ export function balanceRelaxedShifts(options: {
       !improves(next) ||
       counts(result).some((n, i) => n !== budget[i]) ||
       spread(proposal) > spreadBefore ||
+      !preservesWorkloadBalance(state, date, current, proposal, duty) ||
       (duty !== null &&
         dutyAfternoonFlightIds(state, proposal, duty).size >
           dutyAfternoonFlightIds(state, current, duty).size)

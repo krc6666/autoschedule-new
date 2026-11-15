@@ -123,6 +123,7 @@ function priority(
       todayFatigueExcess: 0,
       todayHoursSpread: 0,
       rollingHoursSpread: 0,
+      recentFatigueSpread: 0,
       todayFatigueSpread: 0,
     },
     historicalFatigue: 0,
@@ -289,6 +290,7 @@ describe("scheduling policy contract", () => {
         todayFatigueExcess: 0,
         todayHoursSpread: 0,
         rollingHoursSpread: 0,
+        recentFatigueSpread: 0,
         todayFatigueSpread: 0,
       },
     });
@@ -301,6 +303,7 @@ describe("scheduling policy contract", () => {
         todayFatigueExcess: 10,
         todayHoursSpread: 10,
         rollingHoursSpread: 10,
+        recentFatigueSpread: 10,
         todayFatigueSpread: 10,
       },
     });

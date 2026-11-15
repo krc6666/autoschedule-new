@@ -41,6 +41,7 @@ import type { SchedulePreparation } from "./schedule-preparation";
 import { buildDutyFlightCountModel } from "./daily-duty-flight-count-model";
 import {
   workloadBalanceLoadSnapshots,
+  recentFatigueBalanceApplicable,
   WORKLOAD_BALANCE_MIN_FLIGHTS,
 } from "../reviews/workload-balance";
 import {
@@ -1184,11 +1185,9 @@ function workloadModel(
 ): WorkloadModel {
   if (!state.settings.workloadBalanceEnabled)
     return { variables: [], constraints: [], objectives: [] };
-  if (
-    state.flights.length < WORKLOAD_BALANCE_MIN_FLIGHTS ||
-    preparation.runFacts.workloadPressure.pressure === "宽松"
-  )
-    return { variables: [], constraints: [], objectives: [] };
+  const balanceDaily =
+    state.flights.length >= WORKLOAD_BALANCE_MIN_FLIGHTS &&
+    preparation.runFacts.workloadPressure.pressure !== "宽松";
   const staff = state.staff.filter(
     (person) => person.status === "正常" && person.staffType === "常规"
   );
@@ -1199,6 +1198,9 @@ function workloadModel(
       (load) => [load.id, load]
     )
   );
+  const balanceRecent = recentFatigueBalanceApplicable([...baseline.values()]);
+  if (!balanceDaily && !balanceRecent)
+    return { variables: [], constraints: [], objectives: [] };
   const variables: Array<SolverProblem["variables"][number]> = [];
   const constraints: LinearConstraint[] = [];
   const objectives: LexicographicObjective[] = [];
@@ -1314,6 +1316,42 @@ function workloadModel(
     Math.max(0.5, state.settings.maxTodayFatigueDifference)
   );
   const violationId = "workload:configured-target-violation";
+  const recentFatigue = balanceRecent
+    ? metric(
+        "recent-fatigue",
+        (choice) => choice.task.rule.fatiguePoints,
+        (staffId) => {
+          const load = baseline.get(staffId);
+          return (load?.recentFatigue ?? 0) + (load?.todayFatigue ?? 0);
+        },
+        0
+      )
+    : null;
+  const recentObjective: LexicographicObjective[] = recentFatigue
+    ? [
+        {
+          id: "candidate:workload-balance:recent-fatigue-spread",
+          direction: "minimize",
+          terms: [{ variableId: recentFatigue.spreadId, coefficient: 1 }],
+          optimality: "best-effort",
+        },
+      ]
+    : [];
+  // Small days do not chase daily equality, but cannot overload someone to catch up.
+  if (!balanceDaily)
+    return {
+      variables,
+      constraints,
+      objectives: [
+        {
+          id: "candidate:workload-balance:today-fatigue-excess",
+          direction: "minimize",
+          terms: [{ variableId: fatigue.excessId, coefficient: 1 }],
+          optimality: "best-effort",
+        },
+        ...recentObjective,
+      ],
+    };
   variables.push({ id: violationId });
   const excesses = [today, rolling, fatigue];
   constraints.push(
@@ -1384,6 +1422,11 @@ function workloadModel(
       },
     ]
   );
+  const dailyFatigueIndex = objectives.findIndex(
+    (objective) =>
+      objective.id === "candidate:workload-balance:today-fatigue-spread"
+  );
+  objectives.splice(dailyFatigueIndex, 0, ...recentObjective);
   return { variables, constraints, objectives };
 }
 

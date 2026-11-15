@@ -24,7 +24,7 @@ import {
   type LatePriorityFatigueReliefPolicy,
   type RotationReview,
 } from "./reassignment-safety-policy";
-import { evaluateWorkloadBalance } from "./workload-balance";
+import { preservesWorkloadBalance } from "./workload-balance";
 import { crossWorkdayReservationStatuses } from "./cross-workday-qualification-reservation";
 import { crossFlightPriorityReassignmentReasons } from "../rules/cross-flight-priority";
 import { isDutyReliefPriorityPosition } from "./position-rotation-policy";
@@ -469,22 +469,14 @@ function plannedAssignmentSafetyReasons(
     state.settings.workloadBalanceEnabled &&
     !intentPolicy.allowWorkloadBalanceRegression
   ) {
-    const before = evaluateWorkloadBalance(
-      state,
-      date,
-      assignments,
-      facts?.currentDutyStaffId
-    );
-    const after = evaluateWorkloadBalance(
-      plannedState,
-      date,
-      planned,
-      facts?.currentDutyStaffId
-    );
     if (
-      after.workHoursDifference > before.workHoursDifference ||
-      after.rollingWorkHoursDifference > before.rollingWorkHoursDifference ||
-      after.todayFatigueDifference > before.todayFatigueDifference
+      !preservesWorkloadBalance(
+        state,
+        date,
+        assignments,
+        planned,
+        facts?.currentDutyStaffId
+      )
     ) {
       reasons.push("调整会扩大工时或疲劳差");
     }

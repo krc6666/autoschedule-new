@@ -1,0 +1,5 @@
+src/domain/candidates/candidate-priority.ts(200,26): error TS2339: Property 'recentFatigueSpread' does not exist on type '{ violatesConfiguredTarget: boolean; todayHoursExcess: number; rollingHoursExcess: number; todayFatigueExcess: number; todayHoursSpread: number; rollingHoursSpread: number; todayFatigueSpread: number; }'.
+src/domain/candidates/candidate-priority.ts(201,29): error TS2339: Property 'recentFatigueSpread' does not exist on type '{ violatesConfiguredTarget: boolean; todayHoursExcess: number; rollingHoursExcess: number; todayFatigueExcess: number; todayHoursSpread: number; rollingHoursSpread: number; todayFatigueSpread: number; }'.
+tests/domain/recent-fatigue-balance.test.ts(61,21): error TS2550: Property 'toSorted' does not exist on type 'number[]'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2023' or later.
+tests/domain/recent-fatigue-balance.test.ts(61,31): error TS7006: Parameter 'a' implicitly has an 'any' type.
+tests/domain/recent-fatigue-balance.test.ts(61,34): error TS7006: Parameter 'b' implicitly has an 'any' type.

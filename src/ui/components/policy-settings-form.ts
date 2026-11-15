@@ -165,7 +165,7 @@ export class PolicySettingsFormElement extends LightDomElement {
             ${this.ordinaryPriorityPositionCollection()}
             ${this.toggle("lateShiftRecoveryEnabled", "跨工作日恢复保护", "全局开放链优先避免连续晚间重岗位")}
             ${this.time("lateShiftEndTime", "末班结束界线（晚于）")}
-            ${this.toggle("workloadBalanceEnabled", "工时与疲劳均衡", "压力不宽松时启用")}
+            ${this.toggle("workloadBalanceEnabled", "工时与疲劳均衡", "当日负荷均衡，并按历史统计天数补充平衡近期累计疲劳；近期调节也适用于宽松班")}
             ${this.toggle("dailyFlightCountBalanceExemptHalfRest", "半休人员豁免", "勾选后半休人员不参与航班数比较")}
             ${this.toggle("dailyFlightCountBalanceExemptTeamLeaders", "分队长豁免", "勾选后分队长不参与航班数比较")}
             ${this.number("maxWorkHoursDifference", "最大工时差", 0, 24, 0.5)}
