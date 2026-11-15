@@ -1,0 +1,167 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-15-cloud-toolbar",
+  "title": "极简云端工具栏、折叠菜单与清晰保存反馈",
+  "startedFrom": "b22b1ff381d9303dbac62ef7563fb56d2e3a52df",
+  "expectation": {
+    "example": "上一轮提醒版本先提交为b22b1ff；管理员打开工作台仅看到保存主按钮、保存状态及更多操作。点击保存马上显示进行中，收到成功回执显示本机完成时间，失败显示原因分类并可重试。用户明确授权本轮全程自主决策，成功时间显示5秒后简化、悬停查看。",
+    "expected": "保存/状态/更多同一简洁工具栏；发布、下载恢复副本、导入恢复副本、退出登录默认折叠。无已读取云端数据等说明性段落。保存中禁用重复提交，成功记录真实回执完成时间，5秒后收起时间但保留悬停详情，失败区分网络/服务、权限、版本冲突和校验问题并保留重试。",
+    "unchanged": "未保存退出提醒、失败弹窗、CAS、权限、模型/SQL、自动恢复、原Excel和排班安全链保持；时间及菜单仅为当前界面状态，不新增持久化字段。只先提交上一轮版本，本轮新UI不自动commit/push/部署；保留owner的PROJECT_MAP.md。",
+    "fallback": "保存失败保留当前模型、云端版本、未上传修改与失败原因，不刷新成功时间；在途保存与迟到回执仍受命令排他/会话守卫约束。已保存后再次编辑重新显示未上传，不把旧成功状态当成新修改已保存；旧链接和恢复功能通过更多操作使用。"
+  },
+  "testedVersion": "56a117931d1852a807d0fe3467a36cfb3d6eef686a88ce2ffe1c60cf22901be9",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "按本轮目标在旧实现执行10项组件测试全部失败，修改后同语义测试通过；本轮需求覆盖上一轮完全隐藏辅助工具要求。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-cloud-toolbar-red.txt",
+          "summary": "修改前组件10项失败：缺少折叠菜单、进行中/成功时间/类型化失败及重试。",
+          "sha256": "b8897056fc2048831fdd8c2db6c7f6065c635f30e80a591a9d9d7f77d898665e"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-cloud-toolbar-targeted.txt",
+          "summary": "4文件44项定向通过，覆盖菜单命令、保存生命周期、5秒收起/悬停、五类错误、失败重试、新修改、会话结束/销毁迟到回执与退出保护。",
+          "sha256": "0a5af0e616d8b7ac7c833a1e5a1cde1612ad26eb17e1b4e556fd6db64cfbb64e"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "保存开始立即saving且禁用提交，只有有效成功回执打完成时间；五秒后收起且title保留。正常状态无读取说明段落，初次读取不伪造保存时间。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-cloud-toolbar-targeted.txt",
+          "summary": "4文件44项定向通过，覆盖菜单命令、保存生命周期、5秒收起/悬停、五类错误、失败重试、新修改、会话结束/销毁迟到回执与退出保护。",
+          "sha256": "0a5af0e616d8b7ac7c833a1e5a1cde1612ad26eb17e1b4e556fd6db64cfbb64e"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-cloud-toolbar-browser.json",
+          "summary": "实际生产入口和官方SDK，隔离Chrome 1440/390；主栏单按钮与四项折叠菜单、保存中/时间/5秒折叠/悬停、网络及权限失败弹窗和重试、新修改、退出与刷新取消、两组上传、下载、成功退出通过。全部外部请求被合成Auth/RPC拦截，无真实云库写入；43个生产文件哈希，无页面异常。",
+          "sha256": "134291d37f35f34f551cfcd4bcc343d5e3e7ef09a23d4959262cc99c84492e31"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "网络/服务、权限、冲突、校验、未知错误通过类型区分；失败保留模型与版本及退出保护，重试共用保存入口。更多菜单四操作保持原安全限制，恢复命令与下载数据由组件/app及浏览器覆盖。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-cloud-toolbar-targeted.txt",
+          "summary": "4文件44项定向通过，覆盖菜单命令、保存生命周期、5秒收起/悬停、五类错误、失败重试、新修改、会话结束/销毁迟到回执与退出保护。",
+          "sha256": "0a5af0e616d8b7ac7c833a1e5a1cde1612ad26eb17e1b4e556fd6db64cfbb64e"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-cloud-toolbar-browser.json",
+          "summary": "实际生产入口和官方SDK，隔离Chrome 1440/390；主栏单按钮与四项折叠菜单、保存中/时间/5秒折叠/悬停、网络及权限失败弹窗和重试、新修改、退出与刷新取消、两组上传、下载、成功退出通过。全部外部请求被合成Auth/RPC拦截，无真实云库写入；43个生产文件哈希，无页面异常。",
+          "sha256": "134291d37f35f34f551cfcd4bcc343d5e3e7ef09a23d4959262cc99c84492e31"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "成功后新修改不能被旧成功反馈遮盖；快照上传后又有修改仍提醒。会话过期/销毁后迟到成功与失败不恢复旧状态，不弹迟到错误；timer及文档监听随组件清理。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-cloud-toolbar-targeted.txt",
+          "summary": "4文件44项定向通过，覆盖菜单命令、保存生命周期、5秒收起/悬停、五类错误、失败重试、新修改、会话结束/销毁迟到回执与退出保护。",
+          "sha256": "0a5af0e616d8b7ac7c833a1e5a1cde1612ad26eb17e1b4e556fd6db64cfbb64e"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-cloud-toolbar-browser.json",
+          "summary": "实际生产入口和官方SDK，隔离Chrome 1440/390；主栏单按钮与四项折叠菜单、保存中/时间/5秒折叠/悬停、网络及权限失败弹窗和重试、新修改、退出与刷新取消、两组上传、下载、成功退出通过。全部外部请求被合成Auth/RPC拦截，无真实云库写入；43个生产文件哈希，无页面异常。",
+          "sha256": "134291d37f35f34f551cfcd4bcc343d5e3e7ef09a23d4959262cc99c84492e31"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "命令排他、未上传权威基线、busy/conflict与计算/历史编辑保护保持；未上传或保存中提醒，成功无新修改不提醒。新UI不写模型、SQL、Excel或缓存字段。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-cloud-toolbar-targeted.txt",
+          "summary": "4文件44项定向通过，覆盖菜单命令、保存生命周期、5秒收起/悬停、五类错误、失败重试、新修改、会话结束/销毁迟到回执与退出保护。",
+          "sha256": "0a5af0e616d8b7ac7c833a1e5a1cde1612ad26eb17e1b4e556fd6db64cfbb64e"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-cloud-toolbar-functional.txt",
+          "summary": "npm.cmd test退出0，197文件1970项完整功能通过，158.15秒；并发2，未更改原门槛。",
+          "sha256": "ebf427657db78d89732612e68a74ff6d24b901d1183249f34161850587c798e8"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-cloud-toolbar-typecheck.txt",
+          "summary": "npm.cmd run typecheck退出0。",
+          "sha256": "1d7f620d90e7f350bd46125f9122cb6a108e840eeea32bb75642f48ac47525e9"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "完整1970项功能通过；源代码改动仅cloud-application/cloud-contract/cloud-panel及限定cloud样式。排班算法、存储/SQL与恢复适配器未改。PROJECT_MAP.md仍为ac5212bdf633236e094666e099fbd51977d9cd70；原改动未覆盖或提交。按风险L2，无性能路径变动，未重跑性能或本轮verify。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-cloud-toolbar-functional.txt",
+          "summary": "npm.cmd test退出0，197文件1970项完整功能通过，158.15秒；并发2，未更改原门槛。",
+          "sha256": "ebf427657db78d89732612e68a74ff6d24b901d1183249f34161850587c798e8"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-cloud-toolbar-typecheck.txt",
+          "summary": "npm.cmd run typecheck退出0。",
+          "sha256": "1d7f620d90e7f350bd46125f9122cb6a108e840eeea32bb75642f48ac47525e9"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-cloud-toolbar-build.txt",
+          "summary": "npm.cmd run build退出0，生产构建9.14秒；原node:module外部化和大块提示保持。",
+          "sha256": "154e5ca0c0e346447bbb48d58d063bfea8310134eaf1973b3065bb6534d73d41"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "verified",
+      "reason": "本次实际生产包在1440/390通过浏览器入口与可见交互检查，43文件哈希绑定；截图人工核对菜单边界、紧凑布局和低饱和状态。用户全程自主授权下采用隔离浏览器及模拟服务，不操作用户真实会话；公网和真实Supabase本轮未验证，未部署。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-cloud-toolbar-browser.json",
+          "summary": "实际生产入口和官方SDK，隔离Chrome 1440/390；主栏单按钮与四项折叠菜单、保存中/时间/5秒折叠/悬停、网络及权限失败弹窗和重试、新修改、退出与刷新取消、两组上传、下载、成功退出通过。全部外部请求被合成Auth/RPC拦截，无真实云库写入；43个生产文件哈希，无页面异常。",
+          "sha256": "134291d37f35f34f551cfcd4bcc343d5e3e7ef09a23d4959262cc99c84492e31"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-cloud-toolbar-build.txt",
+          "summary": "npm.cmd run build退出0，生产构建9.14秒；原node:module外部化和大块提示保持。",
+          "sha256": "154e5ca0c0e346447bbb48d58d063bfea8310134eaf1973b3065bb6534d73d41"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-cloud-toolbar-1440-menu.png",
+          "summary": "桌面工具栏及展开菜单实际截图，无人员资料。",
+          "sha256": "8c99d0616d56fcaa5b2e5a0ef2e891112de6802ba42ea485eba0104ff06ca93b"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-cloud-toolbar-390-permission.png",
+          "summary": "390宽度失败分类与点击重试实际截图，柔和文字无大色块。",
+          "sha256": "6b4f838543f426aa5f14d4207fe41343a5812952dd7dec0e9f5d714d2d339ff9"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-cloud-toolbar-1440-saved.png",
+          "summary": "桌面成功回执后具体时间实际截图。",
+          "sha256": "5f521c0e1f614c5c26ec3ca629cb20ecc32089b7572da984349a243043e04082"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-cloud-toolbar-390-compact.png",
+          "summary": "390宽度成功五秒后简化状态实际截图。",
+          "sha256": "17940fa1b01fca592f3d3d12ea82b36a49bf3eaf7c9337b339c2acb84f8b963f"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "red.txt记录旧实现缺少本轮10项行为，targeted.txt记录44项通过；真实生产入口的browser.json进一步核对按钮、菜单和完整保存反馈，不以文字存在代替交互。",
+    "laterChanges": "新的人员修改、快照在途变更、后续重试、恢复/发布、会话结束及组件销毁可能改坏反馈。targeted.txt保留新修改与迟到回执反向测试，browser.json核对新增人员、取消退出/刷新与重试。排班和数据字段不变，无新增领域规则后置链。",
+    "finalArtifact": "browser.json绑定43个生产文件SHA256及两视口交互运行，附桌面/手机截图并人工核对；本轮范围为本地UI代码修改。构建/完整功能通过，真实Supabase及公网未更新，旧36项与上一轮现场待验收状态未放行。"
+  },
+  "review": {
+    "missedScope": "已查默认/空库、正常保存、五类失败、快照后新修改、重试、菜单下载/恢复命令/退出、冲突保护及会话失效；浏览器实际核对两视口和原生alert/confirm/beforeunload。真实托管服务和公网本轮未验收，未把模拟服务当作云端实测；无新增持久化字段。",
+    "rootCause": "旧界面只有通用message和busy，缺少拥有明确生命周期的保存反馈与成功完成时间，且上一轮直接移除了工具。按新要求使用app单一反馈投影及原Workspace脏状态，UI只管理菜单/短期时间折叠；探针失败来自选择器不精确及对取消导航仍等待load，与产品保存逻辑无关。",
+    "earlyDetection": "修改工具栏前先列请求/成功回执/失败/新编辑/迟到回执/重新登录消费矩阵，用旧实现运行可见行为失败测试；交付前在真实生产入口同时观察进行中、失败重试、成功后再编辑及两视口菜单，并对取消刷新按对话框事件核对。"
+  }
+}

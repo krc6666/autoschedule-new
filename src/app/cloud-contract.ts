@@ -23,6 +23,13 @@ export interface CloudPublication {
   snapshot: PublicSchedule;
 }
 
+/** Transient request feedback; never part of the saved scheduling model. */
+export type CloudSaveFeedback =
+  | { phase: "idle" }
+  | { phase: "saving" }
+  | { phase: "saved"; savedAt: number }
+  | { phase: "failed"; kind: CloudError["kind"] | "unknown"; message: string };
+
 export interface CloudBackend {
   currentUser(): Promise<string | null>;
   signIn(email: string, password: string): Promise<void>;

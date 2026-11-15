@@ -1,0 +1,222 @@
+{
+  "status": "passed",
+  "runtime": "Installed Chrome; isolated contexts; actual production entry and official SDK",
+  "backend": "All external requests intercepted with synthetic Auth/RPC; no live Supabase reads or writes",
+  "checks": [
+    {
+      "viewport": 1440,
+      "mainVisibleButtons": 1,
+      "menuActions": 4,
+      "menuInViewport": true,
+      "savePending": true,
+      "successTimestamp": true,
+      "foldAfterFiveSeconds": true,
+      "tooltipRetained": true,
+      "failureCategories": ["network/service", "permission"],
+      "failureAlerts": 2,
+      "retry": true,
+      "newEditsOverrideSuccess": true,
+      "logoutCancelPreservesEditor": true,
+      "beforeUnloadCancelPreservesEditor": true,
+      "twoGroupsSaved": true,
+      "download": true,
+      "logout": true
+    },
+    {
+      "viewport": 390,
+      "mainVisibleButtons": 1,
+      "menuActions": 4,
+      "menuInViewport": true,
+      "savePending": true,
+      "successTimestamp": true,
+      "foldAfterFiveSeconds": true,
+      "tooltipRetained": true,
+      "failureCategories": ["network/service", "permission"],
+      "failureAlerts": 2,
+      "retry": true,
+      "newEditsOverrideSuccess": true,
+      "logoutCancelPreservesEditor": true,
+      "beforeUnloadCancelPreservesEditor": true,
+      "twoGroupsSaved": true,
+      "download": true,
+      "logout": true
+    }
+  ],
+  "pageErrors": [],
+  "artifactFiles": [
+    {
+      "path": "assets/bootstrap-icons-BeopsB42.woff",
+      "sha256": "f55513b7b591cb84a3b87ff0e34ea24d4831d6fedc22e54b911ca64b5b544a15"
+    },
+    {
+      "path": "assets/bootstrap-icons-mSm7cUeB.woff2",
+      "sha256": "6c75710364a1ca5604267716f6d28997b26319fdb078cf11e0b42ab66ff2ea61"
+    },
+    {
+      "path": "assets/cloud-application-BuoCuLGF.js",
+      "sha256": "b768d198018f2273de5caaaf77351f51292eacc4b15659f6f9c6500905e827c6"
+    },
+    {
+      "path": "assets/cloud-application-BuoCuLGF.js.map",
+      "sha256": "d4a108803158fba91993ed9f8e6a6e23ff3a194a84f4659b03dc3f46fb88ccdd"
+    },
+    {
+      "path": "assets/duty-roster-excel-BndNoX7A.js",
+      "sha256": "529ec61e9ae742b7d253c9126c9bce7ec51a06ead4517fcc31978a5cee324df3"
+    },
+    {
+      "path": "assets/duty-roster-excel-BndNoX7A.js.map",
+      "sha256": "230237b5ad3bb0616166b06cd7e8d14f043d4b37b7cb54460b2ef090a4a7e1cc"
+    },
+    {
+      "path": "assets/excel-D-MZeqf-.js",
+      "sha256": "9c3218c73b6c7b96c3e7cb72bfee9a05591d47b5252a634b121d72c652dd3c56"
+    },
+    {
+      "path": "assets/excel-D-MZeqf-.js.map",
+      "sha256": "264006d68190ceaa00b090076254f6f95db1272fd57a9731ab0ae10c36035011"
+    },
+    {
+      "path": "assets/excel-worksheet-D-cQbw_M.js",
+      "sha256": "6dc299bc55aabb8877a92c8049f62a3f9b30e130a6403fc9797e6d00beb70d21"
+    },
+    {
+      "path": "assets/excel-worksheet-D-cQbw_M.js.map",
+      "sha256": "0fb392cd232b6ecc213fa739c30c7909a8afc230bcc9cbf51c05cc534076ed0e"
+    },
+    {
+      "path": "assets/highs-BWKFkgAM.js",
+      "sha256": "96ee84d0132f812e21943c82fa0b005e0a0e8346bff87393714a39c1d3f1218d"
+    },
+    {
+      "path": "assets/highs-BWKFkgAM.js.map",
+      "sha256": "613e5d299b910267798f226c4993a4dd22fa5dbaade928c67891f4ecce656469"
+    },
+    {
+      "path": "assets/highs-CGwuLKTv.js",
+      "sha256": "864751d308eada6d2e22d6bac8d092a86c11347cb0b5240e4517fdada8d53308"
+    },
+    {
+      "path": "assets/highs-CGwuLKTv.js.map",
+      "sha256": "789b4c96b80ed6cd3101a890da95e4fd65edf7708d11c10a2f7295bcc1d4016f"
+    },
+    {
+      "path": "assets/highs-D01W9kFF.wasm",
+      "sha256": "2a95cbf93774622cf4b9ba7650017159aedcec83223f9f1ae5f486818f53a08a"
+    },
+    {
+      "path": "assets/highs-DEeTqoGR.wasm",
+      "sha256": "36e68fe5cdd886bedb12c39ab498b6f316bc38936bc11a94ea956face8b85fe2"
+    },
+    {
+      "path": "assets/highs-DN70-a7y.js",
+      "sha256": "dba6b4d193b8af20ad46b6f087a3c11ddbce46ac62101e673f5b10fe17364942"
+    },
+    {
+      "path": "assets/highs-DN70-a7y.js.map",
+      "sha256": "73a0dd6e80e1561f8df64ecbd98040a1400ec47592cead9aef1e31f7aa124dc9"
+    },
+    {
+      "path": "assets/highs-DO06CldI.js",
+      "sha256": "4545558696364f376c777fe55e6e81b7e10570c12d52c91444a1023b923cedf8"
+    },
+    {
+      "path": "assets/highs-DO06CldI.js.map",
+      "sha256": "f2921e6764efacd828e1062e0e4f196ccfc7b326cf4d56d17fcef1671d0735e8"
+    },
+    {
+      "path": "assets/highs-solver-B870NaIl.js",
+      "sha256": "7e444fa1e17b7e40675bdeb79694fbcde255921aea4b91a5fda94ca43002083c"
+    },
+    {
+      "path": "assets/highs-solver-B870NaIl.js.map",
+      "sha256": "7c45f2d82d506619fe9888314244471708562707e0261c7a12b39652d4811354"
+    },
+    {
+      "path": "assets/html2canvas.esm-DXEQVQnt.js",
+      "sha256": "8c46cc1bb52e600a4f397027529ced15488e01a9ca234cbf3649596841edf983"
+    },
+    {
+      "path": "assets/html2canvas.esm-DXEQVQnt.js.map",
+      "sha256": "5113828531512ac613c844b770c8fb56aa2397c51e5b2abab1d70260f44364a8"
+    },
+    {
+      "path": "assets/index-DeRdAJok.js",
+      "sha256": "a93e0f6eaaf95301dc67173042b74585a8dd8883c436504abd93a5c2b5946d45"
+    },
+    {
+      "path": "assets/index-DeRdAJok.js.map",
+      "sha256": "71f419f16c700a533581e68e37cdded5a0f6fa8fba2bafc8038d7338b0663047"
+    },
+    {
+      "path": "assets/late-priority-counts-excel-BCO87Dx3.js",
+      "sha256": "d46576814dd26fe91e2821b3c93ca1916c0df90567f0c01655ad497920a575c7"
+    },
+    {
+      "path": "assets/late-priority-counts-excel-BCO87Dx3.js.map",
+      "sha256": "b84465a3d0a0a2270ab957a76a3a480537801e0dfa7566e6d172b51b3f2432bc"
+    },
+    {
+      "path": "assets/schedule.worker-ZdQqs24G.js",
+      "sha256": "6e53ba20f87a6fc69e1c46d3f32aeb74e14b7626bc2d31d2848f721ab062fbc5"
+    },
+    {
+      "path": "assets/schedule.worker-ZdQqs24G.js.map",
+      "sha256": "0e088a31c1f0e73676230cf1e38a1a7b97fd2959981cd3d6c85cd8a7cb86e428"
+    },
+    {
+      "path": "assets/style-DAphUwbA.css",
+      "sha256": "0e6483836f083ae8a4fc66fb0da0e1c62387c938babdc9c7e36813d6d831a150"
+    },
+    {
+      "path": "assets/supabase-backend-DMJHdLqm.js",
+      "sha256": "db95ec2eacccd0984f8829ddc87e5a2cd4a3a792163e38ec19f7ff5944a1dec2"
+    },
+    {
+      "path": "assets/supabase-backend-DMJHdLqm.js.map",
+      "sha256": "88d5d2a4ea35fde3efb51b0c88378fc96fe65ba6c02b4790796a4745859f2ec8"
+    },
+    {
+      "path": "assets/xlsx.min-C1qP0va1.js",
+      "sha256": "2fb540959f3af382886e6bbae2b39e060ff6423ba8311775e8d6ec441fc6d8fb"
+    },
+    {
+      "path": "assets/xlsx.min-C1qP0va1.js.map",
+      "sha256": "3b7c3c55293ac2253a48bf981029c6bde00212c31248c50fa5a8d87f00f07fae"
+    },
+    {
+      "path": "assets/__vite-browser-external-D7Ct-6yo.js",
+      "sha256": "80b82acfeb87bf2cb6a47b0aa48e078951b8a2616fe5059cec7bc46dd650621d"
+    },
+    {
+      "path": "assets/__vite-browser-external-D7Ct-6yo.js.map",
+      "sha256": "cceffbc75ccf684c4f3eedf3b6a9ceb57ce42c708f40d815187c210f6784789f"
+    },
+    {
+      "path": "index.html",
+      "sha256": "24f8fb44fbe7b7ae69ca9b14fb490ad5454bd9098185cd9cd889cca2f802b0ed"
+    },
+    {
+      "path": "template/排班工具配置模板.xlsx",
+      "sha256": "f9f0c50f02c1cd57f77bba8ae32ddb80d71f6f5082271e2c3c83cb3d4510deca"
+    },
+    {
+      "path": "航班计划脚本/flight-filter.user.js",
+      "sha256": "ca3023c239982eeabd21240aeaa7ba7a27b3f373ed827d3ac7973da2d0962d3e"
+    },
+    {
+      "path": "航班计划脚本/flights.css",
+      "sha256": "21e3ed47604b6620b02caef9d47f86ff09a7ae1b8f7de0d0b021f3e93d359423"
+    },
+    {
+      "path": "航班计划脚本/flights.html",
+      "sha256": "0d435a2cca4fea9d76529fdd97e9cad46799bb2fad91a076bed36cd4b9998677"
+    },
+    {
+      "path": "航班计划脚本/flights.js",
+      "sha256": "447d49634ca2353baf7964e90ba11e2aaae01892e7455e291a9d9792a99001af"
+    }
+  ],
+  "liveSupabase": false,
+  "deployed": false
+}

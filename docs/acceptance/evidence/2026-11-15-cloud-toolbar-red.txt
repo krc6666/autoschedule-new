@@ -1,0 +1,105 @@
+Command: npm.cmd exec vitest -- run tests/ui/cloud-panel.test.ts
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+stderr | tests/ui/cloud-panel.test.ts
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+
+ ❯ tests/ui/cloud-panel.test.ts (10 tests | 10 failed) 35ms
+     × keeps only save outside a closed native disclosure and removes instruction paragraphs 19ms
+     × renders progress beside a disabled save button 3ms
+     × shows the completion time for five seconds and retains the full tooltip afterward 4ms
+     × does not let a previous success hide newer edits 2ms
+     × shows unavailable failure and lets its retry control emit save 2ms
+     × shows unauthorized failure and lets its retry control emit save 1ms
+     × shows conflict failure and lets its retry control emit save 1ms
+     × shows invalid failure and lets its retry control emit save 1ms
+     × shows unknown failure and lets its retry control emit save 1ms
+     × closes on Escape, outside pointer and menu actions; emits the original commands 1ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 10 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/ui/cloud-panel.test.ts > minimal cloud toolbar > keeps only save outside a closed native disclosure and removes instruction paragraphs
+AssertionError: expected null not to be null
+ ❯ tests/ui/cloud-panel.test.ts:28:22
+     26|     const element = await panel({ message: "已读取云端数据，修改后请点击保存到云端。" });
+     27|     const menu = element.querySelector("details")!;
+     28|     expect(menu).not.toBeNull();
+       |                      ^
+     29|     expect(menu.open).toBe(false);
+     30|     expect(element.querySelector("summary")?.getAttribute("aria-label"…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/10]⎯
+
+ FAIL  tests/ui/cloud-panel.test.ts > minimal cloud toolbar > renders progress beside a disabled save button
+AssertionError: the given combination of arguments (undefined and string) is invalid for this assertion. You can use an array, a map, an object, a set, a string, or a weakset instead of a string
+ ❯ tests/ui/cloud-panel.test.ts:39:76
+     37|   it("renders progress beside a disabled save button", async () => {
+     38|     const element = await panel({ busy: true, saveFeedback: { phase: "…
+     39|     expect(element.querySelector('[data-cloud-save-status]')?.textCont…
+       |                                                                            ^
+     40|     expect(element.querySelector<HTMLButtonElement>('[data-cloud-actio…
+     41|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/10]⎯
+
+ FAIL  tests/ui/cloud-panel.test.ts > minimal cloud toolbar > shows the completion time for five seconds and retains the full tooltip afterward
+TypeError: Cannot read properties of null (reading 'textContent')
+ ❯ tests/ui/cloud-panel.test.ts:48:19
+     46|     const element = await panel({ saveFeedback: { phase: "saved", save…
+     47|     const status = element.querySelector<HTMLElement>('[data-cloud-sav…
+     48|     expect(status.textContent).toContain("已保存 14:30:15");
+       |                   ^
+     49|     expect(status.title).toContain("14:30:15");
+     50|     await vi.advanceTimersByTimeAsync(5_000);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/10]⎯
+
+ FAIL  tests/ui/cloud-panel.test.ts > minimal cloud toolbar > does not let a previous success hide newer edits
+AssertionError: the given combination of arguments (undefined and string) is invalid for this assertion. You can use an array, a map, an object, a set, a string, or a weakset instead of a string
+ ❯ tests/ui/cloud-panel.test.ts:61:76
+     59|   it("does not let a previous success hide newer edits", async () => {
+     60|     const element = await panel({ dirty: true, saveFeedback: { phase: …
+     61|     expect(element.querySelector('[data-cloud-save-status]')?.textCont…
+       |                                                                            ^
+     62|   });
+     63|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/10]⎯
+
+ FAIL  tests/ui/cloud-panel.test.ts > minimal cloud toolbar > shows unavailable failure and lets its retry control emit save
+ FAIL  tests/ui/cloud-panel.test.ts > minimal cloud toolbar > shows unauthorized failure and lets its retry control emit save
+ FAIL  tests/ui/cloud-panel.test.ts > minimal cloud toolbar > shows conflict failure and lets its retry control emit save
+ FAIL  tests/ui/cloud-panel.test.ts > minimal cloud toolbar > shows invalid failure and lets its retry control emit save
+ FAIL  tests/ui/cloud-panel.test.ts > minimal cloud toolbar > shows unknown failure and lets its retry control emit save
+TypeError: Cannot read properties of null (reading 'textContent')
+ ❯ tests/ui/cloud-panel.test.ts:71:19
+     69|     element.addEventListener("cloud-command", handler);
+     70|     const status = element.querySelector<HTMLElement>('[data-cloud-sav…
+     71|     expect(status.textContent).toContain("保存失败，点击重试");
+       |                   ^
+     72|     expect(status.textContent).toContain(reason);
+     73|     expect(status.title).toContain("具体错误详情");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/10]⎯
+
+ FAIL  tests/ui/cloud-panel.test.ts > minimal cloud toolbar > closes on Escape, outside pointer and menu actions; emits the original commands
+TypeError: Cannot set properties of null (setting 'open')
+ ❯ tests/ui/cloud-panel.test.ts:83:10
+     81|     const handler = vi.fn();
+     82|     element.addEventListener("cloud-command", handler);
+     83|     menu.open = true;
+       |          ^
+     84|     document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape…
+     85|     expect(menu.open).toBe(false);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/10]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  10 failed (10)
+   Start at  12:19:30
+   Duration  716ms (transform 65ms, setup 0ms, import 94ms, tests 35ms, environment 375ms)
+
+
+Command exit code: 1

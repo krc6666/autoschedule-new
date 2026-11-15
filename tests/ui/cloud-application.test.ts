@@ -1,6 +1,7 @@
 // @vitest-environment happy-dom
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { mountCloudApplication } from "../../src/app/cloud-application";
+import { CloudError } from "../../src/app/cloud-contract";
 import { createBrowserCloudPersistence } from "../../src/infrastructure/cloud-recovery-store";
 import {
   cloudFixture,
@@ -55,6 +56,7 @@ describe("cloud entry controls and public view", () => {
       confirm,
       alert,
       download,
+      now: () => new Date(2026, 10, 15, 14, 30, 15).getTime(),
     });
     dispose = app.dispose;
     const command = async (detail: CloudCommand) => {
@@ -98,7 +100,8 @@ describe("cloud entry controls and public view", () => {
       "test-password-not-a-secret"
     );
     expect(app.mountEditor).toHaveBeenCalledOnce();
-    expect(app.root.textContent).toContain("已保存到云端");
+    expect(app.root.textContent).toContain("已与云端同步");
+    expect(app.root.querySelector("time")).toBeNull();
   });
 
   it("actual save button uploads edited model and reports failure without marking it saved", async () => {
@@ -109,14 +112,20 @@ describe("cloud entry controls and public view", () => {
     app.getStore().getState().persist();
     await settle();
     expect(app.root.textContent).toContain("有修改未上传");
-    fixture.backend.save.mockRejectedValueOnce(new Error("保存网络失败"));
+    fixture.backend.save.mockRejectedValueOnce(
+      new CloudError("unavailable", "保存网络失败")
+    );
     const save = [...app.root.querySelectorAll("button")].find(
       (b) => b.textContent?.trim() === "保存到云端"
     )!;
     save.click();
     await settle();
-    expect(app.root.textContent).toContain("保存网络失败");
-    expect(app.root.textContent).toContain("有修改未上传");
+    expect(app.root.textContent).toContain("保存失败，点击重试");
+    expect(app.root.textContent).toContain("网络或服务暂不可用");
+    expect(
+      app.root.querySelector<CloudPanelElement>("autoschedule-cloud-panel")!
+        .state.dirty
+    ).toBe(true);
     expect(app.alert).toHaveBeenCalledOnce();
     expect(app.alert.mock.calls[0]![0]).toContain("云端保存失败");
     expect(app.alert.mock.calls[0]![0]).toContain("保存网络失败");
@@ -124,14 +133,18 @@ describe("cloud entry controls and public view", () => {
     const shouldWarn = app.mountEditor.mock.calls[0]![1].shouldWarnOnExit;
     app.getStore().getState().markExported();
     expect(shouldWarn()).toBe(true);
-    save.click();
+    app.root.querySelector<HTMLButtonElement>(".cloud-save-retry")!.click();
     await settle();
-    expect(app.root.textContent).toContain("版本 2");
+    expect(app.root.textContent).toContain("已保存 14:30:15");
+    expect(
+      app.root.querySelector<CloudPanelElement>("autoschedule-cloud-panel")!
+        .state.version
+    ).toBe(2);
     expect(fixture.backend.save).toHaveBeenCalledTimes(2);
     expect(app.alert).toHaveBeenCalledOnce();
     expect(shouldWarn()).toBe(false);
     expect(
-      app.root.querySelector("autoschedule-cloud-panel")!.textContent
+      app.root.querySelector("[data-cloud-save-status]")!.textContent
     ).not.toMatch(/副本|发布|导出/);
     await app.command({ type: "download" });
     expect(app.download).toHaveBeenCalledOnce();
@@ -152,6 +165,79 @@ describe("cloud entry controls and public view", () => {
     expect(app.alert).toHaveBeenCalledOnce();
     expect(app.alert.mock.calls[0]![0]).toContain("云端保存失败");
   });
+
+  it.each([
+    ["unauthorized", "权限问题"],
+    ["conflict", "版本冲突"],
+    ["invalid", "数据校验未通过"],
+  ] as const)(
+    "classifies %s save errors and exposes a pending retry",
+    async (kind, label) => {
+      const fixture = cloudFixture();
+      fixture.backend.save.mockRejectedValueOnce(
+        new CloudError(kind, "服务端拒绝")
+      );
+      const app = mount(fixture);
+      await settle();
+      app.getStore().getState().configuration.addStaff();
+      await app.command({ type: "save" });
+      expect(app.root.textContent).toContain(label);
+      expect(
+        app.root.querySelector<HTMLElement>("[data-cloud-save-status]")!.title
+      ).toBe("服务端拒绝");
+      expect(
+        app.root.querySelector<CloudPanelElement>("autoschedule-cloud-panel")!
+          .state.version
+      ).toBe(1);
+      expect(app.mountEditor.mock.calls[0]![1].shouldWarnOnExit()).toBe(true);
+      let finish!: (version: number) => void;
+      fixture.backend.save.mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            finish = resolve;
+          })
+      );
+      app.root.querySelector<HTMLButtonElement>(".cloud-save-retry")!.click();
+      await settle();
+      expect(app.root.textContent).toContain("正在保存到云端...");
+      expect(app.root.textContent).not.toContain("保存失败");
+      finish(2);
+      await settle();
+      expect(app.root.textContent).toContain("已保存 14:30:15");
+      expect(app.alert).toHaveBeenCalledOnce();
+      app.getStore().getState().configuration.addStaff();
+      await settle();
+      expect(app.root.textContent).toContain("有修改未上传");
+      expect(
+        app.root.querySelector("[data-cloud-save-status]")!.textContent
+      ).not.toContain("已保存");
+    }
+  );
+
+  it.each(["expire", "dispose"] as const)(
+    "does not restore a late save success after %s",
+    async (ending) => {
+      const fixture = cloudFixture();
+      let finish!: (version: number) => void;
+      fixture.backend.save.mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            finish = resolve;
+          })
+      );
+      const app = mount(fixture);
+      await settle();
+      await app.command({ type: "save" });
+      if (ending === "expire") fixture.expire();
+      else dispose?.();
+      await settle();
+      finish(2);
+      await settle();
+      expect(app.root.querySelector("time")).toBeNull();
+      expect(app.root.querySelector("[data-cloud-save-status]")).toBeNull();
+      expect(app.alert).not.toHaveBeenCalled();
+    }
+  );
 
   it("reminds about cloud saving before logout and keeps editing when cancelled", async () => {
     const fixture = cloudFixture();
@@ -186,6 +272,12 @@ describe("cloud entry controls and public view", () => {
     expect(shouldWarn()).toBe(false);
     await app.command({ type: "save" });
     expect(shouldWarn()).toBe(true);
+    expect(app.root.textContent).toContain("正在保存到云端...");
+    expect(
+      app.root.querySelector<HTMLButtonElement>('[data-cloud-action="save"]')!
+        .disabled
+    ).toBe(true);
+    expect(app.root.querySelector("time")).toBeNull();
     const logout = [...app.root.querySelectorAll("button")].find(
       (button) => button.textContent?.trim() === "退出登录"
     )!;
@@ -195,6 +287,7 @@ describe("cloud entry controls and public view", () => {
     finish(2);
     await settle();
     expect(shouldWarn()).toBe(false);
+    expect(app.root.textContent).toContain("已保存 14:30:15");
     expect(app.alert).not.toHaveBeenCalled();
   });
 
@@ -250,8 +343,10 @@ describe("cloud entry controls and public view", () => {
     });
     app.getStore().getState().configuration.addStaff();
     await app.command({ type: "save" });
-    expect(app.root.textContent).toContain("已保存到云端");
-    expect(app.root.textContent).not.toMatch(/副本|发布|导出/);
+    expect(app.root.textContent).toContain("已保存 14:30:15");
+    expect(
+      app.root.querySelector("[data-cloud-save-status]")!.textContent
+    ).not.toMatch(/副本|发布|导出/);
     expect(app.alert).not.toHaveBeenCalled();
     expect(app.mountEditor.mock.calls[0]![1].shouldWarnOnExit()).toBe(false);
   });
@@ -269,8 +364,10 @@ describe("cloud entry controls and public view", () => {
     const app = mount(fixture, "", false, storage);
     await settle();
     const panel = app.root.querySelector("autoschedule-cloud-panel")!;
-    expect(panel.textContent).toContain("云端已有不同版本");
-    expect(panel.textContent).not.toMatch(/副本|发布|导出/);
+    expect(panel.textContent).toContain("云端版本已变化");
+    expect(panel.querySelector<HTMLDetailsElement>("details")!.open).toBe(
+      false
+    );
     app.confirm.mockReturnValueOnce(false);
     await app.command({ type: "discard" });
     expect(storage.getItem(key)).toBe(original);
@@ -278,7 +375,7 @@ describe("cloud entry controls and public view", () => {
     await app.command({ type: "discard" });
     expect(storage.getItem(key)).toBeNull();
     expect(fixture.backend.save).not.toHaveBeenCalled();
-    expect(panel.textContent).not.toContain("云端已有不同版本");
+    expect(panel.textContent).not.toContain("云端版本已变化");
   });
 
   it("does not expose the editor on auth failure and permits signing out of a non-admin account", async () => {
@@ -345,24 +442,31 @@ describe("cloud entry controls and public view", () => {
     expect(fixture.backend.save).not.toHaveBeenCalled();
   });
 
-  it("only shows cloud save and logout in the normal toolbar, including an empty workspace", async () => {
+  it("only shows the save action outside collapsed more operations, including an empty workspace", async () => {
     const fixture = cloudFixture();
     fixture.backend.load.mockResolvedValueOnce({ version: 0, model: null });
     const app = mount(fixture);
     await settle();
     const panel = app.root.querySelector("autoschedule-cloud-panel")!;
     expect(
-      [...panel.querySelectorAll("button")].map((button) =>
+      [...panel.querySelectorAll("button")]
+        .filter((button) => !button.closest("details"))
+        .map((button) => button.textContent?.trim())
+    ).toEqual(["保存到云端"]);
+    const menu = panel.querySelector<HTMLDetailsElement>("details")!;
+    expect(menu.open).toBe(false);
+    expect(
+      [...menu.querySelectorAll("button")].map((button) =>
         button.textContent?.trim()
       )
-    ).toEqual(["保存到云端", "退出登录"]);
+    ).toEqual(["发布当前组班表", "下载恢复副本", "导入恢复副本", "退出登录"]);
     expect(
-      panel.querySelector('input[type="file"], input[readonly]')
-    ).toBeNull();
-    expect(panel.textContent).not.toMatch(/副本|发布|迁移|导出/);
+      panel.querySelector<HTMLInputElement>('input[type="file"]')!.hidden
+    ).toBe(true);
+    expect(panel.textContent).toContain("有修改未上传");
   });
 
-  it("retains hidden publication state without restoring a publish button or share link", async () => {
+  it("keeps publication and its previous link within collapsed more operations after failure", async () => {
     const fixture = cloudFixture(publishableCloudModel());
     const app = mount(fixture);
     await settle();
@@ -377,8 +481,12 @@ describe("cloud entry controls and public view", () => {
     fixture.backend.publish.mockRejectedValueOnce(new Error("本次发布失败"));
     await app.command({ type: "publish" });
     expect(panel.state.shareUrl).toBe(link);
-    expect(panel.querySelector("input[readonly]")).toBeNull();
-    expect(panel.textContent).not.toContain("发布当前组班表");
+    expect(
+      panel.querySelector<HTMLInputElement>("details input[readonly]")!.value
+    ).toBe(link);
+    expect(panel.querySelector<HTMLDetailsElement>("details")!.open).toBe(
+      false
+    );
     expect(app.root.textContent).toContain("本次发布失败");
   });
 
@@ -448,7 +556,13 @@ describe("cloud entry controls and public view", () => {
       .click();
     await settle();
     expect(fixture.backend.save).toHaveBeenCalledOnce();
-    expect(root.textContent).toContain("版本 2");
+    expect(
+      root.querySelector<CloudPanelElement>("autoschedule-cloud-panel")!.state
+        .version
+    ).toBe(2);
+    expect(
+      root.querySelector("[data-cloud-save-status]")!.textContent
+    ).toContain("已保存");
     const savedExit = new Event("beforeunload", { cancelable: true });
     window.dispatchEvent(savedExit);
     expect(savedExit.defaultPrevented).toBe(false);

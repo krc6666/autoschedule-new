@@ -1,5 +1,5 @@
 import { mountAutoscheduleApp, type MountedAutoscheduleApp } from "../app";
-import type { CloudBackend } from "./cloud-contract";
+import { CloudError, type CloudBackend } from "./cloud-contract";
 import { CloudWorkspace } from "./cloud-workspace";
 import {
   createBrowserCloudPersistence,
@@ -24,6 +24,7 @@ export interface CloudApplicationOptions {
   alert?: (message: string) => void;
   mountEditor?: typeof mountAutoscheduleApp;
   download?: (json: string) => void;
+  now?: () => number;
 }
 
 export function mountCloudApplication(
@@ -33,6 +34,7 @@ export function mountCloudApplication(
   options: CloudApplicationOptions = {}
 ): { dispose(): void } {
   const location = options.location ?? window.location;
+  const now = options.now ?? Date.now;
   const token = new URLSearchParams(location.hash.slice(1)).get("schedule");
   let disposed = false;
   if (token !== null) {
@@ -72,6 +74,8 @@ export function mountCloudApplication(
     phase: "loading",
     busy: true,
     message: "正在验证登录与读取云端数据…",
+    notice: null,
+    saveFeedback: { phase: "idle" },
     dirty: false,
     version: 0,
     conflict: false,
@@ -110,6 +114,8 @@ export function mountCloudApplication(
       busy: true,
       message: "正在验证登录与读取云端数据…",
       shareUrl: "",
+      notice: null,
+      saveFeedback: { phase: "idle" },
     });
     try {
       const userId = await backend.currentUser();
@@ -144,10 +150,7 @@ export function mountCloudApplication(
       render({
         phase: "editor",
         busy: false,
-        message:
-          remote.version === 0
-            ? "云端还没有数据，请在工作台完成配置后点击“保存到云端”。"
-            : "已读取云端数据，修改后请点击“保存到云端”。",
+        message: "",
       });
     } catch (error) {
       if (!disposed && request === epoch)
@@ -174,7 +177,14 @@ export function mountCloudApplication(
     if (pendingCommand !== null || disposed) return;
     pendingCommand = command.type;
     const actionWorkspace = workspace;
-    render({ busy: true, message: "正在处理…" });
+    render({
+      busy: true,
+      message: "",
+      notice: null,
+      ...(command.type === "save"
+        ? { saveFeedback: { phase: "saving" as const } }
+        : {}),
+    });
     try {
       if (command.type === "login") {
         await backend.signIn(command.email, command.password);
@@ -192,15 +202,15 @@ export function mountCloudApplication(
         if (command.type === "download") {
           download(workspace.recoveryJson());
           render({
-            message:
-              "已生成恢复副本，请妥善保管；此文件包含内部配置与历史，不是公开班表。",
+            message: "恢复副本已下载。",
+            notice: "info",
           });
         } else {
           switch (command.type) {
             case "save":
               await workspace.save();
               if (workspace !== actionWorkspace) return;
-              render({ message: "已保存到云端。" });
+              render({ saveFeedback: { phase: "saved", savedAt: now() } });
               break;
             case "publish": {
               const publication = await workspace.publish();
@@ -210,6 +220,7 @@ export function mountCloudApplication(
               render({
                 shareUrl: url.href,
                 message: `已发布 ${publication.snapshot.groupId} 组 ${publication.snapshot.date} 班表。`,
+                notice: "info",
               });
               break;
             }
@@ -226,7 +237,9 @@ export function mountCloudApplication(
                   );
                 workspace.importLocal(local);
                 render({
-                  message: "本机资料已带入编辑区，请核对两组内容后保存到云端。",
+                  message: "已导入，尚未保存到云端。",
+                  notice: "info",
+                  saveFeedback: { phase: "idle" },
                 });
               }
               break;
@@ -235,8 +248,10 @@ export function mountCloudApplication(
                 confirm(
                   "放弃当前设备尚未保存到云端的修改，改用已保存的云端内容？此操作不会改写云端。"
                 )
-              )
+              ) {
                 workspace.discardRecovery();
+                render({ saveFeedback: { phase: "idle" } });
+              }
               break;
             case "restore": {
               const restored = await readCloudRecoveryFile(command.file);
@@ -248,8 +263,9 @@ export function mountCloudApplication(
               ) {
                 workspace.restoreRecovery(restored);
                 render({
-                  message:
-                    "恢复副本已带入编辑区，尚未上传；核对后请保存到云端。",
+                  message: "已导入，尚未保存到云端。",
+                  notice: "info",
+                  saveFeedback: { phase: "idle" },
                 });
               }
               break;
@@ -264,6 +280,7 @@ export function mountCloudApplication(
                 render({
                   message:
                     "已取消退出，请先点击“保存到云端”，保存成功后再退出。",
+                  notice: "info",
                 });
                 break;
               }
@@ -279,6 +296,7 @@ export function mountCloudApplication(
                 cacheWarning: "",
                 shareUrl: "",
                 message: "已退出当前设备。",
+                saveFeedback: { phase: "idle" },
               });
               break;
           }
@@ -288,7 +306,18 @@ export function mountCloudApplication(
       if (!disposed && (!actionWorkspace || workspace === actionWorkspace)) {
         const message =
           error instanceof Error ? error.message : "操作未成功，请重试。";
-        render({ message });
+        render(
+          command.type === "save"
+            ? {
+                message: "",
+                saveFeedback: {
+                  phase: "failed",
+                  kind: error instanceof CloudError ? error.kind : "unknown",
+                  message,
+                },
+              }
+            : { message, notice: "error" }
+        );
         if (command.type === "save")
           alert(
             `云端保存失败\n${message}\n\n尚未确认保存到云端，请不要关闭页面，核对后重新点击“保存到云端”。`
@@ -328,6 +357,8 @@ export function mountCloudApplication(
         cacheWarning: "",
         shareUrl: "",
         message: "登录已结束，请重新登录。",
+        notice: null,
+        saveFeedback: { phase: "idle" },
       });
     });
   });

@@ -1,0 +1,7 @@
+Command: npm.cmd run typecheck
+
+> autoschedule@1.0.0 typecheck
+> tsc -b --pretty false
+
+
+Command exit code: 0
