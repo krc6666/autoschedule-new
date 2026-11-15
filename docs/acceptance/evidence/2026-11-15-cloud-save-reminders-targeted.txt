@@ -1,0 +1,12 @@
+Command: npm.cmd exec vitest -- run tests/ui/cloud-application.test.ts tests/app/browser-exit-warning.test.ts tests/app/cloud-workspace.test.ts tests/infrastructure/cloud-recovery.test.ts tests/ui/cloud-bootstrap.test.ts
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+
+ Test Files  5 passed (5)
+      Tests  30 passed (30)
+   Start at  11:53:45
+   Duration  4.69s (transform 4.71s, setup 0ms, import 6.23s, tests 993ms, environment 939ms)
+
+
+Command exit code: 0

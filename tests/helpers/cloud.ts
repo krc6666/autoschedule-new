@@ -100,7 +100,10 @@ export function cloudFixture(model = cloudModel()) {
         signedOut = () => {};
       };
     }),
-    load: vi.fn(async () => ({ version, model: structuredClone(saved) })),
+    load: vi.fn<CloudBackend["load"]>(async () => ({
+      version,
+      model: structuredClone(saved),
+    })),
     save: vi.fn(async (expected: number, next: AppState) => {
       if (expected !== version)
         throw new CloudError("conflict", "WORKSPACE_CONFLICT");

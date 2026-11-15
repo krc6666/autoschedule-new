@@ -1,0 +1,112 @@
+Command: npm.cmd exec vitest -- run tests/ui/cloud-application.test.ts
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+stderr | tests/ui/cloud-application.test.ts
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+
+ ❯ tests/ui/cloud-application.test.ts (15 tests | 4 failed) 584ms
+     × actual save button uploads edited model and reports failure without marking it saved 33ms
+     × reminds about cloud saving before logout and keeps editing when cancelled 18ms
+     × only shows cloud save and logout in the normal toolbar, including an empty workspace 11ms
+     × retains hidden publication state without restoring a publish button or share link 33ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/ui/cloud-application.test.ts > cloud entry controls and public view > actual save button uploads edited model and reports failure without marking it saved
+AssertionError: expected '云端保存失败\n保存网络失败\n\n尚未确认保存到云端，请留在当前页面核对…' not to match /副本|发布|导出/
+
+- Expected:
+/副本|发布|导出/
+
++ Received:
+"云端保存失败
+保存网络失败
+
+尚未确认保存到云端，请留在当前页面核对并重试；需要时可下载恢复副本备份。"
+
+ ❯ tests/ui/cloud-application.test.ts:116:45
+    114|     expect(app.alert.mock.calls[0]![0]).toContain("云端保存失败");
+    115|     expect(app.alert.mock.calls[0]![0]).toContain("保存网络失败");
+    116|     expect(app.alert.mock.calls[0]![0]).not.toMatch(/副本|发布|导出/);
+       |                                             ^
+    117|     const shouldWarn = app.mountEditor.mock.calls[0]![1].shouldWarnOnE…
+    118|     app.getStore().getState().markExported();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  tests/ui/cloud-application.test.ts > cloud entry controls and public view > reminds about cloud saving before logout and keeps editing when cancelled
+AssertionError: expected '还有修改未保存到云端。\n请点“取消”，回到工作台点击“保存到云端”，保存…' not to match /副本|发布|导出/
+
+- Expected:
+/副本|发布|导出/
+
++ Received:
+"还有修改未保存到云端。
+请点“取消”，回到工作台点击“保存到云端”，保存成功后再退出。
+点“确定”将直接退出；本机恢复副本不能代替云端保存。确定仍要退出？"
+
+ ❯ tests/ui/cloud-application.test.ts:156:47
+    154|     expect(app.confirm).toHaveBeenCalledOnce();
+    155|     expect(app.confirm.mock.calls[0]![0]).toContain("保存到云端");
+    156|     expect(app.confirm.mock.calls[0]![0]).not.toMatch(/副本|发布|导出/);
+       |                                               ^
+    157|     expect(fixture.backend.signOut).not.toHaveBeenCalled();
+    158|     expect(app.root.textContent).toContain("有修改未上传");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  tests/ui/cloud-application.test.ts > cloud entry controls and public view > only shows cloud save and logout in the normal toolbar, including an empty workspace
+AssertionError: expected [ '保存到云端', '发布当前组班表', '下载恢复副本', …(2) ] to deeply equal [ '保存到云端', '退出登录' ]
+
+- Expected
++ Received
+
+  [
+    "保存到云端",
++   "发布当前组班表",
++   "下载恢复副本",
++   "首次从本机迁移",
+    "退出登录",
+  ]
+
+ ❯ tests/ui/cloud-application.test.ts:285:93
+    283|     await settle();
+    284|     const panel = app.root.querySelector("autoschedule-cloud-panel")!;
+    285|     expect([...panel.querySelectorAll("button")].map(button => button.…
+       |                                                                                             ^
+    286|     expect(panel.querySelector('input[type="file"], input[readonly]'))…
+    287|     expect(panel.textContent).not.toMatch(/副本|发布|迁移|导出/);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  tests/ui/cloud-application.test.ts > cloud entry controls and public view > retains hidden publication state without restoring a publish button or share link
+AssertionError: expected <input class="form-control" …(1)></input> to be null
+
+- Expected:
+null
+
++ Received:
+<input
+  class="form-control"
+  readonly=""
+/>
+
+ ❯ tests/ui/cloud-application.test.ts:303:52
+    301|     await app.command({ type: "publish" });
+    302|     expect(panel.state.shareUrl).toBe(link);
+    303|     expect(panel.querySelector("input[readonly]")).toBeNull();
+       |                                                    ^
+    304|     expect(panel.textContent).not.toContain("发布当前组班表");
+    305|     expect(app.root.textContent).toContain("本次发布失败");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed | 11 passed (15)
+   Start at  11:58:21
+   Duration  3.78s (transform 2.19s, setup 0ms, import 2.62s, tests 584ms, environment 366ms)
+
+
+Command exit code: 1

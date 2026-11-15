@@ -1,0 +1,243 @@
+{
+  "checkedAt": "2026-11-15T04:09:48.134Z",
+  "sourceHead": "436fab071794dd838c24c964acc972aaa7b333b1",
+  "scope": "Current local production build, prepared for review; not deployed",
+  "artifactRoot": "C:\\Users\\19598\\AppData\\Local\\Temp\\autoschedule-save-reminders-release-47oCbR",
+  "files": [
+    {
+      "path": ".nojekyll",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "assets/__vite-browser-external-D7Ct-6yo.js",
+      "bytes": 191,
+      "sha256": "80b82acfeb87bf2cb6a47b0aa48e078951b8a2616fe5059cec7bc46dd650621d"
+    },
+    {
+      "path": "assets/__vite-browser-external-D7Ct-6yo.js.map",
+      "bytes": 209,
+      "sha256": "cceffbc75ccf684c4f3eedf3b6a9ceb57ce42c708f40d815187c210f6784789f"
+    },
+    {
+      "path": "assets/bootstrap-icons-BeopsB42.woff",
+      "bytes": 180288,
+      "sha256": "f55513b7b591cb84a3b87ff0e34ea24d4831d6fedc22e54b911ca64b5b544a15"
+    },
+    {
+      "path": "assets/bootstrap-icons-mSm7cUeB.woff2",
+      "bytes": 134044,
+      "sha256": "6c75710364a1ca5604267716f6d28997b26319fdb078cf11e0b42ab66ff2ea61"
+    },
+    {
+      "path": "assets/cloud-application-DFWb6sO0.js",
+      "bytes": 15428,
+      "sha256": "59c6e59e750bcbeb2fb82a855be2475a50debc8902f2c20e638cd960cdaf1d75"
+    },
+    {
+      "path": "assets/cloud-application-DFWb6sO0.js.map",
+      "bytes": 42707,
+      "sha256": "13182d20c04b612090e0b28b2ccfd0a65a5b26d0e154b6a9d0a80a835925fca6"
+    },
+    {
+      "path": "assets/duty-roster-excel-C3n1PslW.js",
+      "bytes": 7128,
+      "sha256": "30005ef8ac12ad6498f1c654b776bfad90d9fc45c6e3a6829e60841667254eb9"
+    },
+    {
+      "path": "assets/duty-roster-excel-C3n1PslW.js.map",
+      "bytes": 25686,
+      "sha256": "174a770ddd980558c35485192085da95c1e4064413727f7d8f4888109732b74f"
+    },
+    {
+      "path": "assets/excel-B0Ku-VtL.js",
+      "bytes": 45517,
+      "sha256": "896d3a87e8eaf9b11d10db0dcad3fc1049d78f8a7e017eadb963f5d94099c525"
+    },
+    {
+      "path": "assets/excel-B0Ku-VtL.js.map",
+      "bytes": 180262,
+      "sha256": "568ab8d4088a8235c93e5105c2a4f0d2e39c4b91dfc48752f98a7d5c6ac686f1"
+    },
+    {
+      "path": "assets/excel-worksheet-BfpmaNBW.js",
+      "bytes": 636,
+      "sha256": "fc8e0b76d6275ad118d52377067709b7a2279f5cd331cb4ca1a5612218369fc9"
+    },
+    {
+      "path": "assets/excel-worksheet-BfpmaNBW.js.map",
+      "bytes": 2590,
+      "sha256": "8e3bfa29dbaa1219fde8590d3df7bac072721c9885f89a790948072bf328c81e"
+    },
+    {
+      "path": "assets/highs-B8W98ls1.js",
+      "bytes": 42423,
+      "sha256": "bb1dd68ee8652c877283d43107e20ac7de85ffe5b0dc6122e067cc524a30d4e9"
+    },
+    {
+      "path": "assets/highs-B8W98ls1.js.map",
+      "bytes": 207566,
+      "sha256": "64d8968e36f797068938445d0f197d1cc516ced4178fb1a3c99ba47394885154"
+    },
+    {
+      "path": "assets/highs-BWKFkgAM.js",
+      "bytes": 42303,
+      "sha256": "96ee84d0132f812e21943c82fa0b005e0a0e8346bff87393714a39c1d3f1218d"
+    },
+    {
+      "path": "assets/highs-BWKFkgAM.js.map",
+      "bytes": 207785,
+      "sha256": "613e5d299b910267798f226c4993a4dd22fa5dbaade928c67891f4ecce656469"
+    },
+    {
+      "path": "assets/highs-CZHdFe6D.js",
+      "bytes": 43088,
+      "sha256": "fd4bed9ef58c09956b0ab7f61f07d3911d9011f8645572d5b8989beb35169b2a"
+    },
+    {
+      "path": "assets/highs-CZHdFe6D.js.map",
+      "bytes": 211514,
+      "sha256": "09aa8694382e2282ff97c754844c2d4cc24732078df80c82a8136b324da8f1c4"
+    },
+    {
+      "path": "assets/highs-D01W9kFF.wasm",
+      "bytes": 3651465,
+      "sha256": "2a95cbf93774622cf4b9ba7650017159aedcec83223f9f1ae5f486818f53a08a"
+    },
+    {
+      "path": "assets/highs-DEeTqoGR.wasm",
+      "bytes": 3674431,
+      "sha256": "36e68fe5cdd886bedb12c39ab498b6f316bc38936bc11a94ea956face8b85fe2"
+    },
+    {
+      "path": "assets/highs-DN70-a7y.js",
+      "bytes": 42968,
+      "sha256": "dba6b4d193b8af20ad46b6f087a3c11ddbce46ac62101e673f5b10fe17364942"
+    },
+    {
+      "path": "assets/highs-DN70-a7y.js.map",
+      "bytes": 211726,
+      "sha256": "73a0dd6e80e1561f8df64ecbd98040a1400ec47592cead9aef1e31f7aa124dc9"
+    },
+    {
+      "path": "assets/highs-solver-BnbkbHUK.js",
+      "bytes": 25943,
+      "sha256": "271410127b6f3bd122e30b5d7de2dc6d89a51ed6a154584e6c5b37044ef093bc"
+    },
+    {
+      "path": "assets/highs-solver-BnbkbHUK.js.map",
+      "bytes": 145365,
+      "sha256": "f1f9983a5202ff805fcae2c6ecf28911c07c61ee89d5acd3a0dd099c38093e65"
+    },
+    {
+      "path": "assets/html2canvas.esm-DXEQVQnt.js",
+      "bytes": 201094,
+      "sha256": "8c46cc1bb52e600a4f397027529ced15488e01a9ca234cbf3649596841edf983"
+    },
+    {
+      "path": "assets/html2canvas.esm-DXEQVQnt.js.map",
+      "bytes": 602717,
+      "sha256": "5113828531512ac613c844b770c8fb56aa2397c51e5b2abab1d70260f44364a8"
+    },
+    {
+      "path": "assets/index-BC6wZhYE.js",
+      "bytes": 964903,
+      "sha256": "52624f97feef727a9d59af9e925eafbe05e6716eaa1a2237b11e239e7cae953f"
+    },
+    {
+      "path": "assets/index-BC6wZhYE.js.map",
+      "bytes": 3372860,
+      "sha256": "48520f4b369e2b20792cc839303bee02b83899ffe4959d7920c7f7efd03db596"
+    },
+    {
+      "path": "assets/late-priority-counts-excel-CqkfHz3W.js",
+      "bytes": 2932,
+      "sha256": "963ae9625c76ab9d39e9d5ecd9ac40845cbaae6b5cea7a865daf76dcd2f9d5eb"
+    },
+    {
+      "path": "assets/late-priority-counts-excel-CqkfHz3W.js.map",
+      "bytes": 11640,
+      "sha256": "7464d17a5e7102556d6e99b5ef8da0f6fac9164dde35806d376f30eaa662d45c"
+    },
+    {
+      "path": "assets/schedule.worker-ZdQqs24G.js",
+      "bytes": 437721,
+      "sha256": "6e53ba20f87a6fc69e1c46d3f32aeb74e14b7626bc2d31d2848f721ab062fbc5"
+    },
+    {
+      "path": "assets/schedule.worker-ZdQqs24G.js.map",
+      "bytes": 1990483,
+      "sha256": "0e088a31c1f0e73676230cf1e38a1a7b97fd2959981cd3d6c85cd8a7cb86e428"
+    },
+    {
+      "path": "assets/style-CzPXRm7y.css",
+      "bytes": 369387,
+      "sha256": "0ea1fe890c1f3ba5fcb121832ae7c6a711548cc3b2adc65aab4fc2d8d08443a7"
+    },
+    {
+      "path": "assets/supabase-backend-DXOiRjxA.js",
+      "bytes": 230300,
+      "sha256": "167815970d601ca78919e46f17f6bb86b5d1fe0ca4ca90a9e332e78fe5c85ad0"
+    },
+    {
+      "path": "assets/supabase-backend-DXOiRjxA.js.map",
+      "bytes": 1249116,
+      "sha256": "f763d88efe900f72b5a753edc915b789f422da7fb66d73d6ab644649d2c49726"
+    },
+    {
+      "path": "assets/xlsx.min-Pwe2_Qw1.js",
+      "bytes": 869585,
+      "sha256": "a961ec1c4360ba26a97cd764aea9251e11557216fb12781a8a4a6948d648bb7b"
+    },
+    {
+      "path": "assets/xlsx.min-Pwe2_Qw1.js.map",
+      "bytes": 1678376,
+      "sha256": "2209c94c8d8e38d776b54b2398c455e3907dd6abbd1ce240fc0c8ff46ccd4b87"
+    },
+    {
+      "path": "index.html",
+      "bytes": 553,
+      "sha256": "0723c3808cc8f7178bc60f8d0b998d79f694a6d84e41424a34ee9fa88a635bd1"
+    },
+    {
+      "path": "template/排班工具配置模板.xlsx",
+      "bytes": 81870,
+      "sha256": "f9f0c50f02c1cd57f77bba8ae32ddb80d71f6f5082271e2c3c83cb3d4510deca"
+    },
+    {
+      "path": "航班计划脚本/flight-filter.user.js",
+      "bytes": 13213,
+      "sha256": "ca3023c239982eeabd21240aeaa7ba7a27b3f373ed827d3ac7973da2d0962d3e"
+    },
+    {
+      "path": "航班计划脚本/flights.css",
+      "bytes": 4264,
+      "sha256": "21e3ed47604b6620b02caef9d47f86ff09a7ae1b8f7de0d0b021f3e93d359423"
+    },
+    {
+      "path": "航班计划脚本/flights.html",
+      "bytes": 1635,
+      "sha256": "0d435a2cca4fea9d76529fdd97e9cad46799bb2fad91a076bed36cd4b9998677"
+    },
+    {
+      "path": "航班计划脚本/flights.js",
+      "bytes": 7450,
+      "sha256": "447d49634ca2353baf7964e90ba11e2aaae01892e7455e291a9d9792a99001af"
+    }
+  ],
+  "checks": {
+    "saveFailurePopupPresent": true,
+    "saveButtonPresent": true,
+    "logoutButtonPresent": true,
+    "extraToolbarLabelsAbsent": true,
+    "savedStatusPresent": true
+  },
+  "ownerProjectMapUnchanged": true,
+  "schedulingAndDataContractsUnchanged": true,
+  "realBrowserPopupsVerified": false,
+  "realSupabaseWritesDuringThisTask": false,
+  "committed": false,
+  "pushed": false,
+  "deployed": false,
+  "sourceFingerprint": "8a84f195d6f5ae9ff4e9d22cf179943b9909512ccf5eef2e6554e2074b4905c5"
+}

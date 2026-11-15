@@ -21,6 +21,7 @@ export interface CloudApplicationOptions {
   persistence?: (scope: string, userId: string) => BrowserCloudPersistence;
   location?: Pick<Location, "href" | "hash">;
   confirm?: (message: string) => boolean;
+  alert?: (message: string) => void;
   mountEditor?: typeof mountAutoscheduleApp;
   download?: (json: string) => void;
 }
@@ -65,7 +66,7 @@ export function mountCloudApplication(
   let workspace: CloudWorkspace | null = null;
   let editor: MountedAutoscheduleApp | null = null;
   let epoch = 0;
-  let actionPending = false;
+  let pendingCommand: CloudCommand["type"] | null = null;
   let persistence: BrowserCloudPersistence | null = null;
   let state: CloudPanelState = {
     phase: "loading",
@@ -137,15 +138,16 @@ export function mountCloudApplication(
         store: current.store,
         cloud: true,
         preferences: persistence.preferences,
-        shouldWarnOnExit: () => current.hasUnsavedChanges,
+        shouldWarnOnExit: () =>
+          current.hasUnsavedChanges || pendingCommand === "save",
       });
       render({
         phase: "editor",
         busy: false,
         message:
           remote.version === 0
-            ? "云端还没有数据。可首次迁移本机资料，或在工作台配置后保存到云端。"
-            : "已读取云端数据。本机未上传的同版本修改会作为恢复内容保留。",
+            ? "云端还没有数据，请在工作台完成配置后点击“保存到云端”。"
+            : "已读取云端数据，修改后请点击“保存到云端”。",
       });
     } catch (error) {
       if (!disposed && request === epoch)
@@ -160,6 +162,7 @@ export function mountCloudApplication(
     }
   };
   const confirm = options.confirm ?? globalThis.confirm;
+  const alert = options.alert ?? ((message: string) => window.alert(message));
   const download =
     options.download ??
     ((json: string) =>
@@ -168,8 +171,8 @@ export function mountCloudApplication(
         "排班云端恢复副本.json"
       ));
   const handle = async (command: CloudCommand) => {
-    if (actionPending || disposed) return;
-    actionPending = true;
+    if (pendingCommand !== null || disposed) return;
+    pendingCommand = command.type;
     const actionWorkspace = workspace;
     render({ busy: true, message: "正在处理…" });
     try {
@@ -197,7 +200,7 @@ export function mountCloudApplication(
             case "save":
               await workspace.save();
               if (workspace !== actionWorkspace) return;
-              render({ message: "已保存到云端。公开班表仍需单独发布。" });
+              render({ message: "已保存到云端。" });
               break;
             case "publish": {
               const publication = await workspace.publish();
@@ -230,7 +233,7 @@ export function mountCloudApplication(
             case "discard":
               if (
                 confirm(
-                  "确认已下载需要保留的恢复副本？继续会放弃本机旧副本，使用当前已读取的云端数据。"
+                  "放弃当前设备尚未保存到云端的修改，改用已保存的云端内容？此操作不会改写云端。"
                 )
               )
                 workspace.discardRecovery();
@@ -255,10 +258,15 @@ export function mountCloudApplication(
               if (
                 workspace.hasUnsavedChanges &&
                 !confirm(
-                  "还有修改未上传。退出前将保留本机恢复副本，换电脑仍无法读取这些修改。确认退出？"
+                  "还有修改未保存到云端。\n请点“取消”，回到工作台点击“保存到云端”，保存成功后再退出。\n点“确定”将直接退出，未保存的修改无法从云端读取。确定仍要退出？"
                 )
-              )
+              ) {
+                render({
+                  message:
+                    "已取消退出，请先点击“保存到云端”，保存成功后再退出。",
+                });
                 break;
+              }
               if (!workspace.recoveryConflict) workspace.stash();
               await backend.signOut();
               ++epoch;
@@ -277,13 +285,17 @@ export function mountCloudApplication(
         }
       }
     } catch (error) {
-      if (!actionWorkspace || workspace === actionWorkspace)
-        render({
-          message:
-            error instanceof Error ? error.message : "操作未成功，请重试。",
-        });
+      if (!disposed && (!actionWorkspace || workspace === actionWorkspace)) {
+        const message =
+          error instanceof Error ? error.message : "操作未成功，请重试。";
+        render({ message });
+        if (command.type === "save")
+          alert(
+            `云端保存失败\n${message}\n\n尚未确认保存到云端，请不要关闭页面，核对后重新点击“保存到云端”。`
+          );
+      }
     } finally {
-      actionPending = false;
+      pendingCommand = null;
       render({ busy: false });
     }
   };

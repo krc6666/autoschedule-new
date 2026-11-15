@@ -1,0 +1,12 @@
+Command: npm.cmd run verify
+
+> autoschedule@1.0.0 verify
+> npm run typecheck && npm test && npm run test:performance && npm run build
+
+
+> autoschedule@1.0.0 typecheck
+> tsc -b --pretty false
+
+tests/ui/cloud-application.test.ts(350,62): error TS2322: Type 'null' is not assignable to type 'AppState'.
+
+Command exit code: 1

@@ -153,7 +153,7 @@ function fail(error: { message: string; code?: string }): never {
   if (error.message.includes("WORKSPACE_CONFLICT")) {
     throw new CloudError(
       "conflict",
-      "云端已有更新，已阻止旧数据覆盖。请先下载本机恢复副本，再重新登录读取最新数据。"
+      "云端已有更新，已阻止旧数据覆盖。本次修改尚未保存到云端，请核对后重新登录读取最新数据。"
     );
   }
   if (error.code === "42501" || error.message.includes("ADMIN_REQUIRED")) {

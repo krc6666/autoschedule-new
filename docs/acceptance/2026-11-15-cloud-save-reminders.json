@@ -1,0 +1,132 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-15-cloud-save-reminders",
+  "title": "云端只保留保存入口，并强化未保存退出及失败提醒",
+  "startedFrom": "436fab071794dd838c24c964acc972aaa7b333b1",
+  "expectation": {
+    "example": "管理员修改人员后尚未上传，关闭或刷新页面出现浏览器离开确认；点击退出登录明确提醒先保存。保存请求失败时有明显弹窗，修改与未上传状态保留。owner已提供公网工作台截图，并确认只在未保存或保存中提醒。",
+    "expected": "正常云端顶栏仅保留保存到云端和退出登录，隐藏发布、恢复副本导入/下载及首次迁移；提示只围绕云端保存。未上传修改或正在保存时提醒离开；退出取消后继续编辑，明确确认仍可退出；保存成功且无后续修改不再因本地未导出误弹。保存失败或被阻止时弹窗提示未成功，只有成功回执更新云端保存状态。",
+    "unchanged": "排班、Worker/WASM、权限、版本冲突保护、SQL、恢复副本、Excel和本地版未导出提醒保持；不自动上传，不在卸载时异步保存；不处理owner的PROJECT_MAP.md。owner随后授权先本地commit此版本，再独立改造顶部UI；本次不push或部署。",
+    "fallback": "保存失败保留编辑模型、云端版本及未上传状态，允许重试；取消退出保持登录。既有版本冲突继续暂停编辑，明确确认放弃本机未上传修改后才能使用云端内容；不删除旧发布数据和内部本机恢复保护。关闭/刷新仅请求浏览器原生确认，文案和是否展示由浏览器控制，不声称可强制拦截系统关闭。"
+  },
+  "testedVersion": "69c1a30ebbf81068d935fdd831c811806b79ab436bfb85d16659ccc6d12923dc",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "先观察到5项失败（缺弹窗、退出未明确先保存、在途保存漏提醒、云存成功仍因单机未导出误提醒），范围确认后再观察到4项失败（额外工具和副本/发布文案仍在）；修复后完整测试通过。首轮verify的夹具类型失败也保留。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-cloud-save-reminders-red.txt",
+          "summary": "修改前新增UI回归5失败/9通过，实际复现提醒缺失和云端保存后误阻止。",
+          "sha256": "b7dee7d208a0b0ba949d4c5f0e0ab9e677d6db6be30438f6243099a14a5efddc"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-cloud-save-reminders-scope-red.txt",
+          "summary": "owner确认隐藏工具后补红测，4失败/11通过，捕获按钮和副本/发布文案仍可见。",
+          "sha256": "627c3cf957ecab29d2597188b6d614627db5deddf34dc20a63d3dc2d2e9792fb"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-cloud-save-reminders-verify.txt",
+          "summary": "首轮完整验证在类型检查停止：测试夹具把load推断为非空，新增空云端回执不能赋null；后按真实接口声明mock，未改产品返回值。",
+          "sha256": "9d1b506146c5ef3a73cced746c2462e3ae707aa085a105703e6799dfd50f6ca3"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-cloud-save-reminders-verify-final.txt",
+          "summary": "当前完整verify退出0：196文件1955项功能、7文件19项性能、类型检查和生产构建通过；并发2，不改变原门槛。自动验证不代替浏览器原生弹窗和公网现场。",
+          "sha256": "b18ff6c01458325e57ecee096f3529b459edc5d83ad3ce05b4b058b68bddafe5"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "Happy DOM真实保存按钮及挂载编辑器验证未保存关闭事件被阻止、云存成功后解除、失败弹窗并保留修改；正常及空云端顶栏均只有保存与退出，登录/保存说明不含副本或发布。此项是自动入口证据，未宣称真实浏览器已核对。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-cloud-save-reminders-verify-final.txt",
+          "summary": "当前完整verify退出0：196文件1955项功能、7文件19项性能、类型检查和生产构建通过；并发2，不改变原门槛。自动验证不代替浏览器原生弹窗和公网现场。",
+          "sha256": "b18ff6c01458325e57ecee096f3529b459edc5d83ad3ce05b4b058b68bddafe5"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "覆盖保存无修改但尚在途、计算/历史编辑拒绝、重试、取消退出、缓存不可写不误报云存失败、实际版本冲突取消保留原字节/确认后使用云端、空云端及原单机模式。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-cloud-save-reminders-verify-final.txt",
+          "summary": "当前完整verify退出0：196文件1955项功能、7文件19项性能、类型检查和生产构建通过；并发2，不改变原门槛。自动验证不代替浏览器原生弹窗和公网现场。",
+          "sha256": "b18ff6c01458325e57ecee096f3529b459edc5d83ad3ce05b4b058b68bddafe5"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "保存快照捕获后再改模型，成功回执不能清除新修改的离开提醒；会话结束/销毁后的迟到保存失败不再弹窗。已存在发布状态/迟到发布仍不暴露被隐藏的工具或链接。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-cloud-save-reminders-verify-final.txt",
+          "summary": "当前完整verify退出0：196文件1955项功能、7文件19项性能、类型检查和生产构建通过；并发2，不改变原门槛。自动验证不代替浏览器原生弹窗和公网现场。",
+          "sha256": "b18ff6c01458325e57ecee096f3529b459edc5d83ad3ce05b4b058b68bddafe5"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "云端脏状态仍来自CloudWorkspace，保存中复用唯一命令排他状态；正常云存成功不被单机导出标记误阻止，单机原未导出提醒仍有效。冲突不能静默丢弃；原SQL/CAS及坏数据校验不放宽。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-cloud-save-reminders-verify-final.txt",
+          "summary": "当前完整verify退出0：196文件1955项功能、7文件19项性能、类型检查和生产构建通过；并发2，不改变原门槛。自动验证不代替浏览器原生弹窗和公网现场。",
+          "sha256": "b18ff6c01458325e57ecee096f3529b459edc5d83ad3ce05b4b058b68bddafe5"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-cloud-save-reminders-artifact.json",
+          "summary": "当前生产包逐文件SHA256、编译后的保存失败弹窗和工具隐藏检查；冻结到临时目录供审查。无浏览器现场、无本轮真实云端写入、未提交或发布。",
+          "sha256": "cca535dbec45b995a79e283d13dd953ee00ce7a6528446aa0efba125ce5853a5"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "排班领域、模型、SQL、原恢复和云缓存适配器未修改，完整原功能/19项性能通过；只修改后端冲突提示文字，不改RPC/CAS。原工作台Excel与本地退出提醒保留。PROJECT_MAP.md与任务开始时一致，未纳入操作。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-cloud-save-reminders-verify-final.txt",
+          "summary": "当前完整verify退出0：196文件1955项功能、7文件19项性能、类型检查和生产构建通过；并发2，不改变原门槛。自动验证不代替浏览器原生弹窗和公网现场。",
+          "sha256": "b18ff6c01458325e57ecee096f3529b459edc5d83ad3ce05b4b058b68bddafe5"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-cloud-save-reminders-artifact.json",
+          "summary": "当前生产包逐文件SHA256、编译后的保存失败弹窗和工具隐藏检查；冻结到临时目录供审查。无浏览器现场、无本轮真实云端写入、未提交或发布。",
+          "sha256": "cca535dbec45b995a79e283d13dd953ee00ce7a6528446aa0efba125ce5853a5"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "当前生产包已通过自动检查并冻结为可发布文件，原生alert/confirm/beforeunload的实际展示及最终公网页面尚未由owner验收。本轮没有新的commit/push/部署授权，线上仍为原版本；不能用Happy DOM或静态文字存在代替浏览器现场。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-cloud-save-reminders-artifact.json",
+          "summary": "当前生产包逐文件SHA256、编译后的保存失败弹窗和工具隐藏检查；冻结到临时目录供审查。无浏览器现场、无本轮真实云端写入、未提交或发布。",
+          "sha256": "cca535dbec45b995a79e283d13dd953ee00ce7a6528446aa0efba125ce5853a5"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-cloud-save-reminders-verify-final.txt",
+          "summary": "当前完整verify退出0：196文件1955项功能、7文件19项性能、类型检查和生产构建通过；并发2，不改变原门槛。自动验证不代替浏览器原生弹窗和公网现场。",
+          "sha256": "b18ff6c01458325e57ecee096f3529b459edc5d83ad3ce05b4b058b68bddafe5"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "red的5项失败直接发现缺弹窗、在途保存漏提醒与云存成功后误弹；scope-red的4项失败发现额外工具/文案。verify-final的当前1955项功能和19项性能及类型/构建证明自动修复结果，未替代现场。",
+    "laterChanges": "保存迟到回执、保存后再编辑、会话结束、缓存失败和版本冲突都可能改坏提示或数据；UI/Store回归逐一覆盖，冲突取消保留原字节，确认使用云端不写云库。单机导出提醒单独从真实挂载入口验证。",
+    "finalArtifact": "artifact.json绑定本次生产包逐文件SHA256并核对编译后的保存/失败提示和隐藏工具。owner当前截图属于修改前版本；新浏览器弹窗和公网更新尚未现场验收，finalArtifact保持unverified。"
+  },
+  "review": {
+    "missedScope": "核对云端正常/空库/保存失败/在途/成功后再改/退出取消/会话过期/缓存问题/冲突处理及原单机入口；移除常规副本和发布提醒，同时保留旧数据与内部恢复保护。真实浏览器弹窗和公网效果未验证，未伪报完成；本轮未发布，也未放行历史待验收项。",
+    "rootCause": "云端接入复用了单机导出离开保护且做OR，未把云端保存作为离开提醒的权威条件；保存异常只有顶部文字，命令排他只记录忙闲无法识别无修改的在途保存。界面还包含owner不需要的副本与发布工具；按最终确认隐藏，保留版本安全边界。测试mock曾把正式可空load回执推断为非空，类型检查捕获后按正式接口修正。",
+    "earlyDetection": "接入另一持久化渠道时先列退出、保存回执、在途、失败和本机导出的消费矩阵，跑成功后不误阻止及失败后仍阻止的成对入口测试；UI收口同时检查空库、提示文字、异常冲突和迟到回执，交付前用当前完整验证与生产包版本绑定，再由owner核对浏览器原生弹窗。"
+  }
+}

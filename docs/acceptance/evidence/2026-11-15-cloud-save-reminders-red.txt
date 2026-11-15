@@ -1,0 +1,102 @@
+Command: npm.cmd exec vitest -- run tests/ui/cloud-application.test.ts
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+stderr | tests/ui/cloud-application.test.ts
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+
+ ❯ tests/ui/cloud-application.test.ts (14 tests | 5 failed) 709ms
+     × actual save button uploads edited model and reports failure without marking it saved 36ms
+     × prevents cloud transfer during compute or history edit 25ms
+     × reminds about cloud saving before logout and keeps editing when cancelled 23ms
+     × warns throughout a pending save even when the model was already saved 27ms
+     × mounts the real editor and keeps its ordinary local save distinct from explicit cloud upload 383ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/ui/cloud-application.test.ts > cloud entry controls and public view > actual save button uploads edited model and reports failure without marking it saved
+AssertionError: expected "vi.fn()" to be called once, but got 0 times
+ ❯ tests/ui/cloud-application.test.ts:104:23
+    102|     expect(app.root.textContent).toContain("保存网络失败");
+    103|     expect(app.root.textContent).toContain("有修改未上传");
+    104|     expect(app.alert).toHaveBeenCalledOnce();
+       |                       ^
+    105|     expect(app.alert.mock.calls[0]![0]).toContain("云端保存失败");
+    106|     expect(app.alert.mock.calls[0]![0]).toContain("保存网络失败");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  tests/ui/cloud-application.test.ts > cloud entry controls and public view > prevents cloud transfer during compute or history edit
+AssertionError: expected "vi.fn()" to be called once, but got 0 times
+ ❯ tests/ui/cloud-application.test.ts:128:23
+    126|     expect(fixture.backend.publish).not.toHaveBeenCalled();
+    127|     expect(app.root.textContent).toContain("先结束排班计算");
+    128|     expect(app.alert).toHaveBeenCalledOnce();
+       |                       ^
+    129|     expect(app.alert.mock.calls[0]![0]).toContain("云端保存失败");
+    130|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  tests/ui/cloud-application.test.ts > cloud entry controls and public view > reminds about cloud saving before logout and keeps editing when cancelled
+AssertionError: expected '还有修改未上传。退出前将保留本机恢复副本，换电脑仍无法读取这些修改。确认退…' to contain '保存到云端'
+
+Expected: "保存到云端"
+Received: "还有修改未上传。退出前将保留本机恢复副本，换电脑仍无法读取这些修改。确认退出？"
+
+ ❯ tests/ui/cloud-application.test.ts:140:43
+    138|     await app.command({ type: "logout" });
+    139|     expect(app.confirm).toHaveBeenCalledOnce();
+    140|     expect(app.confirm.mock.calls[0]![0]).toContain("保存到云端");
+       |                                           ^
+    141|     expect(fixture.backend.signOut).not.toHaveBeenCalled();
+    142|     expect(app.root.textContent).toContain("有修改未上传");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL  tests/ui/cloud-application.test.ts > cloud entry controls and public view > warns throughout a pending save even when the model was already saved
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/ui/cloud-application.test.ts:158:26
+    156|     expect(shouldWarn()).toBe(false);
+    157|     await app.command({ type: "save" });
+    158|     expect(shouldWarn()).toBe(true);
+       |                          ^
+    159|     const logout = [...app.root.querySelectorAll("button")].find(butto…
+    160|     expect(logout.disabled).toBe(true);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+ FAIL  tests/ui/cloud-application.test.ts > cloud entry controls and public view > mounts the real editor and keeps its ordinary local save distinct from explicit cloud upload
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ tests/ui/cloud-application.test.ts:336:40
+    334|     const savedExit = new Event("beforeunload", { cancelable: true });
+    335|     window.dispatchEvent(savedExit);
+    336|     expect(savedExit.defaultPrevented).toBe(false);
+       |                                        ^
+    337|   });
+    338| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  5 failed | 9 passed (14)
+   Start at  11:53:11
+   Duration  4.23s (transform 2.44s, setup 0ms, import 2.91s, tests 709ms, environment 390ms)
+
+
+Command exit code: 1

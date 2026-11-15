@@ -63,29 +63,6 @@ export class CloudPanelElement extends LightDomElement {
                   保存到云端
                 </button>
                 <button
-                  class="btn btn-outline-primary btn-sm"
-                  ?disabled=${s.busy || s.conflict || s.dirty}
-                  @click=${() => this.command({ type: "publish" })}
-                >
-                  发布当前组班表
-                </button>
-                <button
-                  class="btn btn-outline-secondary btn-sm"
-                  ?disabled=${s.busy}
-                  @click=${() => this.command({ type: "download" })}
-                >
-                  下载恢复副本
-                </button>
-                <label class="btn btn-outline-secondary btn-sm mb-0"
-                  >导入恢复副本<input
-                    class="visually-hidden"
-                    type="file"
-                    accept=".json,application/json"
-                    ?disabled=${s.busy || s.conflict}
-                    @change=${this.restore}
-                /></label>
-                ${s.canImport ? html`<button class="btn btn-outline-secondary btn-sm" ?disabled=${s.busy || s.conflict} @click=${() => this.command({ type: "import-local" })}>首次从本机迁移</button>` : null}
-                <button
                   class="btn btn-outline-secondary btn-sm"
                   ?disabled=${s.busy}
                   @click=${() => this.command({ type: "logout" })}
@@ -127,31 +104,29 @@ export class CloudPanelElement extends LightDomElement {
                 </button>
               </form>
               <p class="small text-secondary mt-2 mb-0">
-                仅管理员可修改。查看班表请打开管理员提供的发布链接。
+                登录后可读取和保存云端配置。
               </p>
             `
           : null
       }
       ${s.message ? html`<p class="mt-2 mb-0" role="status">${s.message}</p>` : null}
-      ${s.cacheWarning ? html`<p class="mt-2 mb-0 text-danger" role="alert">${s.cacheWarning}</p>` : null}
       ${
         s.conflict
           ? html`
               <p class="mt-2 mb-1 text-danger" role="alert">
-                本机有尚未上传的旧副本，云端已有不同版本。编辑已暂停，请先下载副本备份。
+                当前设备还有未保存到云端的内容，但云端已有不同版本。编辑已暂停，请核对后再选择使用云端内容。
               </p>
               <button
                 class="btn btn-outline-danger btn-sm"
                 ?disabled=${s.busy}
                 @click=${() => this.command({ type: "discard" })}
               >
-                放弃本机旧副本，使用云端数据
+                放弃本机未保存修改，使用云端内容
               </button>
             `
           : null
       }
-      ${s.phase === "editor" ? html`<p class="small text-secondary mt-2 mb-0">编辑后请点“保存到云端”，换电脑才能接续。只有点“发布”才会更新公开班表；发布内容不含配置、草稿或历史库。</p>` : null}
-      ${s.shareUrl ? html`<label class="d-block mt-2">查看链接<input class="form-control" readonly .value=${s.shareUrl} @focus=${(event: FocusEvent) => (event.target as HTMLInputElement).select()} /></label>` : null}
+      ${s.phase === "editor" ? html`<p class="small text-secondary mt-2 mb-0">修改后请点“保存到云端”，保存成功后再退出。</p>` : null}
       ${
         s.phase === "error"
           ? html`
@@ -186,13 +161,6 @@ export class CloudPanelElement extends LightDomElement {
     };
     form.reset();
     this.command(command);
-  }
-
-  private restore(event: Event): void {
-    const input = event.currentTarget as HTMLInputElement;
-    const file = input.files?.[0];
-    input.value = "";
-    if (file) this.command({ type: "restore", file });
   }
 }
 

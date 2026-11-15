@@ -34,8 +34,7 @@ export function mountAutoscheduleApp(
   const removeBrowserExitWarning = installBrowserExitWarning(
     window,
     () =>
-      (options.shouldWarnOnExit?.() ?? false) ||
-      store.getState().hasUnexportedChanges()
+      options.shouldWarnOnExit?.() ?? store.getState().hasUnexportedChanges()
   );
   const restoredScheduleNotice = store.getState().model.assignments.length > 0;
   const restorationIssues = getLastRestorationReport().issues;

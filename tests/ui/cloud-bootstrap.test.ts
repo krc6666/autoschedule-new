@@ -1,6 +1,9 @@
 // @vitest-environment happy-dom
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { mountConfiguredApplication } from "../../src/bootstrap";
+import { mountAutoscheduleApp } from "../../src/app";
+import { createAutoscheduleStore } from "../../src/app/store/autoschedule-store";
+import { cloudModel } from "../helpers/cloud";
 import { settleLit } from "./lit-test-helpers";
 
 let dispose: (() => void) | undefined;
@@ -12,6 +15,32 @@ afterEach(() => {
 });
 
 describe("configured app entry", () => {
+  it("retains local unexported exit warnings and clears them only after local export", async () => {
+    const root = document.createElement("div");
+    document.body.append(root);
+    const model = cloudModel();
+    const store = createAutoscheduleStore({
+      initialState: model,
+      persistence: {
+        load: () => model,
+        save: (state) => ({ state, sizeBytes: 0, nearCapacity: false }),
+        clear: () => {},
+      },
+    });
+    dispose = mountAutoscheduleApp(root, { store }).dispose;
+    const warns = () => {
+      const event = new Event("beforeunload", { cancelable: true });
+      window.dispatchEvent(event);
+      return event.defaultPrevented;
+    };
+    expect(warns()).toBe(false);
+    store.getState().configuration.addStaff();
+    expect(warns()).toBe(true);
+    store.getState().markExported();
+    expect(warns()).toBe(false);
+    dispose();
+    expect(warns()).toBe(false);
+  });
   it("retains the original editable local application with no cloud settings", async () => {
     vi.stubEnv("VITE_SUPABASE_URL", "");
     vi.stubEnv("VITE_SUPABASE_PUBLISHABLE_KEY", "");
