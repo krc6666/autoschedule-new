@@ -1,0 +1,84 @@
+{
+  "taskId": "2026-11-15-supervisor-fill-existing-vacancies",
+  "input": {
+    "kind": "Owner-provided current-group configuration Excel plus 2026-11-18 screenshot",
+    "sha256": "26801fa44971cf46ab02f1e8f6b5c0c6f87592d4ab9d954297bbf0d77202ffbc",
+    "privateFilesKeptInIgnoredTmp": true
+  },
+  "failureBeforeFix": {
+    "synthetic": {
+      "testCases": 15,
+      "failed": 11,
+      "passedHardConstraintProtections": 4,
+      "flights": ["AB123", "TR121", "KE166"],
+      "paths": [
+        "backup-refill",
+        "reassignment-solver",
+        "final-supervisor-assignments",
+        "full-generation"
+      ]
+    },
+    "ownerConfigReplay": {
+      "samePositionsAndFallbackAsScreenshot": true,
+      "configuredTarget": "CX937/G14",
+      "genericFallback": "CX937/G19",
+      "existingVacancy": "CX937/G12"
+    },
+    "isolatedCause": {
+      "oldVacancyIncluded": "search fails",
+      "onlyOldVacancyExcluded": "search selects supervisor",
+      "chainFinalGuardPasses": true
+    }
+  },
+  "failureAfterFix": {
+    "focusedTests": 51,
+    "relatedFiles": 81,
+    "relatedTests": 1102,
+    "typecheckExit": 0,
+    "ownerConfigKernelReplayPasses": true,
+    "boundary": {
+      "input": "owner-provided Excel; stored privately in .tmp; no browser interaction",
+      "configurationImportWarnings": [],
+      "otherGroupUnchanged": true,
+      "workerErrors": 0,
+      "sourceAndTargetSamePerson": true,
+      "sourceLinkAndRuleLinkRetained": true,
+      "targetWorkHours": 0,
+      "targetFatigue": 0,
+      "unfilled": ["CX937/G12"],
+      "restoredLinks": true,
+      "exportIndependentRead": true,
+      "finalRows": 44
+    }
+  },
+  "sourceSha256": "787e9632e2bc125fba53970d4cba9fa31801d22f4aa5d456ce716d33f2747d8b",
+  "finalXlsx": {
+    "localPath": ".tmp/cx937-fixed-schedule.xlsx",
+    "sha256": "2b9c0ed4af5a13ff1cae4059355460e3232aacf2bf857de07332f5573466ba99",
+    "independentlyReadTargetMatchesSupervisor": true,
+    "targetHours": 0,
+    "targetFatigue": 0,
+    "unfilled": ["CX937/G12"]
+  },
+  "ownerAcceptance": {
+    "status": "verified",
+    "source": "Owner reply in this conversation after refreshing the original 127.0.0.1:55350 page and rerunning 2026-11-18",
+    "result": "Configured supervisor is in both source supervisor post and G14; no new vacancy",
+    "agentDidNotOperateBrowser": true
+  },
+  "limitations": {
+    "browserInteraction": "Owner operated original browser per repository AGENTS and confirmed the result; agent did not operate browser",
+    "newSettings": "none; existing settings retained",
+    "externalOperations": "No commit, push, cloud save or publish performed"
+  },
+  "fullVerification": {
+    "exitCode": 0,
+    "functionalFiles": 200,
+    "functionalTests": 1998,
+    "performanceFiles": 7,
+    "performanceTests": 19,
+    "typecheck": true,
+    "productionBuild": true,
+    "maxWorkers": 2
+  }
+}

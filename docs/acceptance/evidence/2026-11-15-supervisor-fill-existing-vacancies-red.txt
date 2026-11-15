@@ -1,0 +1,190 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/domain/supervisor-fill-existing-vacancies.test.ts (15 tests | 11 failed) 312ms
+     × backup refill preserves the old vacancy on 'AB123'/'G14' 17ms
+     × backup refill preserves the old vacancy on 'TR121'/'H07' 2ms
+     × backup refill preserves the old vacancy on 'KE166'/'H05' 2ms
+     × solver finds a legal chain despite an old vacancy on 'AB123'/'G14' 61ms
+     × solver finds a legal chain despite an old vacancy on 'TR121'/'H07' 3ms
+     × solver finds a legal chain despite an old vacancy on 'KE166'/'H05' 3ms
+     × final supervisor assignments keep the configured target on 'AB123' 11ms
+     × final supervisor assignments keep the configured target on 'TR121' 4ms
+     × final supervisor assignments keep the configured target on 'KE166' 5ms
+     × allows an originally empty configured target and multiple unrelated old vacancies 2ms
+     × full generation keeps configured fill and final guard rejects a subsequently broken source link 186ms
+npx.cmd :
+所在位置 行:2 字符: 68
++ ...  $env:TEMP; npx.cmd vitest run tests/domain/supervisor-fill-existing- ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 11 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/domain/supervisor-fill-existing-vacancies.test.ts > configured supervisor fill preserves pre-existing vaca
+ncies for every flight > backup refill preserves the old vacancy on 'AB123'/'G14'
+ FAIL  tests/domain/supervisor-fill-existing-vacancies.test.ts > configured supervisor fill preserves pre-existing vaca
+ncies for every flight > backup refill preserves the old vacancy on 'TR121'/'H07'
+ FAIL  tests/domain/supervisor-fill-existing-vacancies.test.ts > configured supervisor fill preserves pre-existing vaca
+ncies for every flight > backup refill preserves the old vacancy on 'KE166'/'H05'
+AssertionError: expected undefined to be 'supervisor' // Object.is equality
+
+- Expected:
+"supervisor"
+
++ Received:
+undefined
+
+ ❯ tests/domain/supervisor-fill-existing-vacancies.test.ts:62:24
+     60|     const oldVacancy = structuredClone(assignments.at(-1)!);
+     61|     const chosen = prepareConfiguredSupervisorFillUnderShortage(state,…
+     62|     expect(chosen?.id).toBe(supervisor.id);
+       |                        ^
+     63|     expect(assignments.find((a) => a.positionRuleId === "first")?.staf…
+     64|     expect(assignments.find((a) => a.positionRuleId === "target")?.sta…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/11]⎯
+
+ FAIL  tests/domain/supervisor-fill-existing-vacancies.test.ts > configured supervisor fill preserves pre-existing vaca
+ncies for every flight > solver finds a legal chain despite an old vacancy on 'AB123'/'G14'
+ FAIL  tests/domain/supervisor-fill-existing-vacancies.test.ts > configured supervisor fill preserves pre-existing vaca
+ncies for every flight > solver finds a legal chain despite an old vacancy on 'TR121'/'H07'
+ FAIL  tests/domain/supervisor-fill-existing-vacancies.test.ts > configured supervisor fill preserves pre-existing vaca
+ncies for every flight > solver finds a legal chain despite an old vacancy on 'KE166'/'H05'
+AssertionError: expected undefined to be 'supervisor' // Object.is equality
+
+- Expected:
+"supervisor"
+
++ Received:
+undefined
+
+ ❯ tests/domain/supervisor-fill-existing-vacancies.test.ts:72:24
+     70|     const oldVacancy = structuredClone(assignments.at(-1)!);
+     71|     const chosen = await prepareConfiguredSupervisorFillUnderShortageB…
+     72|     expect(chosen?.id).toBe(supervisor.id);
+       |                        ^
+     73|     expect(assignments.find((a) => a.positionRuleId === "first")?.staf…
+     74|     expect(assignments.find((a) => a.positionRuleId === "middle")?.sta…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/11]⎯
+
+ FAIL  tests/domain/supervisor-fill-existing-vacancies.test.ts > configured supervisor fill preserves pre-existing vaca
+ncies for every flight > final supervisor assignments keep the configured target on 'AB123'
+AssertionError: expected { id: 'a-target', …(13) } to match object { staffId: 'supervisor', …(4) }
+(11 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "fatiguePoints": 0,
+-   "staffId": "supervisor",
+-   "supervisorFillRuleId": "configured-fill",
+-   "supervisorSourceAssignmentId": "assignment-mwhpu90p-g7goj6",
+-   "workHours": 0,
++   "fatiguePoints": 2,
++   "staffId": "worker",
++   "workHours": 2,
+  }
+
+ ❯ tests/domain/supervisor-fill-existing-vacancies.test.ts:83:63
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/11]⎯
+
+ FAIL  tests/domain/supervisor-fill-existing-vacancies.test.ts > configured supervisor fill preserves pre-existing vaca
+ncies for every flight > final supervisor assignments keep the configured target on 'TR121'
+AssertionError: expected { id: 'a-target', …(13) } to match object { staffId: 'supervisor', …(4) }
+(11 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "fatiguePoints": 0,
+-   "staffId": "supervisor",
+-   "supervisorFillRuleId": "configured-fill",
+-   "supervisorSourceAssignmentId": "assignment-mwhpu90x-lq9fef",
+-   "workHours": 0,
++   "fatiguePoints": 2,
++   "staffId": "worker",
++   "workHours": 2,
+  }
+
+ ❯ tests/domain/supervisor-fill-existing-vacancies.test.ts:83:63
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/11]⎯
+
+ FAIL  tests/domain/supervisor-fill-existing-vacancies.test.ts > configured supervisor fill preserves pre-existing vaca
+ncies for every flight > final supervisor assignments keep the configured target on 'KE166'
+AssertionError: expected { id: 'a-target', …(13) } to match object { staffId: 'supervisor', …(4) }
+(11 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "fatiguePoints": 0,
+-   "staffId": "supervisor",
+-   "supervisorFillRuleId": "configured-fill",
+-   "supervisorSourceAssignmentId": "assignment-mwhpu912-p9nor1",
+-   "workHours": 0,
++   "fatiguePoints": 2,
++   "staffId": "worker",
++   "workHours": 2,
+  }
+
+ ❯ tests/domain/supervisor-fill-existing-vacancies.test.ts:83:63
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/11]⎯
+
+ FAIL  tests/domain/supervisor-fill-existing-vacancies.test.ts > configured supervisor fill preserves pre-existing vaca
+ncies for every flight > allows an originally empty configured target and multiple unrelated old vacancies
+AssertionError: expected undefined to be 'supervisor' // Object.is equality
+
+- Expected:
+"supervisor"
+
++ Received:
+undefined
+
+ ❯ tests/domain/supervisor-fill-existing-vacancies.test.ts:96:98
+     94|     assignments.push(assignment(extraRule, null));
+     95|     const oldVacancies = structuredClone(assignments.filter((a) => a.p…
+     96|     expect(prepareConfiguredSupervisorFillUnderShortage(state, assignm…
+       |                                                                                                  ^
+     97|     expect(assignments.filter((a) => oldVacancies.some((old) => old.id…
+     98|   });
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/11]⎯
+
+ FAIL  tests/domain/supervisor-fill-existing-vacancies.test.ts > configured supervisor fill preserves pre-existing vaca
+ncies for every flight > full generation keeps configured fill and final guard rejects a subsequently broken source lin
+k
+AssertionError: expected undefined to be 'assignment-mwhpu963-wah59o' // Object.is equality
+
+- Expected:
+"assignment-mwhpu963-wah59o"
+
++ Received:
+undefined
+
+ ❯ tests/domain/supervisor-fill-existing-vacancies.test.ts:127:49
+    125|     const source = result.assignments.find((a) => a.positionRuleId ===…
+    126|     const target = result.assignments.find((a) => a.positionRuleId ===…
+    127|     expect(target.supervisorSourceAssignmentId).toBe(source.id);
+       |                                                 ^
+    128|     const preparation = prepareSchedule(state, DATE, evaluateAutomatic…
+    129|     const safety = createScheduleSafetySession({ phase: "final", state…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/11]⎯
+
+ Test Files  1 failed (1)
+      Tests  11 failed | 4 passed (15)
+   Start at  18:52:49
+   Duration  1.96s (transform 1.24s, setup 0ms, import 1.43s, tests 312ms, environment 0ms)

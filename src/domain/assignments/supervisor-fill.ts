@@ -77,7 +77,11 @@ function placeStaffOnAssignment(
   assignment.fatiguePoints = rule?.fatiguePoints ?? assignment.workHours;
 }
 
-/** Auto-schedulable numbered counters only — skip manual / below-threshold posts. */
+/**
+ * Capture occupied auto-schedulable counters before a fill attempt. Both search
+ * paths must restore counters they displace, without requiring old vacancies
+ * to be filled too. The configured target is selected separately and may be empty.
+ */
 function sameFlightMovableAutoCounters(
   state: AssignmentEligibilityFacts,
   assignments: readonly Assignment[],
@@ -85,7 +89,7 @@ function sameFlightMovableAutoCounters(
 ): Assignment[] {
   return assignments.filter((assignment) => {
     if (assignment.flightId !== flightId) return false;
-    if (assignment.status === "manual") return false;
+    if (assignment.status !== "assigned" || !assignment.staffId) return false;
     const rule = assignmentRule(state, assignment);
     const flight = state.flights.find(
       (item) => item.id === assignment.flightId

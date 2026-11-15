@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-15-supervisor-fill-existing-vacancies",
+  "title": "所有配置督导补位保留原有空缺且不得新增空缺",
+  "startedFrom": "2a4e764bb106ed6b150d96a6f23c62604e707df9",
+  "expectation": {
+    "example": "Owner提供11月18日现场截图和配置Excel：配置CX937督导补G14，但秦雁兼任G19、陈睿康在G14、G12原本缺人。已真实配置重放同一结果，排除旧空岗义务后秦雁补G14、刘翔接G19、陈睿康接G15通过最终检查。Owner明确修公共机制而非航班特例。",
+    "expected": "所有航班已启用配置补位在短员时优先尝试完整合法链；原有空岗可以保留，本次腾挪不能新增空岗。连环求解和备用回填共用同一原覆盖集合。",
+    "unchanged": "配置匹配、独立督导优先、岗位资质/状态/类型、锁定、半休、真实跨航班冲突、工时、衔接、同航班互斥、岗位完整性、五人上限、最终守卫、人工规则和存储格式保持。无新参数和姓名/航班/柜台特例。",
+    "fallback": "无完整合法方案时整次恢复，沿原通用兼任或合法空缺处理；不得把旧空缺转移到已覆盖岗位。真实浏览器由Owner操作复验，不自动打开或修改现场状态。"
+  },
+  "testedVersion": "881eacb2dab346bfb80da2193b4fd60e5d414c3b0e375a39376d95deca6470ae",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "原现场配置完整重放与截图的岗位、人员及失败提示一致；修改前11项新长期回归失败，修改后51项定向通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supervisor-fill-existing-vacancies-red.txt",
+          "summary": "修复前匿名15项回归中11项失败，备用、连环、最终收尾和完整生成均复现；4项资格/锁定失败恢复保护通过。",
+          "sha256": "daeba4944897895b81abcc0be746835d0288aef99dc35eb56548b716a9063d19"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supervisor-fill-existing-vacancies-artifact.json",
+          "summary": "实际Owner配置重放、公共导入/重启/真实Worker/Store/Excel独立读回与结果恢复：G14正确绑定，旧G12保留、无新空缺、B组不变。",
+          "sha256": "b15fee8da9e57c573e96d9e39c4cd8abedf18c3ad4ac0e028edb70cba848491d"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "匿名AB123、TR121、KE166三组配置与不同柜台均能保留指定补位和旧空缺；现有正常/独立督导及原36项回归通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supervisor-fill-existing-vacancies-artifact.json",
+          "summary": "实际Owner配置重放、公共导入/重启/真实Worker/Store/Excel独立读回与结果恢复：G14正确绑定，旧G12保留、无新空缺、B组不变。",
+          "sha256": "b15fee8da9e57c573e96d9e39c4cd8abedf18c3ad4ac0e028edb70cba848491d"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "备用直填和统一求解连环共用同一已覆盖柜台基线；原空目标、多旧空岗、无资质和锁定失败恢复分别覆盖。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supervisor-fill-existing-vacancies-artifact.json",
+          "summary": "实际Owner配置重放、公共导入/重启/真实Worker/Store/Excel独立读回与结果恢复：G14正确绑定，旧G12保留、无新空缺、B组不变。",
+          "sha256": "b15fee8da9e57c573e96d9e39c4cd8abedf18c3ad4ac0e028edb70cba848491d"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "真实完整kernel及Worker经过全部后置管线，最终44行、唯一CX937/G12旧空缺；保存恢复和XLSX最终读回仍为配置目标，不沿用反事实拦截。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supervisor-fill-existing-vacancies-artifact.json",
+          "summary": "实际Owner配置重放、公共导入/重启/真实Worker/Store/Excel独立读回与结果恢复：G14正确绑定，旧G12保留、无新空缺、B组不变。",
+          "sha256": "b15fee8da9e57c573e96d9e39c4cd8abedf18c3ad4ac0e028edb70cba848491d"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "实际合法三人换岗经最终守卫及daily safety通过；长期回归从完整生成的合法关联出发清空来源督导，最终守卫拒绝；无资质/锁定路径无部分提交。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supervisor-fill-existing-vacancies-artifact.json",
+          "summary": "实际Owner配置重放、公共导入/重启/真实Worker/Store/Excel独立读回与结果恢复：G14正确绑定，旧G12保留、无新空缺、B组不变。",
+          "sha256": "b15fee8da9e57c573e96d9e39c4cd8abedf18c3ad4ac0e028edb70cba848491d"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "完整npm.cmd run verify退出0：200文件1998项功能测试、7文件19项性能测试、类型检查及生产构建通过。81文件1102项关联回归先前已通过；原硬约束、独立督导优先、人工和保存格式保留。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supervisor-fill-existing-vacancies-artifact.json",
+          "summary": "实际Owner配置重放、公共导入/重启/真实Worker/Store/Excel独立读回与结果恢复：G14正确绑定，旧G12保留、无新空缺、B组不变。",
+          "sha256": "b15fee8da9e57c573e96d9e39c4cd8abedf18c3ad4ac0e028edb70cba848491d"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supervisor-fill-existing-vacancies-verify.txt",
+          "summary": "本次完整verify原生退出0；保留原功能与性能阈值，并发2。",
+          "sha256": "fe08d64d4e993e267c995974ad6f00b66567043e7aca0837da58675b55fef2dd"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "verified",
+      "reason": "修复源码与真实Worker/Excel/保存恢复最终产物已验证；Owner按原55350浏览器刷新并重排11月18日，明确回复督导与G14同人且没有新增空岗。页面证据来自Owner现场操作，与自动测试分别记录。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-supervisor-fill-existing-vacancies-artifact.json",
+          "summary": "实际Owner配置重放、公共导入/重启/真实Worker/Store/Excel独立读回与结果恢复：G14正确绑定，旧G12保留、无新空缺、B组不变。",
+          "sha256": "b15fee8da9e57c573e96d9e39c4cd8abedf18c3ad4ac0e028edb70cba848491d"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "实际配置可重复生成G19兼任和G12空缺；修前11项红测涵盖两条公共路径，修后跨航班定向及真实Worker最终产物转为配置目标。见red及artifact证据。",
+    "laterChanges": "督导finalizer、岗位压缩、恢复、轮岗和最终补缺可能改回；完整kernel/真实Worker、最终守卫反向破坏、Store安装及保存重启、XLSX独立读取均验证最终关联和原空缺；Owner另在原页面重排确认同人补G14且无新增空岗。",
+    "finalArtifact": "本次实际Owner配置生成.tmp/cx937-fixed-schedule.xlsx，匿名artifact绑定输入及最终文件SHA256；独立读出G14与督导同人、目标工时/疲劳0、唯一旧G12空缺。Worker result安装及再次恢复保留来源与规则关联。"
+  },
+  "review": {
+    "missedScope": "已查两条准备路径及共同柜台集合，未把修复塞入单航班分支或修改通用求解器；三个航班参数化及实际配置完整链验证。浏览器由Owner在原入口刷新重排并确认，无新增设置或线上发布。未逐一人工尝试所有可能配置组合，由通用回归覆盖相应边界。",
+    "rootCause": "同航班可腾挪集合包含原有空柜台，连环模型要求每岗恰好一人、备用回填要求补齐全部非目标空岗，使任何旧缺员都否决合法配置补位。现由共同入口仅捕获尝试前已覆盖柜台，目标仍独立匹配。",
+    "earlyDetection": "今后改动补位/重排前，先放入“原本无安全替补的空岗+另一条合法补位链”的匿名夹具，分别运行备用/连环/完整后置并断言旧空岗不增不移、配置目标关联和失败恢复；再检查实际Worker及导出/恢复最终产物。"
+  }
+}
