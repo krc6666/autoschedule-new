@@ -24,7 +24,10 @@ import { ScheduleGuardError } from "./schedule-guard";
 import {
   guideSourceStaff,
   isGuideAssignment,
+  isIndependentGuideAssignment,
+  guideAssignmentWorkload,
 } from "../flights/schedule-position-rules";
+import { evaluateManualAssignment } from "../candidates/manual-assignment-override";
 
 function rejectAssignment(
   ruleId: string,
@@ -212,6 +215,15 @@ export function assertDailyScheduleSafety({
           )
       )
     );
+    otherAutomaticAssignments.push(
+      ...assignments.filter(
+        (other) =>
+          other.id !== assignment.id &&
+          other.status === "assigned" &&
+          Boolean(other.staffId) &&
+          isIndependentGuideAssignment(state, other)
+      )
+    );
     const supervisorSource = assignment.supervisorSourceAssignmentId
       ? assignments.find(
           (candidate) =>
@@ -255,6 +267,35 @@ export function assertDailyScheduleSafety({
     }
   }
   for (const guide of assignments) {
+    if (guide.staffId && isIndependentGuideAssignment(state, guide)) {
+      const workload = guideAssignmentWorkload(state, guide);
+      if (
+        guide.status !== "assigned" ||
+        guide.workHours !== workload.workHours ||
+        guide.fatiguePoints !== workload.fatiguePoints
+      ) {
+        rejectAssignment(
+          "guide-workload",
+          guide,
+          "独立引导的实际工时或疲劳点数不完整"
+        );
+      }
+      const assessment = evaluateManualAssignment(
+        { ...state, assignments: [...assignments] },
+        guide.id,
+        guide.staffId
+      );
+      const violation =
+        assessment.blockers[0] ??
+        assessment.warnings.find(
+          (warning) =>
+            !guide.manualOverrideWarnings?.some(
+              (saved) => saved.code === warning.code
+            )
+        );
+      if (violation) rejectAssignment(violation.code, guide, violation.message);
+      continue;
+    }
     if (
       guide.status !== "assigned" ||
       !guide.staffId ||

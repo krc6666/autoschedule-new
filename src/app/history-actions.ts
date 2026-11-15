@@ -105,6 +105,7 @@ export function buildHistoricalScheduleDraft(
         record.manualOverrideWarnings
       );
     if (record.teamLeaderGapFill) assignment.teamLeaderGapFill = true;
+    if (record.guideMode) assignment.guideMode = record.guideMode;
     assignment.manualRemark = record.assignmentRemarks?.manualRemark ?? "";
     assignment.status = assignment.staffId ? "assigned" : assignment.status;
   }
@@ -168,6 +169,7 @@ export function currentScheduleHistory(
         item.manualOverrideWarnings
       ),
       ...(item.teamLeaderGapFill ? { teamLeaderGapFill: true as const } : {}),
+      ...(item.guideMode ? { guideMode: item.guideMode } : {}),
       ...(item.countBaseline
         ? { countBaseline: structuredClone(item.countBaseline) }
         : {}),

@@ -3,7 +3,7 @@ import type { ScheduleGenerationFacts } from "../shared/scheduling-facts";
 import {
   assignmentRule,
   guideSourceStaff,
-  isGuideAssignment,
+  isReusableAssignment,
   makeUnfilled,
 } from "../flights/schedule-position-rules";
 import { guardExplanation } from "../shared/schedule-issue-explanation";
@@ -70,7 +70,7 @@ export function recoverLocalScheduleIssues(
             "原来补位的督导岗位已留空，柜台不能继续沿用这份补位安排。"
           );
         } else if (
-          isGuideAssignment(state, row) &&
+          isReusableAssignment(state, row) &&
           !assignments.some(
             (source) =>
               source.flightId === row.flightId &&

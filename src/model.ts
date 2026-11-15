@@ -86,7 +86,13 @@ export interface ManualCountEvidence {
   assignmentRemarks?: { remark: string; manualRemark: string };
 }
 
-export interface HistoryRecord extends ManualCountEvidence {
+export interface GuideAssignmentEvidence {
+  /** Explicit manual independent duty; absent means the original guide reuse. */
+  guideMode?: "independent";
+}
+
+export interface HistoryRecord
+  extends ManualCountEvidence, GuideAssignmentEvidence {
   id: string;
   date: string;
   flightNo: string;
@@ -108,7 +114,8 @@ export interface HistoryRecord extends ManualCountEvidence {
   teamLeaderGapFill?: true;
 }
 
-export interface Assignment extends ManualCountEvidence {
+export interface Assignment
+  extends ManualCountEvidence, GuideAssignmentEvidence {
   id: string;
   flightId: string;
   flightNo: string;

@@ -8,6 +8,9 @@ import {
   administrativeSupportAutomaticRule,
   assignmentRule,
   guideSourceStaff,
+  isReusableAssignment,
+  manualGuideAssignment,
+  isIndependentGuideAssignment,
 } from "../flights/schedule-position-rules";
 import {
   positionTransitionCost,
@@ -478,12 +481,15 @@ export function diagnoseManualAssignmentEligibility(
   staffId: string,
   ignoreAssignmentId?: string
 ): AssignmentEligibilityDiagnostic {
-  const assignment = state.assignments.find((item) => item.id === assignmentId);
+  const originalAssignment = state.assignments.find(
+    (item) => item.id === assignmentId
+  );
   const person = state.staff.find((item) => item.id === staffId);
-  if (!assignment || !person)
+  if (!originalAssignment || !person)
     return violation("missing-target", "人员或岗位不存在");
+  const assignment = manualGuideAssignment(state, originalAssignment, staffId);
   const rule = assignmentRule(state, assignment);
-  const flight = state.flights.find(
+  const configuredFlight = state.flights.find(
     (item) => item.id === assignment.flightId
   ) ?? {
     id: assignment.flightId,
@@ -494,6 +500,13 @@ export function diagnoseManualAssignmentEligibility(
     positions: [assignment.position],
     remark: "",
   };
+  const flight = isIndependentGuideAssignment(state, assignment)
+    ? {
+        ...configuredFlight,
+        startTime: assignment.startTime,
+        endTime: assignment.endTime,
+      }
+    : configuredFlight;
   const factRule = rule ?? {
     id: assignment.positionRuleId ?? assignment.id,
     flightNo: assignment.flightNo,
@@ -580,7 +593,9 @@ export function diagnoseManualAssignmentEligibility(
     });
     return diagnostic(violations);
   }
-  const reuse = rule?.category === "引导";
+  const reuse = isReusableAssignment(state, assignment);
+  if (rule?.category === "引导" && person.staffType !== "常规")
+    return violation("staff-type", "引导岗位只能安排常规人员");
   const otherAssignments = state.assignments.filter(
     (item) =>
       item.id !== assignmentId && (reuse || item.id !== ignoreAssignmentId)
@@ -674,7 +689,8 @@ export function diagnoseManualAssignmentEligibility(
     others,
     staffId,
     flight,
-    eligibilityRule
+    eligibilityRule,
+    isIndependentGuideAssignment(state, assignment) ? assignment : undefined
   )[0];
   if (minimumTransition) {
     violations.push({

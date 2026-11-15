@@ -2,6 +2,10 @@ import type { Assignment, Flight, PositionRule } from "../../model";
 import type { AssignmentTimingFacts } from "../shared/scheduling-facts";
 import { timeToMinutes } from "../shared/time";
 import { isValidDiversionTransfer } from "./assignment-timing";
+import {
+  isIndependentGuideAssignment,
+  isReusableAssignment,
+} from "../flights/schedule-position-rules";
 
 interface TransitionWork {
   flightId: string;
@@ -58,10 +62,16 @@ function assignmentWork(
   return {
     flightId: assignment.flightId,
     flightNo: assignment.flightNo,
-    startTime: flight?.startTime ?? assignment.startTime,
-    endTime: flight?.endTime ?? assignment.endTime,
+    startTime: isIndependentGuideAssignment(state, assignment)
+      ? assignment.startTime
+      : (flight?.startTime ?? assignment.startTime),
+    endTime: isIndependentGuideAssignment(state, assignment)
+      ? assignment.endTime
+      : (flight?.endTime ?? assignment.endTime),
     rule,
-    workHours: assignment.workHours,
+    workHours: isReusableAssignment(state, assignment)
+      ? 0
+      : assignment.workHours,
   };
 }
 
@@ -72,12 +82,12 @@ function taskWork(flight: Flight, rule: PositionRule): TransitionWork {
     startTime: flight.startTime,
     endTime: flight.endTime,
     rule,
-    workHours: 1,
+    workHours: rule.category === "引导" ? 0 : 1,
   };
 }
 
 function participatesInTransition(work: TransitionWork): boolean {
-  return work.workHours > 0 && work.rule?.category !== "引导";
+  return work.workHours > 0;
 }
 
 function transitionViolation(
@@ -147,9 +157,12 @@ export function minimumFlightTransitionViolationsForInsertion(
   assignments: readonly Assignment[],
   staffId: string,
   flight: Flight,
-  rule: PositionRule
+  rule: PositionRule,
+  assignment?: Assignment
 ): MinimumFlightTransitionViolation[] {
-  const candidate = taskWork(flight, rule);
+  const candidate = assignment
+    ? assignmentWork(state, assignment)
+    : taskWork(flight, rule);
   return assignments.flatMap((assignment) => {
     if (assignment.staffId !== staffId || assignment.status !== "assigned") {
       return [];

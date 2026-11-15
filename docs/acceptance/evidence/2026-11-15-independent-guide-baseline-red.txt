@@ -1,0 +1,62 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/app/independent-guide.test.ts (11 tests | 1 failed | 10 skipped) 34ms
+     × 清柜台再填同人做独立引导，改其他柜台不改独立人，归档与历史编辑保留负荷 31ms
+ ❯ tests/app/schedule-actions.test.ts (20 tests | 1 failed | 19 skipped) 26ms
+     × 允许未参加该航班的常规人员独立引导，仍拒绝不存在的人员 23ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/app/independent-guide.test.ts > 人工独立引导 > 清柜台再填同人做独立引导，改其他柜台不改独立人，归档与历史编辑保留负荷
+AssertionError: expected { changed: false, …(1) } to match object { changed: true }
+(1 matching property omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "changed": true,
++   "changed": false,
+  }
+
+ ❯ tests/app/independent-guide.test.ts:169:7
+    167|     expect(
+    168|       updateAssignmentField(state, "a2", "staffName", "人员1")
+    169|     ).toMatchObject({ changed: true });
+       |       ^
+    170|     expect(state.assignments[2]).toMatchObject({
+    171|       staffId: "p1",
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/app/schedule-actions.test.ts > 引导人员人工调整 > 允许未参加该航班的常规人员独立引导，仍拒绝不存在的人员
+AssertionError: expected { changed: false, …(1) } to match object { changed: true }
+(1 matching property omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "changed": true,
++   "changed": false,
+  }
+
+ ❯ tests/app/schedule-actions.test.ts:983:7
+    981|     expect(
+    982|       updateAssignmentField(state, guide.id, "staffName", outsider.nam…
+    983|     ).toMatchObject({ changed: true });
+       |       ^
+    984|     expect(guide).toMatchObject({
+    985|       staffId: outsider.id,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  2 failed | 29 skipped (31)
+   Start at  19:41:23
+   Duration  12.80s (transform 16.71s, setup 0ms, import 22.55s, tests 59ms, environment 0ms)
+
+
+EXIT_CODE=1

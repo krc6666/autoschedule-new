@@ -12,6 +12,7 @@ import {
   assignmentRule,
   compareGuideSourceAssignments,
   guideSourceStaff,
+  isIndependentGuideAssignment,
 } from "../flights/schedule-position-rules";
 import { positionTransitionInsertionCost } from "../reviews/schedule-protection";
 import { isPreNoonFlight } from "../flights/schedule-tasks";
@@ -426,7 +427,16 @@ export function compactRegularAssignments(
           right.assignment
         )
       );
-    const usedStaffIds = new Set<string>();
+    const usedStaffIds = new Set(
+      assignments
+        .filter(
+          (a) =>
+            a.flightId === flightId &&
+            isIndependentGuideAssignment(state, a) &&
+            a.staffId
+        )
+        .map((a) => a.staffId!)
+    );
     assignments
       .filter(
         (assignment) =>
@@ -439,6 +449,7 @@ export function compactRegularAssignments(
           (displayIndex.get(right.positionRuleId ?? "") ?? 0)
       )
       .forEach((guide) => {
+        if (isIndependentGuideAssignment(state, guide)) return;
         const source = guideSources.find(
           (item) => !usedStaffIds.has(item.person.id)
         );

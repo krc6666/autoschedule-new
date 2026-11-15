@@ -1,0 +1,142 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-15-independent-guide",
+  "title": "手动独立引导及真实工时疲劳闭环",
+  "startedFrom": "07c3f58c9ccc179b45a80d240be3eb2c64ea28b7",
+  "expectation": {
+    "example": "11月18日CX931清掉不需要的末端柜台后，在柜台引导填写该正常常规人员；旧系统拒绝未在该航班承担可复用岗位。",
+    "expected": "手填可独立引导，按该行实际时段计算工时、按引导岗位配置点数，后续换柜台人不覆盖，保存、导出、归档后保留。",
+    "unchanged": "自动排班继续复用；兼任仍零重复负荷；原人员状态、类型、夜班阻断及人工冲突警告不变；不改变柜台启用与次数规则。",
+    "fallback": "硬阻断拒绝并保留原安排；可控限制按现有人工越权警告；旧缺标记沿原复用，不猜独立。真实页面由Owner操作验收。"
+  },
+  "testedVersion": "9dfc855e6fa368e994d5c5dacfff4bd75a08e161c7ffd009cb6784bb697eb65e",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "修改前首轮2文件25项中6项因原强制来源失败、19项原行为通过；另以只读Vite加载07c3f58源码重放两个精确症状均失败并保留原输出，不回滚工作区。当前完整回归通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-independent-guide-baseline-red.txt",
+          "summary": "只读07c3f58基线：清柜台再填引导及无来源独立人选两项均拒绝，原生退出1",
+          "sha256": "24bf6e2636abc1a588ad3259c7c0164f56d1d43ae0cab476f4674aef8254549f"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-independent-guide-verify.txt",
+          "summary": "最终完整npm.cmd run verify：类型、203文件2014项功能、7文件19项性能与生产构建，退出0",
+          "sha256": "954746b598ba1b6b8696bb2d348cc7e9b700bb4a8f2912be8ce3be4234c116bc"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "清柜台→填写独立引导，按实际时段与岗位点数；零点与跨午夜、原兼任零负荷及真实Worker默认复用均通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-independent-guide-verify.txt",
+          "summary": "最终完整npm.cmd run verify：类型、203文件2014项功能、7文件19项性能与生产构建，退出0",
+          "sha256": "954746b598ba1b6b8696bb2d348cc7e9b700bb4a8f2912be8ce3be4234c116bc"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-independent-guide-artifact.json",
+          "summary": "真实HiGHS生成后人工独立安排，实际XLSX读回2小时5点；配置字节到空状态、重启及历史草稿一致，绑定生产资源哈希",
+          "sha256": "5833a892564d99def714d334a21dda4d330d13f801df5afdfdc5732e2bf0b5b7"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-independent-guide-artifact-run.txt",
+          "summary": "独立产物探针运行原生退出0，未替换产品求解器或统计实现",
+          "sha256": "36d3996db26e8ece2b8c3916671c078caab2ca1b97e110709fe0b0397c928c3a"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "独立人拖出交换、清空再兼任、病休/行政/夜班拒绝、双向跨航班衔接提醒、当日/月度/近期疲劳、原重点次数例外均通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-independent-guide-verify.txt",
+          "summary": "最终完整npm.cmd run verify：类型、203文件2014项功能、7文件19项性能与生产构建，退出0",
+          "sha256": "954746b598ba1b6b8696bb2d348cc7e9b700bb4a8f2912be8ce3be4234c116bc"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "同航班刷新、真实柜台压缩及局部恢复保留独立安排；历史载入、保存重启、配置到空状态及结果Excel往返一致，B组保留。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-independent-guide-verify.txt",
+          "summary": "最终完整npm.cmd run verify：类型、203文件2014项功能、7文件19项性能与生产构建，退出0",
+          "sha256": "954746b598ba1b6b8696bb2d348cc7e9b700bb4a8f2912be8ce3be4234c116bc"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-independent-guide-artifact.json",
+          "summary": "真实HiGHS生成后人工独立安排，实际XLSX读回2小时5点；配置字节到空状态、重启及历史草稿一致，绑定生产资源哈希",
+          "sha256": "5833a892564d99def714d334a21dda4d330d13f801df5afdfdc5732e2bf0b5b7"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "合法独立安排通过后，后置归零工时、设病休及无警告重叠均被最终复核拒绝；无来源旧复用仍拒绝，独立不能获得复用并发豁免。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-independent-guide-verify.txt",
+          "summary": "最终完整npm.cmd run verify：类型、203文件2014项功能、7文件19项性能与生产构建，退出0",
+          "sha256": "954746b598ba1b6b8696bb2d348cc7e9b700bb4a8f2912be8ce3be4234c116bc"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "完整verify退出0，未放宽原测试或性能阈值；原自动策略、资格/值班/督导补位/轮岗/恢复优先级不变，独立实际负荷进入原统计。下载模板24表原942单元格值/公式/类型一致，仅追加O1引导安排。PROJECT_MAP.md原SHA256保持，未commit/push/发布。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-independent-guide-verify.txt",
+          "summary": "最终完整npm.cmd run verify：类型、203文件2014项功能、7文件19项性能与生产构建，退出0",
+          "sha256": "954746b598ba1b6b8696bb2d348cc7e9b700bb4a8f2912be8ce3be4234c116bc"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-independent-guide-template-audit.json",
+          "summary": "逐一比较模板全部24表原942个单元格值、公式与类型，保持一致",
+          "sha256": "d84f580e15d211c31f510f52f3fc1f03f4e0b9dbdacc15002c88ca664bfad160"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-independent-guide-artifact.json",
+          "summary": "真实HiGHS生成后人工独立安排，实际XLSX读回2小时5点；配置字节到空状态、重启及历史草稿一致，绑定生产资源哈希",
+          "sha256": "5833a892564d99def714d334a21dda4d330d13f801df5afdfdc5732e2bf0b5b7"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "实际XLSX与生产构建、Worker/Store/DOM已验证；55350进程确认运行本仓Vite。已请Owner在原页面刷新并按CX931清柜台→填引导核对人员和工时点数；Owner回复“暂时不方便验收”，现场保留待验收。遵守人复现、机器查代码，未自行打开浏览器。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-independent-guide-verify.txt",
+          "summary": "最终完整npm.cmd run verify：类型、203文件2014项功能、7文件19项性能与生产构建，退出0",
+          "sha256": "954746b598ba1b6b8696bb2d348cc7e9b700bb4a8f2912be8ce3be4234c116bc"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-independent-guide-artifact.json",
+          "summary": "真实HiGHS生成后人工独立安排，实际XLSX读回2小时5点；配置字节到空状态、重启及历史草稿一致，绑定生产资源哈希",
+          "sha256": "5833a892564d99def714d334a21dda4d330d13f801df5afdfdc5732e2bf0b5b7"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-independent-guide-artifact-run.txt",
+          "summary": "独立产物探针运行原生退出0，未替换产品求解器或统计实现",
+          "sha256": "36d3996db26e8ece2b8c3916671c078caab2ca1b97e110709fe0b0397c928c3a"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "首轮改前失败与baseline-red.txt中的只读07c3f58重放稳定捕获来源硬拦截；verify.txt包含当前全部回归。",
+    "laterChanges": "同航班刷新与压缩原会覆盖人员，恢复原会清无来源引导，统计归档原会过滤所有引导，恢复/Excel原无模式；矩阵对应消费点及长期后置/反向/往返回归已覆盖。",
+    "finalArtifact": "artifact.json对应.tmp/independent-guide/final-result.xlsx实际字节，独立读取到2小时5点并保留模式，配置空状态迁移和重启历史草稿一致；完整verify含真实Worker及DOM。Owner原页面现场验收仍待反馈。"
+  },
+  "review": {
+    "missedScope": "逐项核对手填/拖动双向、来源缺失、同航班刷新、压缩、局部恢复、最终并发/工时/衔接、归档/统计、localStorage/Excel/模板。查漏补入独立衔接及原重点次数排除；旧无模式不猜独立。现场尚未验收。",
+    "rootCause": "原实现把引导岗位分类同时当作必须复用、零工时疲劳和无需独立归档的依据，没有可持久化的独立承担事实。只删除手填报错会被后续改人并丢负荷。",
+    "earlyDetection": "修改岗位承担方式前列完整传播矩阵，用清原岗位→填引导→再改其他岗位→保存重启/导出/归档的可观察链路先红后绿，并从合法结果反向破坏验证最终守卫。"
+  }
+}

@@ -468,6 +468,9 @@ function restoreHistory(value: unknown[]): HistoryRecord[] {
         fatiguePoints: item.fatiguePoints,
         remark: item.remark,
         ...(historyCoverage ? { historyCoverage } : {}),
+        ...(item.guideMode === "independent"
+          ? { guideMode: "independent" as const }
+          : {}),
         ...restoreManualCountEvidence(item),
       },
     ];
@@ -637,6 +640,7 @@ function restoredAssignment(value: unknown): Assignment | null {
   if (typeof value.supervisorFillRuleId === "string")
     assignment.supervisorFillRuleId = value.supervisorFillRuleId;
   if (value.teamLeaderGapFill === true) assignment.teamLeaderGapFill = true;
+  if (value.guideMode === "independent") assignment.guideMode = "independent";
   if (value.layoutGroup === "primary" || value.layoutGroup === "bottom")
     assignment.layoutGroup = value.layoutGroup;
   if (

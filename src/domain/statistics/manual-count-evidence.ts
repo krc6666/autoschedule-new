@@ -5,6 +5,7 @@ import type {
 } from "../../model";
 import type { SchedulingFacts } from "../shared/scheduling-facts";
 import { isCountedWorkloadAssignment } from "../shared/workload-accounting";
+import { isGuideAssignment } from "../flights/schedule-position-rules";
 
 export function captureCountBaseline(
   assignment: Assignment,
@@ -49,13 +50,17 @@ export function monthlyCountRecords(
     state.activeScheduleDate === date && state.assignments.length ? date : null;
   return [
     ...state.history.filter(
-      (r) => r.date.startsWith(date.slice(0, 7)) && r.date !== activeDate
+      (r) =>
+        r.date.startsWith(date.slice(0, 7)) &&
+        r.date !== activeDate &&
+        r.guideMode !== "independent"
     ),
     ...(activeDate
       ? state.assignments
           .filter(
             (a) =>
               isCountedWorkloadAssignment(state, a) &&
+              !isGuideAssignment(state, a) &&
               ((a.status === "assigned" && a.staffId) ||
                 a.countBaseline?.staffId)
           )

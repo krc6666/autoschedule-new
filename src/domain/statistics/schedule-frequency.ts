@@ -92,6 +92,8 @@ export function createScheduleFrequencyFacts(
     return resolved;
   };
   for (const record of state.history) {
+    // Independent guide history records workload, not priority-position counts.
+    if (record.guideMode === "independent") continue;
     const recordAirline = cachedAirlineCode(record.flightNo);
     const positionKey = positionHistoryKey(
       record.staffId,

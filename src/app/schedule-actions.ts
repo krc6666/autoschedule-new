@@ -15,6 +15,8 @@ import {
   guideSourceStaff,
   isAuxiliaryCategory,
   isGuideAssignment,
+  isIndependentGuideAssignment,
+  manualGuideAssignment,
 } from "../domain/flights/schedule-position-rules";
 import {
   clearSupervisorLink,
@@ -156,6 +158,11 @@ function refreshSameFlightGuides(state: AppState, flightIds: string[]): void {
     );
     const usedStaffIds = new Set<string>();
     for (const guide of guideAssignments) {
+      if (isIndependentGuideAssignment(state, guide) && guide.staffId)
+        usedStaffIds.add(guide.staffId);
+    }
+    for (const guide of guideAssignments) {
+      if (isIndependentGuideAssignment(state, guide)) continue;
       const candidates = state.assignments
         .filter((item) => item.flightId === flightId && item.id !== guide.id)
         .map((item) => ({
@@ -210,6 +217,11 @@ function clearAssignmentStaff(state: AppState, assignment: Assignment): void {
   clearSupervisorLink(state, assignment);
   assignment.staffId = null;
   assignment.staffName = "";
+  delete assignment.guideMode;
+  if (isGuideAssignment(state, assignment)) {
+    assignment.workHours = 0;
+    assignment.fatiguePoints = 0;
+  }
   assignment.status =
     rule?.manual ||
     isAuxiliaryCategory(rule?.category) ||
@@ -305,21 +317,40 @@ export function assignStaff(
   captureCountBaseline(assignment);
   if (source && !copySource) captureCountBaseline(source);
   clearSupervisorLink(state, assignment);
+  const guideChoice = manualGuideAssignment(state, assignment, person.id);
   assignment.staffId = person.id;
   assignment.staffName = person.name;
   const guideAssignment = isGuideAssignment(state, assignment);
-  assignment.status = guideAssignment ? "manual" : "assigned";
+  assignment.status = "assigned";
   if (guideAssignment) {
-    assignment.workHours = 0;
-    assignment.fatiguePoints = 0;
+    // Use the same projected facts as the preflight manual eligibility check.
+    const guide = guideChoice;
+    assignment.status = guide.status;
+    assignment.workHours = guide.workHours;
+    assignment.fatiguePoints = guide.fatiguePoints;
+    if (guide.guideMode) assignment.guideMode = guide.guideMode;
+    else delete assignment.guideMode;
   }
   clearAutomaticAssignmentEvidence(assignment);
   if (source && !copySource) {
     clearSupervisorLink(state, source);
     if (targetStaffId) {
+      const sourceGuideChoice = manualGuideAssignment(
+        state,
+        source,
+        targetStaffId
+      );
       source.staffId = targetStaffId;
       source.staffName = targetStaffName;
       source.status = "assigned";
+      if (isGuideAssignment(state, source)) {
+        source.status = sourceGuideChoice.status;
+        source.workHours = sourceGuideChoice.workHours;
+        source.fatiguePoints = sourceGuideChoice.fatiguePoints;
+        if (sourceGuideChoice.guideMode)
+          source.guideMode = sourceGuideChoice.guideMode;
+        else delete source.guideMode;
+      }
       clearAutomaticAssignmentEvidence(source);
     } else {
       const sourceRule = source.positionRuleId
@@ -327,6 +358,11 @@ export function assignStaff(
         : undefined;
       source.staffId = null;
       source.staffName = "";
+      delete source.guideMode;
+      if (isGuideAssignment(state, source)) {
+        source.workHours = 0;
+        source.fatiguePoints = 0;
+      }
       source.status =
         sourceRule?.manual ||
         isAuxiliaryCategory(sourceRule?.category) ||
@@ -373,7 +409,9 @@ export function assignStaff(
         ? "人员岗位已交换"
         : copySource
           ? isGuideAssignment(state, assignment)
-            ? "引导人员已复用"
+            ? isIndependentGuideAssignment(state, assignment)
+              ? "独立引导人员已安排"
+              : "引导人员已复用"
             : "分流人员已转派"
           : "人员分配已更新",
     warning,
@@ -399,17 +437,8 @@ export function updateAssignmentField(
   if (field !== "staffName") return { changed: false };
 
   const staffName = normalizeText(value);
-  const rule = assignment.positionRuleId
-    ? state.positionRules.find((item) => item.id === assignment.positionRuleId)
-    : undefined;
   if (!staffName) return assignStaff(state, id, "");
   const person = state.staff.find((item) => item.name === staffName);
-  if (!person && rule?.category === "引导") {
-    return {
-      changed: false,
-      error: "引导岗位只能复用同一航班中已经上岗的常规人员",
-    };
-  }
   if (!person) return { changed: false, error: `人员不存在：${staffName}` };
   return assignStaff(state, id, person.id);
 }

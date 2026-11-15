@@ -971,7 +971,7 @@ describe("引导人员人工调整", () => {
     });
   });
 
-  it("拒绝未参加该航班和不存在的引导人员", () => {
+  it("允许未参加该航班的常规人员独立引导，仍拒绝不存在的人员", () => {
     const state = guideSchedule();
     const guide = state.assignments.find(
       (assignment) => assignment.id === "guide-assignment"
@@ -979,11 +979,18 @@ describe("引导人员人工调整", () => {
     const outsider = state.staff[2]!;
 
     expect(
-      updateAssignmentField(state, guide.id, "staffName", outsider.name).error
-    ).toContain("未在该航班承担可复用岗位");
+      updateAssignmentField(state, guide.id, "staffName", outsider.name)
+    ).toMatchObject({ changed: true });
+    expect(guide).toMatchObject({
+      staffId: outsider.id,
+      guideMode: "independent",
+      status: "assigned",
+      workHours: 2,
+      fatiguePoints: 5,
+    });
     expect(
       updateAssignmentField(state, guide.id, "staffName", "不存在人员").error
-    ).toContain("只能复用同一航班");
+    ).toContain("人员不存在");
   });
 
   it("允许复用行政支援岗位上的常规人员", () => {

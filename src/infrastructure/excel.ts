@@ -838,6 +838,7 @@ function parseHistory(
   const gapFillIndex = headerIndex(header, ["分队长补差"], -1);
   const evidenceIndex = headerIndex(header, ["人工调整证据"], -1);
   const attendanceIndex = headerIndex(header, ["出勤时段"], -1);
+  const guideModeIndex = headerIndex(header, ["引导安排"], -1);
   return data.slice(1).flatMap((row) => {
     const date = normalizeText(row[dateIndex]).slice(0, 10);
     const staffName = normalizeText(row[nameIndex]);
@@ -914,6 +915,9 @@ function parseHistory(
         remark: normalizeText(row[remarkIndex]),
         ...(historyCoverage ? { historyCoverage } : {}),
         ...(teamLeaderGapFill ? { teamLeaderGapFill } : {}),
+        ...(guideModeIndex >= 0 && normalizeText(row[guideModeIndex]) === "独立"
+          ? { guideMode: "independent" as const }
+          : {}),
         ...evidence,
       },
     ];
@@ -1324,6 +1328,7 @@ export function buildConfigWorkbook(state: AppState): XLSX.WorkBook {
         "航班截载时间",
         "人工调整证据",
         "出勤时段",
+        "引导安排",
       ],
       ...state.history.map((record) => [
         record.id,
@@ -1344,6 +1349,7 @@ export function buildConfigWorkbook(state: AppState): XLSX.WorkBook {
         record.attendanceIntervals
           ? JSON.stringify(record.attendanceIntervals)
           : "",
+        record.guideMode === "independent" ? "独立" : "",
       ]),
     ],
     [18, 12, 12, 18, 16, 14, 12, 12, 16, 12, 32, 20, 14, 12, 36]
@@ -1394,6 +1400,7 @@ export function buildScheduleWorkbook(
         "人员编号",
         "人工调整证据",
         "出勤时段",
+        "引导安排",
       ],
       ...assignments.map((item) => [
         date,
@@ -1425,6 +1432,7 @@ export function buildScheduleWorkbook(
           },
         }),
         attendance.has(item.id) ? JSON.stringify(attendance.get(item.id)) : "",
+        item.guideMode === "independent" ? "独立" : "",
       ]),
     ],
     [12, 12, 16, 14, 12, 12, 16, 12, 24, 12, 12, 60, 16, 36]

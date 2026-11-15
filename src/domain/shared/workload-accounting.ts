@@ -1,5 +1,6 @@
 import type { Assignment } from "../../model";
 import type { WorkloadAccountingFacts } from "./scheduling-facts";
+import { isReusableAssignment } from "../flights/schedule-position-rules";
 
 export function isCountedWorkloadAssignment(
   state: WorkloadAccountingFacts,
@@ -9,10 +10,7 @@ export function isCountedWorkloadAssignment(
     ? state.staff.find((item) => item.id === assignment.staffId)
     : undefined;
   if (person?.staffType === "行政支援") return false;
-  const rule = assignment.positionRuleId
-    ? state.positionRules.find((item) => item.id === assignment.positionRuleId)
-    : undefined;
-  return rule?.category !== "引导";
+  return !isReusableAssignment(state, assignment);
 }
 
 export function countedWorkloadAssignments(

@@ -59,6 +59,56 @@ export function guideSourceStaff(
     : undefined;
 }
 
+export function isIndependentGuideAssignment(
+  state: Pick<FlightRuleFacts, "positionRules">,
+  assignment: Assignment
+): boolean {
+  return (
+    isGuideAssignment(state, assignment) &&
+    assignment.guideMode === "independent"
+  );
+}
+
+/** Project the manual choice before checking conflicts/hours or committing it. */
+export function manualGuideAssignment(
+  state: Pick<
+    ScheduleGenerationFacts,
+    "positionRules" | "staff" | "assignments"
+  >,
+  assignment: Assignment,
+  staffId: string
+): Assignment {
+  if (!isGuideAssignment(state, assignment)) return assignment;
+  // Other counter edits must not silently change an explicit independent duty.
+  const independent =
+    (isIndependentGuideAssignment(state, assignment) &&
+      assignment.staffId === staffId) ||
+    !state.assignments.some(
+      (source) =>
+        source.id !== assignment.id &&
+        source.flightId === assignment.flightId &&
+        guideSourceStaff(state, source)?.id === staffId
+    );
+  const result = { ...assignment, staffId };
+  if (independent) result.guideMode = "independent";
+  else delete result.guideMode;
+  result.status = independent ? "assigned" : "manual";
+  Object.assign(result, guideAssignmentWorkload(state, result));
+  return result;
+}
+
+export function guideAssignmentWorkload(
+  state: Pick<FlightRuleFacts, "positionRules">,
+  assignment: Assignment
+): Pick<Assignment, "workHours" | "fatiguePoints"> {
+  return isIndependentGuideAssignment(state, assignment)
+    ? {
+        workHours: durationHours(assignment.startTime, assignment.endTime),
+        fatiguePoints: assignmentRule(state, assignment)!.fatiguePoints,
+      }
+    : { workHours: 0, fatiguePoints: 0 };
+}
+
 /** A guide can legally reuse its regular-counter source on the same flight. */
 export function isLegalGuideReuse(
   state: Pick<ScheduleGenerationFacts, "positionRules" | "staff">,
@@ -72,9 +122,9 @@ export function isLegalGuideReuse(
   )
     return false;
   return (
-    (isGuideAssignment(state, left) &&
+    (isReusableAssignment(state, left) &&
       guideSourceStaff(state, right)?.id === left.staffId) ||
-    (isGuideAssignment(state, right) &&
+    (isReusableAssignment(state, right) &&
       guideSourceStaff(state, left)?.id === right.staffId)
   );
 }
@@ -100,7 +150,10 @@ export function isReusableAssignment(
   state: Pick<FlightRuleFacts, "positionRules">,
   assignment: Assignment
 ): boolean {
-  return isGuideAssignment(state, assignment);
+  return (
+    isGuideAssignment(state, assignment) &&
+    !isIndependentGuideAssignment(state, assignment)
+  );
 }
 
 export function makeUnfilled(

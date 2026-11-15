@@ -7,6 +7,7 @@ import {
   isFixedBottomPosition,
 } from "../../domain/flights/schedule-position-rules";
 import { availableStaffForManualAssignment } from "../../domain/candidates/assignment-eligibility";
+import { evaluateManualAssignment } from "../../domain/candidates/manual-assignment-override";
 import { timeConflictAssignmentIds } from "../../domain/assignments/assignment-time-conflicts";
 import type { AppState, Assignment, Staff } from "../../model";
 
@@ -86,6 +87,18 @@ export function buildSchedulePageModel(
         (person, index, people) =>
           people.findIndex((candidate) => candidate.id === person.id) === index
       );
+    for (const person of state.staff) {
+      if (guideCandidates.some((p) => p.id === person.id)) continue;
+      if (
+        assignments.some(
+          (a) =>
+            state.positionRules.find((r) => r.id === a.positionRuleId)
+              ?.category === "引导" &&
+            evaluateManualAssignment(state, a.id, person.id).allowed
+        )
+      )
+        guideCandidates.push(person);
+    }
     return {
       flight,
       guideListId: `schedule-guide-staff-${groupIndex}`,
