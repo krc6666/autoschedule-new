@@ -595,19 +595,34 @@ function parseSameFlightStaffExclusions(
       const enabled = enabledIndex < 0 ? true : parseBoolean(row[enabledIndex]);
       const firstStaffId = cell(row, header, ["人员A编号", "人员A"], 2);
       const secondStaffId = cell(row, header, ["人员B编号", "人员B"], 4);
+      const membersIndex = headerIndex(header, ["人员编号"], -1);
+      const members =
+        membersIndex >= 0
+          ? splitList(row[membersIndex])
+          : [firstStaffId, secondStaffId];
+      const legacy = membersIndex < 0;
       const errors = [
         enabled === undefined ? "启用必须填写是或否" : "",
-        !firstStaffId ? "人员A编号不能为空" : "",
-        !secondStaffId ? "人员B编号不能为空" : "",
-        firstStaffId && !staffIds.has(firstStaffId)
+        legacy && !firstStaffId ? "人员A编号不能为空" : "",
+        legacy && !secondStaffId ? "人员B编号不能为空" : "",
+        legacy && firstStaffId && !staffIds.has(firstStaffId)
           ? `人员A编号“${firstStaffId}”不存在`
           : "",
-        secondStaffId && !staffIds.has(secondStaffId)
+        legacy && secondStaffId && !staffIds.has(secondStaffId)
           ? `人员B编号“${secondStaffId}”不存在`
           : "",
-        firstStaffId && firstStaffId === secondStaffId
+        legacy && firstStaffId && firstStaffId === secondStaffId
           ? "两个人员不能相同"
           : "",
+        !legacy && members.length < 2 ? "互斥组至少需要两名人员" : "",
+        !legacy && new Set(members).size !== members.length
+          ? "互斥人员编号不能重复"
+          : "",
+        ...(!legacy
+          ? members
+              .filter((id) => !staffIds.has(id))
+              .map((id) => `互斥人员编号“${id}”不存在`)
+          : []),
       ].filter(Boolean);
       if (errors.length) return { errors };
       return {
@@ -619,8 +634,7 @@ function parseSameFlightStaffExclusions(
           ),
           enabled: enabled ?? true,
           flightNo: cell(row, header, ["适用航班", "航班号"], 1).toUpperCase(),
-          firstStaffId,
-          secondStaffId,
+          staffIds: members,
         },
       };
     }
@@ -1026,25 +1040,23 @@ export function appendScheduleRuleSheets(
       [
         "规则ID",
         "适用航班（空白表示全部）",
-        "人员A编号",
-        "人员A姓名",
-        "人员B编号",
-        "人员B姓名",
+        "人员编号",
+        "人员姓名（仅核对）",
         "启用",
       ],
       ...state.settings.sameFlightStaffExclusions.map((exclusion) => [
         exclusion.id,
         exclusion.flightNo,
-        exclusion.firstStaffId,
-        state.staff.find((person) => person.id === exclusion.firstStaffId)
-          ?.name ?? "",
-        exclusion.secondStaffId,
-        state.staff.find((person) => person.id === exclusion.secondStaffId)
-          ?.name ?? "",
+        exclusion.staffIds.join(","),
+        exclusion.staffIds
+          .map(
+            (id) => state.staff.find((person) => person.id === id)?.name ?? ""
+          )
+          .join("、"),
         exclusion.enabled ? "是" : "否",
       ]),
     ],
-    [32, 24, 16, 16, 16, 16, 10]
+    [32, 24, 40, 40, 10]
   );
   append(
     workbook,

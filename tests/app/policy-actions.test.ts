@@ -237,8 +237,7 @@ describe("policy actions", () => {
 
     expect(exclusion).toMatchObject({
       enabled: true,
-      firstStaffId: state.staff[0]!.id,
-      secondStaffId: state.staff[1]!.id,
+      staffIds: [state.staff[0]!.id, state.staff[1]!.id],
       flightNo: "",
     });
     expect(
@@ -246,8 +245,8 @@ describe("policy actions", () => {
         state,
         "same-flight-staff-exclusion",
         exclusion.id,
-        "firstStaffId",
-        state.staff[2]!.id
+        "staffIds",
+        [state.staff[2]!.id, state.staff[1]!.id].join(",")
       )
     ).toBe("saved");
     expect(
@@ -261,8 +260,7 @@ describe("policy actions", () => {
     ).toBe("saved");
     expect(exclusion).toMatchObject({
       enabled: true,
-      firstStaffId: state.staff[2]!.id,
-      secondStaffId: state.staff[1]!.id,
+      staffIds: [state.staff[2]!.id, state.staff[1]!.id],
       flightNo: "KE166",
     });
     state.schedulePolicyStale = false;

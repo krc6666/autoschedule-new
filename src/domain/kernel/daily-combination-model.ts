@@ -31,7 +31,10 @@ import {
   isSameAirlinePriorityPosition,
   sameAirlinePriorityConflict,
 } from "../rules/airline-rotation";
-import { sameFlightStaffExclusionApplies } from "../rules/same-flight-staff-exclusion";
+import {
+  sameFlightStaffExclusionApplies,
+  sameFlightStaffExclusionPairs,
+} from "../rules/same-flight-staff-exclusion";
 import { isDailyPrimaryPosition } from "../rules/daily-primary-position";
 
 export interface DailyCombinationChoice {
@@ -434,7 +437,17 @@ function sameFlightStaffExclusionConstraints(
   const constraints: LinearConstraint[] = [];
   for (const [exclusionIndex, exclusion] of (
     state.settings.sameFlightStaffExclusions ?? []
-  ).entries()) {
+  )
+    .flatMap((group) =>
+      sameFlightStaffExclusionPairs(group).map(
+        ([firstStaffId, secondStaffId]) => ({
+          ...group,
+          firstStaffId,
+          secondStaffId,
+        })
+      )
+    )
+    .entries()) {
     const relevant = staffChoices.filter(
       (choice) =>
         (choice.person.id === exclusion.firstStaffId ||

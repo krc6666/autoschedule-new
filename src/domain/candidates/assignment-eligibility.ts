@@ -384,7 +384,9 @@ export function diagnoseSameFlightStaffExclusionEligibility(
     sameFlightStaffExclusionPairMessage(
       options.state,
       exclusion,
-      options.flight.flightNo
+      options.flight.flightNo,
+      options.person.id,
+      conflict.staffId
     )
   );
 }
@@ -625,7 +627,9 @@ export function diagnoseManualAssignmentEligibility(
       message: `${sameFlightStaffExclusionPairMessage(
         state,
         exclusion,
-        assignment.flightNo
+        assignment.flightNo,
+        staffId,
+        exclusionConflict.staffId
       )}，本次为人工突破`,
     });
   }

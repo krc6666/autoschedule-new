@@ -338,8 +338,7 @@ describe("rules page", () => {
         id: "pair",
         enabled: true,
         flightNo: "MISSING",
-        firstStaffId: state.staff[0]!.id,
-        secondStaffId: state.staff[1]!.id,
+        staffIds: [state.staff[0]!.id, state.staff[1]!.id],
       },
     ];
     state.settings.crossFlightPriorityPolicies = [
@@ -585,8 +584,7 @@ describe("rules page", () => {
       {
         id: "pair-1",
         enabled: false,
-        firstStaffId: state.staff[0]!.id,
-        secondStaffId: state.staff[1]!.id,
+        staffIds: [state.staff[0]!.id, state.staff[1]!.id],
         flightNo: "KE166",
       },
     ];
@@ -604,11 +602,27 @@ describe("rules page", () => {
       card?.querySelector<HTMLInputElement>('input[type="checkbox"]')?.checked
     ).toBe(false);
     const selects = card?.querySelectorAll<HTMLSelectElement>("select");
-    expect(selects).toHaveLength(3);
-    expect(selects?.[0]?.value).toBe(state.staff[0]!.id);
-    expect(selects?.[1]?.value).toBe(state.staff[1]!.id);
-    expect(selects?.[2]?.value).toBe("KE166");
-    expect(selects?.[2]?.textContent).toContain("全部航班");
+    expect(selects).toHaveLength(1);
+    expect(selects?.[0]?.value).toBe("KE166");
+    expect(selects?.[0]?.textContent).toContain("全部航班");
+    expect(card?.querySelectorAll("fieldset input:checked")).toHaveLength(2);
+    let command: CustomEvent | undefined;
+    element.addEventListener("autoschedule-command", (event) => {
+      command = event as CustomEvent;
+    });
+    const third =
+      card!.querySelectorAll<HTMLInputElement>("fieldset input")[2]!;
+    third.click();
+    expect(command?.detail).toMatchObject({
+      type: "update-policy",
+      entity: "same-flight-staff-exclusion",
+      id: "pair-1",
+      field: "staffIds",
+      value: state.staff
+        .slice(0, 3)
+        .map((p) => p.id)
+        .join(","),
+    });
     expect(card?.querySelector('button[aria-label="删除"]')).not.toBeNull();
   });
 

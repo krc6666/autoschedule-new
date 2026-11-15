@@ -2546,8 +2546,7 @@ describe("all-flight mobile-supervisor scheduling", { timeout: 15_000 }, () => {
       {
         id: "supervisor-regular-exclusion",
         enabled: true,
-        firstStaffId: supervisor.id,
-        secondStaffId: regular.id,
+        staffIds: [supervisor.id, regular.id],
         flightNo: "KE166",
       },
     ];

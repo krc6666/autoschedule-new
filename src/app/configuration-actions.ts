@@ -523,9 +523,12 @@ export function deleteStaff(state: AppState, id: string): boolean {
       (adjustment) => adjustment.staffId !== id
     );
   state.settings.sameFlightStaffExclusions =
-    state.settings.sameFlightStaffExclusions.filter(
-      (rule) => rule.firstStaffId !== id && rule.secondStaffId !== id
-    );
+    state.settings.sameFlightStaffExclusions
+      .map((rule) => ({
+        ...rule,
+        staffIds: rule.staffIds.filter((staffId) => staffId !== id),
+      }))
+      .filter((rule) => rule.staffIds.length >= 2);
   state.settings.crossFlightPriorityPolicies.forEach((rule) => {
     rule.staffIds = rule.staffIds.filter((staffId) => staffId !== id);
   });
@@ -868,8 +871,9 @@ export function updateConfigurationField(
         ) as [string | null, string | null];
       });
       state.settings.sameFlightStaffExclusions.forEach((rule) => {
-        if (rule.firstStaffId === id) rule.firstStaffId = value;
-        if (rule.secondStaffId === id) rule.secondStaffId = value;
+        rule.staffIds = rule.staffIds.map((staffId) =>
+          staffId === id ? value : staffId
+        );
       });
       state.settings.crossFlightPriorityPolicies.forEach((rule) => {
         rule.staffIds = rule.staffIds.map((staffId) =>

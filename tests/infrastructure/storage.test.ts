@@ -68,8 +68,7 @@ describe("state persistence", () => {
       {
         id: "pair-1",
         enabled: false,
-        firstStaffId: state.staff[0]!.id,
-        secondStaffId: state.staff[1]!.id,
+        staffIds: [state.staff[0]!.id, state.staff[1]!.id],
         flightNo: "KE166",
       },
     ];
@@ -80,11 +79,28 @@ describe("state persistence", () => {
     ).toEqual(state.settings.sameFlightStaffExclusions);
 
     const legacyRule = JSON.parse(JSON.stringify(state));
+    for (const settings of [
+      legacyRule.settings,
+      legacyRule.groups.A.settings,
+    ]) {
+      settings.sameFlightStaffExclusions = [
+        {
+          id: "pair-1",
+          firstStaffId: state.staff[0]!.id,
+          secondStaffId: state.staff[1]!.id,
+          flightNo: "KE166",
+        },
+      ];
+    }
     delete legacyRule.settings.sameFlightStaffExclusions[0].enabled;
     expect(
       loadState({ getItem: () => JSON.stringify(legacyRule) }).settings
         .sameFlightStaffExclusions[0]?.enabled
     ).toBe(true);
+    expect(
+      loadState({ getItem: () => JSON.stringify(legacyRule) }).settings
+        .sameFlightStaffExclusions[0]?.staffIds
+    ).toEqual(state.staff.slice(0, 2).map((p) => p.id));
 
     const legacy = JSON.parse(JSON.stringify(state));
     delete legacy.settings.sameFlightStaffExclusions;

@@ -157,8 +157,7 @@ describe("configuration diagnostics", () => {
             id: "bad",
             enabled: true,
             flightNo: "",
-            firstStaffId: s.staff[0]!.id,
-            secondStaffId: s.staff[0]!.id,
+            staffIds: [s.staff[0]!.id, s.staff[0]!.id],
           },
         ];
       },
@@ -325,8 +324,7 @@ describe("configuration diagnostics", () => {
         id: "pair",
         enabled: true,
         flightNo: "",
-        firstStaffId: "other-one",
-        secondStaffId: "other-two",
+        staffIds: ["other-one", "other-two"],
       },
     ];
     expect(

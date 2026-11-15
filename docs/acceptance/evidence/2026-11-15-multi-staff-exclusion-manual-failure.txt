@@ -1,0 +1,38 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/app/schedule-actions.test.ts (20 tests | 1 failed | 19 skipped) 23ms
+     × 允许人工突破同航班人员互斥并报警，自动重排后恢复互斥 20ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/app/schedule-actions.test.ts > 人工调整后的规则证据 > 允许人工突破同航班人员互斥并报警，自动重排后恢复互斥
+AssertionError: expected { changed: true, …(2) } to match object { changed: true, …(1) }
+(1 matching property omitted from actual)
+
+- Expected
++ Received
+
+  {
+    "changed": true,
+-   "warning": StringContaining "刘红与华嘉慧不能同时安排在F100",
++   "warning": "人工调整已保留，突破以下限制：
++ 华嘉慧与刘红不能同时安排在F100，本次为人工突破",
+  }
+
+ ❯ tests/app/schedule-actions.test.ts:290:20
+    288|     const manual = assignStaff(state, "assignment-1", second!.id);
+    289|
+    290|     expect(manual).toMatchObject({
+       |                    ^
+    291|       changed: true,
+    292|       warning: expect.stringContaining(
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 19 skipped (20)
+   Start at  22:02:29
+   Duration  2.35s (transform 1.73s, setup 0ms, import 2.03s, tests 23ms, environment 0ms)
+Exit code: 1

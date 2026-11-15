@@ -175,8 +175,7 @@ describe("complete configuration device transfer", () => {
         id: "exclusion",
         enabled: false,
         flightNo: "TW616",
-        firstStaffId: source.staff[0]!.id,
-        secondStaffId: source.staff[1]!.id,
+        staffIds: [source.staff[0]!.id, source.staff[1]!.id],
       },
     ];
     source.settings.teamLeaderGapFillPositionPolicies = [
@@ -563,8 +562,7 @@ describe("complete configuration device transfer", () => {
         id: "e",
         enabled: false,
         flightNo: old,
-        firstStaffId: source.staff[0]!.id,
-        secondStaffId: source.staff[1]!.id,
+        staffIds: [source.staff[0]!.id, source.staff[1]!.id],
       },
     ];
     source.settings.teamLeaderGapFillPositionPolicies = [

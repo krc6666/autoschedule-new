@@ -179,8 +179,7 @@ describe("seasonal flight confirmation and group isolation", () => {
           id: "exclude",
           enabled: false,
           flightNo: "OLD100",
-          firstStaffId: "b1",
-          secondStaffId: "b2",
+          staffIds: ["b1", "b2"],
         },
       ];
       settings.teamLeaderGapFillPositionPolicies = [

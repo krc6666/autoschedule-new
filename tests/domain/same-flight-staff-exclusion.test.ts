@@ -18,14 +18,14 @@ import { createScheduleSafetySession } from "../../src/domain/kernel/schedule-sa
 import { createScheduleRunFacts } from "../../src/domain/shared/schedule-run-facts";
 import {
   matchingSameFlightStaffExclusion,
+  sameFlightStaffExclusionPairMessage,
   sameFlightStaffExclusionViolations,
 } from "../../src/domain/rules/same-flight-staff-exclusion";
 
 interface ExclusionInput {
   id: string;
   enabled: boolean;
-  firstStaffId: string;
-  secondStaffId: string;
+  staffIds: string[];
   flightNo: string;
 }
 
@@ -120,8 +120,7 @@ function scenario(
     {
       id: "exclusion-1",
       enabled: options.enabled ?? true,
-      firstStaffId: pair[0],
-      secondStaffId: pair[1],
+      staffIds: [pair[0], pair[1]],
       flightNo: options.scopedFlightNo ?? "",
     },
   ];
@@ -137,6 +136,44 @@ function assignedStaffIds(state: AppState) {
 }
 
 describe("same-flight staff exclusion", () => {
+  it("reports the actual conflicting members in configured order", () => {
+    const state = scenario({ staffIds: ["worker-a", "worker-b", "worker-c"] });
+    const group = {
+      id: "group",
+      enabled: true,
+      flightNo: "",
+      staffIds: ["worker-a", "worker-b", "worker-c"],
+    };
+    expect(
+      sameFlightStaffExclusionPairMessage(
+        state,
+        group,
+        "F100",
+        "worker-c",
+        "worker-b"
+      )
+    ).toBe("WORKER-B与WORKER-C不能同时安排在F100");
+  });
+
+  it("excludes the second and third members of a multi-person group", async () => {
+    const state = scenario({ staffIds: ["worker-a", "worker-b", "worker-c"] });
+    state.positionRules[0]!.qualifiedStaffIds = ["worker-b"];
+    state.positionRules[1]!.qualifiedStaffIds = ["worker-c"];
+    state.settings.sameFlightStaffExclusions = [
+      {
+        id: "group",
+        enabled: true,
+        flightNo: "",
+        staffIds: ["worker-a", "worker-b", "worker-c"],
+      },
+    ];
+    expect(
+      matchingSameFlightStaffExclusion(state, "worker-b", "worker-c", "F100")
+        ?.id
+    ).toBe("group");
+    expect(await assignedStaffIds(state)).toHaveLength(1);
+  });
+
   it("never assigns an excluded pair to the same flight", async () => {
     const assigned = await assignedStaffIds(scenario());
 
@@ -215,58 +252,69 @@ describe("same-flight staff exclusion", () => {
     expect(sameFlightStaffExclusionViolations(state, assignments)).toEqual([]);
   });
 
-  it("rejects a post-stage proposal that reintroduces the excluded pair", () => {
-    const state = scenario();
-    const [firstRule, secondRule] = state.positionRules;
-    const legal = {
-      id: "assignment-a",
-      flightId: state.flights[0]!.id,
-      flightNo: "F100",
-      positionRuleId: firstRule!.id,
-      position: firstRule!.name,
-      staffId: "worker-a",
-      staffName: "WORKER-A",
-      startTime: "08:00",
-      endTime: "10:00",
-      workHours: 2,
-      fatiguePoints: 1,
-      remark: "",
-      manualRemark: "",
-      status: "assigned" as const,
-    };
-    const illegal = {
-      ...legal,
-      id: "assignment-b",
-      positionRuleId: secondRule!.id,
-      position: secondRule!.name,
-      staffId: "worker-b",
-      staffName: "WORKER-B",
-    };
-    const ledger = createScheduleLedger([legal], {
-      safetySession: createScheduleSafetySession({
-        phase: "partial",
-        state,
-        date: "2026-09-28",
-        runFacts: createScheduleRunFacts(state, "2026-09-28"),
-        guards: createDefaultScheduleGuards(),
-      }),
-    });
+  it.each([false, true])(
+    "rejects a post-stage proposal that reintroduces excluded people (multi=%s)",
+    (multi) => {
+      const state = scenario();
+      if (multi) {
+        state.staff.push(staff("third-person", "THIRD"));
+        state.settings.sameFlightStaffExclusions[0]!.staffIds = [
+          "third-person",
+          "worker-a",
+          "worker-b",
+        ];
+      }
+      const [firstRule, secondRule] = state.positionRules;
+      const legal = {
+        id: "assignment-a",
+        flightId: state.flights[0]!.id,
+        flightNo: "F100",
+        positionRuleId: firstRule!.id,
+        position: firstRule!.name,
+        staffId: "worker-a",
+        staffName: "WORKER-A",
+        startTime: "08:00",
+        endTime: "10:00",
+        workHours: 2,
+        fatiguePoints: 1,
+        remark: "",
+        manualRemark: "",
+        status: "assigned" as const,
+      };
+      const illegal = {
+        ...legal,
+        id: "assignment-b",
+        positionRuleId: secondRule!.id,
+        position: secondRule!.name,
+        staffId: "worker-b",
+        staffName: "WORKER-B",
+      };
+      const ledger = createScheduleLedger([legal], {
+        safetySession: createScheduleSafetySession({
+          phase: "partial",
+          state,
+          date: "2026-09-28",
+          runFacts: createScheduleRunFacts(state, "2026-09-28"),
+          guards: createDefaultScheduleGuards(),
+        }),
+      });
 
-    let error: unknown;
-    try {
-      ledger.commit({ type: "replace", assignments: [legal, illegal] });
-    } catch (caught) {
-      error = caught;
+      let error: unknown;
+      try {
+        ledger.commit({ type: "replace", assignments: [legal, illegal] });
+      } catch (caught) {
+        error = caught;
+      }
+
+      expect(error).toBeInstanceOf(ScheduleGuardError);
+      expect((error as ScheduleGuardError).violations).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ ruleId: "same-flight-staff-exclusion" }),
+        ])
+      );
+      expect(ledger.snapshot()).toEqual([legal]);
     }
-
-    expect(error).toBeInstanceOf(ScheduleGuardError);
-    expect((error as ScheduleGuardError).violations).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ ruleId: "same-flight-staff-exclusion" }),
-      ])
-    );
-    expect(ledger.snapshot()).toEqual([legal]);
-  });
+  );
 
   it("ignores a disabled exclusion in the final post-stage guard", () => {
     const state = scenario({ enabled: false });

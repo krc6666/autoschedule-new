@@ -332,8 +332,7 @@ describe("workbook boundary", () => {
       {
         id: "disabled-pair",
         enabled: false,
-        firstStaffId: state.staff[0]!.id,
-        secondStaffId: state.staff[1]!.id,
+        staffIds: state.staff.slice(0, 3).map((p) => p.id),
         flightNo: "KE166",
       },
     ];
@@ -378,8 +377,7 @@ describe("workbook boundary", () => {
       {
         id: "legacy-pair",
         enabled: true,
-        firstStaffId: state.staff[0]!.id,
-        secondStaffId: state.staff[1]!.id,
+        staffIds: [state.staff[0]!.id, state.staff[1]!.id],
         flightNo: "KE166",
       },
     ]);

@@ -326,10 +326,8 @@ export function applyWorkbookImport(
     const settingsPatch = { ...imported.settings };
     if (imported.settings.sameFlightStaffExclusions !== undefined)
       settingsPatch.sameFlightStaffExclusions =
-        imported.settings.sameFlightStaffExclusions.filter(
-          (rule) =>
-            activeStaffIds.has(rule.firstStaffId) &&
-            activeStaffIds.has(rule.secondStaffId)
+        imported.settings.sameFlightStaffExclusions.filter((rule) =>
+          rule.staffIds.every((id) => activeStaffIds.has(id))
         );
     if (imported.settings.crossFlightPriorityPolicies !== undefined)
       settingsPatch.crossFlightPriorityPolicies =

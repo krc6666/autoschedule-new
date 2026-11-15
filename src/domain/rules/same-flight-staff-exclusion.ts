@@ -7,10 +7,22 @@ export const SAME_FLIGHT_STAFF_EXCLUSION_RULE_ID =
 
 export interface SameFlightStaffExclusionViolation {
   exclusion: SameFlightStaffExclusion;
+  firstStaffId: string;
+  secondStaffId: string;
   flightId: string;
   flightNo: string;
   firstAssignmentIds: string[];
   secondAssignmentIds: string[];
+}
+
+/** Compile each group once into the distinct-person conflicts consumed by all paths. */
+export function sameFlightStaffExclusionPairs(
+  exclusion: SameFlightStaffExclusion
+): readonly (readonly [string, string])[] {
+  const members = [...new Set(exclusion.staffIds)];
+  return members.flatMap((first, index) =>
+    members.slice(index + 1).map((second) => [first, second] as const)
+  );
 }
 
 export function sameFlightStaffExclusionApplies(
@@ -35,10 +47,8 @@ export function matchingSameFlightStaffExclusion(
   return (state.settings.sameFlightStaffExclusions ?? []).find(
     (exclusion) =>
       sameFlightStaffExclusionApplies(exclusion, flightNo) &&
-      ((exclusion.firstStaffId === firstStaffId &&
-        exclusion.secondStaffId === secondStaffId) ||
-        (exclusion.firstStaffId === secondStaffId &&
-          exclusion.secondStaffId === firstStaffId))
+      exclusion.staffIds.includes(firstStaffId) &&
+      exclusion.staffIds.includes(secondStaffId)
   );
 }
 
@@ -58,20 +68,26 @@ export function sameFlightStaffExclusionViolations(
     const flightNo = flightAssignments[0]?.flightNo ?? "";
     for (const exclusion of state.settings.sameFlightStaffExclusions ?? []) {
       if (!sameFlightStaffExclusionApplies(exclusion, flightNo)) continue;
-      const firstAssignmentIds = flightAssignments
-        .filter((item) => item.staffId === exclusion.firstStaffId)
-        .map((item) => item.id);
-      const secondAssignmentIds = flightAssignments
-        .filter((item) => item.staffId === exclusion.secondStaffId)
-        .map((item) => item.id);
-      if (!firstAssignmentIds.length || !secondAssignmentIds.length) continue;
-      violations.push({
-        exclusion,
-        flightId,
-        flightNo,
-        firstAssignmentIds,
-        secondAssignmentIds,
-      });
+      for (const [firstStaffId, secondStaffId] of sameFlightStaffExclusionPairs(
+        exclusion
+      )) {
+        const firstAssignmentIds = flightAssignments
+          .filter((item) => item.staffId === firstStaffId)
+          .map((item) => item.id);
+        const secondAssignmentIds = flightAssignments
+          .filter((item) => item.staffId === secondStaffId)
+          .map((item) => item.id);
+        if (!firstAssignmentIds.length || !secondAssignmentIds.length) continue;
+        violations.push({
+          exclusion,
+          firstStaffId,
+          secondStaffId,
+          flightId,
+          flightNo,
+          firstAssignmentIds,
+          secondAssignmentIds,
+        });
+      }
     }
   }
   return violations;
@@ -84,18 +100,25 @@ export function sameFlightStaffExclusionMessage(
   return sameFlightStaffExclusionPairMessage(
     state,
     violation.exclusion,
-    violation.flightNo
+    violation.flightNo,
+    violation.firstStaffId,
+    violation.secondStaffId
   );
 }
 
 export function sameFlightStaffExclusionPairMessage(
   state: Pick<ScheduleGenerationFacts, "staff">,
   exclusion: SameFlightStaffExclusion,
-  flightNo: string
+  flightNo: string,
+  firstStaffId = exclusion.staffIds[0] ?? "",
+  secondStaffId = exclusion.staffIds[1] ?? ""
 ): string {
+  const [first, second] =
+    exclusion.staffIds.indexOf(firstStaffId) <=
+    exclusion.staffIds.indexOf(secondStaffId)
+      ? [firstStaffId, secondStaffId]
+      : [secondStaffId, firstStaffId];
   const name = (staffId: string): string =>
     state.staff.find((person) => person.id === staffId)?.name ?? staffId;
-  return `${name(exclusion.firstStaffId)}与${name(
-    exclusion.secondStaffId
-  )}不能同时安排在${flightNo}`;
+  return `${name(first)}与${name(second)}不能同时安排在${flightNo}`;
 }

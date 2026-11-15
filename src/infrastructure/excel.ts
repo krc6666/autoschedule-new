@@ -1253,10 +1253,8 @@ export function buildConfigWorkbook(state: AppState): XLSX.WorkBook {
           ),
         })),
       sameFlightStaffExclusions:
-        state.settings.sameFlightStaffExclusions.filter(
-          (rule) =>
-            activeStaffIds.has(rule.firstStaffId) &&
-            activeStaffIds.has(rule.secondStaffId)
+        state.settings.sameFlightStaffExclusions.filter((rule) =>
+          rule.staffIds.every((id) => activeStaffIds.has(id))
         ),
     },
   });

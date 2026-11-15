@@ -179,24 +179,31 @@ function normalizeSameFlightStaffExclusions(
   sourceArray(value, fallback)
     .filter((item) => item && typeof item === "object")
     .forEach((item, index) => {
-      const exclusion = item as Partial<SameFlightStaffExclusion>;
-      const firstStaffId = String(exclusion.firstStaffId ?? "").trim();
-      const secondStaffId = String(exclusion.secondStaffId ?? "").trim();
-      if (!firstStaffId || !secondStaffId || firstStaffId === secondStaffId)
-        return;
+      const exclusion = item as Partial<SameFlightStaffExclusion> & {
+        firstStaffId?: unknown;
+        secondStaffId?: unknown;
+      };
+      // Explicit old-format migration at the configuration boundary only.
+      const members = Array.isArray(exclusion.staffIds)
+        ? exclusion.staffIds
+        : [exclusion.firstStaffId, exclusion.secondStaffId];
+      const staffIds = [
+        ...new Set(
+          members.map((id) => String(id ?? "").trim()).filter(Boolean)
+        ),
+      ].sort();
+      if (staffIds.length < 2) return;
       const flightNo = String(exclusion.flightNo ?? "")
         .trim()
         .toUpperCase();
-      const pair = [firstStaffId, secondStaffId].sort();
-      const key = `${pair[0]}\u0000${pair[1]}\u0000${flightNo}`;
+      const key = JSON.stringify([staffIds, flightNo]);
       if (unique.has(key)) return;
       unique.set(key, {
         id:
           String(exclusion.id ?? "").trim() ||
           `same-flight-staff-exclusion-${index + 1}`,
         enabled: exclusion.enabled !== false,
-        firstStaffId: pair[0]!,
-        secondStaffId: pair[1]!,
+        staffIds,
         flightNo,
       });
     });

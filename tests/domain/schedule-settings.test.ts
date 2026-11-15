@@ -116,39 +116,42 @@ describe("schedule settings module", () => {
     ).toBe("prefer");
   });
 
-  it("normalizes same-flight exclusions as unordered unique staff pairs", () => {
-    const normalized = normalizeScheduleSettings({
-      sameFlightStaffExclusions: [
-        {
-          id: " first ",
-          enabled: false,
-          firstStaffId: "worker-b",
-          secondStaffId: "worker-a",
-          flightNo: " ke166 ",
-        },
-        {
-          id: "duplicate",
-          enabled: true,
-          firstStaffId: "worker-a",
-          secondStaffId: "worker-b",
-          flightNo: "KE166",
-        },
-        {
-          id: "invalid",
-          enabled: true,
-          firstStaffId: "worker-a",
-          secondStaffId: "worker-a",
-          flightNo: "",
-        },
-      ],
-    });
+  it("migrates legacy same-flight staff pairs into unordered unique groups", () => {
+    const normalized = normalizeScheduleSettings(
+      JSON.parse(
+        JSON.stringify({
+          sameFlightStaffExclusions: [
+            {
+              id: " first ",
+              enabled: false,
+              firstStaffId: "worker-b",
+              secondStaffId: "worker-a",
+              flightNo: " ke166 ",
+            },
+            {
+              id: "duplicate",
+              enabled: true,
+              firstStaffId: "worker-a",
+              secondStaffId: "worker-b",
+              flightNo: "KE166",
+            },
+            {
+              id: "invalid",
+              enabled: true,
+              firstStaffId: "worker-a",
+              secondStaffId: "worker-a",
+              flightNo: "",
+            },
+          ],
+        })
+      )
+    );
 
     expect(normalized.sameFlightStaffExclusions).toEqual([
       {
         id: "first",
         enabled: false,
-        firstStaffId: "worker-a",
-        secondStaffId: "worker-b",
+        staffIds: ["worker-a", "worker-b"],
         flightNo: "KE166",
       },
     ]);

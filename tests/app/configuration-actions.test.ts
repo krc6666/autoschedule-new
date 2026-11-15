@@ -855,8 +855,7 @@ describe("configuration actions", () => {
       {
         id: "exclusion-1",
         enabled: true,
-        firstStaffId: first!.id,
-        secondStaffId: second!.id,
+        staffIds: [first!.id, second!.id],
         flightNo: template.flightNo,
       },
     ];
@@ -890,8 +889,7 @@ describe("configuration actions", () => {
       {
         id: "exclusion-1",
         enabled: true,
-        firstStaffId: first!.id,
-        secondStaffId: second!.id,
+        staffIds: [first!.id, second!.id],
         flightNo: "",
       },
     ];
@@ -900,8 +898,7 @@ describe("configuration actions", () => {
       updateConfigurationField(state, "staff", first!.id, "id", "RENAMED")
     ).toBe("updated");
     expect(state.settings.sameFlightStaffExclusions[0]).toMatchObject({
-      firstStaffId: "RENAMED",
-      secondStaffId: second!.id,
+      staffIds: ["RENAMED", second!.id],
     });
   });
 
@@ -912,15 +909,13 @@ describe("configuration actions", () => {
       {
         id: "remove-me",
         enabled: true,
-        firstStaffId: first!.id,
-        secondStaffId: second!.id,
+        staffIds: [first!.id, second!.id],
         flightNo: "",
       },
       {
         id: "keep-me",
         enabled: false,
-        firstStaffId: second!.id,
-        secondStaffId: third!.id,
+        staffIds: [second!.id, third!.id],
         flightNo: "",
       },
     ];
@@ -930,10 +925,30 @@ describe("configuration actions", () => {
       {
         id: "keep-me",
         enabled: false,
-        firstStaffId: second!.id,
-        secondStaffId: third!.id,
+        staffIds: [second!.id, third!.id],
         flightNo: "",
       },
+    ]);
+  });
+
+  it("retains the remaining exclusion group after deleting one of three members", () => {
+    const state = createDefaultState();
+    const ids = state.staff.slice(0, 3).map((p) => p.id);
+    state.settings.sameFlightStaffExclusions = [
+      { id: "group", enabled: true, flightNo: "", staffIds: ids },
+    ];
+    expect(
+      updateConfigurationField(state, "staff", ids[2]!, "id", "RENAMED-THIRD")
+    ).toBe("updated");
+    expect(state.settings.sameFlightStaffExclusions[0]!.staffIds).toEqual([
+      ids[0],
+      ids[1],
+      "RENAMED-THIRD",
+    ]);
+    expect(deleteStaff(state, ids[0]!)).toBe(true);
+    expect(state.settings.sameFlightStaffExclusions[0]!.staffIds).toEqual([
+      ids[1],
+      "RENAMED-THIRD",
     ]);
   });
 

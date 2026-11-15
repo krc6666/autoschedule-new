@@ -1,0 +1,33 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/domain/same-flight-staff-exclusion.test.ts (10 tests | 1 failed | 9 skipped) 16ms
+     × excludes the second and third members of a multi-person group 14ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/domain/same-flight-staff-exclusion.test.ts > same-flight staff exclusion > excludes the second and third members of a multi-person group
+AssertionError: expected undefined to be 'group' // Object.is equality
+
+- Expected:
+"group"
+
++ Received:
+undefined
+
+ ❯ tests/domain/same-flight-staff-exclusion.test.ts:145:89
+    143|       { id: "group", enabled: true, flightNo: "", staffIds: ["worker-a…
+    144|     ];
+    145|     expect(matchingSameFlightStaffExclusion(state, "worker-b", "worker…
+       |                                                                                         ^
+    146|     expect(await assignedStaffIds(state)).toHaveLength(1);
+    147|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 3 skipped (4)
+      Tests  1 failed | 38 skipped (39)
+   Start at  21:51:44
+   Duration  2.33s (transform 2.67s, setup 0ms, import 3.55s, tests 16ms, environment 1ms)
+Exit code: 1

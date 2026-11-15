@@ -1,0 +1,31 @@
+{
+  "passed": true,
+  "scope": "production-static-artifacts-only; Owner browser evidence recorded separately",
+  "uiAssets": [
+    {
+      "path": "dist/assets/index-B-XPZS0b.js",
+      "sha256": "d5e88dc1edd9ca0da43c33fb65d7aa53336778b3136338850d2fdee756c18a25"
+    }
+  ],
+  "ruleAssets": [
+    {
+      "path": "dist/assets/cloud-application-0bL-NW92.js",
+      "sha256": "4fdcb3086c1ce2312b0b92f94ab7c63d8e5d285bcc3aea92b4f75cd97e6fbebc"
+    },
+    {
+      "path": "dist/assets/excel-CHbKRq_W.js",
+      "sha256": "24c0a59d38cb556868b8c86241598ac12e5ac4cff87b5403f5b6e875e1711fa9"
+    },
+    {
+      "path": "dist/assets/index-B-XPZS0b.js",
+      "sha256": "d5e88dc1edd9ca0da43c33fb65d7aa53336778b3136338850d2fdee756c18a25"
+    },
+    {
+      "path": "dist/assets/schedule.worker-DDS_LOpZ.js",
+      "sha256": "6f5f1551fd6b09295d2b34accc49e1911b7e6d3f8d77630a3cd90a27d36650f7"
+    }
+  ],
+  "templateSha256": "a5ea16ae8ca28461baf08a43c01639658ebfcc0f65130131eb70f3cd713f1716",
+  "originalProjectMapHash": "49f304c96afd07eb7d784593ae87fcaa18832a015406f475656df6bdc77b0cfd",
+  "diffCheck": "exit 0"
+}

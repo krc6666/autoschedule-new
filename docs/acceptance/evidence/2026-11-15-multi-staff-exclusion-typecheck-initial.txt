@@ -1,0 +1,8 @@
+
+> autoschedule@1.0.0 typecheck
+> tsc -b --pretty false
+
+tests/domain/schedule-settings.test.ts(125,11): error TS2353: Object literal may only specify known properties, and 'firstStaffId' does not exist in type 'SameFlightStaffExclusion'.
+tests/domain/schedule-settings.test.ts(132,11): error TS2353: Object literal may only specify known properties, and 'firstStaffId' does not exist in type 'SameFlightStaffExclusion'.
+tests/domain/schedule-settings.test.ts(139,11): error TS2353: Object literal may only specify known properties, and 'firstStaffId' does not exist in type 'SameFlightStaffExclusion'.
+Exit code: 1

@@ -200,8 +200,7 @@ export function addSameFlightStaffExclusion(
   const exclusion: SameFlightStaffExclusion = {
     id: createId("same-flight-staff-exclusion"),
     enabled: true,
-    firstStaffId: first?.id ?? "",
-    secondStaffId: second?.id ?? "",
+    staffIds: [first?.id, second?.id].filter((id): id is string => Boolean(id)),
     flightNo: "",
   };
   return appendPolicyItem(
@@ -271,18 +270,15 @@ function updateSameFlightStaffExclusion(
           "flightNo",
           normalizeText(value).toUpperCase()
         );
-      if (field === "firstStaffId" || field === "secondStaffId") {
-        const staffId = normalizeText(value);
-        const otherStaffId =
-          field === "firstStaffId"
-            ? exclusion.secondStaffId
-            : exclusion.firstStaffId;
+      if (field === "staffIds") {
+        const staffIds = [...new Set(splitList(value))];
         if (
-          !state.staff.some((person) => person.id === staffId) ||
-          staffId === otherStaffId
+          staffIds.some((id) => !state.staff.some((person) => person.id === id))
         )
           return "invalid";
-        return replacePolicyValue(exclusion, field, staffId);
+        if (staffIds.join(",") === exclusion.staffIds.join(","))
+          return "unchanged";
+        return replacePolicyValue(exclusion, "staffIds", staffIds);
       }
       return "invalid";
     }

@@ -101,15 +101,13 @@ describe("workbook actions", () => {
       {
         id: "same-flight-pair",
         enabled: false,
-        firstStaffId: source.staff[0]!.id,
-        secondStaffId: source.staff[1]!.id,
+        staffIds: [source.staff[0]!.id, source.staff[1]!.id],
         flightNo: "KE166",
       },
       {
         id: "all-flight-pair",
         enabled: true,
-        firstStaffId: source.staff[2]!.id,
-        secondStaffId: source.staff[3]!.id,
+        staffIds: [source.staff[2]!.id, source.staff[3]!.id],
         flightNo: "",
       },
     ];
@@ -515,8 +513,7 @@ describe("workbook actions", () => {
       id: "b-pair",
       enabled: false,
       flightNo: "KE166",
-      firstStaffId: otherA.id,
-      secondStaffId: otherB.id,
+      staffIds: [otherA.id, otherB.id],
     };
     state.groups.B.settings.sameFlightStaffExclusions = [otherRule];
     const beforeB = structuredClone(state.groups.B.settings);
@@ -524,8 +521,7 @@ describe("workbook actions", () => {
       id: "a-pair",
       enabled: true,
       flightNo: "CX937",
-      firstStaffId: state.staff[0]!.id,
-      secondStaffId: state.staff[1]!.id,
+      staffIds: [state.staff[0]!.id, state.staff[1]!.id],
     };
 
     applyWorkbookImport(

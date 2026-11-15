@@ -1240,7 +1240,7 @@ select {
 }
 .same-flight-exclusion-row {
   grid-template-columns:
-    72px minmax(120px, 0.8fr) minmax(120px, 0.8fr) minmax(150px, 1.2fr)
+    72px minmax(240px, 2fr) minmax(150px, 1.2fr)
     34px;
 }
 .supervisor-coverage-row .form-label {

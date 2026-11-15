@@ -1,0 +1,192 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-15-multi-staff-exclusion",
+  "title": "同航班互斥支持多人组",
+  "startedFrom": "e61670c9809379ad07fd4b1530d118f3a4987034",
+  "expectation": {
+    "example": "Owner确认：同组勾选甲乙丙，同一航班最多安排其中一人，甲乙、甲丙、乙丙均互斥。",
+    "expected": "规则页多人勾选；自动、补缺、轮岗及最终守卫消费同一组内任意两人互斥事实；当前组配置保存、导出、空库导入、重启后效果保留。旧两人JSON/Excel迁为两人组。",
+    "unchanged": "保留逐组启停、指定航班/全部航班、其他硬约束、人工显式突破及原红色警告、组隔离、既有历史统计。互斥不足人时留空不突破。停止的G12/督导问题不修改；原PROJECT_MAP.md保留。",
+    "fallback": "非法导入拒绝对应整表并保留原配置；人员不足不突破互斥。配置修改仅标班表待重排；不改已生成结果。"
+  },
+  "testedVersion": "80c088458a9363a5a212a7594bf8b5ba8f8ac7cdbb4892a4e010bad04b657ea7",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "先证明旧实现漏掉组内第二/第三人组合；新实现同场景及完整回归通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-multi-staff-exclusion-before.txt",
+          "summary": "改前第二/第三人匹配失败，退出1，证明旧两端实现不能覆盖多人组。",
+          "sha256": "ee30b82934adebf3dce9185534673115abc7a4ab5310f34c33671e96d6bc3264"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-multi-staff-exclusion-focused.txt",
+          "summary": "7文件188项领域、人工候选、规则编辑及配置相关回归通过。",
+          "sha256": "83b619bd7068878c8eaa1d29f1af10d0d83f58a8fb29affc6cb9c081e86c2724"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-multi-staff-exclusion-verify-final.txt",
+          "summary": "最终完整npm run verify退出0；类型检查、207文件2042项功能、7文件19项性能及生产构建通过，并发2，原阈值保持。",
+          "sha256": "93b75aae8b8c629563806fcc52087d7fc0a8d98b112ff349e0c7d7dbdeecbe69"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "UI一次可勾选三人；配置经过实际字节导出、空库导入和重启，实际Worker/WASM排班及Store安装后同班只安排一人。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-multi-staff-exclusion-transfer.txt",
+          "summary": "4文件48项通过，包括配置修改→真实Excel字节→空库导入→重启→实际Worker/WASM→Store最终安装。",
+          "sha256": "c609e6da9c5d9b28980ad9ae4014ffcd61b08e73096f5ccb15fd6684d92afce9"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-multi-staff-exclusion-neighbors.txt",
+          "summary": "8文件156项通过，包含UI多人勾选及完整命令、人员改编号/删除、旧JSON/Excel迁移和保存恢复。",
+          "sha256": "aa9e0f72918b226c3589d42e6073fd6e459146b6fad0f51973b42796e6baa083"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-multi-staff-exclusion-verify-final.txt",
+          "summary": "最终完整npm run verify退出0；类型检查、207文件2042项功能、7文件19项性能及生产构建通过，并发2，原阈值保持。",
+          "sha256": "93b75aae8b8c629563806fcc52087d7fc0a8d98b112ff349e0c7d7dbdeecbe69"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "旧两人JSON及Excel迁为两人组，组启停、航班范围、同人合法兼任、A/B隔离、成员编号及删除均验证；非法人数/重复/未知整张规则表拒绝。模板同步。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-multi-staff-exclusion-focused.txt",
+          "summary": "7文件188项领域、人工候选、规则编辑及配置相关回归通过。",
+          "sha256": "83b619bd7068878c8eaa1d29f1af10d0d83f58a8fb29affc6cb9c081e86c2724"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-multi-staff-exclusion-transfer.txt",
+          "summary": "4文件48项通过，包括配置修改→真实Excel字节→空库导入→重启→实际Worker/WASM→Store最终安装。",
+          "sha256": "c609e6da9c5d9b28980ad9ae4014ffcd61b08e73096f5ccb15fd6684d92afce9"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-multi-staff-exclusion-neighbors.txt",
+          "summary": "8文件156项通过，包含UI多人勾选及完整命令、人员改编号/删除、旧JSON/Excel迁移和保存恢复。",
+          "sha256": "aa9e0f72918b226c3589d42e6073fd6e459146b6fad0f51973b42796e6baa083"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-multi-staff-exclusion-template.txt",
+          "summary": "独立读取新旧模板，24表目录相同；互斥列更新，其余937单元格值、类型、公式相同。",
+          "sha256": "ee447ad00b6d9f751d4b99360ddeb805545ca7123a32f3ef086495c6a5a36768"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-multi-staff-exclusion-verify-final.txt",
+          "summary": "最终完整npm run verify退出0；类型检查、207文件2042项功能、7文件19项性能及生产构建通过，并发2，原阈值保持。",
+          "sha256": "93b75aae8b8c629563806fcc52087d7fc0a8d98b112ff349e0c7d7dbdeecbe69"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "通过真实ledger提交入口，先保留合法安排，再尝试插入组内另一人，统一守卫拒绝且原结果不变；两人组和非首两人成员均覆盖。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-multi-staff-exclusion-focused.txt",
+          "summary": "7文件188项领域、人工候选、规则编辑及配置相关回归通过。",
+          "sha256": "83b619bd7068878c8eaa1d29f1af10d0d83f58a8fb29affc6cb9c081e86c2724"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-multi-staff-exclusion-message-regression.txt",
+          "summary": "2文件32项通过：保留人工突破旧提示顺序，多人冲突显示真实第二/第三人，自动重排重新遵守互斥。",
+          "sha256": "0f059637dbd76431d0c57ee76160196c654247f3f042fef9fdcc0bcc7ce8c2ef"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-multi-staff-exclusion-verify-final.txt",
+          "summary": "最终完整npm run verify退出0；类型检查、207文件2042项功能、7文件19项性能及生产构建通过，并发2，原阈值保持。",
+          "sha256": "93b75aae8b8c629563806fcc52087d7fc0a8d98b112ff349e0c7d7dbdeecbe69"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "完整assignments互斥扫描读取所有组内不同人员对，实际Worker最终结果经Store安全安装；人工显式突破仍沿原红色警告，自动重排不突破。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-multi-staff-exclusion-transfer.txt",
+          "summary": "4文件48项通过，包括配置修改→真实Excel字节→空库导入→重启→实际Worker/WASM→Store最终安装。",
+          "sha256": "c609e6da9c5d9b28980ad9ae4014ffcd61b08e73096f5ccb15fd6684d92afce9"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-multi-staff-exclusion-message-regression.txt",
+          "summary": "2文件32项通过：保留人工突破旧提示顺序，多人冲突显示真实第二/第三人，自动重排重新遵守互斥。",
+          "sha256": "0f059637dbd76431d0c57ee76160196c654247f3f042fef9fdcc0bcc7ce8c2ef"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-multi-staff-exclusion-verify-final.txt",
+          "summary": "最终完整npm run verify退出0；类型检查、207文件2042项功能、7文件19项性能及生产构建通过，并发2，原阈值保持。",
+          "sha256": "93b75aae8b8c629563806fcc52087d7fc0a8d98b112ff349e0c7d7dbdeecbe69"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "完整功能、性能、类型及构建通过；不修改规则优先级或阈值。旧人工突破行为、逐组启停/航班范围、合法兼任及缺人留空保留。原PROJECT_MAP.md未修改。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-multi-staff-exclusion-message-regression.txt",
+          "summary": "2文件32项通过：保留人工突破旧提示顺序，多人冲突显示真实第二/第三人，自动重排重新遵守互斥。",
+          "sha256": "0f059637dbd76431d0c57ee76160196c654247f3f042fef9fdcc0bcc7ce8c2ef"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-multi-staff-exclusion-verify-final.txt",
+          "summary": "最终完整npm run verify退出0；类型检查、207文件2042项功能、7文件19项性能及生产构建通过，并发2，原阈值保持。",
+          "sha256": "93b75aae8b8c629563806fcc52087d7fc0a8d98b112ff349e0c7d7dbdeecbe69"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-multi-staff-exclusion-template.txt",
+          "summary": "独立读取新旧模板，24表目录相同；互斥列更新，其余937单元格值、类型、公式相同。",
+          "sha256": "ee447ad00b6d9f751d4b99360ddeb805545ca7123a32f3ef086495c6a5a36768"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-multi-staff-exclusion-artifact.txt",
+          "summary": "本仓dist生产产物包含多人勾选界面及staffIds配置链路；Git差异检查通过，Owner原PROJECT_MAP.md哈希保持。",
+          "sha256": "2c6527e6abd14dbe14fd4d64fcd29626cdc34ba2b4d01694e0e36a8d303fba0e"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "verified",
+      "reason": "源码及dist位于Owner指定D:/autoschedule-migrate/autoschedule。Owner按原页面保存/刷新/三人勾选/重排步骤亲自验收，回复三人勾选正常、重排符合预期；配置及最终Worker结果另有自动往返证据。不扩展为公网部署或其他历史任务验收。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-multi-staff-exclusion-owner.txt",
+          "summary": "Owner在原127.0.0.1:55350页面人工验收，回复“三人勾选正常，重排符合预期”。",
+          "sha256": "b8add6d9f8725fee61617b42a87a72d9586df34f1a8da04d33bb4f84d673f70b"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-multi-staff-exclusion-transfer.txt",
+          "summary": "4文件48项通过，包括配置修改→真实Excel字节→空库导入→重启→实际Worker/WASM→Store最终安装。",
+          "sha256": "c609e6da9c5d9b28980ad9ae4014ffcd61b08e73096f5ccb15fd6684d92afce9"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-multi-staff-exclusion-neighbors.txt",
+          "summary": "8文件156项通过，包含UI多人勾选及完整命令、人员改编号/删除、旧JSON/Excel迁移和保存恢复。",
+          "sha256": "aa9e0f72918b226c3589d42e6073fd6e459146b6fad0f51973b42796e6baa083"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-multi-staff-exclusion-artifact.txt",
+          "summary": "本仓dist生产产物包含多人勾选界面及staffIds配置链路；Git差异检查通过，Owner原PROJECT_MAP.md哈希保持。",
+          "sha256": "2c6527e6abd14dbe14fd4d64fcd29626cdc34ba2b4d01694e0e36a8d303fba0e"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "before日志记录旧实现无法匹配组内第二/第三人；focused/transfer及最终verify记录同一行为通过。首轮完整检查另发现旧提示顺序变化，保留旧断言修复，并用message-regression验证。",
+    "laterChanges": "补缺、恢复、轮岗和补位可能改写结果，仍走同一候选事实与完整assignments守卫；ledger反向提交被拒且保留旧结果。人员维护、Excel、迁移可能漏成员，已通过编号/删除、旧格式、新字节空库重启与实际Worker往返核对。",
+    "finalArtifact": "当前本仓生产dist含新界面，真实Worker/WASM→Store最终结果和下载模板经独立读取验证；Owner原页面回复“三人勾选正常，重排符合预期”，本任务现场验收通过。未commit、push或部署。"
+  },
+  "review": {
+    "missedScope": "逐项核对传播矩阵：候选、模型、后置、最终提示、人工越权、人员维护、A/B组、localStorage/Excel/下载模板均已覆盖；rg确认旧两端字段仅留在迁移边界与实际冲突对数据。Owner原页面已确认本任务三人勾选和重排；不代替其他日期/复杂现场配置的逐项验收或公网部署。",
+    "rootCause": "原长期模型只表达两个端点，不能表示一个任意多人组；若仅扩UI会漏模型、第二/第三人互斥、提示及配置迁移。另一次回归发现实际冲突人传入顺序改变了旧提示，已按配置组顺序稳定显示。",
+    "earlyDetection": "设计人员集合字段时先列出全部消费者，以非首两人组合写失败测试；在正式交付前跑真实配置字节空库重启与Worker、安全守卫后置破坏测试，并保留旧提示和合法兼任回归。"
+  }
+}

@@ -93,18 +93,16 @@ export class PolicyStructuredRulesElement extends LightDomElement {
       !matchesPolicySearch(
         this.query,
         "同航班人员互斥",
-        "两人不能同时安排在同一个航班",
-        "人员 A",
-        "人员 B",
+        "同组人员在同一航班最多安排一人",
+        "互斥人员",
         "适用航班",
         "全部航班",
         "新增互斥规则",
         items.map((item) => [
           item.enabled ? "启用" : "停用",
-          this.model.staff.find((person) => person.id === item.firstStaffId)
-            ?.name,
-          this.model.staff.find((person) => person.id === item.secondStaffId)
-            ?.name,
+          item.staffIds.map(
+            (id) => this.model.staff.find((person) => person.id === id)?.name
+          ),
           item.flightNo,
         ])
       )
@@ -120,7 +118,7 @@ export class PolicyStructuredRulesElement extends LightDomElement {
           ><strong>同航班人员互斥</strong
           ><small
             >${items.filter((item) => item.enabled).length}/${items.length}
-            条启用 · 启用项为硬互斥</small
+            条启用 · 同组人员在同一航班最多安排一人</small
           ></span
         ><i class="bi bi-chevron-down"></i>
       </summary>
@@ -141,18 +139,7 @@ export class PolicyStructuredRulesElement extends LightDomElement {
                   item.enabled,
                   "启用"
                 )}
-                ${this.staffSelect(
-                  item.id,
-                  "firstStaffId",
-                  item.firstStaffId,
-                  "人员 A"
-                )}
-                ${this.staffSelect(
-                  item.id,
-                  "secondStaffId",
-                  item.secondStaffId,
-                  "人员 B"
-                )}
+                ${this.staffCheckboxes("same-flight-staff-exclusion", item.id, item.staffIds, "互斥人员（至少选择两人）")}
                 ${this.flightScopeSelect(item.id, item.flightNo)}
                 ${this.deleteButton("sameFlightStaffExclusions", item.id)}
                 ${this.diagnostics("sameFlightStaffExclusions", item.id)}
@@ -696,22 +683,6 @@ export class PolicyStructuredRulesElement extends LightDomElement {
     );
   }
 
-  private staffSelect(
-    id: string,
-    field: "firstStaffId" | "secondStaffId",
-    value: string,
-    label: string
-  ) {
-    return this.select(
-      "same-flight-staff-exclusion",
-      id,
-      field,
-      value,
-      label,
-      this.model.staff.map((person) => [person.id, person.name] as const)
-    );
-  }
-
   private flightScopeSelect(id: string, value: string) {
     const flightNumbers = [
       ...new Set(
@@ -737,8 +708,22 @@ export class PolicyStructuredRulesElement extends LightDomElement {
   }
 
   private priorityStaffCheckboxes(id: string, selected: string[]) {
+    return this.staffCheckboxes(
+      "cross-flight-priority",
+      id,
+      selected,
+      "优先人员"
+    );
+  }
+
+  private staffCheckboxes(
+    entity: string,
+    id: string,
+    selected: string[],
+    label: string
+  ) {
     return html`<fieldset class="form-label">
-      <legend class="form-label mb-1">优先人员</legend>
+      <legend class="form-label mb-1">${label}</legend>
       <div class="d-flex flex-wrap gap-2">
         ${this.model.staff.map(
           (person) =>
@@ -755,7 +740,7 @@ export class PolicyStructuredRulesElement extends LightDomElement {
                     : selected.filter((item) => item !== person.id);
                   dispatchUiCommand(this, {
                     type: "update-policy",
-                    entity: "cross-flight-priority",
+                    entity,
                     id,
                     field: "staffIds",
                     value: next.join(","),

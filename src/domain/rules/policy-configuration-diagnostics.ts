@@ -180,20 +180,17 @@ export function diagnosePolicyConfiguration(
       )!;
       checkFlight(rule.flightNo, "适用航班", true);
       if (
-        !rule.firstStaffId ||
-        !rule.secondStaffId ||
-        rule.firstStaffId === rule.secondStaffId ||
-        [rule.firstStaffId, rule.secondStaffId].some(
-          (staffId) => !currentStaffIds.has(staffId)
-        )
+        rule.staffIds.length < 2 ||
+        new Set(rule.staffIds).size !== rule.staffIds.length ||
+        rule.staffIds.some((staffId) => !currentStaffIds.has(staffId))
       )
         issues.push(
           policyDiagnostic(
             "staff-reference-invalid",
             "互斥人员未选齐、已删除、不属于当前组或重复",
-            "互斥需要两名不同的当前组人员；人员当前休假不会使这条长期规则失效。",
+            "互斥组至少需要两名不同的当前组人员，同一航班最多安排其中一人；人员当前休假不会使这条长期规则失效。",
             [
-              "在本条规则重新选择“人员 A”和“人员 B”，确保是两名不同人员。",
+              "在本条规则勾选至少两名不同的互斥人员。",
               "人员列表中没有所需人员时，先在配置 → 人员配置中建立人员。",
             ]
           )
