@@ -1,4 +1,5 @@
 import type { AppState, ScheduleGroupId } from "../model";
+import type { AuditDetails, AuditPage } from "./operation-audit-contract";
 
 export interface PublicScheduleRow {
   flightNo: string;
@@ -37,6 +38,8 @@ export interface CloudBackend {
   onSignedOut(callback: () => void): () => void;
   load(): Promise<{ version: number; model: AppState | null }>;
   save(expectedVersion: number, model: AppState): Promise<number>;
+  listAudit(beforeId?: string | null): Promise<AuditPage>;
+  auditDetails(entryId: string, afterIndex?: number): Promise<AuditDetails>;
   publish(
     expectedVersion: number,
     groupId: ScheduleGroupId

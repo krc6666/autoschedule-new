@@ -452,7 +452,7 @@ describe("cloud entry controls and public view", () => {
       [...panel.querySelectorAll("button")]
         .filter((button) => !button.closest("details"))
         .map((button) => button.textContent?.trim())
-    ).toEqual(["保存到云端"]);
+    ).toEqual(["保存到云端", "操作记录"]);
     const menu = panel.querySelector<HTMLDetailsElement>("details")!;
     expect(menu.open).toBe(false);
     expect(

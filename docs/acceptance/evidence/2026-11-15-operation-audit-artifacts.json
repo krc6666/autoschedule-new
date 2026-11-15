@@ -1,0 +1,39 @@
+{
+  "localOnly": true,
+  "browserAcceptance": "unverified",
+  "remoteMigrationApplied": false,
+  "publicSiteUpdated": false,
+  "assertions": {
+    "standalonePage": true,
+    "pageEntry": true,
+    "beforeAfter": true,
+    "listRpc": true,
+    "detailsRpc": true
+  },
+  "artifacts": [
+    {
+      "path": "dist/assets/cloud-application-D366wm3O.js",
+      "sha256": "d74cf0e40350f326a72e327efbd73c34bae06f0afae26d7a344dcd24b26cccb8"
+    },
+    {
+      "path": "dist/assets/cloud-application-D366wm3O.js.map",
+      "sha256": "361482d8f2ca84f83045c84e86a1c7cffdf6c0eb1ffa9b7341e2f17ec3c2b8e3"
+    },
+    {
+      "path": "dist/assets/style-DFFFk0uF.css",
+      "sha256": "7657affc919bdf291405c63d402b2bfdce5977302dfa2b78134f881d726e0063"
+    },
+    {
+      "path": "dist/assets/supabase-backend-DJBEGiJt.js",
+      "sha256": "dfeb654bc002c84e61d4e4df5ee3fd734800fb5cc97468e4eaeaaf14bd16221c"
+    },
+    {
+      "path": "dist/assets/supabase-backend-DJBEGiJt.js.map",
+      "sha256": "d1a189a431e6a14606927823b9ea29148c4b059d1934fbeeb2c4604ef8286b25"
+    }
+  ],
+  "migration": {
+    "path": "supabase/migrations/202611150002_operation_audit.sql",
+    "sha256": "d37efa8fec03c129249c7440fadc573f1af574356395eb5a65ba635539ebcba3"
+  }
+}

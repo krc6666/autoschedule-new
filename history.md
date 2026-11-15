@@ -1,5 +1,21 @@
 # autoschedule 开发历史
 
+<a id="operation-audit-2026-11-15"></a>
+
+## 2026-11-15：单管理员云端修改审计（本地验证完成，远端/现场待启用）
+
+- 问题：Owner要求记录谁修改了什么及前后内容，不记录访问；确认沿用单管理员登录账号、只记录成功云保存的实际变化，并要求单独页面。
+- 原因：现有云端只有整份JSON工作区及CAS版本，班表历史是业务负荷事实，不是操作审计。客户端逐按钮记日志会漏导入、恢复和旧客户端；将日志放AppState会被业务恢复覆盖。
+- 调查与局部架构结论：实际读取OWASP日志、PostgreSQL触发器/事务、Supabase权限官方资料（https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html 、https://www.postgresql.org/docs/current/trigger-definition.html 、https://supabase.com/docs/guides/database/functions）。推荐独立数据库记录与工作区触发器，SQL唯一比较事实，SDK/app/UI分层消费；pgAudit的SQL文本及Auth登录日志不能直接满足中文业务前后值。使用auth.uid而非SECURITY DEFINER下的current_user确认操作账号；不承诺数据库owner也无法改记录。按Owner偏好不另生成正式/HTML审视报告。
+- 尝试：隔离PGlite探针已验证认证身份、只读不记、切组/时间戳不记、CAS失败无成功记录，以及审计失败业务与版本一起回滚。尚非产品实现或现场验收；产品回归和最终结论在本条继续补充。
+- 实现：增量SQL提供工作区触发器、独立审计主表/差异表、服务器身份与时间、20条保存头及50项详情分页；唯一groups/shared差异投影忽略根重复及技术凭据，保留顺序变更。SDK严格校验回执，独立会话查询controller保护迟到响应，顶栏入口打开独立页面，返回保持原Store草稿；普通客户端无增改删权限，原匿名发布测试在新迁移安装后继续通过。旧库升级测试证明不改旧工作区、不补造过去记录。
+- 查漏与修正：类型检查发现新增次数修正测试把业务显示文字“督导”写进机器枚举，改为真实supervisor，并使展示复用原领域中文标签；没有改变次数业务。真实Excel探针发现导入会重建岗位ID，变化超过50项；最初只检查第一页未找到人员变化，改为按服务端游标读取全部并独立核对总项数，没有放大单页上限或删除变化。保留失败日志，不将测试夹具/分页断言问题称为产品故障。
+- 自动验证：206文件2031项完整功能通过（178.09秒，并发2）；之后新增真实Excel字节导入→Store→同一云保存RPC→JSON恢复再保存，以及详情后续页失败重试/草稿保留回归，最终4文件23项和5文件55项定向通过。最终生产构建含类型检查退出0（Vite7.18秒），新页面、查询RPC与CSS进入实际dist；保留原node:module外部化及大块提示，没有修改构建或求解性能合同，未运行L3或L4 verify。完整验证后仅新增测试与中文类别映射，受影响定向及最终类型构建已复验；日志和最终哈希在任务记录绑定。
+- 交付边界：本仓源码/dist和可执行增量迁移已准备，未连接真实Supabase执行SQL、未发布公网、未提交或push。未主动打开真实浏览器，页面DOM不冒充Owner现场；远端/现场验收保持未验证。审计须数据库备份，配置/工作区恢复不能覆盖；不承诺数据库owner防篡改。原PROJECT_MAP.md SHA256保持49F304C96AFD07EB7D784593AE87FCAA18832A015406F475656DF6BDC77B0CFD。
+- 提交前补验：Owner随后授权本地commit。第一轮完整verify类型通过、功能2032项通过/1项原排班测试超过15秒，未执行后续性能/构建且未提交；原并发环境误用了旧名称VITEST_MAX_THREADS，核对当前Vitest源码实际消费VITEST_MAX_WORKERS后，以并发2重新运行完整门禁，不改产品、测试阈值或求解预算。失败日志保留为2026-11-15-operation-audit-commit-verify.txt；最终结果另记，不覆盖失败证据。提交前仅收敛新页面Lit模板格式，不改变渲染语义。
+- 提交前最终结果：完整`npm.cmd run verify`退出0，206文件2033项功能、7文件19项性能、类型检查和生产构建全部通过，并发2且原时限不变。日志为`docs/acceptance/evidence/2026-11-15-operation-audit-commit-verify-final.txt`。本次仅开发提交，未执行真实Supabase迁移或公网部署，现场待验收状态不变；原PROJECT_MAP.md不纳入。
+- 怎么防再犯：保存机制先列全group/shared、导入/恢复/旧客户端消费点；先失败测试，再验证同事务及最终独立页面。材料见docs/acceptance/2026-11-15-operation-audit.json；原PROJECT_MAP.md保留。本次仅授权开发提交，不push或部署，现场待验收状态保持。
+
 <a id="independent-guide-2026-11-15"></a>
 
 ## 2026-11-15：人工独立引导（自动验证完成，现场待验收）

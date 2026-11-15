@@ -24,13 +24,19 @@ describe("Supabase database authorization and transactions", () => {
       )
     );
     await db.exec(
+      readFileSync(
+        "supabase/migrations/202611150002_operation_audit.sql",
+        "utf8"
+      )
+    );
+    await db.exec(
       `insert into public.autoschedule_admin values (true, '00000000-0000-4000-8000-000000000001');`
     );
   }, 30000);
   afterAll(async () => db?.close());
   beforeEach(async () => {
     await db.exec(
-      "reset role; truncate public.autoschedule_workspace, public.autoschedule_publications;"
+      "reset role; truncate public.autoschedule_audit_entries cascade; truncate public.autoschedule_workspace, public.autoschedule_publications;"
     );
   });
 

@@ -1,0 +1,25 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/infrastructure/operation-audit-database.test.ts (7 tests | 7 skipped) 1639ms
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/infrastructure/operation-audit-database.test.ts > cloud modification audit through actual workspace RPC
+Error: ENOENT: no such file or directory, open 'D:\autoschedule-migrate\autoschedule\supabase\migrations\202611150002_operation_audit.sql'
+ ❯ tests/infrastructure/operation-audit-database.test.ts:21:22
+     19|       "supabase/migrations/202611150001_cloud_workspace.sql",
+     20|       "supabase/migrations/202611150002_operation_audit.sql",
+     21|     ]) await db.exec(readFileSync(path, "utf8"));
+       |                      ^
+     22|     await db.query("insert into public.autoschedule_admin values(true,…
+     23|   }, 30000);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  7 skipped (7)
+   Start at  20:31:54
+   Duration  3.16s (transform 1.09s, setup 0ms, import 1.32s, tests 1.64s, environment 0ms)
+Exit code: 1

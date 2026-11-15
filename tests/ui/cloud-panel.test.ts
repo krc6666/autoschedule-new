@@ -47,7 +47,7 @@ describe("minimal cloud toolbar", () => {
       [...element.querySelectorAll("button")]
         .filter((button) => !button.closest("details"))
         .map((button) => button.textContent?.trim())
-    ).toEqual(["保存到云端"]);
+    ).toEqual(["保存到云端", "操作记录"]);
     expect(
       [...menu.querySelectorAll("button")].map((button) =>
         button.textContent?.trim()

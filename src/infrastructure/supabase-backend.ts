@@ -13,6 +13,7 @@ import {
   restorePersistedState,
 } from "./state-restoration";
 import type { CloudConfiguration } from "./supabase-config";
+import { parseAuditDetails, parseAuditPage } from "./operation-audit-response";
 
 function record(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -259,6 +260,19 @@ export function createSupabaseBackend(
         );
       }
       return Number(version);
+    },
+    async listAudit(beforeId = null) {
+      return parseAuditPage(
+        await rpc("cloud_list_audit", { p_before_id: beforeId })
+      );
+    },
+    async auditDetails(entryId, afterIndex = 0) {
+      return parseAuditDetails(
+        await rpc("cloud_audit_details", {
+          p_entry_id: entryId,
+          p_after_index: afterIndex,
+        })
+      );
     },
     async publish(expectedVersion, groupId) {
       const data = await rpc("cloud_publish_schedule", {

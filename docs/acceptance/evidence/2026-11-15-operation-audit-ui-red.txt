@@ -1,0 +1,86 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/infrastructure/supabase-backend.test.ts (9 tests | 1 failed) 133ms
+     × loads audit pages/details through authenticated RPC without sending actor or changing workspace 6ms
+stderr | tests/ui/operation-audit.test.ts
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+
+ ❯ tests/ui/operation-audit.test.ts (4 tests | 4 failed) 157ms
+     × opens a separate page, shows exact human-readable before/after and preserves the mounted editor 85ms
+     × uses bounded paging, retry on read failure, and never reports a failed read as empty 22ms
+     × clears records on session expiry and ignores a late response 26ms
+     × renders hostile audit content as text and preserves empty/false/zero values 22ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/infrastructure/supabase-backend.test.ts > official Supabase SDK adapter > loads audit pages/details through authenticated RPC without sending actor or changing workspace
+TypeError: backend.listAudit is not a function
+ ❯ tests/infrastructure/supabase-backend.test.ts:61:26
+     59|     const details = { changes: [{ index: 1, scope: "A", area: "setting…
+     60|     const { backend, fetcher } = adapter([{ data: page }, { data: deta…
+     61|     expect(await backend.listAudit("22")).toEqual(page);
+       |                          ^
+     62|     expect(await backend.auditDetails("21", 0)).toEqual(details);
+     63|     expect(JSON.parse(String(fetcher.mock.calls[0]![1]!.body))).toEqua…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  tests/ui/operation-audit.test.ts > independent operation records page > opens a separate page, shows exact human-readable before/after and preserves the mounted editor
+AssertionError: audit: expected null not to be null
+ ❯ Object.click tests/ui/operation-audit.test.ts:26:32
+     24|   const click = async (action: string) => {
+     25|     const button = root.querySelector<HTMLButtonElement>(`[data-cloud-…
+     26|     expect(button, action).not.toBeNull(); button!.click(); await sett…
+       |                                ^
+     27|   };
+     28|   return { fixture, root, click, listAudit, auditDetails };
+ ❯ tests/ui/operation-audit.test.ts:35:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  tests/ui/operation-audit.test.ts > independent operation records page > uses bounded paging, retry on read failure, and never reports a failed read as empty
+AssertionError: audit: expected null not to be null
+ ❯ Object.click tests/ui/operation-audit.test.ts:26:32
+     24|   const click = async (action: string) => {
+     25|     const button = root.querySelector<HTMLButtonElement>(`[data-cloud-…
+     26|     expect(button, action).not.toBeNull(); button!.click(); await sett…
+       |                                ^
+     27|   };
+     28|   return { fixture, root, click, listAudit, auditDetails };
+ ❯ tests/ui/operation-audit.test.ts:57:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL  tests/ui/operation-audit.test.ts > independent operation records page > clears records on session expiry and ignores a late response
+AssertionError: audit: expected null not to be null
+ ❯ Object.click tests/ui/operation-audit.test.ts:26:32
+     24|   const click = async (action: string) => {
+     25|     const button = root.querySelector<HTMLButtonElement>(`[data-cloud-…
+     26|     expect(button, action).not.toBeNull(); button!.click(); await sett…
+       |                                ^
+     27|   };
+     28|   return { fixture, root, click, listAudit, auditDetails };
+ ❯ tests/ui/operation-audit.test.ts:74:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+ FAIL  tests/ui/operation-audit.test.ts > independent operation records page > renders hostile audit content as text and preserves empty/false/zero values
+AssertionError: audit: expected null not to be null
+ ❯ Object.click tests/ui/operation-audit.test.ts:26:32
+     24|   const click = async (action: string) => {
+     25|     const button = root.querySelector<HTMLButtonElement>(`[data-cloud-…
+     26|     expect(button, action).not.toBeNull(); button!.click(); await sett…
+       |                                ^
+     27|   };
+     28|   return { fixture, root, click, listAudit, auditDetails };
+ ❯ tests/ui/operation-audit.test.ts:86:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  5 failed | 8 passed (13)
+   Start at  20:34:17
+   Duration  3.91s (transform 4.07s, setup 0ms, import 4.86s, tests 290ms, environment 509ms)
+Exit code: 1

@@ -53,6 +53,49 @@ describe("official Supabase SDK adapter", () => {
     expect(new Headers(init.headers).get("apikey")).toBe(config.publicKey);
   });
 
+  it("loads audit pages/details through authenticated RPC without sending actor or changing workspace", async () => {
+    const entry = {
+      id: "21",
+      actor: "audit@example.invalid",
+      occurredAt: "2026-11-15T10:00:00Z",
+      version: 2,
+      changeCount: 1,
+    };
+    const page = { entries: [entry], nextCursor: null };
+    const details = {
+      changes: [
+        {
+          index: 1,
+          scope: "A",
+          area: "settings",
+          key: "maxDailyHours",
+          operation: "update",
+          before: 12,
+          after: 9,
+        },
+      ],
+      staffLabels: {},
+      nextCursor: null,
+    };
+    const { backend, fetcher } = adapter([
+      { data: page },
+      { data: details },
+      { data: { entries: [{}], nextCursor: null } },
+    ]);
+    expect(await backend.listAudit("22")).toEqual(page);
+    expect(await backend.auditDetails("21", 0)).toEqual(details);
+    expect(JSON.parse(String(fetcher.mock.calls[0]![1]!.body))).toEqual({
+      p_before_id: "22",
+    });
+    expect(JSON.parse(String(fetcher.mock.calls[1]![1]!.body))).toEqual({
+      p_entry_id: "21",
+      p_after_index: 0,
+    });
+    await expect(backend.listAudit()).rejects.toMatchObject({
+      kind: "invalid",
+    });
+  });
+
   it("maps permission and version failures and does not invent a successful save", async () => {
     const { backend } = adapter([
       { data: { code: "P0001", message: "WORKSPACE_CONFLICT" }, status: 400 },

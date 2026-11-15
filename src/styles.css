@@ -13,6 +13,49 @@
   --bs-link-hover-color: #77171e;
 }
 
+.operation-audit-page {
+  max-width: 1440px;
+  margin: 24px auto;
+  padding: 0 20px;
+  min-width: 0;
+}
+.operation-audit-list {
+  display: grid;
+  gap: 12px;
+}
+.operation-audit-entry {
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--as-border);
+  border-radius: 10px;
+  background: var(--as-surface);
+}
+.audit-account {
+  overflow-wrap: anywhere;
+}
+.operation-audit-details {
+  margin-top: 12px;
+}
+.operation-audit-change {
+  border-top: 1px solid var(--as-border);
+  padding: 12px 0;
+}
+.audit-table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+}
+.operation-audit-change table {
+  min-width: 480px;
+  table-layout: fixed;
+}
+.operation-audit-change th:first-child {
+  width: 24%;
+}
+.operation-audit-change td {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
 .cloud-panel {
   padding: 12px 20px;
   border-bottom: 1px solid var(--as-border);

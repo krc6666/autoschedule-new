@@ -13,6 +13,11 @@ import {
   type CloudPanelState,
 } from "../ui/components/cloud-panel";
 import { PublicScheduleElement } from "../ui/components/public-schedule";
+import { OperationAuditController } from "./operation-audit-controller";
+import {
+  OperationAuditPageElement,
+  type AuditPageCommand,
+} from "../ui/components/operation-audit-page";
 
 const TOKEN_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -64,7 +69,10 @@ export function mountCloudApplication(
 
   const panel = new CloudPanelElement();
   const editorRoot = document.createElement("div");
-  root.replaceChildren(panel, editorRoot);
+  const auditRoot = document.createElement("div");
+  auditRoot.hidden = true;
+  root.replaceChildren(panel, editorRoot, auditRoot);
+  let audit: OperationAuditController | null = null;
   let workspace: CloudWorkspace | null = null;
   let editor: MountedAutoscheduleApp | null = null;
   let epoch = 0;
@@ -96,10 +104,15 @@ export function mountCloudApplication(
         canImport: workspace.cloudVersion === 0,
       };
     editorRoot.inert = state.busy || state.conflict;
-    editorRoot.hidden = state.conflict;
+    editorRoot.hidden = state.conflict || Boolean(state.auditOpen);
+    auditRoot.hidden = state.phase !== "editor" || !state.auditOpen;
     panel.state = state;
   };
   const closeEditor = () => {
+    audit?.dispose();
+    audit = null;
+    auditRoot.replaceChildren();
+    state = { ...state, auditOpen: false };
     editor?.dispose();
     workspace?.dispose();
     editor = null;
@@ -175,6 +188,38 @@ export function mountCloudApplication(
       ));
   const handle = async (command: CloudCommand) => {
     if (pendingCommand !== null || disposed) return;
+    if (command.type === "audit" || command.type === "workspace") {
+      if (!workspace || state.phase !== "editor") return;
+      if (command.type === "workspace") {
+        render({ auditOpen: false });
+      } else {
+        if (!audit) {
+          audit = new OperationAuditController(backend);
+          const page = new OperationAuditPageElement();
+          page.view = audit.view;
+          const currentAudit = audit;
+          audit.onChange = (view) => {
+            page.view = view;
+          };
+          page.addEventListener("audit-command", (event) => {
+            if (disposed || currentAudit !== audit) return;
+            const action = (event as CustomEvent<AuditPageCommand>).detail;
+            if (action.type === "back") void handle({ type: "workspace" });
+            else if (action.type === "refresh" || action.type === "more")
+              void currentAudit.load(action.type === "more");
+            else if ("id" in action)
+              void currentAudit.expand(
+                action.id,
+                action.type === "details-more"
+              );
+          });
+          auditRoot.replaceChildren(page);
+        }
+        render({ auditOpen: true });
+        await audit.load();
+      }
+      return;
+    }
     pendingCommand = command.type;
     const actionWorkspace = workspace;
     render({

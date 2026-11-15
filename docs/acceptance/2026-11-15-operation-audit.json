@@ -1,0 +1,192 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-15-operation-audit",
+  "title": "单管理员云端修改记录与独立操作记录页面",
+  "startedFrom": "799100c9b11c694d8cd487e8b9c7cf53f4d02102",
+  "expectation": {
+    "example": "管理员把A组2026-11-18的CX931/G14从示例甲改为示例乙，再点击保存到云端。Owner确认按登录账号记录，成功保存的最终变化才留痕，并要求单独页面。",
+    "expected": "独立操作记录页面按时间倒序分页，显示服务端确认的账号、时间、版本和修改对象，展开查看前后值。人员、资质、规则、班表、历史、次数和导入恢复的实际变化统一记录；只读、同值保存和保存前改回不记。",
+    "unchanged": "单管理员权限、手动云端保存、A/B隔离及共用资料、原排班规则/Worker/Excel合同均不变。日志独立于AppState，配置或恢复文件不能替换/删除已有记录，不向匿名分享公开。",
+    "fallback": "业务保存与审计同事务，任一步失败都不提交；本机草稿保留。读取记录失败只提示并允许重试/返回工作台；不能显示为暂无记录。未授权执行远端迁移或发布，先完成本地SQL、SDK与DOM可审查结果。"
+  },
+  "testedVersion": "d00af28904d5e6810b76d5dcbeefe940461abcc96d363e208bd9a803555b3add",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "改前缺少入口和SDK方法，改后实际SQL与DOM链路通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-operation-audit-ui-red.txt",
+          "summary": "改前5项真实失败：没有操作记录入口和查询RPC适配；原8项仍通过。",
+          "sha256": "e5fd2343130714505667a8dd730275cdf3b98941c3c6673448522098edf256d7"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-operation-audit-red.txt",
+          "summary": "数据库改前缺少新增迁移，保留缺功能证据，不将7项跳过称为业务断言失败。",
+          "sha256": "4942a7d4f2f6f28c9c41d8d4db80c942725e8489cc620c7faab2521eae07f828"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-operation-audit-integration-final.txt",
+          "summary": "最终4文件23项通过，真实SQL、Excel字节/JSON恢复→Store→同一云保存、分页全量独立计数、权限及回滚。",
+          "sha256": "4caf024e8f464f041a34835c045645085265a8c5389c7b1ffca12377d437f24b"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-operation-audit-ui-final.txt",
+          "summary": "最终5文件55项通过，独立页面前后值、原Store草稿保持、分页失败重试及会话失效隔离。",
+          "sha256": "b7663918554510063f24d3819a8427434eb7396ddecd1ccc63b1159e895c9b39"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-operation-audit-commit-verify-final.txt",
+          "summary": "提交前最终完整npm run verify退出0：206文件2033项功能、7文件19项性能、类型与生产构建通过；并发2，原阈值不变。",
+          "sha256": "478abec4242116044c3268246acc87a54045c3569f14b245505b1109357123cd"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "单管理员保存统一产生前后事实，独立页面显示真实对象与字段；原功能保持。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-operation-audit-integration-final.txt",
+          "summary": "最终4文件23项通过，真实SQL、Excel字节/JSON恢复→Store→同一云保存、分页全量独立计数、权限及回滚。",
+          "sha256": "4caf024e8f464f041a34835c045645085265a8c5389c7b1ffca12377d437f24b"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-operation-audit-ui-final.txt",
+          "summary": "最终5文件55项通过，独立页面前后值、原Store草稿保持、分页失败重试及会话失效隔离。",
+          "sha256": "b7663918554510063f24d3819a8427434eb7396ddecd1ccc63b1159e895c9b39"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-operation-audit-commit-verify-final.txt",
+          "summary": "提交前最终完整npm run verify退出0：206文件2033项功能、7文件19项性能、类型与生产构建通过；并发2，原阈值不变。",
+          "sha256": "478abec4242116044c3268246acc87a54045c3569f14b245505b1109357123cd"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "A/B/shared、初次保存、旧库升级、Excel导入和JSON恢复、顺序及无ID账本、两层分页均已覆盖。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-operation-audit-integration-final.txt",
+          "summary": "最终4文件23项通过，真实SQL、Excel字节/JSON恢复→Store→同一云保存、分页全量独立计数、权限及回滚。",
+          "sha256": "4caf024e8f464f041a34835c045645085265a8c5389c7b1ffca12377d437f24b"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-operation-audit-ui-final.txt",
+          "summary": "最终5文件55项通过，独立页面前后值、原Store草稿保持、分页失败重试及会话失效隔离。",
+          "sha256": "b7663918554510063f24d3819a8427434eb7396ddecd1ccc63b1159e895c9b39"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-operation-audit-commit-verify-final.txt",
+          "summary": "提交前最终完整npm run verify退出0：206文件2033项功能、7文件19项性能、类型与生产构建通过；并发2，原阈值不变。",
+          "sha256": "478abec4242116044c3268246acc87a54045c3569f14b245505b1109357123cd"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "恢复及导入不能替换审计；同值/技术凭据/切组不记，读取不新增；返回和迟到响应不破坏草稿与会话。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-operation-audit-integration-final.txt",
+          "summary": "最终4文件23项通过，真实SQL、Excel字节/JSON恢复→Store→同一云保存、分页全量独立计数、权限及回滚。",
+          "sha256": "4caf024e8f464f041a34835c045645085265a8c5389c7b1ffca12377d437f24b"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-operation-audit-ui-final.txt",
+          "summary": "最终5文件55项通过，独立页面前后值、原Store草稿保持、分页失败重试及会话失效隔离。",
+          "sha256": "b7663918554510063f24d3819a8427434eb7396ddecd1ccc63b1159e895c9b39"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-operation-audit-commit-verify-final.txt",
+          "summary": "提交前最终完整npm run verify退出0：206文件2033项功能、7文件19项性能、类型与生产构建通过；并发2，原阈值不变。",
+          "sha256": "478abec4242116044c3268246acc87a54045c3569f14b245505b1109357123cd"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "真实PGlite执行角色权限、CAS、失败同事务回滚、匿名分享白名单；SDK坏回执与页面文本编码保护。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-operation-audit-integration-final.txt",
+          "summary": "最终4文件23项通过，真实SQL、Excel字节/JSON恢复→Store→同一云保存、分页全量独立计数、权限及回滚。",
+          "sha256": "4caf024e8f464f041a34835c045645085265a8c5389c7b1ffca12377d437f24b"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-operation-audit-ui-final.txt",
+          "summary": "最终5文件55项通过，独立页面前后值、原Store草稿保持、分页失败重试及会话失效隔离。",
+          "sha256": "b7663918554510063f24d3819a8427434eb7396ddecd1ccc63b1159e895c9b39"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-operation-audit-commit-verify-final.txt",
+          "summary": "提交前最终完整npm run verify退出0：206文件2033项功能、7文件19项性能、类型与生产构建通过；并发2，原阈值不变。",
+          "sha256": "478abec4242116044c3268246acc87a54045c3569f14b245505b1109357123cd"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "最终完整verify覆盖2033项功能及19项性能，原求解/工时疲劳/轮岗未改；类型、生产构建通过，无新AppState/Excel/本地配置字段。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-operation-audit-functional.txt",
+          "summary": "206文件2031项全功能通过，并发2；后续新增2项及中文类别展示由最终定向覆盖。",
+          "sha256": "8fddd144ea39506d807c73e3c2d889baabba1a8f7842b3ea9b385ee474411d8c"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-operation-audit-integration-final.txt",
+          "summary": "最终4文件23项通过，真实SQL、Excel字节/JSON恢复→Store→同一云保存、分页全量独立计数、权限及回滚。",
+          "sha256": "4caf024e8f464f041a34835c045645085265a8c5389c7b1ffca12377d437f24b"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-operation-audit-ui-final.txt",
+          "summary": "最终5文件55项通过，独立页面前后值、原Store草稿保持、分页失败重试及会话失效隔离。",
+          "sha256": "b7663918554510063f24d3819a8427434eb7396ddecd1ccc63b1159e895c9b39"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-operation-audit-build.txt",
+          "summary": "最终npm run build含类型检查退出0；Vite7.18秒，保留原构建提示。",
+          "sha256": "8efb4437fbdfe154d6c55dea9eac34b772a829dc8c516d96d13a78a6b86bfced"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-operation-audit-commit-verify-final.txt",
+          "summary": "提交前最终完整npm run verify退出0：206文件2033项功能、7文件19项性能、类型与生产构建通过；并发2，原阈值不变。",
+          "sha256": "478abec4242116044c3268246acc87a54045c3569f14b245505b1109357123cd"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "本地实际生产构建与DOM已核对；真实Supabase新迁移、公网新包及Owner真实页面未启用/验收。不得以测试代替现场。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-operation-audit-artifacts.json",
+          "summary": "最终dist的独立页面、前后值、查询RPC静态断言及SHA256；不是浏览器或远端证据。",
+          "sha256": "597df69fe66153849b95a30caf71ed7b693c03be3274ce60a6393ad18f15df20"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-operation-audit-build.txt",
+          "summary": "最终npm run build含类型检查退出0；Vite7.18秒，保留原构建提示。",
+          "sha256": "8efb4437fbdfe154d6c55dea9eac34b772a829dc8c516d96d13a78a6b86bfced"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-15-operation-audit-commit-verify-final.txt",
+          "summary": "提交前最终完整npm run verify退出0：206文件2033项功能、7文件19项性能、类型与生产构建通过；并发2，原阈值不变。",
+          "sha256": "478abec4242116044c3268246acc87a54045c3569f14b245505b1109357123cd"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "改前UI/SDK5项失败和缺SQL迁移证据，对应最终独立页面与数据库真实调用通过。",
+    "laterChanges": "Excel导入、JSON恢复、旧客户端保存由统一数据库触发器覆盖；只读/同值保存不记；CAS与审计失败回滚；退出与迟到结果有长期回归。",
+    "finalArtifact": "本地dist、增量SQL与DOM结果已核对并绑定产物哈希；真实远端/公网和Owner页面尚未启用，保持未验收。"
+  },
+  "review": {
+    "missedScope": "按传播矩阵核对A/B/shared、资质/规则/历史/统计/轮值、导入恢复、旧客户端、权限、分页及会话；实测发现导入超50项，改为读取全部页并核对changeCount。远端/现场仍缺证据。",
+    "rootCause": "原工作区只保存最终JSON及版本，没有独立审计；客户端按钮日志或恢复文件内日志不能可靠覆盖所有保存路径、身份与旧记录。",
+    "earlyDetection": "新增保存机制前先列唯一写入owner与所有消费者；先跑缺功能红测，再以SQL角色与事务反向测试、真实文件→Store→RPC→独立页对照验证，分页必须独立核对总数。"
+  }
+}

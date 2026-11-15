@@ -13,7 +13,9 @@ export type CloudCommand =
         | "import-local"
         | "download"
         | "discard"
-        | "retry";
+        | "retry"
+        | "audit"
+        | "workspace";
     };
 
 export interface CloudPanelState {
@@ -28,6 +30,7 @@ export interface CloudPanelState {
   canImport: boolean;
   cacheWarning: string;
   shareUrl: string;
+  auditOpen?: boolean;
 }
 
 const FAILURE_LABELS = {
@@ -190,6 +193,15 @@ export class CloudPanelElement extends LightDomElement {
                   保存到云端
                 </button>
                 ${this.saveStatus()}
+                <button
+                  class="btn btn-outline-secondary btn-sm"
+                  data-cloud-action="audit"
+                  aria-pressed=${Boolean(s.auditOpen)}
+                  ?disabled=${s.busy}
+                  @click=${() => this.command({ type: "audit" })}
+                >
+                  操作记录
+                </button>
                 <details class="cloud-more">
                   <summary aria-label="更多操作" title="更多操作">…</summary>
                   <div
