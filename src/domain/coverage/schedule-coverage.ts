@@ -400,6 +400,36 @@ export function compactRegularAssignments(
     changedFlightIds.add(flight.id);
   }
 
+  refreshReusableGuides(state, assignments, changedFlightIds);
+
+  assignments
+    .filter(
+      (assignment) =>
+        changedFlightIds.has(assignment.flightId) &&
+        assignment.status === "unfilled" &&
+        isPreNoonFlight(assignment) &&
+        assignmentRule(state, assignment)?.category === "常规"
+    )
+    .forEach((assignment) => {
+      if (assignment.vacancyEvidence) return;
+      const flight = state.flights.find(
+        (item) => item.id === assignment.flightId
+      )!;
+      const rule = assignmentRule(state, assignment)!;
+      assignment.systemNotes = [
+        preNoonShortageNote(state, assignments, flight, rule),
+      ];
+    });
+
+  return changedFlightIds;
+}
+
+/** Rebuild only reused guides from their current same-flight source jobs. */
+export function refreshReusableGuides(
+  state: ScheduleGenerationFacts,
+  assignments: Assignment[],
+  changedFlightIds: ReadonlySet<string>
+): void {
   for (const flightId of changedFlightIds) {
     const flight = state.flights.find((item) => item.id === flightId)!;
     const displayRules = activeFlightRules(state, flight);
@@ -462,25 +492,4 @@ export function compactRegularAssignments(
         if (source) usedStaffIds.add(source.person.id);
       });
   }
-
-  assignments
-    .filter(
-      (assignment) =>
-        changedFlightIds.has(assignment.flightId) &&
-        assignment.status === "unfilled" &&
-        isPreNoonFlight(assignment) &&
-        assignmentRule(state, assignment)?.category === "常规"
-    )
-    .forEach((assignment) => {
-      if (assignment.vacancyEvidence) return;
-      const flight = state.flights.find(
-        (item) => item.id === assignment.flightId
-      )!;
-      const rule = assignmentRule(state, assignment)!;
-      assignment.systemNotes = [
-        preNoonShortageNote(state, assignments, flight, rule),
-      ];
-    });
-
-  return changedFlightIds;
 }

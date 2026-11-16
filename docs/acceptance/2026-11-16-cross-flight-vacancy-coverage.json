@@ -1,0 +1,157 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-16-cross-flight-vacancy-coverage",
+  "title": "跨航班优先为合法补空让步，配置督导补位释放人员",
+  "startedFrom": "aacdfc9eb5025bb2487e5f945d42a61d3bd7264c",
+  "expectation": {
+    "example": "Owner提供配置(8).xlsx（SHA256 0aaf09dfc54e5173c0f4f40aadbb96492e10f8d3dce16b8493d4117f01526321）及11月18日截图：两上午航班重叠、人员互斥、优先人员名单6人及新增一人两种配置，非优先航班末位柜台空缺，另有已启用同航班督导补位关系。私有输入仅留本地.tmp。",
+    "expected": "有完整安全方案时补齐自动常规岗位；允许跨航班优先让步，允许配置督导补位释放普通人员经跨航班链补空。原已覆盖岗位不得新增空缺，后置流程不撤销合法补空。",
+    "unchanged": "互斥、资格、状态、夜班、真实时段冲突、最小衔接、工时、半休、锁定、KE166专项；无需求不强制督导兼任；不变更配置字段、人工与行政支援流程。",
+    "fallback": "没有完整安全链、超时或最终守卫拒绝时整次保留原安排及真实空岗说明，不搬移空缺或绕过硬约束。"
+  },
+  "testedVersion": "6f1808ec31d451add2a032f2991566ec77ab595ebf12195d8c20c2c74b67be8d",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "保留改前精确失败回归；修后匿名回归及真实输入两种名单均补齐G12。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-cross-flight-vacancy-red.txt",
+          "summary": "改前匿名初排、督导释放、共享优先让步3项回归全部失败。",
+          "sha256": "7d410c6316b52fd4218babcd4022053de1a144f74ab2a0818d45883aa3ca635b"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-cross-flight-vacancy-verify.txt",
+          "summary": "临时单worker完整verify：类型、2117项功能、性能及生产构建通过；不修改仓库测试配置。",
+          "sha256": "b1b79cf665a8bb1c9cd1b1c805cd406a6d2a2b44be17d795fc345a221d3dda8e"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-cross-flight-vacancy-real-replay.txt",
+          "summary": "同一最终实现对真实配置文件两种名单的重放，2项通过。",
+          "sha256": "890851e8558f70f3edeae756e32c777bdab2a91d54335fb26aceb05f9c4bd3fe"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-cross-flight-vacancy-real-artifact.json",
+          "summary": "原6人优先与新增第7人两次真实文件结果脱敏；各26个启用常规岗位、0空岗，G12已安排，互斥与补位关联独立核对。",
+          "sha256": "cb73a59333d5107445c08c011ba1955b4ea313a63b07e6a36b6f6efa056b83ab"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "普通换人先行，已有配置督导补位释放完整链；互斥仍生效，普通人员足够时不强制兼任。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-cross-flight-vacancy-verify.txt",
+          "summary": "临时单worker完整verify：类型、2117项功能、性能及生产构建通过；不修改仓库测试配置。",
+          "sha256": "b1b79cf665a8bb1c9cd1b1c805cd406a6d2a2b44be17d795fc345a221d3dda8e"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-cross-flight-vacancy-real-artifact.json",
+          "summary": "原6人优先与新增第7人两次真实文件结果脱敏；各26个启用常规岗位、0空岗，G12已安排，互斥与补位关联独立核对。",
+          "sha256": "cb73a59333d5107445c08c011ba1955b4ea313a63b07e6a36b6f6efa056b83ab"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "禁用、缺配置、待确认、人工-only、锁定、无资格、人工目标、低客流、分队长、超时及最终拒绝回退均覆盖；两种真实名单、Worker/WASM、Excel和localStorage往返通过。性能只证明本机本次样本。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-cross-flight-vacancy-verify.txt",
+          "summary": "临时单worker完整verify：类型、2117项功能、性能及生产构建通过；不修改仓库测试配置。",
+          "sha256": "b1b79cf665a8bb1c9cd1b1c805cd406a6d2a2b44be17d795fc345a221d3dda8e"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-cross-flight-vacancy-real-replay.txt",
+          "summary": "同一最终实现对真实配置文件两种名单的重放，2项通过。",
+          "sha256": "890851e8558f70f3edeae756e32c777bdab2a91d54335fb26aceb05f9c4bd3fe"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-cross-flight-vacancy-real-artifact.json",
+          "summary": "原6人优先与新增第7人两次真实文件结果脱敏；各26个启用常规岗位、0空岗，G12已安排，互斥与补位关联独立核对。",
+          "sha256": "cb73a59333d5107445c08c011ba1955b4ea313a63b07e6a36b6f6efa056b83ab"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "完整排班生成经过督导收尾、恢复、轮岗、均衡及最终产物检查；新增换人刷新引导和补位关联，模拟后续破坏互斥或拆除合法兼任关联均被原最终守卫拒绝。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-cross-flight-vacancy-verify.txt",
+          "summary": "临时单worker完整verify：类型、2117项功能、性能及生产构建通过；不修改仓库测试配置。",
+          "sha256": "b1b79cf665a8bb1c9cd1b1c805cd406a6d2a2b44be17d795fc345a221d3dda8e"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-cross-flight-vacancy-real-artifact.json",
+          "summary": "原6人优先与新增第7人两次真实文件结果脱敏；各26个启用常规岗位、0空岗，G12已安排，互斥与补位关联独立核对。",
+          "sha256": "cb73a59333d5107445c08c011ba1955b4ea313a63b07e6a36b6f6efa056b83ab"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "每条候选链通过原锁定与最终安全检查后原子提交；净补空判断禁止迁移空缺，超时或守卫拒绝保持原快照。真实两次最终安全均通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-cross-flight-vacancy-verify.txt",
+          "summary": "临时单worker完整verify：类型、2117项功能、性能及生产构建通过；不修改仓库测试配置。",
+          "sha256": "b1b79cf665a8bb1c9cd1b1c805cd406a6d2a2b44be17d795fc345a221d3dda8e"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-cross-flight-vacancy-real-artifact.json",
+          "summary": "原6人优先与新增第7人两次真实文件结果脱敏；各26个启用常规岗位、0空岗，G12已安排，互斥与补位关联独立核对。",
+          "sha256": "cb73a59333d5107445c08c011ba1955b4ea313a63b07e6a36b6f6efa056b83ab"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "完整功能及性能验证通过，涵盖KE166专项、硬约束、人工、行政支援、疲劳、轮岗和配置边界。首轮补上分队长范围漏接，未改无关功能；并发旧测试超时单独保留，串行门禁通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-cross-flight-vacancy-verify.txt",
+          "summary": "临时单worker完整verify：类型、2117项功能、性能及生产构建通过；不修改仓库测试配置。",
+          "sha256": "b1b79cf665a8bb1c9cd1b1c805cd406a6d2a2b44be17d795fc345a221d3dda8e"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-cross-flight-vacancy-verify-parallel.txt",
+          "summary": "并发完整功能验证2116项通过、1项旧引导测试超时；定向通过后以临时单worker完整verify核对。",
+          "sha256": "4bde60e8edbf460faeb86976b0bc56b38e8a085541caa6241d03ba983b5f5f0b"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "已取得真实Excel两种名单最终排班及独立统计，Worker/Store/结果Excel/保存恢复也通过；Owner明确暂时无法现场验证，当前页面刷新重排与新导出的现场效果仍待验收。未主动打开浏览器，未提交、推送或发布。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-cross-flight-vacancy-real-artifact.json",
+          "summary": "原6人优先与新增第7人两次真实文件结果脱敏；各26个启用常规岗位、0空岗，G12已安排，互斥与补位关联独立核对。",
+          "sha256": "cb73a59333d5107445c08c011ba1955b4ea313a63b07e6a36b6f6efa056b83ab"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-cross-flight-vacancy-real-replay.txt",
+          "summary": "同一最终实现对真实配置文件两种名单的重放，2项通过。",
+          "sha256": "890851e8558f70f3edeae756e32c777bdab2a91d54335fb26aceb05f9c4bd3fe"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-cross-flight-vacancy-verify.txt",
+          "summary": "临时单worker完整verify：类型、2117项功能、性能及生产构建通过；不修改仓库测试配置。",
+          "sha256": "b1b79cf665a8bb1c9cd1b1c805cd406a6d2a2b44be17d795fc345a221d3dda8e"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "red.txt记录改前3项失败；verify.txt记录修后长期回归通过；real-replay.txt及real-artifact.json证明真实配置6人/7人名单均补齐CX937/G12且没有转移空缺。",
+    "laterChanges": "督导收尾、配置补位、复用引导刷新、恢复、轮岗和均衡可能改写人员。完整生成与Worker最终结果回归检查覆盖；合法结果拆除补位关联或改为互斥人员被最终守卫拒绝，超时/最终拒绝不提交部分链。",
+    "finalArtifact": "real-artifact.json保留两种真实输入的匿名最终岗位、独立26岗/0空岗、互斥和补位关联核对，输入SHA256绑定配置(8)。这是本地结果证据；现场页面与Owner新导出未验收，不以测试替代。"
+  },
+  "review": {
+    "missedScope": "完整回归首次发现新补空调用统一重排器时遗漏排除分队长，已收口isAutomaticRegularStaff并保留自动生成反向回归；另修仅支持全天模型的旧模拟求解器。并发旧引导测试超时已保留，未修改时限，单worker完整通过。真实页面是唯一尚未闭合的验收项；有界搜索不承诺发现任意长度的可行链。",
+    "rootCause": "一般跨航班优先被硬候选配对提前执行，覆盖目标之前已删去合法解；旧督导收尾只看本航班已满柜台，不能利用已有同航班补位关系释放跨航班完整换人链。两层必须同时修复。",
+    "earlyDetection": "业务确认后先构造非对称资质+同航班互斥+独立督导的失败用例；传播矩阵先核对自动人员范围与统一重排器差异。改后必须用原名单和新增优先人员名单重放最终产物，并检查Worker/存储/Excel及后置破坏反向；局部通过不能提前声称验收。"
+  }
+}

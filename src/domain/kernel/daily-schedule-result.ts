@@ -457,7 +457,6 @@ export function materializeDailySchedulePlan({
     vacancyDiagnosticFacts: {
       strictRecoveryExcludedStaffIdsByTask:
         model.strictRecoveryExcludedStaffIdsByTask,
-      crossFlightPriorityReservations: model.crossFlightPriorityReservations,
     },
     warnings,
     optimizationQuality: "all-objectives-optimal",

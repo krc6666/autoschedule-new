@@ -28,7 +28,7 @@ describe("actionable warning evidence", () => {
     expect(conciseAssignmentWarningReason([])).toContain("原因未记录");
   });
 
-  it("reports the final mixed recovery and priority blockers without changing assignments", async () => {
+  it("reports actual recovery and occupancy blockers without inventing hard priority reservations", async () => {
     const state = warningScenario();
     const result = await generateSchedule(state, "2026-10-17");
     const cx = result.assignments.find((a) => a.position === "G18")!;
@@ -38,7 +38,8 @@ describe("actionable warning evidence", () => {
     ).toBe("p1");
     const explanation = cx.systemNotes?.join("\n") ?? "";
     expect(explanation).toContain("严格跨工作日恢复 3 人");
-    expect(explanation).toContain("跨航班优先 1 人");
+    expect(explanation).toContain("当前时段冲突 1 人");
+    expect(explanation).not.toContain("跨航班优先");
     expect(explanation).toContain("2026-10-15 TR121/H02");
     expect(explanation).toContain("23:55");
     expect(explanation).toContain("KE166");

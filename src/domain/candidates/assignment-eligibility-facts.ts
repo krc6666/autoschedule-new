@@ -12,6 +12,16 @@ import {
 } from "../flights/schedule-position-rules";
 import { durationHours, isNightInterval } from "../shared/time";
 
+/** Ordinary automatic scheduling excludes team leaders; manual gap fill owns
+ * their separate, explicit entry path. */
+export function isAutomaticRegularStaff(person: Staff): boolean {
+  return (
+    person.status === "正常" &&
+    person.staffType === "常规" &&
+    !person.teamLeader
+  );
+}
+
 export interface StaffAssignmentFacts {
   available: boolean;
   regularStaff: boolean;

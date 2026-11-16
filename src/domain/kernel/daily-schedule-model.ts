@@ -1,7 +1,7 @@
 import type { Staff } from "../../model";
 import type { ScheduleGenerationFacts } from "../shared/scheduling-facts";
-import type { CrossFlightPriorityReservation } from "../reviews/vacancy-diagnostics";
 import { diagnoseBaseAssignmentEligibility } from "../candidates/assignment-eligibility";
+import { isAutomaticRegularStaff } from "../candidates/assignment-eligibility-facts";
 import { createAssignedPosition } from "../assignments/assignment-factory";
 import { evaluateAutomaticHardConstraints } from "../rules/built-in-rule-registry";
 import {
@@ -101,7 +101,6 @@ export interface DailyScheduleVacancyChoice {
 }
 
 export interface DailyScheduleModel {
-  readonly crossFlightPriorityReservations: readonly CrossFlightPriorityReservation[];
   readonly problem: SolverProblem;
   readonly staffChoices: readonly DailyScheduleStaffChoice[];
   readonly vacancyChoices: readonly DailyScheduleVacancyChoice[];
@@ -136,7 +135,6 @@ interface CrossWorkdayReservationModel {
 }
 
 interface CrossFlightPriorityModel {
-  reservations: CrossFlightPriorityReservation[];
   variables: Array<SolverProblem["variables"][number]>;
   constraints: LinearConstraint[];
   objectives: LexicographicObjective[];
@@ -149,7 +147,6 @@ function crossFlightPriorityModel(
   const variables: CrossFlightPriorityModel["variables"] = [];
   const constraints: LinearConstraint[] = [];
   const objectives: LexicographicObjective[] = [];
-  const reservations: CrossFlightPriorityReservation[] = [];
 
   enabledCrossFlightPriorityPolicies(state).forEach((policy, policyIndex) => {
     const terms: Array<{ variableId: string; coefficient: number }> = [];
@@ -175,57 +172,8 @@ function crossFlightPriorityModel(
       );
       if (!protectedChoices.length) return;
 
-      // A priority policy must also reserve the person from overlapping lower
-      // priority work when the priority task has another legal candidate.
-      for (const protectedChoice of protectedChoices) {
-        const overlappingLowerPriorityChoices = choices.filter(
-          (choice) =>
-            choice.person.id === staffId &&
-            choice.task.flight.id !== protectedChoice.task.flight.id &&
-            intervalsOverlap(
-              choice.task.flight.startTime,
-              choice.task.flight.endTime,
-              protectedChoice.task.flight.startTime,
-              protectedChoice.task.flight.endTime
-            ) &&
-            (() => {
-              const rank = crossFlightPriorityPolicyRank(state, {
-                flightNo: choice.task.flight.flightNo,
-                staffId,
-              });
-              return rank === null || rank > policyIndex;
-            })()
-        );
-        if (!overlappingLowerPriorityChoices.length) continue;
-
-        const priorityAlternatives = choices.filter(
-          (choice) =>
-            choice.task.key === protectedChoice.task.key &&
-            choice.person.id !== staffId
-        );
-        if (!priorityAlternatives.length) continue;
-
-        for (const lowerChoice of overlappingLowerPriorityChoices) {
-          for (const alternative of priorityAlternatives) {
-            reservations.push({
-              taskKey: lowerChoice.task.key,
-              staffId,
-              priorityFlightNo: protectedChoice.task.flight.flightNo,
-              protectedTaskKey: alternative.task.key,
-              alternativeStaffId: alternative.person.id,
-            });
-            constraints.push({
-              id: `cross-flight-priority-reserve:${policyIndex}:${staffIndex}:${lowerChoice.id}:${alternative.id}`,
-              terms: [
-                { variableId: lowerChoice.id, coefficient: 1 },
-                { variableId: alternative.id, coefficient: 1 },
-              ],
-              upperBound: 1,
-            });
-          }
-        }
-      }
-
+      // Coverage is fixed before this preference. Never reserve a person
+      // with a hard pair exclusion that can prevent an otherwise full schedule.
       const variableId = `cross-flight-priority-retained:${policyIndex}:${staffIndex}`;
       variables.push({
         id: variableId,
@@ -255,7 +203,7 @@ function crossFlightPriorityModel(
     }
   });
 
-  return { variables, constraints, objectives, reservations };
+  return { variables, constraints, objectives };
 }
 
 function ke166SupervisorAvailabilityModel(
@@ -553,7 +501,7 @@ function staffChoicesForTasks(
   for (const task of scheduledTasks) {
     const candidates = state.staff.filter(
       (person) =>
-        !person.teamLeader &&
+        isAutomaticRegularStaff(person) &&
         diagnoseBaseAssignmentEligibility(state, task.flight, task.rule, person)
           .eligible &&
         (dutyTargetTaskKeys.has(task.key) &&
@@ -974,9 +922,8 @@ function staffCoverageModel(
   const workedVariableIds = new Map<string, string>();
   const variables: { id: string }[] = [];
   const constraints: LinearConstraint[] = [];
-  for (const person of state.staff.filter(
-    (item) =>
-      item.status === "正常" && item.staffType === "常规" && !item.teamLeader
+  for (const person of state.staff.filter((item) =>
+    isAutomaticRegularStaff(item)
   )) {
     const ownChoices = staffChoices.filter(
       (choice) => choice.person.id === person.id && choice.workHours > 0
@@ -1956,7 +1903,6 @@ export function buildDailyScheduleModel({
       staffChoiceBuild.halfRestAffectedStaffIdsByTask,
     strictRecoveryExcludedStaffIdsByTask:
       staffChoiceBuild.strictRecoveryExcludedStaffIdsByTask,
-    crossFlightPriorityReservations: crossFlightPriority.reservations,
     problem: {
       variables: [
         ...staffChoices.map(({ id }) => ({ id })),

@@ -1,5 +1,9 @@
 import type { Assignment } from "../../model";
-import type { HistoryRuleFacts } from "../shared/scheduling-facts";
+import type {
+  HistoryRuleFacts,
+  AssignmentEligibilityFacts,
+} from "../shared/scheduling-facts";
+import { improvesAutomaticRegularCoverage } from "../coverage/automatic-regular-coverage";
 import type { CrossFlightPriorityPolicy } from "./structured-policy-contract";
 import { intervalsOverlap } from "../shared/time";
 import type { ScheduleFrequencyFacts } from "../statistics/schedule-frequency";
@@ -47,13 +51,24 @@ export function crossFlightPriorityPolicyMatches(
 }
 
 export function crossFlightPriorityReassignmentReasons(
-  state: HistoryRuleFacts,
+  state: HistoryRuleFacts & AssignmentEligibilityFacts,
   original: readonly Assignment[],
   planned: readonly Assignment[],
   _date: string,
   _frequencyFacts?: ScheduleFrequencyFacts
 ): string[] {
-  const reasons: string[] = [];
+  if (improvesAutomaticRegularCoverage(state, original, planned)) return [];
+  return crossFlightPriorityDisplacedFlights(state, original, planned).map(
+    (flightNo) => `调整会把重点人员调离${flightNo}，优先保留原航班安排`
+  );
+}
+
+export function crossFlightPriorityDisplacedFlights(
+  state: HistoryRuleFacts,
+  original: readonly Assignment[],
+  planned: readonly Assignment[]
+): string[] {
+  const flights: string[] = [];
   for (const policy of enabledCrossFlightPriorityPolicies(state)) {
     const protectedOriginal = original.filter((assignment) =>
       crossFlightPriorityPolicyMatches(policy, assignment)
@@ -62,12 +77,14 @@ export function crossFlightPriorityReassignmentReasons(
       if (!before.staffId) continue;
       const retainedInPriorityFlight = planned.some(
         (assignment) =>
+          assignment.status === "assigned" &&
           assignment.staffId === before.staffId &&
           assignment.flightNo.trim().toUpperCase() === policy.flightNo
       );
       if (retainedInPriorityFlight) continue;
       const replacements = planned.filter(
         (assignment) =>
+          assignment.status === "assigned" &&
           assignment.staffId === before.staffId &&
           assignment.flightNo.trim().toUpperCase() !== policy.flightNo &&
           intervalsOverlap(
@@ -90,12 +107,10 @@ export function crossFlightPriorityReassignmentReasons(
         })
       )
         continue;
-      reasons.push(
-        `调整会把重点人员调离${policy.flightNo}，优先保留原航班安排`
-      );
+      flights.push(policy.flightNo);
     }
   }
-  return [...new Set(reasons)];
+  return [...new Set(flights)];
 }
 
 export function crossFlightPriorityCandidateScore(

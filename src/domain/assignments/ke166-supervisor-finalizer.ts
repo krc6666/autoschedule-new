@@ -33,6 +33,7 @@ import {
 import { createScheduleSafetySession } from "../kernel/schedule-safety-session";
 import { assertDailyScheduleSafety } from "../kernel/daily-schedule-safety";
 import { ScheduleGuardError } from "../kernel/schedule-guard";
+import { fillAutomaticVacancies } from "../coverage/automatic-vacancy-coverage";
 import {
   readableSupervisorRejection,
   supervisorSearchFailureNotes,
@@ -559,5 +560,14 @@ export async function finalizeMobileSupervisors({
     preserveLegalCounters(supervisorAssignment);
     processedTasks.add(task.key);
   }
+  await fillAutomaticVacancies(
+    solver,
+    state,
+    assignments,
+    date,
+    lockedAssignmentIds,
+    preparation.runFacts,
+    validateRegularAssignments
+  );
   return assignments;
 }

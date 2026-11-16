@@ -21,7 +21,15 @@ class TimeLimitedCompleteScheduleSolver implements SolverPort {
   async solve(problem: SolverProblem) {
     const stopped = problem.objectives.find(
       (objective) => objective.optimality === "best-effort"
-    )!;
+    );
+    // This fixture only supplies the original time-limited daily plan. Later
+    // vacancy repairs are a separate model and have no solution in this stub.
+    if (!stopped)
+      return {
+        termination: "infeasible" as const,
+        selectedVariableIds: new Set<string>(),
+        objectiveValues: new Map<string, number>(),
+      };
     return {
       termination: "time-limited-feasible" as const,
       selectedVariableIds: new Set(

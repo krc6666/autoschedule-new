@@ -1,0 +1,718 @@
+[
+  {
+    "run": "six",
+    "measuredSummary": {
+      "inputSha256": "0aaf09dfc54e5173c0f4f40aadbb96492e10f8d3dce16b8493d4117f01526321",
+      "date": "2026-11-18",
+      "priorityPeople": 6,
+      "vacancies": 0,
+      "g12Filled": true,
+      "earlyPeople": 14,
+      "exclusions": 2,
+      "finalSafety": true,
+      "source": "Real configuration workbook through public import and domain kernel; page remains owner validation"
+    },
+    "independentActiveRegularSlots": 26,
+    "independentRegularVacancies": 0,
+    "exclusions": [
+      {
+        "flight": "KE160",
+        "distinctExcludedMembers": 1,
+        "passed": true
+      },
+      {
+        "flight": "CX937",
+        "distinctExcludedMembers": 1,
+        "passed": true
+      }
+    ],
+    "links": [
+      {
+        "flight": "CX937",
+        "target": "G14",
+        "sameFlight": true,
+        "samePerson": true,
+        "hours": 0,
+        "fatigue": 0,
+        "rulePresent": true
+      },
+      {
+        "flight": "KE160",
+        "target": "H05",
+        "sameFlight": true,
+        "samePerson": true,
+        "hours": 0,
+        "fatigue": 0,
+        "rulePresent": true
+      }
+    ],
+    "finalRows": [
+      {
+        "flight": "CX937",
+        "position": "\u7763\u5bfc",
+        "workerAlias": "worker-04",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "CX937",
+        "position": "G20",
+        "workerAlias": "worker-16",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "CX937",
+        "position": "G19",
+        "workerAlias": "worker-14",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "CX937",
+        "position": "G18",
+        "workerAlias": "worker-13",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "CX937",
+        "position": "G17",
+        "workerAlias": "worker-15",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "CX937",
+        "position": "G16",
+        "workerAlias": "worker-09",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "CX937",
+        "position": "G15",
+        "workerAlias": "worker-06",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "CX937",
+        "position": "G14",
+        "workerAlias": "worker-04",
+        "status": "assigned",
+        "hours": 0
+      },
+      {
+        "flight": "CX937",
+        "position": "G13",
+        "workerAlias": null,
+        "status": "manual",
+        "hours": 2
+      },
+      {
+        "flight": "CX937",
+        "position": "G12",
+        "workerAlias": "worker-07",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "CX937",
+        "position": "\u67dc\u53f0\u5f15\u5bfc",
+        "workerAlias": "worker-07",
+        "status": "assigned",
+        "hours": 0
+      },
+      {
+        "flight": "KE160",
+        "position": "\u7763\u5bfc",
+        "workerAlias": "worker-10",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "KE160",
+        "position": "H02",
+        "workerAlias": "worker-12",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "KE160",
+        "position": "H03",
+        "workerAlias": "worker-02",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "KE160",
+        "position": "H04",
+        "workerAlias": "worker-03",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "KE160",
+        "position": "H05",
+        "workerAlias": "worker-10",
+        "status": "assigned",
+        "hours": 0
+      },
+      {
+        "flight": "KE160",
+        "position": "H06",
+        "workerAlias": "worker-05",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "KE160",
+        "position": "H07",
+        "workerAlias": "worker-08",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "KE160",
+        "position": "H08",
+        "workerAlias": null,
+        "status": "manual",
+        "hours": 2
+      },
+      {
+        "flight": "KE160",
+        "position": "H09",
+        "workerAlias": null,
+        "status": "manual",
+        "hours": 2
+      },
+      {
+        "flight": "KE160",
+        "position": "\u67dc\u53f0\u5f15\u5bfc",
+        "workerAlias": "worker-05",
+        "status": "assigned",
+        "hours": 0
+      },
+      {
+        "flight": "MF8683",
+        "position": "\u7763\u5bfc",
+        "workerAlias": "worker-03",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "MF8683",
+        "position": "G20",
+        "workerAlias": "worker-02",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "MF8683",
+        "position": "G19",
+        "workerAlias": "worker-06",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "MF8683",
+        "position": "G18",
+        "workerAlias": "worker-16",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "MF8683",
+        "position": "G17",
+        "workerAlias": "worker-08",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "MF8683",
+        "position": "G16",
+        "workerAlias": null,
+        "status": "manual",
+        "hours": 2
+      },
+      {
+        "flight": "MF8683",
+        "position": "\u67dc\u53f0\u5f15\u5bfc",
+        "workerAlias": "worker-08",
+        "status": "assigned",
+        "hours": 0
+      },
+      {
+        "flight": "AE218",
+        "position": "\u7763\u5bfc",
+        "workerAlias": "worker-10",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "AE218",
+        "position": "H02",
+        "workerAlias": "worker-15",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "AE218",
+        "position": "H03",
+        "workerAlias": "worker-12",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "AE218",
+        "position": "H04",
+        "workerAlias": "worker-05",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "AE218",
+        "position": "H05",
+        "workerAlias": "worker-13",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "AE218",
+        "position": "H06",
+        "workerAlias": "worker-04",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "AE218",
+        "position": "H07",
+        "workerAlias": null,
+        "status": "manual",
+        "hours": 2
+      },
+      {
+        "flight": "AE218",
+        "position": "H08",
+        "workerAlias": null,
+        "status": "manual",
+        "hours": 2
+      },
+      {
+        "flight": "AE218",
+        "position": "H09",
+        "workerAlias": null,
+        "status": "manual",
+        "hours": 2
+      },
+      {
+        "flight": "AE218",
+        "position": "\u67dc\u53f0\u5f15\u5bfc",
+        "workerAlias": "worker-04",
+        "status": "assigned",
+        "hours": 0
+      },
+      {
+        "flight": "AK151",
+        "position": "\u7763\u5bfc",
+        "workerAlias": "worker-04",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "AK151",
+        "position": "G07",
+        "workerAlias": "worker-08",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "AK151",
+        "position": "G08",
+        "workerAlias": "worker-10",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "AK151",
+        "position": "G09",
+        "workerAlias": "worker-03",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "AK151",
+        "position": "G10",
+        "workerAlias": "worker-05",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "AK151",
+        "position": "\u5f15\u5bfc",
+        "workerAlias": "worker-05",
+        "status": "assigned",
+        "hours": 0
+      }
+    ]
+  },
+  {
+    "run": "seven",
+    "measuredSummary": {
+      "inputSha256": "0aaf09dfc54e5173c0f4f40aadbb96492e10f8d3dce16b8493d4117f01526321",
+      "date": "2026-11-18",
+      "priorityPeople": 7,
+      "vacancies": 0,
+      "g12Filled": true,
+      "earlyPeople": 14,
+      "exclusions": 2,
+      "finalSafety": true,
+      "source": "Real configuration workbook through public import and domain kernel; page remains owner validation"
+    },
+    "independentActiveRegularSlots": 26,
+    "independentRegularVacancies": 0,
+    "exclusions": [
+      {
+        "flight": "KE160",
+        "distinctExcludedMembers": 1,
+        "passed": true
+      },
+      {
+        "flight": "CX937",
+        "distinctExcludedMembers": 1,
+        "passed": true
+      }
+    ],
+    "links": [
+      {
+        "flight": "CX937",
+        "target": "G14",
+        "sameFlight": true,
+        "samePerson": true,
+        "hours": 0,
+        "fatigue": 0,
+        "rulePresent": true
+      },
+      {
+        "flight": "KE160",
+        "target": "H05",
+        "sameFlight": true,
+        "samePerson": true,
+        "hours": 0,
+        "fatigue": 0,
+        "rulePresent": true
+      }
+    ],
+    "finalRows": [
+      {
+        "flight": "CX937",
+        "position": "\u7763\u5bfc",
+        "workerAlias": "worker-04",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "CX937",
+        "position": "G20",
+        "workerAlias": "worker-16",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "CX937",
+        "position": "G19",
+        "workerAlias": "worker-14",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "CX937",
+        "position": "G18",
+        "workerAlias": "worker-13",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "CX937",
+        "position": "G17",
+        "workerAlias": "worker-15",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "CX937",
+        "position": "G16",
+        "workerAlias": "worker-06",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "CX937",
+        "position": "G15",
+        "workerAlias": "worker-07",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "CX937",
+        "position": "G14",
+        "workerAlias": "worker-04",
+        "status": "assigned",
+        "hours": 0
+      },
+      {
+        "flight": "CX937",
+        "position": "G13",
+        "workerAlias": null,
+        "status": "manual",
+        "hours": 2
+      },
+      {
+        "flight": "CX937",
+        "position": "G12",
+        "workerAlias": "worker-09",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "CX937",
+        "position": "\u67dc\u53f0\u5f15\u5bfc",
+        "workerAlias": "worker-15",
+        "status": "assigned",
+        "hours": 0
+      },
+      {
+        "flight": "KE160",
+        "position": "\u7763\u5bfc",
+        "workerAlias": "worker-10",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "KE160",
+        "position": "H02",
+        "workerAlias": "worker-12",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "KE160",
+        "position": "H03",
+        "workerAlias": "worker-02",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "KE160",
+        "position": "H04",
+        "workerAlias": "worker-03",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "KE160",
+        "position": "H05",
+        "workerAlias": "worker-10",
+        "status": "assigned",
+        "hours": 0
+      },
+      {
+        "flight": "KE160",
+        "position": "H06",
+        "workerAlias": "worker-05",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "KE160",
+        "position": "H07",
+        "workerAlias": "worker-08",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "KE160",
+        "position": "H08",
+        "workerAlias": null,
+        "status": "manual",
+        "hours": 2
+      },
+      {
+        "flight": "KE160",
+        "position": "H09",
+        "workerAlias": null,
+        "status": "manual",
+        "hours": 2
+      },
+      {
+        "flight": "KE160",
+        "position": "\u67dc\u53f0\u5f15\u5bfc",
+        "workerAlias": "worker-05",
+        "status": "assigned",
+        "hours": 0
+      },
+      {
+        "flight": "MF8683",
+        "position": "\u7763\u5bfc",
+        "workerAlias": "worker-03",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "MF8683",
+        "position": "G20",
+        "workerAlias": "worker-02",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "MF8683",
+        "position": "G19",
+        "workerAlias": "worker-05",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "MF8683",
+        "position": "G18",
+        "workerAlias": "worker-08",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "MF8683",
+        "position": "G17",
+        "workerAlias": "worker-16",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "MF8683",
+        "position": "G16",
+        "workerAlias": null,
+        "status": "manual",
+        "hours": 2
+      },
+      {
+        "flight": "MF8683",
+        "position": "\u67dc\u53f0\u5f15\u5bfc",
+        "workerAlias": "worker-16",
+        "status": "assigned",
+        "hours": 0
+      },
+      {
+        "flight": "AE218",
+        "position": "\u7763\u5bfc",
+        "workerAlias": "worker-10",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "AE218",
+        "position": "H02",
+        "workerAlias": "worker-15",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "AE218",
+        "position": "H03",
+        "workerAlias": "worker-12",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "AE218",
+        "position": "H04",
+        "workerAlias": "worker-06",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "AE218",
+        "position": "H05",
+        "workerAlias": "worker-13",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "AE218",
+        "position": "H06",
+        "workerAlias": "worker-04",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "AE218",
+        "position": "H07",
+        "workerAlias": null,
+        "status": "manual",
+        "hours": 2
+      },
+      {
+        "flight": "AE218",
+        "position": "H08",
+        "workerAlias": null,
+        "status": "manual",
+        "hours": 2
+      },
+      {
+        "flight": "AE218",
+        "position": "H09",
+        "workerAlias": null,
+        "status": "manual",
+        "hours": 2
+      },
+      {
+        "flight": "AE218",
+        "position": "\u67dc\u53f0\u5f15\u5bfc",
+        "workerAlias": "worker-04",
+        "status": "assigned",
+        "hours": 0
+      },
+      {
+        "flight": "AK151",
+        "position": "\u7763\u5bfc",
+        "workerAlias": "worker-04",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "AK151",
+        "position": "G07",
+        "workerAlias": "worker-08",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "AK151",
+        "position": "G08",
+        "workerAlias": "worker-10",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "AK151",
+        "position": "G09",
+        "workerAlias": "worker-05",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "AK151",
+        "position": "G10",
+        "workerAlias": "worker-15",
+        "status": "assigned",
+        "hours": 2
+      },
+      {
+        "flight": "AK151",
+        "position": "\u5f15\u5bfc",
+        "workerAlias": "worker-15",
+        "status": "assigned",
+        "hours": 0
+      }
+    ]
+  }
+]

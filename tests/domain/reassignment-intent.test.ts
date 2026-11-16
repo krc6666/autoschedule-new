@@ -22,6 +22,7 @@ const STRICT_POLICY: ReassignmentIntentPolicy = {
 };
 
 const STRICT_INTENTS: readonly ReassignmentIntent[] = [
+  { kind: "automatic-vacancy-coverage" },
   { kind: "staff-airline-mix-review" },
   { kind: "staff-work-continuity-review" },
   { kind: "mobile-supervisor-counter-coverage" },
@@ -35,6 +36,7 @@ const STRICT_INTENTS: readonly ReassignmentIntent[] = [
 
 describe("reassignment intent policy", () => {
   it.each([
+    [{ kind: "automatic-vacancy-coverage" }, "coverage"],
     [{ kind: "mobile-supervisor-counter-coverage" }, "mobile-supervisor"],
     [
       { kind: "configured-supervisor-fill-under-shortage" },

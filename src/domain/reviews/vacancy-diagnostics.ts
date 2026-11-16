@@ -12,19 +12,8 @@ import {
   NO_QUALIFIED_CANDIDATE_VACANCY_NOTE,
 } from "../assignments/vacancy-evidence";
 
-/** Run-local evidence emitted when the model creates a reservation constraint.
- * This is diagnostic input only; it never participates in assignment decisions. */
-export interface CrossFlightPriorityReservation {
-  taskKey: string;
-  staffId: string;
-  priorityFlightNo: string;
-  protectedTaskKey: string;
-  alternativeStaffId: string;
-}
-
 export interface VacancyDiagnosticFacts {
   strictRecoveryExcludedStaffIdsByTask: ReadonlyMap<string, readonly string[]>;
-  crossFlightPriorityReservations: readonly CrossFlightPriorityReservation[];
 }
 
 /** Recheck direct insertion against the final rows. These facts do not prove
@@ -36,11 +25,6 @@ export function refreshVacancyDiagnostics(
   runFacts: ScheduleRunFacts,
   facts?: VacancyDiagnosticFacts
 ): void {
-  const selected = new Set(
-    assignments
-      .filter((a) => a.status === "assigned" && a.staffId)
-      .map((a) => `${a.flightId}:${a.positionRuleId}:${a.staffId}`)
-  );
   for (const assignment of assignments) {
     if (
       assignment.status === "assigned" &&
@@ -94,29 +78,6 @@ export function refreshVacancyDiagnostics(
         );
         continue;
       }
-      const reservations =
-        facts?.crossFlightPriorityReservations.filter(
-          (r) =>
-            r.taskKey === task.key &&
-            r.staffId === person.id &&
-            selected.has(`${r.protectedTaskKey}:${r.alternativeStaffId}`)
-        ) ?? [];
-      const occupiedPriority = assignments.filter(
-        (a) =>
-          a.status === "assigned" &&
-          a.staffId === person.id &&
-          reservations.some((r) => r.priorityFlightNo === a.flightNo)
-      );
-      if (reservations.length) {
-        add(
-          "跨航班优先",
-          `${person.name}：跨航班优先规则先保留给${[...new Set(reservations.map((r) => r.priorityFlightNo))].join("、")}；${occupiedPriority.map((a) => `当前承担${a.flightNo}/${a.position} ${a.startTime}–${a.endTime}`).join("、") || "当前优先航班由其他候选承担，模型仍限制该人员转入此岗"}`
-        );
-        continue;
-      }
-      // A reserved person can occupy the priority task themselves. The model
-      // has no active alternative pair in that solution: report the actual
-      // direct-insertion check, not an invented priority rejection.
       const diagnostic = evaluateAutomaticHardConstraints({
         state,
         assignments: assignments.filter((a) => a.id !== assignment.id),

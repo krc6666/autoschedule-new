@@ -4,6 +4,7 @@ export type CrossWorkdayReservationDisposition =
   "preserve" | "yield-to-selected-vacancy";
 
 export type ReassignmentIntent =
+  | { kind: "automatic-vacancy-coverage" }
   | { kind: "mobile-supervisor-counter-coverage" }
   | { kind: "configured-supervisor-fill-under-shortage" }
   | { kind: "team-leader-concurrent-gap-fill" }
@@ -43,6 +44,7 @@ export function reassignmentIntentReview(
     case "configured-supervisor-fill-under-shortage":
       return "mobile-supervisor";
     case "team-leader-concurrent-gap-fill":
+    case "automatic-vacancy-coverage":
     case "team-leader-gap-fill":
       return "coverage";
     case "late-priority-frequency-review":
@@ -114,6 +116,7 @@ export function reassignmentIntentPolicy(
         allowTr121CooldownRegression: true,
       };
     case "mobile-supervisor-counter-coverage":
+    case "automatic-vacancy-coverage":
     case "team-leader-concurrent-gap-fill":
     case "late-priority-frequency-review":
     case "ke166-rotation-review":

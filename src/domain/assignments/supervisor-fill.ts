@@ -100,7 +100,7 @@ function sameFlightMovableAutoCounters(
   });
 }
 
-function configuredFillTargets(
+export function configuredFillTargets(
   state: AssignmentEligibilityFacts,
   assignments: readonly Assignment[],
   sourceFlight: Flight,
