@@ -261,6 +261,7 @@ export class CloudPanelElement extends LightDomElement {
         s.phase === "login"
           ? html`<form
               class="d-flex flex-wrap gap-2 mt-3"
+              autocomplete="off"
               @submit=${this.login}
             >
               <label
@@ -277,7 +278,7 @@ export class CloudPanelElement extends LightDomElement {
                   name="password"
                   class="form-control"
                   type="password"
-                  autocomplete="current-password"
+                  autocomplete="off"
                   required
                   ?disabled=${s.busy}
               /></label>

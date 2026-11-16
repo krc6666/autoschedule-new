@@ -33,6 +33,36 @@ async function panel(patch: Partial<CloudPanelState> = {}) {
 }
 
 describe("minimal cloud toolbar", () => {
+  it("requests no password autofill and clears the submitted password before emitting login", async () => {
+    const element = await panel({ phase: "login" });
+    const form = element.querySelector("form")!;
+    const email = form.querySelector<HTMLInputElement>('input[name="email"]')!;
+    const password = form.querySelector<HTMLInputElement>(
+      'input[name="password"]'
+    )!;
+    expect(form.getAttribute("autocomplete")).toBe("off");
+    expect(password.getAttribute("autocomplete")).toBe("off");
+    expect(password.type).toBe("password");
+    expect(password.required).toBe(true);
+    expect(password.value).toBe("");
+    email.value = "admin@example.invalid";
+    password.value = "synthetic-password";
+    const handler = vi.fn((event: Event) => {
+      expect(password.value).toBe("");
+      expect((event as CustomEvent).detail).toEqual({
+        type: "login",
+        email: "admin@example.invalid",
+        password: "synthetic-password",
+      });
+    });
+    element.addEventListener("cloud-command", handler);
+    form.dispatchEvent(
+      new Event("submit", { bubbles: true, cancelable: true })
+    );
+    expect(handler).toHaveBeenCalledOnce();
+    expect(password.getAttribute("value")).toBeNull();
+  });
+
   it("keeps only save outside a closed native disclosure and removes instruction paragraphs", async () => {
     const element = await panel({
       message: "已读取云端数据，修改后请点击保存到云端。",

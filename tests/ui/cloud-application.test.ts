@@ -104,6 +104,45 @@ describe("cloud entry controls and public view", () => {
     expect(app.root.querySelector("time")).toBeNull();
   });
 
+  it("leaves no password after failed login and returns an empty password input after logout", async () => {
+    const fixture = cloudFixture();
+    fixture.setUser(null);
+    fixture.backend.signIn.mockRejectedValueOnce(
+      new CloudError("unauthorized", "登录未成功")
+    );
+    const app = mount(fixture);
+    await settle();
+    const submit = () => {
+      app.root.querySelector<HTMLInputElement>('input[name="email"]')!.value =
+        "admin@example.invalid";
+      app.root.querySelector<HTMLInputElement>(
+        'input[name="password"]'
+      )!.value = "synthetic-password";
+      app.root
+        .querySelector("form")!
+        .dispatchEvent(
+          new Event("submit", { bubbles: true, cancelable: true })
+        );
+    };
+    submit();
+    await settle();
+    expect(app.mountEditor).not.toHaveBeenCalled();
+    expect(app.root.textContent).toContain("登录未成功");
+    expect(
+      app.root.querySelector<HTMLInputElement>('input[name="password"]')!.value
+    ).toBe("");
+    submit();
+    await settle();
+    expect(app.mountEditor).toHaveBeenCalledOnce();
+    await app.command({ type: "logout" });
+    const password = app.root.querySelector<HTMLInputElement>(
+      'input[name="password"]'
+    )!;
+    expect(password.value).toBe("");
+    expect(password.getAttribute("autocomplete")).toBe("off");
+    expect(fixture.backend.signOut).toHaveBeenCalledOnce();
+  });
+
   it("actual save button uploads edited model and reports failure without marking it saved", async () => {
     const fixture = cloudFixture();
     const app = mount(fixture);
