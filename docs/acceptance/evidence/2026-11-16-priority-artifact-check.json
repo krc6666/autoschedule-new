@@ -1,0 +1,17 @@
+{
+  "source": "anonymous real Worker/WASM -> final safety credential -> Store -> XLSX",
+  "sourceXlsxSha256": "3fe94e1350b768c754b297431bb56fdf93c112c1bc7cdbba9ac3f0e64abe912e",
+  "priorWorkday": "2026-11-16",
+  "priorFlight": "KE999",
+  "currentDate": "2026-11-18",
+  "currentFlight": "KE160",
+  "priorSupervisor": "person-0",
+  "exportedSupervisor": "person-1",
+  "ordinaryPriorityMonthlyCounts": {
+    "person-0": 1,
+    "person-1": 1
+  },
+  "exportedRowCount": 2,
+  "unfilledCount": 0,
+  "scope": "automated artifact check; owner page acceptance remains pending"
+}

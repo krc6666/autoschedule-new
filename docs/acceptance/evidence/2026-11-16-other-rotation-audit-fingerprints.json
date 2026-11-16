@@ -1,0 +1,17 @@
+{
+  "scope": "read-only diagnosis; existing dirty worktree; SHA256",
+  "files": {
+    "src/domain/reviews/reassignment-safety-policy.ts": "179cee7b9ddd949f6316b5b0a77701b2cd881c4286fa97e1044348b6285acd38",
+    "src/domain/reviews/relaxed-shift-balance.ts": "6082cbe28b431aed8e465a7cefed177f0672eb85b37d8713da9948eda0582fc4",
+    "src/domain/reviews/staff-work-continuity.ts": "ec8d7563fc293570fa41dcbada97b961cb56b8a8112bcc68c050db140ce9b260",
+    "src/domain/reviews/position-rotation-policy.ts": "2d4d1007ead308e92c4a50ac6658ba53839e268c93e2336aee73348ccfa93ba5",
+    "src/domain/kernel/schedule-finalizer.ts": "f7660bbc44efb373d99d6f70d1981aead78fc7b3c6ac5b65a9768907f15c31e3",
+    "src/domain/rules/built-in-rule-registry.ts": "6c2da489f28d137ab1c719668dd42e949d4f44f2cb78289a5b84ab544e9ae097",
+    "spec.md": "887b5dcbc9b725dc416ec2d97375816cb89da288cbf62d5c4802d184ea58c67b",
+    "docs/acceptance/evidence/2026-11-16-other-rotation-audit-probe.cjs": "5e5e1e1db744095ad559d6527d508701bafae104de1f1ec5ba44261fd344d81f",
+    "docs/acceptance/evidence/2026-11-16-other-rotation-audit-probe.json": "84be1212d1299df96b32b2db9614171ba309d3f79c9658cdea68dac1238bf021",
+    "docs/acceptance/evidence/2026-11-16-other-rotation-audit-probe.txt": "52d15358a2e736040899491372a39efa5071bf106230b8855c91bb7595a63069",
+    "docs/acceptance/evidence/2026-11-16-other-rotation-audit-regression.txt": "4614da654a02c1418a21367da83525d6d1ea1b0fa3563785c5a2cfd32c08064d"
+  },
+  "artifactFormatting": "Commit hook formatted diagnostic scripts and JSON without changing their data; source fingerprints retain the original audit version."
+}

@@ -165,6 +165,11 @@ export class ConfigurationController implements UiCommandController {
               : "航班号不能重复或为空；请检查模板和两组当前航班是否已有新名称，未修改任何配置",
             "danger"
           );
+        else if (result === "priority-position-name-locked")
+          this.context.toast(
+            "重点岗位名称固定，不能改名；请核对航司和规范岗位名称，原配置已保留",
+            "warning"
+          );
         else if (result !== "missing") this.context.commit();
         return true;
       }

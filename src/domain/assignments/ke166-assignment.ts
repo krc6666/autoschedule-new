@@ -15,7 +15,12 @@ import {
   isNumberedRegularPosition,
 } from "../flights/schedule-tasks";
 import { durationHours, intervalsOverlap } from "../shared/time";
-import { consecutivePositionAssignments } from "../statistics/schedule-frequency";
+import {
+  comparePositionFrequency,
+  consecutivePositionAssignments,
+  positionFrequencyProfileForRule,
+} from "../statistics/schedule-frequency";
+import { isOrdinaryPriorityPosition } from "../reviews/position-rotation-policy";
 import { schedulingDecision } from "../rules/schedule-rule-contract";
 import type { ScheduleRunFacts } from "../shared/schedule-run-facts";
 import { clearAutomaticAssignmentEvidence } from "./assignment-evidence";
@@ -235,7 +240,12 @@ function eligibleSupervisorOrder(
   facts?: ScheduleRunFacts,
   requireNonRepeated = false
 ): string[] {
-  const prioritizeKe166Rotation = isKe166MobileSupervisor(flight, rule);
+  const ordinaryPriority = isOrdinaryPriorityPosition(
+    rule,
+    state.settings.ordinaryPriorityPositions
+  );
+  const prioritizeKe166Rotation =
+    isKe166MobileSupervisor(flight, rule) || ordinaryPriority;
   return eligibleStaffForRule(state, flight, rule)
     .filter(
       (person) =>
@@ -251,6 +261,26 @@ function eligibleSupervisorOrder(
     )
     .sort(
       (left, right) =>
+        (ordinaryPriority
+          ? comparePositionFrequency(
+              positionFrequencyProfileForRule(
+                state,
+                left.id,
+                flight.flightNo,
+                rule,
+                date,
+                facts?.scheduleFrequency
+              ),
+              positionFrequencyProfileForRule(
+                state,
+                right.id,
+                flight.flightNo,
+                rule,
+                date,
+                facts?.scheduleFrequency
+              )
+            )
+          : 0) ||
         Number(
           prioritizeKe166Rotation &&
             consecutivePositionAssignments(
@@ -420,7 +450,13 @@ export async function assignMobileSupervisorByCounterCoverage(
 ): Promise<Assignment | undefined> {
   if (!isMobileSupervisor(flight, rule)) return undefined;
   const ke166 = isKe166MobileSupervisor(flight, rule);
-  const requireNonRepeated = ke166 && Boolean(rotationReplacementForStaffId);
+  const ordinaryPriority = isOrdinaryPriorityPosition(
+    rule,
+    state.settings.ordinaryPriorityPositions
+  );
+  const rotationApplies = ke166 || ordinaryPriority;
+  const requireNonRepeated =
+    rotationApplies && Boolean(rotationReplacementForStaffId);
   const eligibleIds = new Set(
     eligibleStaffForRule(state, flight, rule)
       .filter(
@@ -471,8 +507,28 @@ export async function assignMobileSupervisorByCounterCoverage(
         (person) => person.id === right.staffId
       )!;
       return (
+        (ordinaryPriority
+          ? comparePositionFrequency(
+              positionFrequencyProfileForRule(
+                state,
+                leftPerson.id,
+                flight.flightNo,
+                rule,
+                date,
+                facts?.scheduleFrequency
+              ),
+              positionFrequencyProfileForRule(
+                state,
+                rightPerson.id,
+                flight.flightNo,
+                rule,
+                date,
+                facts?.scheduleFrequency
+              )
+            )
+          : 0) ||
         Number(
-          ke166 &&
+          rotationApplies &&
             consecutivePositionAssignments(
               state,
               leftPerson.id,
@@ -483,7 +539,7 @@ export async function assignMobileSupervisorByCounterCoverage(
             ) > 0
         ) -
           Number(
-            ke166 &&
+            rotationApplies &&
               consecutivePositionAssignments(
                 state,
                 rightPerson.id,
@@ -549,7 +605,7 @@ export async function assignMobileSupervisorByCounterCoverage(
   }
   if (!regularAssignment?.staffId) return undefined;
   const currentRepeated =
-    ke166 &&
+    rotationApplies &&
     consecutivePositionAssignments(
       state,
       regularAssignment.staffId,
@@ -586,7 +642,7 @@ export async function assignMobileSupervisorByCounterCoverage(
         schedulingDecision(
           "position-rotation",
           "selected",
-          `KE166机动督导后置绑定前已完成整体安全重排：${originalName}退出原兼任方案；${plan.description}，先保证柜台轮换再启用督导兼任兜底。`
+          `${flight.flightNo}机动督导后置绑定前已完成整体安全重排：${originalName}退出原兼任方案；${plan.description}，先保证柜台轮换再启用督导兼任兜底。`
         ),
       ];
     }
@@ -595,16 +651,16 @@ export async function assignMobileSupervisorByCounterCoverage(
   const regularStaffId = regularAssignment.staffId;
 
   const replacedIndependentSupervisor =
-    ke166 && rotationReplacementForStaffId
+    rotationApplies && rotationReplacementForStaffId
       ? state.staff.find(
           (person) => person.id === rotationReplacementForStaffId
         )
       : undefined;
   const rotationImprovementMessage = replacedIndependentSupervisor
-    ? `KE166机动督导连续轮岗已落实：${replacedIndependentSupervisor.name}上一工作班已承担${flight.flightNo}/${rule.name}，本班改由${regularAssignment.staffName}保留${flight.flightNo}/${regularAssignment.position}并兼任机动督导。`
+    ? `${flight.flightNo}机动督导连续轮岗已落实：${replacedIndependentSupervisor.name}上一工作班已承担${flight.flightNo}/${rule.name}，本班改由${regularAssignment.staffName}保留${flight.flightNo}/${regularAssignment.position}并兼任机动督导。`
     : null;
 
-  const repeatedSupervisorRuns = ke166
+  const repeatedSupervisorRuns = rotationApplies
     ? consecutivePositionAssignments(
         state,
         regularStaffId,

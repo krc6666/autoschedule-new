@@ -1,0 +1,38 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/.codex-worktrees/priority-rotation-20261116
+
+ ❯ tests/domain/configured-priority-rotation.test.ts (19 tests | 1 failed | 18 skipped) 18ms
+     × 岗位显示以当前组岗位配置为准，跨航司不借用旧重点名单 15ms
+npm.cmd :
+所在位置 行:3 字符: 1
++ npm.cmd exec vitest -- run tests/domain/configured-priority-rotation. ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/domain/configured-priority-rotation.test.ts > 已配置普通重点的跨分类自动轮换 > 岗位显示以当前组岗位配置为准，跨航司不借用旧重点名单
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ tests/domain/configured-priority-rotation.test.ts:142:107
+    140|     expect(configuredFlightPositions(state.positionRules)("KE160")).to…
+    141|     expect(updateConfigurationField(state, "template", "template", "fl…
+    142|     expect(isOrdinaryPriorityPosition(state.positionRules[0]!, state.s…
+       |                                                                                                           ^
+    143|     expect(state.settings.ordinaryPriorityPositions[0]!.airlineCode).t…
+    144|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 18 skipped (19)
+   Start at  17:47:11
+   Duration  3.00s (transform 2.26s, setup 0ms, import 2.74s, tests 18ms, environment 0ms)

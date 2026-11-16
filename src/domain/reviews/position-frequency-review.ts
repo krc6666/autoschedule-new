@@ -28,6 +28,7 @@ import {
   type PositionFrequencyAlertAssessment,
 } from "./position-frequency-alert";
 import { assignmentWarningMessage } from "./schedule-warning-message";
+import { reviewMobileSupervisorGroupRotation } from "./mobile-supervisor-rotation-review";
 
 function frequencyProfileText(profile: PositionFrequencyProfile): string {
   return `本月${profile.currentMonthCount}次、最近${POSITION_FREQUENCY_WORKDAY_COUNT}个已归档工作日${profile.recentWorkdayCount}次`;
@@ -209,7 +210,19 @@ export async function reviewSamePositionFrequency(
   const frequencyFacts =
     facts?.scheduleFrequency ?? createScheduleFrequencyFacts(state, date);
   const attemptedReasonsByAssignment = new Map<string, readonly string[]>();
-  const reviewed = new Set<string>();
+  const mobileReview = await reviewMobileSupervisorGroupRotation(
+    solver,
+    state,
+    assignments,
+    date,
+    lockedAssignmentIds,
+    facts,
+    "frequency"
+  );
+  mobileReview.attemptedReasonsByAssignment.forEach((reasons, id) =>
+    attemptedReasonsByAssignment.set(id, reasons)
+  );
+  const reviewed = new Set<string>(mobileReview.reviewedAssignmentIds);
   const primaryAssignments = assignments
     .filter(
       (assignment) => !isRotationLocked(state, assignment, lockedAssignmentIds)
@@ -339,11 +352,14 @@ export async function reviewSamePositionFrequency(
     attemptedReasonsByAssignment.set(primary.id, reasons);
     reviewed.add(primary.id);
   }
-  return applyFrequencyAlertEvidence(
-    state,
-    assignments,
-    date,
-    attemptedReasonsByAssignment,
-    frequencyFacts
-  );
+  return [
+    ...mobileReview.warnings,
+    ...applyFrequencyAlertEvidence(
+      state,
+      assignments,
+      date,
+      attemptedReasonsByAssignment,
+      frequencyFacts
+    ),
+  ];
 }

@@ -27,7 +27,10 @@ import {
 import { preservesWorkloadBalance } from "./workload-balance";
 import { crossWorkdayReservationStatuses } from "./cross-workday-qualification-reservation";
 import { crossFlightPriorityReassignmentReasons } from "../rules/cross-flight-priority";
-import { isDutyReliefPriorityPosition } from "./position-rotation-policy";
+import {
+  isDutyReliefPriorityPosition,
+  isOrdinaryPriorityPosition,
+} from "./position-rotation-policy";
 import { dutyFlightCountStatus } from "../assignments/duty-flight-count";
 import { dutyAfternoonFlightIds } from "../assignments/duty-afternoon-relief";
 import {
@@ -100,7 +103,14 @@ export function isRotationLocked(
     !assignment.positionRuleId ||
     assignment.supervisorSourceAssignmentId !== undefined ||
     !rule ||
-    rule.category !== "常规" ||
+    (rule.category !== "常规" &&
+      !(
+        rule.category === "分流" &&
+        isOrdinaryPriorityPosition(
+          rule,
+          state.settings.ordinaryPriorityPositions
+        )
+      )) ||
     rule.manual
   );
 }

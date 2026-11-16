@@ -1,0 +1,146 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/.codex-worktrees/priority-rotation-20261116
+
+ ❯ tests/domain/configured-priority-rotation.test.ts (15 tests | 10 failed) 94ms
+     × 分流 按航司和岗位命中，不绑定航班号 7ms
+     × 机动督导 按航司和岗位命中，不绑定航班号 2ms
+     × 分流 重点频率改给未承担者 2ms
+     × 机动督导 重点频率改给未承担者 1ms
+     × KE160 已配置机动督导与补位柜台整组解除连续 2ms
+     × MF8683 已配置机动督导与补位柜台整组解除连续 1ms
+     × 机动重点兼任组也执行频率轮次公平 1ms
+     × 无整组资质替代时保留原合法安排并解释 2ms
+     × 人工之后仍按同源事实提示机动重点连续，不自动改人 2ms
+     × 先轮换合法结果，后置恢复尝试换回连续人员必须拒绝 1ms
+npm.cmd :
+所在位置 行:3 字符: 1
++ npm.cmd exec vitest -- run tests/domain/configured-priority-rotation. ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 10 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/domain/configured-priority-rotation.test.ts > 已配置普通重点的跨分类自动轮换 > 分流 按航司和岗位命中，不绑定航班号
+ FAIL  tests/domain/configured-priority-rotation.test.ts > 已配置普通重点的跨分类自动轮换 > 机动督导 按航司和岗位命中，不绑定航班号
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/domain/configured-priority-rotation.test.ts:41:107
+     39|   it.each(["常规", "分流", "机动督导"] as const)("%s 按航司和岗位命中，不绑定航班号", categor…
+     40|     const { state } = scenario(category);
+     41|     expect(isOrdinaryPriorityPosition(state.positionRules[0]!, state.s…
+       |                                                                                                           ^
+     42|     expect(isOrdinaryPriorityPosition({ ...state.positionRules[0]!, fl…
+     43|     expect(isOrdinaryPriorityPosition({ ...state.positionRules[0]!, fl…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/10]⎯
+
+ FAIL  tests/domain/configured-priority-rotation.test.ts > 已配置普通重点的跨分类自动轮换 > 分流 重点频率改给未承担者
+ FAIL  tests/domain/configured-priority-rotation.test.ts > 已配置普通重点的跨分类自动轮换 > 机动督导 重点频率改给未承担者
+AssertionError: expected 'person-0' to be 'person-1' // Object.is equality
+
+Expected: "person-1"
+Received: "person-0"
+
+ ❯ tests/domain/configured-priority-rotation.test.ts:54:29
+     52|     const { state, assignments, primary, replacement } = scenario(cate…
+     53|     await reviewSamePositionFrequency(defaultHighsSolver, state, assig…
+     54|     expect(primary.staffId).toBe(replacement.id);
+       |                             ^
+     55|     expect(primary.decisionTrace?.some(d => d.ruleId === "position-fre…
+     56|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/10]⎯
+
+ FAIL  tests/domain/configured-priority-rotation.test.ts > 已配置普通重点的跨分类自动轮换 > KE160 已配置机动督导与补位柜台整组解除连续
+ FAIL  tests/domain/configured-priority-rotation.test.ts > 已配置普通重点的跨分类自动轮换 > MF8683 已配置机动督导与补位柜台整组解除连续
+AssertionError: expected 'person-0' to be 'person-1' // Object.is equality
+
+Expected: "person-1"
+Received: "person-0"
+
+ ❯ tests/domain/configured-priority-rotation.test.ts:61:29
+     59|     const { state, assignments, primary, replacement } = scenario("机动督…
+     60|     await reviewConsecutivePositionRotation(defaultHighsSolver, state,…
+     61|     expect(primary.staffId).toBe(replacement.id);
+       |                             ^
+     62|     expect(assignments.find(a => a.id === "linked")?.staffId).toBe(rep…
+     63|     expect(assignments.find(a => a.id === "linked")?.workHours).toBe(0…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/10]⎯
+
+ FAIL  tests/domain/configured-priority-rotation.test.ts > 已配置普通重点的跨分类自动轮换 > 机动重点兼任组也执行频率轮次公平
+AssertionError: expected 'person-0' to be 'person-1' // Object.is equality
+
+Expected: "person-1"
+Received: "person-0"
+
+ ❯ tests/domain/configured-priority-rotation.test.ts:70:29
+     68|     const { state, assignments, primary, replacement } = scenario("机动督…
+     69|     await reviewSamePositionFrequency(defaultHighsSolver, state, assig…
+     70|     expect(primary.staffId).toBe(replacement.id);
+       |                             ^
+     71|     expect(assignments.find(a => a.id === "linked")?.staffId).toBe(rep…
+     72|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/10]⎯
+
+ FAIL  tests/domain/configured-priority-rotation.test.ts > 已配置普通重点的跨分类自动轮换 > 无整组资质替代时保留原合法安排并解释
+AssertionError: expected '' to contain '资质'
+
+- Expected
++ Received
+
+- 资质
+
+ ❯ tests/domain/configured-priority-rotation.test.ts:80:32
+     78|     const warnings = await reviewConsecutivePositionRotation(defaultHi…
+     79|     expect(assignments.map(a => a.staffId)).toEqual(before);
+     80|     expect(warnings.join(" ")).toContain("资质");
+       |                                ^
+     81|     expect(primary.decisionTrace?.some(d => d.outcome === "fallback"))…
+     82|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/10]⎯
+
+ FAIL  tests/domain/configured-priority-rotation.test.ts > 已配置普通重点的跨分类自动轮换 > 人工之后仍按同源事实提示机动重点连续，不自动改人
+AssertionError: expected undefined to be true // Object.is equality
+
+- Expected:
+true
+
++ Received:
+undefined
+
+ ❯ tests/domain/configured-priority-rotation.test.ts:100:108
+     98|     refreshPositionRotationEvidence(state, date);
+     99|     expect(primary.staffId).toBe(state.staff[0]!.id);
+    100|     expect(primary.decisionTrace?.some(d => d.ruleId === "position-rot…
+       |                                                                                                            ^
+    101|   });
+    102|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/10]⎯
+
+ FAIL  tests/domain/configured-priority-rotation.test.ts > 已配置普通重点的跨分类自动轮换 > 先轮换合法结果，后置恢复尝试换回连续人员必须拒绝
+AssertionError: expected 'person-0' to be 'person-1' // Object.is equality
+
+Expected: "person-1"
+Received: "person-0"
+
+ ❯ tests/domain/configured-priority-rotation.test.ts:106:29
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/10]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  10 failed | 5 passed (15)
+   Start at  17:35:17
+   Duration  1.03s (transform 614ms, setup 0ms, import 718ms, tests 94ms, environment 0ms)

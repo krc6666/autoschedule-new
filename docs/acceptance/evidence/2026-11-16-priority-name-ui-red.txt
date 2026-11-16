@@ -1,0 +1,45 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+npm.cmd : stderr | tests/ui/priority-position-name-lock.test.ts
+所在位置 行:2 字符: 30
++ ... ORKERS='2'; npm.cmd exec vitest -- run tests/ui/priority-position-nam ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (stderr | tests/...me-lock.test.ts:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+
+ ❯ tests/ui/priority-position-name-lock.test.ts (3 tests | 3 failed) 98ms
+     × 常规 仅命中航司与岗位名单时禁止改名 62ms
+     × 分流 仅命中航司与岗位名单时禁止改名 16ms
+     × 机动督导 仅命中航司与岗位名单时禁止改名 19ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/ui/priority-position-name-lock.test.ts > 重点岗位固定名称提示 > 常规 仅命中航司与岗位名单时禁止改名
+ FAIL  tests/ui/priority-position-name-lock.test.ts > 重点岗位固定名称提示 > 分流 仅命中航司与岗位名单时禁止改名
+ FAIL  tests/ui/priority-position-name-lock.test.ts > 重点岗位固定名称提示 > 机动督导 仅命中航司与岗位名单时禁止改名
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/ui/priority-position-name-lock.test.ts:20:29
+     18|     const names = [...element.querySelectorAll<HTMLInputElement>('[ari…
+     19|     const locked = names.find(input => input.closest("tr")?.querySelec…
+     20|     expect(locked.disabled).toBe(true);
+       |                             ^
+     21|     expect(locked.closest("td")?.textContent).toContain("重点岗位名称固定");
+     22|     expect(names.filter(input => input !== locked).every(input => !inp…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  3 failed (3)
+   Start at  18:10:44
+   Duration  1.00s (transform 269ms, setup 0ms, import 336ms, tests 98ms, environment 361ms)

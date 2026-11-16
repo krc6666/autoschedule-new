@@ -1,0 +1,20 @@
+{
+  "changedExistingFiles": [
+    "src/domain/reviews/reassignment-safety-policy.ts",
+    "tests/infrastructure/staff-work-continuity.test.ts",
+    "spec.md"
+  ],
+  "addedTestFiles": [
+    "tests/domain/staff-work-continuity-priority.test.ts",
+    "tests/helpers/priority-continuity-scenario.ts"
+  ],
+  "otherBaselineFilesUnchanged": 518,
+  "diffCheckExit": 0,
+  "sourceAndTestSha256": {
+    "spec.md": "1f0dc37984831749884e9811c112db75ce8927ded2ed4cd263879891b0f177ad",
+    "src/domain/reviews/reassignment-safety-policy.ts": "a0eb8b85aa928aa7a6b8faea11e39de331532236db0383143ba4e51bf8650d78",
+    "tests/domain/staff-work-continuity-priority.test.ts": "88845a993cc6a1cfd2b34a01c4ed84b4cf359c895853923982baa736b3c1d944",
+    "tests/helpers/priority-continuity-scenario.ts": "511a6c4899b60eeedfdc1eea887fc939b3ed0c58f7e28608e6cbf734dab60fc5",
+    "tests/infrastructure/staff-work-continuity.test.ts": "af1617cd5ad7cf1ec43144dc14420572e840ea4512a2804f7a0762b4bce90878"
+  }
+}

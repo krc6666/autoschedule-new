@@ -8,6 +8,7 @@ import { LightDomElement } from "./light-dom-element";
 import { dynamicSelectValue } from "./dynamic-select";
 import { normalizeWeeklyFlightNo } from "../../domain/flights/weekly-flight-plan";
 import { configuredFlightNumbers } from "../../domain/flights/configured-flight-positions";
+import { isOrdinaryPriorityPosition } from "../../domain/reviews/position-rotation-policy";
 
 const POSITION_CATEGORIES = [
   "常规",
@@ -284,7 +285,8 @@ export class PositionRulesSectionElement extends LightDomElement {
         ${configurationInput(this, "position", rule.id, "flightNo", rule.flightNo, "航班号", { className: "code-input" })}
       </td>
       <td>
-        ${configurationInput(this, "position", rule.id, "name", rule.name, "岗位名称")}
+        ${configurationInput(this, "position", rule.id, "name", rule.name, "岗位名称", { disabled: isOrdinaryPriorityPosition(rule, this.model.settings.ordinaryPriorityPositions) })}
+        ${isOrdinaryPriorityPosition(rule, this.model.settings.ordinaryPriorityPositions) ? html`<small class="text-muted">重点岗位名称固定</small>` : ""}
       </td>
       <td>
         ${configurationSelect(this, "position", rule.id, "category", rule.category, "分类", POSITION_CATEGORIES)}

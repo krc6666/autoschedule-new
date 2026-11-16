@@ -1,0 +1,129 @@
+{
+  "date": "2026-11-18",
+  "flightNo": "KE160",
+  "previousFlightNo": "KE999",
+  "previousWorkday": "2026-11-16",
+  "category": "机动督导",
+  "priority": [
+    {
+      "airlineCode": "KE",
+      "position": "督导"
+    }
+  ],
+  "counts": [
+    {
+      "staffId": "person-0",
+      "before": 1,
+      "after": 1
+    },
+    {
+      "staffId": "person-1",
+      "before": 0,
+      "after": 1
+    }
+  ],
+  "finalAssignments": [
+    {
+      "id": "assignment-mwj3eo1n-fmo7xz",
+      "flightId": "flight",
+      "flightNo": "KE160",
+      "positionRuleId": "priority",
+      "position": "督导",
+      "staffId": "person-1",
+      "staffName": "人员1",
+      "startTime": "09:50",
+      "endTime": "11:50",
+      "workHours": 2,
+      "fatiguePoints": 4,
+      "remark": "",
+      "manualRemark": "",
+      "status": "assigned",
+      "decisionTrace": [
+        {
+          "ruleId": "mobile-supervisor",
+          "stage": "reserved-assignment",
+          "outcome": "selected",
+          "message": "人员1已安排为KE160机动督导组人员"
+        },
+        {
+          "ruleId": "position-frequency-review",
+          "stage": "protection",
+          "outcome": "selected",
+          "message": "人员0承担KE160/督导的同岗次数较高，本班已通过2人整体安全重排改由低频人员；机动督导关系、岗位完整性及全部安全约束验证通过。"
+        }
+      ],
+      "decisionEvidence": {
+        "scheduleRunId": "schedule-run-mwj3enxb-ciu0vm",
+        "ruleFingerprint": "rules-v3:933e062fc2d17f97"
+      }
+    },
+    {
+      "id": "assignment-mwj3eo1a-fpamhv",
+      "flightId": "flight",
+      "flightNo": "KE160",
+      "positionRuleId": "ordinary",
+      "position": "H03",
+      "staffId": "person-0",
+      "staffName": "人员0",
+      "startTime": "09:50",
+      "endTime": "11:50",
+      "workHours": 2,
+      "fatiguePoints": 2,
+      "remark": "",
+      "manualRemark": "",
+      "status": "assigned",
+      "decisionTrace": [
+        {
+          "ruleId": "position-frequency-review",
+          "stage": "protection",
+          "outcome": "selected",
+          "message": "人员0承担KE160/督导的同岗次数较高，本班已通过2人整体安全重排改由低频人员；机动督导关系、岗位完整性及全部安全约束验证通过。"
+        }
+      ],
+      "decisionEvidence": {
+        "scheduleRunId": "schedule-run-mwj3enxb-ciu0vm",
+        "ruleFingerprint": "rules-v3:933e062fc2d17f97"
+      }
+    }
+  ],
+  "exportedRows": [
+    {
+      "日期": "2026-11-18",
+      "航班号": "KE160",
+      "岗位": "督导",
+      "姓名": "人员1",
+      "开始时间": "09:50",
+      "结束时间": "11:50",
+      "工作时长(小时)": 2,
+      "疲劳点数": 4,
+      "备注": "",
+      "状态": "已排",
+      "航班截载时间": "11:50",
+      "系统说明": "",
+      "人员编号": "person-1",
+      "人工调整证据": "{\"assignmentRemarks\":{\"remark\":\"\",\"manualRemark\":\"\"}}",
+      "出勤时段": "",
+      "引导安排": ""
+    },
+    {
+      "日期": "2026-11-18",
+      "航班号": "KE160",
+      "岗位": "H03",
+      "姓名": "人员0",
+      "开始时间": "09:50",
+      "结束时间": "11:50",
+      "工作时长(小时)": 2,
+      "疲劳点数": 2,
+      "备注": "",
+      "状态": "已排",
+      "航班截载时间": "11:50",
+      "系统说明": "",
+      "人员编号": "person-0",
+      "人工调整证据": "{\"assignmentRemarks\":{\"remark\":\"\",\"manualRemark\":\"\"}}",
+      "出勤时段": "",
+      "引导安排": ""
+    }
+  ],
+  "unfilledCount": 0,
+  "credentialPhase": "final"
+}

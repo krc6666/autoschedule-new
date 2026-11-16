@@ -379,7 +379,11 @@ export function reassignmentCandidateSafetyReasons({
     ) {
       reasons.push("调整会破坏跨工作班负荷互补");
     }
-  } else if (
+  }
+  // Preservation reviews protect frequency as well as consecutive rotation.
+  // Improvement reviews retain their existing consecutive-rotation behavior.
+  if (
+    policy.consecutive !== "improve-primary" &&
     policy.frequency === "preserve-priority" &&
     isOrdinaryPriorityPosition(
       rule,

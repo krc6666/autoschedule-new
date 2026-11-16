@@ -8,7 +8,7 @@ import {
 import { applyConfiguredEarlyReleases } from "../assignments/assignment-timing";
 import { findConsecutiveRotationPlan } from "./consecutive-rotation-plan";
 import { historyFatigue } from "../statistics/fatigue";
-import { reviewKe166GroupRotation } from "./ke166-rotation-review";
+import { reviewMobileSupervisorGroupRotation } from "./mobile-supervisor-rotation-review";
 import {
   isHighFatigueOrdinaryRotationPosition,
   isOrdinaryPriorityPosition,
@@ -259,16 +259,17 @@ export async function reviewConsecutivePositionRotation(
   if (!state.settings.positionRotationEnabled) return [];
   const frequencyFacts =
     facts?.scheduleFrequency ?? createScheduleFrequencyFacts(state, date);
-  const ke166Review = await reviewKe166GroupRotation(
+  const mobileReview = await reviewMobileSupervisorGroupRotation(
     solver,
     state,
     assignments,
     date,
     lockedAssignmentIds,
-    facts
+    facts,
+    "consecutive"
   );
-  const reviewed = new Set(ke166Review.reviewedAssignmentIds);
-  const warnings: string[] = [...ke166Review.warnings];
+  const reviewed = new Set(mobileReview.reviewedAssignmentIds);
+  const warnings: string[] = [...mobileReview.warnings];
   const primaryAssignments = assignments
     .filter(
       (assignment) => !isRotationLocked(state, assignment, lockedAssignmentIds)

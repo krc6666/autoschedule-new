@@ -1,0 +1,53 @@
+
+> autoschedule@1.0.0 verify
+> npm run typecheck && npm test && npm run test:performance && npm run build
+
+
+> autoschedule@1.0.0 typecheck
+> tsc -b --pretty false
+
+
+> autoschedule@1.0.0 test
+> vitest run --exclude tests/performance/**
+
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/architecture/acceptance-gate.test.ts (16 tests | 1 failed) 41670ms
+     × rejects a formerly valid record after a later source rewrite 5056ms
+ ❯ tests/domain/scheduling-kernel.test.ts (135 tests | 1 failed) 121378ms
+     × does not copy one flight's configured guide positions into every other flight 22519ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/architecture/acceptance-gate.test.ts > acceptance release gate > rejects a formerly valid record after a later source rewrite
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ tests/architecture/acceptance-gate.test.ts:145:3
+    143|   });
+    144|
+    145|   it("rejects a formerly valid record after a later source rewrite", (…
+       |   ^
+    146|     const root = fixture();
+    147|     save(root, record(root));
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/domain/scheduling-kernel.test.ts > scheduler domain > does not copy one flight's configured guide positions into every other flight
+Error: Test timed out in 15000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ tests/domain/scheduling-kernel.test.ts:5814:3
+    5812|   });
+    5813|
+    5814|   it("does not copy one flight's configured guide positions into every…
+       |   ^
+    5815|     const state = createOrdinarySchedulingState();
+    5816|     const result = await generateSchedule(state, "2026-07-18");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed | 211 passed (213)
+      Tests  2 failed | 2095 passed (2097)
+   Start at  18:38:40
+   Duration  124.51s (transform 36.06s, setup 0ms, import 123.75s, tests 468.87s, environment 40.26s)

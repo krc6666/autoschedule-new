@@ -1,0 +1,85 @@
+{
+  "sourceFingerprint": "c7870d385a06cf95a266dc823e4a622447d8444671fab6ddec56001a29223f68",
+  "assets": [
+    {
+      "path": "dist/index.html",
+      "sha256": "060f8b7a47e3273872f40a3cd41742acdcf0ffd2ae0271be84a90c033920e121"
+    },
+    {
+      "path": "dist/assets/__vite-browser-external-D7Ct-6yo.js",
+      "sha256": "80b82acfeb87bf2cb6a47b0aa48e078951b8a2616fe5059cec7bc46dd650621d"
+    },
+    {
+      "path": "dist/assets/cloud-application-CF5BzbEG.js",
+      "sha256": "f827f321cb0b6c09a66ce90442df58fb8502cdca50ce8faa8c2d00b7490aea2e"
+    },
+    {
+      "path": "dist/assets/duty-roster-excel-DA-J9zZB.js",
+      "sha256": "90e7b0b9c994d3f8bcbf9a7cfdf2ac96180c034cc09da7c3f3d3af859eb0c19b"
+    },
+    {
+      "path": "dist/assets/excel-CWf0g5MT.js",
+      "sha256": "d853f30e1d9783f9a1541c18e4b29e2f552cc86542fcef03a5f055911fccecca"
+    },
+    {
+      "path": "dist/assets/excel-worksheet-CNcmrQQ8.js",
+      "sha256": "eb6c53227316216a40e28b6c759958f95fc57d0e8f5b9826f45e2796b3b14ce2"
+    },
+    {
+      "path": "dist/assets/highs-Bh-9UEeK.js",
+      "sha256": "44957c10d4359f286277d7d5e0478c738f23c5343031a2a3b250926a6f337955"
+    },
+    {
+      "path": "dist/assets/highs-Bo9wdQQ9.js",
+      "sha256": "313c0a30c31e5dae6c46c7668e9dfd811e527a7584b0b91e6edef5bcdae26f85"
+    },
+    {
+      "path": "dist/assets/highs-CIX1csBr.js",
+      "sha256": "a956b950013f4b13255415528739ad66e04c4edb45f1ba0d975a9ba46b570a88"
+    },
+    {
+      "path": "dist/assets/highs-D01W9kFF.wasm",
+      "sha256": "2a95cbf93774622cf4b9ba7650017159aedcec83223f9f1ae5f486818f53a08a"
+    },
+    {
+      "path": "dist/assets/highs-DDLXtLac.js",
+      "sha256": "5e9b449fac7e3fc407392cc7f7e6ee3dde0771d3b9885dc46781cd24e02e33fc"
+    },
+    {
+      "path": "dist/assets/highs-DEeTqoGR.wasm",
+      "sha256": "36e68fe5cdd886bedb12c39ab498b6f316bc38936bc11a94ea956face8b85fe2"
+    },
+    {
+      "path": "dist/assets/highs-solver-CddWvtQy.js",
+      "sha256": "3775518453847237e7f1459e00c7f2f858c940291cf36f296b3c7b8aafa826b9"
+    },
+    {
+      "path": "dist/assets/html2canvas.esm-DXEQVQnt.js",
+      "sha256": "8c46cc1bb52e600a4f397027529ced15488e01a9ca234cbf3649596841edf983"
+    },
+    {
+      "path": "dist/assets/index-B8zzP4Re.js",
+      "sha256": "34e98cd4555280da9fb6f19a5f02b75e6c944474f52cd36537f7babc230ac46b"
+    },
+    {
+      "path": "dist/assets/late-priority-counts-excel-kK2b2J7Y.js",
+      "sha256": "48dc9a1f10127ecc6effa2d087edbe16ad0264443861ec2a9322512dd30b761e"
+    },
+    {
+      "path": "dist/assets/schedule.worker-8dmkYQc4.js",
+      "sha256": "40b66570efb03a8acc8b8066ee17e2abe7056e83572ba773e8056282c443c7ee"
+    },
+    {
+      "path": "dist/assets/style-CV5jB7Sq.css",
+      "sha256": "88e2b6cef1444c09a283819b68c06dd0fed965a46139faf3975aec35be6cdc59"
+    },
+    {
+      "path": "dist/assets/supabase-backend-BQgjbkxj.js",
+      "sha256": "9ce6ae5a362ccefa149abc8d531903a5626433f5b0e90447be6ac2225250637a"
+    },
+    {
+      "path": "dist/assets/xlsx.min-Di7JdnS5.js",
+      "sha256": "b2fd2354b6f76202cfb355b941f26d3e481c79333eee23df5fd22630106970b4"
+    }
+  ]
+}

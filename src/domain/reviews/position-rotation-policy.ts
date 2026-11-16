@@ -4,7 +4,10 @@ import { normalizedPolicyValue } from "./schedule-protection";
 
 interface OrdinaryPriorityMatcher {
   positionsByAirline: ReadonlyMap<string, ReadonlySet<string>>;
-  ruleResults: WeakMap<object, boolean>;
+  ruleResults: WeakMap<
+    object,
+    { flightNo: string; name: string; result: boolean }
+  >;
 }
 
 const ordinaryPriorityPositionSetCache = new WeakMap<
@@ -62,7 +65,12 @@ export function isOrdinaryPriorityPosition(
   rule: Pick<PositionRule, "category" | "flightNo" | "name" | "remark">,
   configured: readonly OrdinaryPriorityPosition[]
 ): boolean {
-  if (rule.category !== "常规") return false;
+  if (
+    rule.category !== "常规" &&
+    rule.category !== "分流" &&
+    rule.category !== "机动督导"
+  )
+    return false;
   let matcher = ordinaryPriorityPositionSetCache.get(configured);
   if (!matcher) {
     const positionsByAirline = new Map<string, Set<string>>();
@@ -77,10 +85,15 @@ export function isOrdinaryPriorityPosition(
     ordinaryPriorityPositionSetCache.set(configured, matcher);
   }
   const cached = matcher.ruleResults.get(rule);
-  if (cached !== undefined) return cached;
+  if (cached?.flightNo === rule.flightNo && cached.name === rule.name)
+    return cached.result;
   const positions = matcher.positionsByAirline.get(airlineCode(rule.flightNo));
   const result = Boolean(positions?.has(ordinaryPositionReference(rule.name)));
-  matcher.ruleResults.set(rule, result);
+  matcher.ruleResults.set(rule, {
+    flightNo: rule.flightNo,
+    name: rule.name,
+    result,
+  });
   return result;
 }
 

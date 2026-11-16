@@ -153,7 +153,7 @@ describe("monthly late priority statistics", () => {
       expect(zero).toBeDefined();
       expect(zero.totalCount).toBe(0);
       expect(zero.categories.督导.qualified).toBe(true);
-      // Statistics must not enable any automatic rule or expand its selectable scope.
+      // Late-priority automation keeps its scope; ordinary priority follows its explicit configuration.
       const supervisor = state.positionRules.find(
         (rule) => rule.name === "督导"
       )!;
@@ -173,7 +173,9 @@ describe("monthly late priority statistics", () => {
         isOrdinaryPriorityPosition(supervisor, [
           { airlineCode: "TR", position: "督导" },
         ])
-      ).toBe(category === "常规");
+      ).toBe(
+        category === "常规" || category === "分流" || category === "机动督导"
+      );
     }
   );
 

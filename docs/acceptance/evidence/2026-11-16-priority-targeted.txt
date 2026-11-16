@@ -1,0 +1,8 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/.codex-worktrees/priority-rotation-20261116
+
+
+ Test Files  8 passed (8)
+      Tests  125 passed (125)
+   Start at  17:56:39
+   Duration  3.84s (transform 2.87s, setup 0ms, import 4.49s, tests 1.29s, environment 1ms)

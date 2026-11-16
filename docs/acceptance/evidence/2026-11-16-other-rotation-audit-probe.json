@@ -1,0 +1,397 @@
+{
+  "date": "2026-11-18",
+  "scope": "read-only anonymous domain probes; no product implementation edits",
+  "consecutiveVersusFrequency": [
+    {
+      "category": "常规",
+      "before": {
+        "staffId": "person-0",
+        "profile": {
+          "currentMonthCount": 1,
+          "recentWorkdayCount": 1
+        },
+        "runs": 1
+      },
+      "safety": {
+        "consecutive-rotation-review": [],
+        "staff-work-continuity-review": [],
+        "late-shift-recovery-review": ["调整会破坏重点岗位频率均衡"]
+      },
+      "afterFrequency": "person-0",
+      "afterConsecutive": {
+        "staffId": "person-1",
+        "profile": {
+          "currentMonthCount": 3,
+          "recentWorkdayCount": 3
+        },
+        "runs": 0
+      },
+      "consecutiveWarnings": [],
+      "fullKernelPriorityStaffId": "person-1",
+      "fullKernelUnfilledCount": 0,
+      "fullKernelCredentialPhase": "final"
+    },
+    {
+      "category": "分流",
+      "before": {
+        "staffId": "person-0",
+        "profile": {
+          "currentMonthCount": 1,
+          "recentWorkdayCount": 1
+        },
+        "runs": 1
+      },
+      "safety": {
+        "consecutive-rotation-review": [],
+        "staff-work-continuity-review": [],
+        "late-shift-recovery-review": ["调整会破坏重点岗位频率均衡"]
+      },
+      "afterFrequency": "person-0",
+      "afterConsecutive": {
+        "staffId": "person-1",
+        "profile": {
+          "currentMonthCount": 3,
+          "recentWorkdayCount": 3
+        },
+        "runs": 0
+      },
+      "consecutiveWarnings": [],
+      "fullKernelPriorityStaffId": "person-1",
+      "fullKernelUnfilledCount": 0,
+      "fullKernelCredentialPhase": "final"
+    },
+    {
+      "category": "机动督导",
+      "before": {
+        "staffId": "person-0",
+        "profile": {
+          "currentMonthCount": 1,
+          "recentWorkdayCount": 1
+        },
+        "runs": 1
+      },
+      "safety": {
+        "consecutive-rotation-review": [],
+        "staff-work-continuity-review": [],
+        "late-shift-recovery-review": ["调整会破坏重点岗位频率均衡"]
+      },
+      "afterFrequency": "person-0",
+      "afterConsecutive": {
+        "staffId": "person-1",
+        "profile": {
+          "currentMonthCount": 3,
+          "recentWorkdayCount": 3
+        },
+        "runs": 0
+      },
+      "consecutiveWarnings": [],
+      "fullKernelPriorityStaffId": "person-1",
+      "fullKernelUnfilledCount": 0,
+      "fullKernelCredentialPhase": "final"
+    }
+  ],
+  "monthlyFinalizer": [
+    {
+      "variant": "ordinary-priority",
+      "before": {
+        "staffId": "person-1",
+        "profile": {
+          "currentMonthCount": 0,
+          "recentWorkdayCount": 0
+        },
+        "runs": 0
+      },
+      "after": {
+        "staffId": "person-0",
+        "profile": {
+          "currentMonthCount": 2,
+          "recentWorkdayCount": 2
+        },
+        "runs": 2
+      },
+      "finalSessionAccepted": true,
+      "warnings": [
+        "人员0的重点岗位频率需要复核：KE160/督导当前频率差距超过允许范围"
+      ],
+      "assignments": [
+        {
+          "position": "督导",
+          "staffId": "person-0"
+        },
+        {
+          "position": "H03",
+          "staffId": "person-1"
+        }
+      ],
+      "fullKernelPriorityStaffId": "person-0",
+      "fullKernelUnfilledCount": 0,
+      "fullKernelCredentialPhase": "final"
+    },
+    {
+      "variant": "high-fatigue-ordinary",
+      "before": {
+        "staffId": "person-1",
+        "profile": {
+          "currentMonthCount": 0,
+          "recentWorkdayCount": 0
+        },
+        "runs": 0
+      },
+      "after": {
+        "staffId": "person-0",
+        "profile": {
+          "currentMonthCount": 0,
+          "recentWorkdayCount": 0
+        },
+        "runs": 2
+      },
+      "finalSessionAccepted": true,
+      "warnings": [
+        "人员0已连续2个工作班承担高疲劳普通岗位KE160/H07，本班继续承担需要复核"
+      ],
+      "assignments": [
+        {
+          "position": "H07",
+          "staffId": "person-0"
+        },
+        {
+          "position": "H03",
+          "staffId": "person-1"
+        }
+      ],
+      "fullKernelPriorityStaffId": "person-0",
+      "fullKernelUnfilledCount": 0,
+      "fullKernelCredentialPhase": "final"
+    },
+    {
+      "variant": "low-fatigue-ordinary",
+      "before": {
+        "staffId": "person-1",
+        "profile": {
+          "currentMonthCount": 0,
+          "recentWorkdayCount": 0
+        },
+        "runs": 0
+      },
+      "after": {
+        "staffId": "person-0",
+        "profile": {
+          "currentMonthCount": 0,
+          "recentWorkdayCount": 0
+        },
+        "runs": 2
+      },
+      "finalSessionAccepted": true,
+      "warnings": [],
+      "assignments": [
+        {
+          "position": "H07",
+          "staffId": "person-0"
+        },
+        {
+          "position": "H03",
+          "staffId": "person-1"
+        }
+      ],
+      "fullKernelPriorityStaffId": "person-0",
+      "fullKernelUnfilledCount": 0,
+      "fullKernelCredentialPhase": "final"
+    },
+    {
+      "variant": "late-priority",
+      "before": {
+        "staffId": "person-1",
+        "profile": {
+          "currentMonthCount": 0,
+          "recentWorkdayCount": 0
+        },
+        "runs": 0
+      },
+      "after": {
+        "staffId": "person-0",
+        "profile": {
+          "currentMonthCount": 0,
+          "recentWorkdayCount": 0
+        },
+        "runs": 2
+      },
+      "latePriorityBefore": {
+        "applies": true,
+        "targetKinds": ["supervisor"],
+        "previousWorkdayAssigned": false,
+        "supervisorQualified": true,
+        "supervisorRotationDeficit": 2,
+        "categoryBoundaryExcess": {
+          "supervisor": 0,
+          "number-one": 0,
+          "declaration": 0,
+          "delivery": 0
+        },
+        "counts": {
+          "supervisor": {
+            "currentMonthCount": 0,
+            "recentWorkdayCount": 0
+          },
+          "number-one": {
+            "currentMonthCount": 0,
+            "recentWorkdayCount": 0
+          },
+          "declaration": {
+            "currentMonthCount": 0,
+            "recentWorkdayCount": 0
+          },
+          "delivery": {
+            "currentMonthCount": 0,
+            "recentWorkdayCount": 0
+          }
+        },
+        "totalCurrentMonthCount": 0,
+        "totalRecentWorkdayCount": 0
+      },
+      "latePriorityAfter": {
+        "applies": true,
+        "targetKinds": ["supervisor"],
+        "previousWorkdayAssigned": true,
+        "supervisorQualified": true,
+        "supervisorRotationDeficit": 0,
+        "categoryBoundaryExcess": {
+          "supervisor": 2,
+          "number-one": 0,
+          "declaration": 0,
+          "delivery": 0
+        },
+        "counts": {
+          "supervisor": {
+            "currentMonthCount": 2,
+            "recentWorkdayCount": 2
+          },
+          "number-one": {
+            "currentMonthCount": 0,
+            "recentWorkdayCount": 0
+          },
+          "declaration": {
+            "currentMonthCount": 0,
+            "recentWorkdayCount": 0
+          },
+          "delivery": {
+            "currentMonthCount": 0,
+            "recentWorkdayCount": 0
+          }
+        },
+        "totalCurrentMonthCount": 2,
+        "totalRecentWorkdayCount": 2
+      },
+      "finalSessionAccepted": true,
+      "warnings": [
+        "人员0的末班重点岗位分类公平需要复核：督导次数差已超过允许范围",
+        "人员0的末班重点岗位合计轮换需要复核：当前人员不是合计次数优先人选"
+      ],
+      "assignments": [
+        {
+          "position": "督导",
+          "staffId": "person-0"
+        },
+        {
+          "position": "H03",
+          "staffId": "person-1"
+        }
+      ],
+      "fullKernelPriorityStaffId": "person-0",
+      "fullKernelUnfilledCount": 0,
+      "fullKernelCredentialPhase": "final"
+    }
+  ],
+  "continuityFinalizer": {
+    "before": {
+      "staffId": "person-0",
+      "profile": {
+        "currentMonthCount": 0,
+        "recentWorkdayCount": 0
+      },
+      "continuity": [
+        {
+          "staffId": "person-0",
+          "spanMinutes": 840,
+          "maximumGapMinutes": 600,
+          "flightCount": 2,
+          "split": true,
+          "morningAssignmentIds": ["morning"],
+          "lastAssignmentIds": ["last"]
+        },
+        {
+          "staffId": "person-1",
+          "spanMinutes": 300,
+          "maximumGapMinutes": 60,
+          "flightCount": 2,
+          "split": false,
+          "morningAssignmentIds": [],
+          "lastAssignmentIds": []
+        }
+      ]
+    },
+    "after": {
+      "staffId": "person-1",
+      "profile": {
+        "currentMonthCount": 3,
+        "recentWorkdayCount": 3
+      },
+      "continuity": [
+        {
+          "staffId": "person-0",
+          "spanMinutes": 360,
+          "maximumGapMinutes": 120,
+          "flightCount": 2,
+          "split": false,
+          "morningAssignmentIds": ["morning"],
+          "lastAssignmentIds": []
+        },
+        {
+          "staffId": "person-1",
+          "spanMinutes": 420,
+          "maximumGapMinutes": 180,
+          "flightCount": 2,
+          "split": false,
+          "morningAssignmentIds": [],
+          "lastAssignmentIds": ["last"]
+        }
+      ]
+    },
+    "warnings": [
+      "人员1的重点岗位频率需要复核：KE160/督导当前频率差距超过允许范围"
+    ]
+  },
+  "healthChecks": [
+    {
+      "name": "常规: consecutive must preserve ordinary-priority frequency",
+      "passed": false
+    },
+    {
+      "name": "分流: consecutive must preserve ordinary-priority frequency",
+      "passed": false
+    },
+    {
+      "name": "机动督导: consecutive must preserve ordinary-priority frequency",
+      "passed": false
+    },
+    {
+      "name": "ordinary-priority: monthly balance must preserve completed rotation",
+      "passed": false
+    },
+    {
+      "name": "high-fatigue-ordinary: monthly balance must preserve completed rotation",
+      "passed": false
+    },
+    {
+      "name": "low-fatigue-ordinary: monthly balance must preserve completed rotation",
+      "passed": false
+    },
+    {
+      "name": "late-priority: monthly balance must preserve completed rotation",
+      "passed": false
+    },
+    {
+      "name": "continuity must preserve ordinary-priority frequency",
+      "passed": false
+    }
+  ]
+}

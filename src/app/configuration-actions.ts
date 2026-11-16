@@ -35,6 +35,10 @@ import {
   withConfiguredFlightPositions,
 } from "../domain/flights/configured-flight-positions";
 import { applyStaffStatusChange } from "../domain/kernel/schedule-state";
+import {
+  isOrdinaryPriorityPosition,
+  ordinaryPositionReference,
+} from "../domain/reviews/position-rotation-policy";
 
 export type ConfigurationValue = string | number | boolean;
 
@@ -702,7 +706,7 @@ export function updateConfigurationField(
   id: string,
   field: string,
   value: ConfigurationValue
-): "updated" | "missing" | "duplicate" {
+): "updated" | "missing" | "duplicate" | "priority-position-name-locked" {
   if (entity === "settings") {
     const key = field as keyof AppState["settings"];
     (state.settings[key] as string | number) = value as string | number;
@@ -743,6 +747,16 @@ export function updateConfigurationField(
     if (field === "coverageRole") return "missing";
     const rule = state.positionRules.find((item) => item.id === id);
     if (!rule) return "missing";
+    if (
+      field === "name" &&
+      isOrdinaryPriorityPosition(
+        rule,
+        state.settings.ordinaryPriorityPositions
+      ) &&
+      ordinaryPositionReference(String(value)) !==
+        ordinaryPositionReference(rule.name)
+    )
+      return "priority-position-name-locked";
     const previousReference = { flightNo: rule.flightNo, name: rule.name };
     (rule as unknown as Record<string, unknown>)[field] =
       typeof value === "string" && field === "flightNo"

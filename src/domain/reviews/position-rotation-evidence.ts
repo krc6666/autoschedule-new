@@ -2,7 +2,10 @@ import type { Assignment } from "../../model";
 import type { ScheduleGenerationFacts } from "../shared/scheduling-facts";
 import { consecutivePositionAssignments } from "../statistics/schedule-frequency";
 import { assignmentRule } from "../flights/schedule-position-rules";
-import { isKe166MobileSupervisor } from "../flights/schedule-tasks";
+import {
+  isKe166MobileSupervisor,
+  isMobileSupervisor,
+} from "../flights/schedule-tasks";
 import { schedulingDecision } from "../rules/schedule-rule-contract";
 import { isOrdinaryPriorityPosition } from "./position-rotation-policy";
 import {
@@ -30,7 +33,13 @@ export function refreshPositionRotationEvidence(
     if (
       rule &&
       flight &&
-      isKe166MobileSupervisor(flight, rule) &&
+      !rule.manual &&
+      (isKe166MobileSupervisor(flight, rule) ||
+        (isMobileSupervisor(flight, rule) &&
+          isOrdinaryPriorityPosition(
+            rule,
+            state.settings.ordinaryPriorityPositions
+          ))) &&
       assignment.status === "assigned" &&
       assignment.staffId
     ) {
@@ -67,7 +76,11 @@ export function refreshPositionRotationEvidence(
     }
     if (
       !rule ||
-      rule.category !== "常规" ||
+      (rule.category !== "常规" &&
+        !isOrdinaryPriorityPosition(
+          rule,
+          state.settings.ordinaryPriorityPositions
+        )) ||
       rule.manual ||
       assignment.supervisorSourceAssignmentId !== undefined ||
       assignment.status !== "assigned" ||

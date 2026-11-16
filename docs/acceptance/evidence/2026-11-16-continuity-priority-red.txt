@@ -1,0 +1,78 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/domain/staff-work-continuity-priority.test.ts (8 tests | 5 failed) 402ms
+     × staff-work-continuity-review cannot move a priority slot to a higher-frequency worker 36ms
+     × staff-airline-mix-review cannot move a priority slot to a higher-frequency worker 3ms
+     × keeps an already rotated slot even when a worse-frequency exchange shortens attendance 75ms
+     × also protects recent frequency when month totals are equal 13ms
+     × retains the priority result through complete schedule finalization 252ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/domain/staff-work-continuity-priority.test.ts > priority rotation before work continuity > staff-work-continuity-review cannot move a priority slot to a higher-frequency worker
+ FAIL  tests/domain/staff-work-continuity-priority.test.ts > priority rotation before work continuity > staff-airline-mix-review cannot move a priority slot to a higher-frequency worker
+AssertionError: expected [] to include '调整会破坏重点岗位频率均衡'
+ ❯ tests/domain/staff-work-continuity-priority.test.ts:55:21
+     53|       intent: { kind },
+     54|     });
+     55|     expect(reasons).toContain("调整会破坏重点岗位频率均衡");
+       |                     ^
+     56|   });
+     57|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  tests/domain/staff-work-continuity-priority.test.ts > priority rotation before work continuity > keeps an already rotated slot even when a worse-frequency exchange shortens attendance
+AssertionError: expected 'peer-b' to be 'peer-a' // Object.is equality
+
+Expected: "peer-a"
+Received: "peer-b"
+
+ ❯ tests/domain/staff-work-continuity-priority.test.ts:68:63
+     66|     ).toMatchObject({ currentMonthCount: 3 });
+     67|     const result = await concentrate(state);
+     68|     expect(result.find((a) => a.id === priority.id)!.staffId).toBe("pe…
+       |                                                               ^
+     69|     expect(result.every((a) => a.status === "assigned")).toBe(true);
+     70|     expect(result).toHaveLength(state.assignments.length);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  tests/domain/staff-work-continuity-priority.test.ts > priority rotation before work continuity > also protects recent frequency when month totals are equal
+AssertionError: expected 'peer-b' to be 'peer-a' // Object.is equality
+
+Expected: "peer-a"
+Received: "peer-b"
+
+ ❯ tests/domain/staff-work-continuity-priority.test.ts:90:83
+     88|     expect(before.currentMonthCount).toBe(incoming.currentMonthCount);
+     89|     expect(before.recentWorkdayCount).toBeLessThan(incoming.recentWork…
+     90|     expect((await concentrate(state)).find((a) => a.id === priority.id…
+       |                                                                                   ^
+     91|   });
+     92|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL  tests/domain/staff-work-continuity-priority.test.ts > priority rotation before work continuity > retains the priority result through complete schedule finalization
+AssertionError: expected 'peer-b' to be 'peer-a' // Object.is equality
+
+Expected: "peer-a"
+Received: "peer-b"
+
+ ❯ tests/domain/staff-work-continuity-priority.test.ts:113:84
+    111|     expect(result.unfilledCount).toBe(0);
+    112|     expect(result.safetyCredential?.phase).toBe("final");
+    113|     expect(result.assignments.find((a) => a.positionRuleId === "rule-3…
+       |                                                                                    ^
+    114|   });
+    115| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  5 failed | 3 passed (8)
+   Start at  18:36:24
+   Duration  2.21s (transform 1.39s, setup 0ms, import 1.58s, tests 402ms, environment 0ms)

@@ -1,0 +1,94 @@
+{
+  "date": "2026-11-14",
+  "scope": "Anonymous configuration bytes -> save/restart -> real Worker module and HiGHS WASM in Node host -> Store -> written XLSX -> independent readback; no browser acceptance",
+  "monthlyBalance": "disabled to isolate the authorized continuity fix; known monthly-balance issue remains out of scope",
+  "selectedPriorityStaffId": "peer-a",
+  "counts": [
+    {
+      "staffId": "peer-a",
+      "monthlyPriorityCount": 0,
+      "exportedFlights": ["TW100", "KE160"]
+    },
+    {
+      "staffId": "peer-b",
+      "monthlyPriorityCount": 3,
+      "exportedFlights": ["CX100", "MF100"]
+    }
+  ],
+  "unfilledCount": 0,
+  "credentialPhase": "final",
+  "rows": [
+    {
+      "日期": "2026-11-14",
+      "航班号": "CX100",
+      "岗位": "G10",
+      "姓名": "peer-b",
+      "开始时间": "08:00",
+      "结束时间": "10:00",
+      "工作时长(小时)": 2,
+      "疲劳点数": 1,
+      "备注": "",
+      "状态": "已排",
+      "航班截载时间": "10:00",
+      "系统说明": "",
+      "人员编号": "peer-b",
+      "人工调整证据": "{\"assignmentRemarks\":{\"remark\":\"\",\"manualRemark\":\"\"}}",
+      "出勤时段": "",
+      "引导安排": ""
+    },
+    {
+      "日期": "2026-11-14",
+      "航班号": "MF100",
+      "岗位": "G11",
+      "姓名": "peer-b",
+      "开始时间": "12:30",
+      "结束时间": "14:30",
+      "工作时长(小时)": 2,
+      "疲劳点数": 1,
+      "备注": "",
+      "状态": "已排",
+      "航班截载时间": "14:30",
+      "系统说明": "",
+      "人员编号": "peer-b",
+      "人工调整证据": "{\"assignmentRemarks\":{\"remark\":\"\",\"manualRemark\":\"\"}}",
+      "出勤时段": "",
+      "引导安排": ""
+    },
+    {
+      "日期": "2026-11-14",
+      "航班号": "TW100",
+      "岗位": "G12",
+      "姓名": "peer-a",
+      "开始时间": "16:00",
+      "结束时间": "18:00",
+      "工作时长(小时)": 2,
+      "疲劳点数": 1,
+      "备注": "",
+      "状态": "已排",
+      "航班截载时间": "18:00",
+      "系统说明": "",
+      "人员编号": "peer-a",
+      "人工调整证据": "{\"assignmentRemarks\":{\"remark\":\"\",\"manualRemark\":\"\"}}",
+      "出勤时段": "",
+      "引导安排": ""
+    },
+    {
+      "日期": "2026-11-14",
+      "航班号": "KE160",
+      "岗位": "督导",
+      "姓名": "peer-a",
+      "开始时间": "20:00",
+      "结束时间": "23:00",
+      "工作时长(小时)": 3,
+      "疲劳点数": 1,
+      "备注": "",
+      "状态": "已排",
+      "航班截载时间": "23:00",
+      "系统说明": "",
+      "人员编号": "peer-a",
+      "人工调整证据": "{\"assignmentRemarks\":{\"remark\":\"\",\"manualRemark\":\"\"}}",
+      "出勤时段": "",
+      "引导安排": ""
+    }
+  ]
+}

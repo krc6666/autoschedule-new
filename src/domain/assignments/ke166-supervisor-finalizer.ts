@@ -17,6 +17,7 @@ import {
   type AssignmentTask,
 } from "../flights/schedule-tasks";
 import { consecutivePositionAssignments } from "../statistics/schedule-frequency";
+import { isOrdinaryPriorityPosition } from "../reviews/position-rotation-policy";
 import { createCandidateRulePlan } from "../rules/candidate-rule-plan";
 import { evaluateAutomaticHardConstraints } from "../rules/built-in-rule-registry";
 import type { SolverPort } from "../solver/solver-port";
@@ -357,7 +358,11 @@ export async function finalizeMobileSupervisors({
       return proposedSupervisor;
     };
     const repeatedIndependentSupervisorCanBeReleased = Boolean(
-      ke166 &&
+      (ke166 ||
+        isOrdinaryPriorityPosition(
+          task.rule,
+          state.settings.ordinaryPriorityPositions
+        )) &&
       selected &&
       consecutivePositionAssignments(
         state,

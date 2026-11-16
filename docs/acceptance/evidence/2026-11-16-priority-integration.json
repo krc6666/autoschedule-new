@@ -1,0 +1,54 @@
+{
+  "trackedOwnerFilesPreserved": 24,
+  "productPatchApplied": [
+    "src/app/configuration-actions.ts",
+    "src/app/controllers/configuration-controller.ts",
+    "src/domain/assignments/ke166-assignment.ts",
+    "src/domain/assignments/ke166-supervisor-finalizer.ts",
+    "src/domain/reviews/ke166-rotation-review.ts",
+    "src/domain/reviews/position-frequency-review.ts",
+    "src/domain/reviews/position-rotation-evidence.ts",
+    "src/domain/reviews/position-rotation-policy.ts",
+    "src/domain/reviews/position-rotation-review.ts",
+    "src/domain/reviews/rotation-review-safety.ts",
+    "tests/app/configuration-actions.test.ts"
+  ],
+  "sharedDocumentsPatched": [
+    "README.md",
+    "history.md",
+    "rule-propagation-matrix.md",
+    "spec.md"
+  ],
+  "untrackedTaskFilesCopied": [
+    "src/domain/reviews/mobile-supervisor-rotation-review.ts",
+    "tests/domain/configured-priority-rotation.test.ts",
+    "tests/app/priority-position-name-lock.test.ts",
+    "docs/acceptance/2026-11-16-priority-rotation-scope.json"
+  ],
+  "ownerHashes": {
+    "PROJECT_MAP.md": "49f304c96afd07eb7d784593ae87fcaa18832a015406f475656df6bdc77b0cfd",
+    "src/app.ts": "d2b3c784274bb0cedf0feb86e0d0ba0858b85c8b4767cf7a0e41f7f7f0b44c16",
+    "src/app/application-context.ts": "b0bbd9c4f3bad4ac0c9174631fe0365c33927d2cf32a058123bd7a5a36c5d05e",
+    "src/app/application-coordinator.ts": "783fba4ff410374ffdec7c599147e919104e481ec9e6a448143d31601c98464f",
+    "src/app/application-view-state.ts": "0f14f20d01563234f0f64ea7edef88f598647bdb08dab9e04fbde8c0b8544b96",
+    "src/app/cloud-application.ts": "5a1871ebbb28d1c9f2f96905ba7570f434463fb55500e206a123f2a6d7a91007",
+    "src/app/controllers/policy-controller.ts": "294d0a1fbd152c1017f68119eeed9a8be3532d7f87288b8bfabed43b80915c64",
+    "src/app/store/autoschedule-store.ts": "c524fde3464b0eabd5b4485de6ed3c16b2e551faca5a02f3be05267722989fb6",
+    "src/domain/coverage/supervisor-fill-facts.ts": "e359339cda4ad6001cd61966b14611fd46b33e3d11814c48720f16b29fa9859e",
+    "src/styles.css": "7e297050a7f3abe0bcab076a49ca2333ec09ad8c2927539964f6e738b630e796",
+    "src/ui/components/autoschedule-app.ts": "bb316d868af63df1a150cb2f2c49b5187ec777fcd4b8916fc41fc5a136c310a3",
+    "src/ui/components/policy-page.ts": "ad39ff0665f9470eb249154931f18650c4f1b90519b0a016b13be463016bbf78",
+    "src/ui/components/policy-rule-ledger.ts": "8f03f6afde359b9bf6ee637ad0da510ba96c0d3a6db64d6fe10a83aab034c4fd",
+    "src/ui/components/policy-settings-form.ts": "cfcbe201ead4159a9d9951e4e358f99f05ed7f253b107ed3ee8d772ca3c4fcdf",
+    "src/ui/components/policy-structured-rules.ts": "b2d403d670540142dc91afd43a52999d223f1bd5bbce1d177c6e7ffff60a53fc",
+    "src/ui/components/supervisor-fill-settings.ts": "447fdb0aec63540cc9ff0622367214997a6bfd63bdc80251f9b58f49d75d042f",
+    "src/ui/components/team-leader-gap-fill-protection-settings.ts": "fc58d33d6a4467e7e2289d25d4c8bb2fd5f6651839d3dc7b8dff0cdb709e84fd",
+    "src/ui/events/ui-command.ts": "1f9f5ec1d695a9c2be56e7a436a841525299d6f9d516b4142ab8b832d5815b4c",
+    "tests/app/configuration-controller.test.ts": "81be7e79c6bbcb69b57831b9fdc9d8f87cd5e4cbcf42e55ab370b28f53167cf3",
+    "tests/app/unified-supervisor-fill.test.ts": "505de1fa5be86babb0d60e66689e5b9ad51daa8598f6258363a3aae4c18a5c8d",
+    "tests/infrastructure/policy-diagnostics-roundtrip.test.ts": "afe884ad28bf407c61788386163d460d1aed5d29e6794707d0557768ed754bd6",
+    "tests/ui/airline-mix-settings.test.ts": "ef5ea0c22b60e9d9051e66a1c90c2cd1137a61673d0e204963014846c91ef976",
+    "tests/ui/cloud-application.test.ts": "845bc4c71508d67e4eaf01d4f0a40037046a41bda4a9fdc360e04128fbe4b4ee",
+    "tests/ui/schedule-policy-view.test.ts": "9b5e08e59268ad570910895968b1a391ba57c379fb76fd61edffdc7f5b30ef4a"
+  }
+}

@@ -1,0 +1,56 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/.codex-worktrees/priority-rotation-20261116
+
+ ❯ tests/app/priority-position-name-lock.test.ts (6 tests | 4 failed) 30ms
+     × 常规 重点改名拒绝，配置和现有班表不变 11ms
+     × 分流 重点改名拒绝，配置和现有班表不变 2ms
+     × 机动督导 重点改名拒绝，配置和现有班表不变 2ms
+     × 公开页面命令提示拒绝原因并保留原岗位 10ms
+npm.cmd :
+所在位置 行:2 字符: 30
++ ... ORKERS='2'; npm.cmd exec vitest -- run tests/app/priority-position-na ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/app/priority-position-name-lock.test.ts > 普通重点固定岗位名 > 常规 重点改名拒绝，配置和现有班表不变
+ FAIL  tests/app/priority-position-name-lock.test.ts > 普通重点固定岗位名 > 分流 重点改名拒绝，配置和现有班表不变
+ FAIL  tests/app/priority-position-name-lock.test.ts > 普通重点固定岗位名 > 机动督导 重点改名拒绝，配置和现有班表不变
+AssertionError: expected 'updated' to be 'priority-position-name-locked' // Object.is equality
+
+Expected: "priority-position-name-locked"
+Received: "updated"
+
+ ❯ tests/app/priority-position-name-lock.test.ts:22:82
+     20|     rule.category = category;
+     21|     const before = structuredClone(state);
+     22|     expect(updateConfigurationField(state, "position", rule.id, "name"…
+       |                                                                                  ^
+     23|     expect(state).toEqual(before);
+     24|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  tests/app/priority-position-name-lock.test.ts > 普通重点固定岗位名 > 公开页面命令提示拒绝原因并保留原岗位
+AssertionError: expected '现场督导' to be '督导' // Object.is equality
+
+Expected: "督导"
+Received: "现场督导"
+
+ ❯ tests/app/priority-position-name-lock.test.ts:39:81
+     37|     });
+     38|     await coordinator.handle({ type: "update-configuration", entity: "…
+     39|     expect(coordinator.model().positionRules.find(r => r.id === rule.i…
+       |                                                                                 ^
+     40|     expect(coordinator.view().toast?.message).toContain("重点岗位名称固定");
+     41|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed | 2 passed (6)
+   Start at  17:52:16
+   Duration  2.11s (transform 1.59s, setup 0ms, import 1.86s, tests 30ms, environment 0ms)

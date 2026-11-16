@@ -1,0 +1,54 @@
+
+> autoschedule@1.0.0 verify
+> npm run typecheck && npm test && npm run test:performance && npm run build
+
+
+> autoschedule@1.0.0 typecheck
+> tsc -b --pretty false
+
+
+> autoschedule@1.0.0 test
+> vitest run --exclude tests/performance/**
+
+
+ RUN  v4.1.10 D:/autoschedule-migrate/.codex-worktrees/priority-rotation-20261116
+
+ ❯ tests/domain/monthly-late-priority-statistics.test.ts (23 tests | 2 failed) 86ms
+     × counts all existing kinds independently of category 机动督导 9ms
+     × counts all existing kinds independently of category 分流 3ms
+npm.cmd :
+所在位置 行:2 字符: 30
++ ... ORKERS='2'; npm.cmd run verify *> docs/acceptance/evidence/2026-11-16 ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/domain/monthly-late-priority-statistics.test.ts > monthly late priority statistics > counts all existing k
+inds independently of category 机动督导
+ FAIL  tests/domain/monthly-late-priority-statistics.test.ts > monthly late priority statistics > counts all existing k
+inds independently of category 分流
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ tests/domain/monthly-late-priority-statistics.test.ts:176:9
+    174|           { airlineCode: "TR", position: "督导" },
+    175|         ])
+    176|       ).toBe(category === "常规");
+       |         ^
+    177|     }
+    178|   );
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+
+ Test Files  1 failed | 208 passed (209)
+      Tests  2 failed | 2069 passed (2071)
+   Start at  17:57:07
+   Duration  167.97s (transform 10.05s, setup 0ms, import 51.55s, tests 220.88s, environment 16.57s)

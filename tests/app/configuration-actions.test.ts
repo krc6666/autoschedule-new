@@ -28,6 +28,7 @@ function normalizeFlightNo(value: string): string {
 describe("configuration actions", () => {
   it("keeps team-leader gap-fill position references synchronized on rename and delete", () => {
     const state = createDefaultState();
+    state.settings.ordinaryPriorityPositions = [];
     const rule = state.positionRules[0]!;
     state.settings.teamLeaderGapFillPositionPolicies = [
       { flightNo: rule.flightNo, position: rule.name, movable: true },

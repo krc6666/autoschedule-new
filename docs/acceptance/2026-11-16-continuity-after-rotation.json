@@ -1,0 +1,152 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-16-continuity-after-rotation",
+  "title": "早晚任务集中必须保留已成立的重点轮换",
+  "startedFrom": "2aebdad87ba382b30f37eed5bc25786d05ccb6d4",
+  "expectation": {
+    "example": "Owner确认仅修早晚任务集中的优先级：KE/督导已安排给本月0次的人员，即使换给3次者能缩短全天跨度，也保留轮换结果；普通重点只看航司+岗位，不分航班号。",
+    "expected": "早晚任务集中同时保护重点岗位次数公平与连续轮换；已有合法公平安排不得为集中任务而退步。下游航司搭配复用同一保持型continuity策略，不能绕过保护。",
+    "unchanged": "连续轮岗执行方式本次不改；不修月度轻松班次均衡，不扩大普通重点名单，不改人工、值班、锁定、资格、覆盖、末班原合同、配置字段或另一窗口改动。",
+    "fallback": "无不破坏轮换的完整安全集中方案、超时或最终守卫拒绝时保留原表，可保留早晚分散；不清岗、不拒整表、不放宽硬约束。真实页面由Owner操作，机器测试不替代现场验收。"
+  },
+  "testedVersion": "7c4aa980b6ab6fa8bc4d2928b168ff6825da40064207bc694fb9b2059e329bf9",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "先保存失败回归，再修保持型共享保护；新增9项修后通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-continuity-priority-red.txt",
+          "summary": "修改前8项中5项失败3项通过，真实集中与完整生成均把重点从0次者换给3次者。",
+          "sha256": "9f76c9674f59f48b1080a97798d98fbc98bdddf2a67f0e81ae705676324d1006"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-continuity-priority-targeted.txt",
+          "summary": "6文件103项通过：9项新回归及集中、航司搭配、安全、连续轮岗、跨分类重点周边保护。",
+          "sha256": "d5a4d6ceb37713cc48fa705d5efaba1ca43493c869d0b95b8e110aae42b91376"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "重点轮换优先于集中；次数同等仍允许集中，完整生成保留重点承担者。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-continuity-priority-targeted.txt",
+          "summary": "6文件103项通过：9项新回归及集中、航司搭配、安全、连续轮岗、跨分类重点周边保护。",
+          "sha256": "d5a4d6ceb37713cc48fa705d5efaba1ca43493c869d0b95b8e110aae42b91376"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-continuity-priority-final.json",
+          "summary": "真实Worker模块/HiGHS WASM→Store→XLSX独立读回：重点给0次者、另一人3次、每人2航班、无空岗、最终凭证有效。",
+          "sha256": "33b3d069e8cfa71bf7f7a2a91b838ece551fc939a8a3de2d60db2d7034439884"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "同月同次数但近期次数不同、同航司不同班号、名单外航司/岗位、无兼顾方案保留原表；原大场景与超时回退回归保持。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-continuity-priority-targeted.txt",
+          "summary": "6文件103项通过：9项新回归及集中、航司搭配、安全、连续轮岗、跨分类重点周边保护。",
+          "sha256": "d5a4d6ceb37713cc48fa705d5efaba1ca43493c869d0b95b8e110aae42b91376"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-continuity-priority-boundary.txt",
+          "summary": "3文件38项通过：新增领域、唯一intent映射、Worker/Store/XLSX与保存恢复。",
+          "sha256": "5afcbe5849b4270fc223d86f3f76967d8f38f371f85bdbb8f53183944a619ea3"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "早晚集中真实后置函数不能改坏合法轮换；下游航司搭配走同一continuity保护；完整生成及Worker最终结果核对，月度均衡问题仍另记未修。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-continuity-priority-targeted.txt",
+          "summary": "6文件103项通过：9项新回归及集中、航司搭配、安全、连续轮岗、跨分类重点周边保护。",
+          "sha256": "d5a4d6ceb37713cc48fa705d5efaba1ca43493c869d0b95b8e110aae42b91376"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-continuity-priority-boundary.txt",
+          "summary": "3文件38项通过：新增领域、唯一intent映射、Worker/Store/XLSX与保存恢复。",
+          "sha256": "5afcbe5849b4270fc223d86f3f76967d8f38f371f85bdbb8f53183944a619ea3"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-continuity-priority-final.json",
+          "summary": "真实Worker模块/HiGHS WASM→Store→XLSX独立读回：重点给0次者、另一人3次、每人2航班、无空岗、最终凭证有效。",
+          "sha256": "33b3d069e8cfa71bf7f7a2a91b838ece551fc939a8a3de2d60db2d7034439884"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "换人接受前拒绝次数退步，保持原连续及硬安全；真实final session和最终凭证通过，无新增拒整表硬约束。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-continuity-priority-targeted.txt",
+          "summary": "6文件103项通过：9项新回归及集中、航司搭配、安全、连续轮岗、跨分类重点周边保护。",
+          "sha256": "d5a4d6ceb37713cc48fa705d5efaba1ca43493c869d0b95b8e110aae42b91376"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-continuity-priority-final.json",
+          "summary": "真实Worker模块/HiGHS WASM→Store→XLSX独立读回：重点给0次者、另一人3次、每人2航班、无空岗、最终凭证有效。",
+          "sha256": "33b3d069e8cfa71bf7f7a2a91b838ece551fc939a8a3de2d60db2d7034439884"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "连续轮岗方式、名单、人工、值班、锁定、资格、覆盖、配置持久化保持；其他窗口文件字节保持，完整verify通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-continuity-priority-scope.json",
+          "summary": "只修改一个产品安全模块、spec及测试；其他518个基线源文件/测试/README字节保持，diff检查退出0。",
+          "sha256": "77f32d8b2188fd98a7619d35f81c678e88b731bb2bc03a08733c7edab5f02d1d"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-continuity-priority-verify.txt",
+          "summary": "首轮完整验证2095项通过、2项仅超时，未放宽断言或阈值；随后限制并发2重跑。",
+          "sha256": "42599fb5d29ef6e8115fcbd4ee77d4735c1ff0df4e859a297cef0c1fd0c125c1"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-continuity-priority-verify-workers2.txt",
+          "summary": "并发2、原阈值不变，完整npm.cmd run verify通过；实际文件数、测试数和耗时以日志为准。",
+          "sha256": "7e9ab945236f851a84084deb3dda112d78edd9b77f00ab9d2ba9be1153b2a1a3"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "本次匿名实际XLSX及独立计数已通过，Owner浏览器/11月18日私有班表尚未现场验收；按AGENTS保持未验收，不用自动测试冒充。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-continuity-priority-final.json",
+          "summary": "真实Worker模块/HiGHS WASM→Store→XLSX独立读回：重点给0次者、另一人3次、每人2航班、无空岗、最终凭证有效。",
+          "sha256": "33b3d069e8cfa71bf7f7a2a91b838ece551fc939a8a3de2d60db2d7034439884"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-continuity-priority-final.xlsx",
+          "summary": "本次实际写出的匿名最终班表；月度均衡关闭以隔离本次早晚集中修复，非Owner现场班表。",
+          "sha256": "a1e8c86c4414f953c66429c885f9055bf25049c8180b38b1430a6ffe5ec90a8e"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-continuity-priority-artifact-fixed.txt",
+          "summary": "临时SSR探针修正CommonJS加载适配后退出0，实际保存重启与写出文件核对通过。",
+          "sha256": "81ca53c3dfd8155963d217f9989f0d0cf2c00981ae5f3abfe499ddad6a33ee08"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "新增反向回归先观察到0→3次换人（8项5失败3通过），修后9项及相邻回归通过，红绿证据已附。",
+    "laterChanges": "下游航司搭配继续消费同一保持型策略，intent及完整kernel/Worker验证；月度均衡位于集中之前且本次未修，其既有问题仍单独记录。",
+    "finalArtifact": "2026-11-16-continuity-priority-final.xlsx由本次真实Worker模块/WASM经Store写出，重新读取独立核对重点0次者承担、另一人3次、每人2班及无空岗；现场未验收。"
+  },
+  "review": {
+    "missedScope": "已查早晚集中、下游航司搭配与最终凭证；连续轮岗、月度均衡按Owner本次边界不改，后者已知可能撤销轮换。未打开浏览器、未声称用户现场已通过。",
+    "rootCause": "保持型continuity同时配置连续与次数保护，但共享候选安全用else if使连续检查吞掉次数检查；本次将保持型频率保护独立执行，改善型连续路径不变。",
+    "earlyDetection": "以后在增加后置舒适性换人时，先放入已合法公平的班表，反向尝试0→3次和同月近期退步，沿最后一个换人入口核对最终assignments与独立导出计数；全量测试不能替代此组合用例。"
+  }
+}

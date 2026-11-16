@@ -1,0 +1,44 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/.codex-worktrees/priority-rotation-20261116
+
+ ❯ tests/domain/configured-priority-rotation.test.ts (21 tests | 2 failed | 19 skipped) 79ms
+     × consecutive 周边重点换人不能间接移动被锁定的督导组 72ms
+     × frequency 周边重点换人不能间接移动被锁定的督导组 6ms
+npm.cmd :
+所在位置 行:2 字符: 30
++ ... ORKERS='2'; npm.cmd exec vitest -- run tests/domain/configured-priori ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/domain/configured-priority-rotation.test.ts > 已配置普通重点的跨分类自动轮换 > consecutive 周边重点换人不能间接移动被锁定的督导组
+ FAIL  tests/domain/configured-priority-rotation.test.ts > 已配置普通重点的跨分类自动轮换 > frequency 周边重点换人不能间接移动被锁定的督导组
+AssertionError: expected [ 'person-1', 'person-0', 'person-1' ] to deeply equal [ 'person-0', 'person-1', 'person-0' ]
+
+- Expected
++ Received
+
+  [
+-   "person-0",
+    "person-1",
+    "person-0",
++   "person-1",
+  ]
+
+ ❯ tests/domain/configured-priority-rotation.test.ts:120:45
+    118|     if (review === "consecutive") await reviewConsecutivePositionRotat…
+    119|     else await reviewSamePositionFrequency(defaultHighsSolver, state, …
+    120|     expect(assignments.map(a => a.staffId)).toEqual(before);
+       |                                             ^
+    121|   });
+    122|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 19 skipped (21)
+   Start at  17:53:43
+   Duration  2.44s (transform 1.77s, setup 0ms, import 2.16s, tests 79ms, environment 0ms)

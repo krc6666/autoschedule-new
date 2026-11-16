@@ -1,0 +1,207 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-16-priority-rotation-scope",
+  "title": "普通重点自动岗位跨分类轮换及航班模板联动核对",
+  "startedFrom": "2aebdad87ba382b30f37eed5bc25786d05ccb6d4",
+  "expectation": {
+    "example": "Owner确认：KE160/督导为机动督导，上一工作班已承担且有完整安全替代时，应与常规、分流中已加入普通重点名单的岗位同样按航司+规范岗位轮换；KE160换成同航司其他班号仍读取同一普通重点事实。",
+    "expected": "仅按普通重点名单的航司＋规范岗位名启用：自动常规/分流/机动督导统一频率和连续轮换；未配置的其他航司/岗位不因同属机动督导而纳入。兼任关系整组调整；模板时段/同航司换号联动；重点岗位改名拒绝并提示，导入失配诊断；不设计改名继承或别名。",
+    "unchanged": "只处理普通重点名单内新范围；名单外既有规则不扩大，引导复用、人工指定、值班锁定及行政支援保持；A/B隔离，历史真实事实不重写，不自动将一个航司的配置移给另一航司；另一窗口规则保存/UI改动不覆盖。",
+    "fallback": "没有完整安全替代、锁定、无资质或搜索超时保留原合法安排并记录实际原因；不拆兼任组、不留新空岗、不放宽硬约束。真实页面由Owner操作，自动测试不替代现场验收。"
+  },
+  "testedVersion": "7c4aa980b6ab6fa8bc4d2928b168ff6825da40064207bc694fb9b2059e329bf9",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "原始文件只读诊断和匿名失败回归证明：跨分类只统计不轮换，源文件未保存集合不作为根因；同航司换号按同一重点键。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-priority-rotation-red.txt",
+          "summary": "旧实现在匿名分类/整组复现15项中10失败5通过，证明跨分类自动路径缺失。",
+          "sha256": "770d895f72c293ff3242aab7a00d9f45457416ed4a3a65bfbc574d5ac969e595"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-priority-targeted.txt",
+          "summary": "隔离目录8文件125项通过，覆盖原周边规则及新分类、整组、后置、模板、Worker及存储边界。",
+          "sha256": "c03cfabc30f35c74df64745c7eb89a5259a92c4ef38639e12ad8ce6aa3ab0023"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-priority-template-cache-red.txt",
+          "summary": "预热集合匹配后模板跨航司变更，旧缓存继续true导致失败；缓存核对航班号/名称后通过。",
+          "sha256": "94ac0bee861eda5f797af0831d7ffe34f4763588c2465f8c72600c235ce67e1a"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "自动常规、分流、机动督导按配置的航司/岗位轮换，其他航司/岗位不命中；频率、连续及人工后反馈验证。最终名称禁改UI单独完成L1类型、22项相关回归及生产构建。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-priority-targeted.txt",
+          "summary": "隔离目录8文件125项通过，覆盖原周边规则及新分类、整组、后置、模板、Worker及存储边界。",
+          "sha256": "c03cfabc30f35c74df64745c7eb89a5259a92c4ef38639e12ad8ce6aa3ab0023"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-priority-integrated-targeted.txt",
+          "summary": "主目录合并后9文件115项通过，含另一窗口统一保存、机动补位和诊断往返。",
+          "sha256": "97f9b97fb5db604fd7b977da1eade138860151b39434fbe7dd7737fb7275b26f"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-priority-verify-integrated.txt",
+          "summary": "主目录完整npm.cmd run verify退出0：211文件2084功能、7文件19性能、类型和构建通过。此后仅补名称禁改UI，最终UI单独按L1复验。",
+          "sha256": "e6ef05cb2e3dc3d9da6aebddd4a71ff172ac98247e4b932ee15bf9013a4881a1"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-priority-name-ui-green.txt",
+          "summary": "最终页面补齐后4文件22项通过；仅命中名单的航司/岗位禁改并提示，其他航司或岗位保持可编辑。",
+          "sha256": "fe57d6b865875e5a6c66ffa910166f32f620f020ec7b71b0405789e87c481cfc"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-priority-final-ui-type-build.txt",
+          "summary": "最后UI修改后重新执行typecheck与build均退出0；不把此前全量测试冒充最后新增UI测试。",
+          "sha256": "7781987bbd28009034b4c8b22e21ee9b7398299473e5ea654a1f4ad602b9ecb4"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "非KE航司、整组零工时补位、无完整资质保留并解释、模板换号/时间、跨航司缓存、重点名锁、Excel字节及存储A/B隔离。页面禁改和提示只消费同源匹配。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-priority-name-red.txt",
+          "summary": "重点改名保护6项先4失败2通过；修后公开命令拒绝并提醒、整份状态不变。",
+          "sha256": "5282a59ae248b6965f30462f31f93a5303cb5cb88f6f9e075439d7ca8f0dac5a"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-priority-template-cache-red.txt",
+          "summary": "预热集合匹配后模板跨航司变更，旧缓存继续true导致失败；缓存核对航班号/名称后通过。",
+          "sha256": "94ac0bee861eda5f797af0831d7ffe34f4763588c2465f8c72600c235ce67e1a"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-priority-targeted.txt",
+          "summary": "隔离目录8文件125项通过，覆盖原周边规则及新分类、整组、后置、模板、Worker及存储边界。",
+          "sha256": "c03cfabc30f35c74df64745c7eb89a5259a92c4ef38639e12ad8ce6aa3ab0023"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-priority-integrated-targeted.txt",
+          "summary": "主目录合并后9文件115项通过，含另一窗口统一保存、机动补位和诊断往返。",
+          "sha256": "97f9b97fb5db604fd7b977da1eade138860151b39434fbe7dd7737fb7275b26f"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-priority-name-ui-red.txt",
+          "summary": "普通重点三分类页面名称仍可编辑，3项UI先失败。",
+          "sha256": "a437438cef82cb1461a6727aa29b463ef3ef367ae132daaed9364dd77ab7da87"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-priority-name-ui-green.txt",
+          "summary": "最终页面补齐后4文件22项通过；仅命中名单的航司/岗位禁改并提示，其他航司或岗位保持可编辑。",
+          "sha256": "fe57d6b865875e5a6c66ffa910166f32f620f020ec7b71b0405789e87c481cfc"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "先生成合法轮换后再经共享重排安全尝试恢复连续人员被拒绝；周边连续/频率不能间接移动锁定督导组；真实Worker完整后置链最终仍未连续。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-priority-group-lock-red.txt",
+          "summary": "连续/频率从周边重点间接移动锁定组，新增2项先失败；修后被共享角色过滤拒绝。",
+          "sha256": "29e6f372751c8ebca5f64b0b02eaaa036230ebf364056c7d9d9a7c5abd75b558"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-priority-targeted.txt",
+          "summary": "隔离目录8文件125项通过，覆盖原周边规则及新分类、整组、后置、模板、Worker及存储边界。",
+          "sha256": "c03cfabc30f35c74df64745c7eb89a5259a92c4ef38639e12ad8ce6aa3ab0023"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-priority-final.xlsx",
+          "summary": "匿名实际Worker/WASM→最终安全凭证→Store安装→排班XLSX，督导改给上一工作班未承担者，无空岗。",
+          "sha256": "3fe94e1350b768c754b297431bb56fdf93c112c1bc7cdbba9ac3f0e64abe912e"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "保留原硬约束和最终安全凭证；兼任组同人/完整资质/零工时、0空岗、Store安装与最终导出经自动化核对。轮换为既有软规则，不新增最终硬约束或放宽安全。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-priority-targeted.txt",
+          "summary": "隔离目录8文件125项通过，覆盖原周边规则及新分类、整组、后置、模板、Worker及存储边界。",
+          "sha256": "c03cfabc30f35c74df64745c7eb89a5259a92c4ef38639e12ad8ce6aa3ab0023"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-priority-final.xlsx",
+          "summary": "匿名实际Worker/WASM→最终安全凭证→Store安装→排班XLSX，督导改给上一工作班未承担者，无空岗。",
+          "sha256": "3fe94e1350b768c754b297431bb56fdf93c112c1bc7cdbba9ac3f0e64abe912e"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-priority-artifact-check.json",
+          "summary": "独立读取实际XLSX单元格，按已知匿名前班事实重算两人各1次，2岗无空缺；不调用domain统计函数。",
+          "sha256": "43690c1c54a97f3d7dc59b65b1de976dde72083a4a6972d40654a83192e8b00a"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-priority-verify-integrated.txt",
+          "summary": "主目录完整npm.cmd run verify退出0：211文件2084功能、7文件19性能、类型和构建通过。此后仅补名称禁改UI，最终UI单独按L1复验。",
+          "sha256": "e6ef05cb2e3dc3d9da6aebddd4a71ff172ac98247e4b932ee15bf9013a4881a1"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "名单外、引导复用、人工/值班锁定、行政及原KE166专项保留；末班自动范围仍限常规；修改旧普通重点断言以对应Owner新合同，末班统计23项通过。另一窗口文件保留并联合验证。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-priority-integration.json",
+          "summary": "只应用本案patch；24个原有脏文件在带回瞬间逐个hash保持，公共文档精准追加合并。",
+          "sha256": "d473cdf7b9e5e372df5f681a84c15b34182ea8cb85d29a60bea6c0de563e5766"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-priority-integrated-targeted.txt",
+          "summary": "主目录合并后9文件115项通过，含另一窗口统一保存、机动补位和诊断往返。",
+          "sha256": "97f9b97fb5db604fd7b977da1eade138860151b39434fbe7dd7737fb7275b26f"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-priority-verify-integrated.txt",
+          "summary": "主目录完整npm.cmd run verify退出0：211文件2084功能、7文件19性能、类型和构建通过。此后仅补名称禁改UI，最终UI单独按L1复验。",
+          "sha256": "e6ef05cb2e3dc3d9da6aebddd4a71ff172ac98247e4b932ee15bf9013a4881a1"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-priority-category-contract.txt",
+          "summary": "末班统计23项通过；只更新显式普通重点机动/分流范围断言，末班自动范围与各分类实际统计不变。",
+          "sha256": "1828ff0e10cc9aff9f83b35b215e76dbe7d874502d58479a465955939e8cac40"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-continuity-priority-verify-workers2.txt",
+          "summary": "最后一次产品修改后的联合完整verify退出0：213文件2097功能、7文件19性能、类型及生产构建通过；提交格式检查只调整换行与文档格式。",
+          "sha256": "7e9ab945236f851a84084deb3dda112d78edd9b77f00ab9d2ba9be1153b2a1a3"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "匿名真实Worker最终XLSX及独立核对已通过；Owner真实页面刷新后用11/18现场配置重新生成及最新导出仍未取得，按AGENTS保持待验收。未主动操作排班浏览器、未修改原私有Excel。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-priority-final.xlsx",
+          "summary": "匿名实际Worker/WASM→最终安全凭证→Store安装→排班XLSX，督导改给上一工作班未承担者，无空岗。",
+          "sha256": "3fe94e1350b768c754b297431bb56fdf93c112c1bc7cdbba9ac3f0e64abe912e"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-priority-artifact-check.json",
+          "summary": "独立读取实际XLSX单元格，按已知匿名前班事实重算两人各1次，2岗无空缺；不调用domain统计函数。",
+          "sha256": "43690c1c54a97f3d7dc59b65b1de976dde72083a4a6972d40654a83192e8b00a"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "原文件只读诊断在内存补KE/督导后仍被常规分类及KE166专项门槛排除；匿名红灯10项、缓存红灯、改名红灯及锁定组红灯分别保留，定向修后通过。",
+    "laterChanges": "补位绑定、机动督导finalizer、连续/频率review、恢复和其他安全重排均在矩阵核对；反向尝试换回连续人及从周边岗位移动锁定组拒绝，Worker最终凭证/Store/XLSX保持合法。",
+    "finalArtifact": "docs/acceptance/evidence/2026-11-16-priority-final.xlsx及独立artifact-check.json证明匿名场景最终效果；它们不代表Owner真实配置的新导出，现场尚待验收。"
+  },
+  "review": {
+    "missedScope": "重点按航司+规范岗位，不按机动分类一刀切；已核对普通/分流/机动、模板原地变更缓存、人工后反馈、两组及Excel。真实现场、多机动组同时参与的全局最优不作已验证声明；搜索沿用最多五人和单机动组边界。 后续跨阶段审查已发现连续与月度均衡的独立问题；Owner本次只修早晚任务集中，其他问题不作已解决声明。",
+    "rootCause": "之前分类修复只扩统计，自动重点owner仍拒绝非常规，通用锁又排除机动，整组求解仅认KE166；诊断只核对名称存在没有揭示自动跳过。模板WeakMap只认对象身份也造成引用更新失效。",
+    "earlyDetection": "改前按history的集合驱动和统计分类事故定位，沿模板→配置→候选→整组求解→后置→最终→反馈/存储逐项填传播矩阵；分类参数化和预热后变更公开入口测试可在提交前暴露同类漏接，锁定组必须含间接移动反向测试。"
+  }
+}
