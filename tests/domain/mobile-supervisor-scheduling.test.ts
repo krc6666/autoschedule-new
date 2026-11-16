@@ -866,8 +866,8 @@ describe("all-flight mobile-supervisor scheduling", { timeout: 15_000 }, () => {
     expect(h05.supervisorFillRuleId).toBeUndefined();
   });
 
-  it("generateSchedule prioritizes configured H05 fill before repeated KE166 counter reuse", async () => {
-    // 连续督导释放分支也必须先走配置补位；否则旧兼任逻辑会把 S 放到 H03，H05 仍由 A 承担。
+  it("generateSchedule restores independent staffing after repeated KE166 fallback when counters can stay covered", async () => {
+    // 连续释放曾进入配置补位；收尾有完整独立方案时应拆开兼任，保留督导本人。
     const state = singleFlightState();
     const supervisor = state.staff[0]!;
     const h05Only = state.staff[1]!;
@@ -985,10 +985,11 @@ describe("all-flight mobile-supervisor scheduling", { timeout: 15_000 }, () => {
     }));
     expect(source.staffId, JSON.stringify(snapshot)).toBe(supervisor.id);
     expect(h05, JSON.stringify(snapshot)).toMatchObject({
-      staffId: supervisor.id,
-      supervisorSourceAssignmentId: source.id,
-      supervisorFillRuleId: "ke166-h05-fill",
+      staffId: h05Only.id,
+      workHours: 2,
     });
+    expect(h05.supervisorSourceAssignmentId).toBeUndefined();
+    expect(h05.supervisorFillRuleId).toBeUndefined();
     expect(h03.staffId, JSON.stringify(snapshot)).toBe(h03Capable.id);
     expect(h03.staffId, JSON.stringify(snapshot)).not.toBe(h05Only.id);
   });
@@ -1948,10 +1949,11 @@ describe("all-flight mobile-supervisor scheduling", { timeout: 15_000 }, () => {
 
     expect(source.staffId, JSON.stringify(snapshot)).toBe(supervisor.id);
     expect(h05, JSON.stringify(snapshot)).toMatchObject({
-      staffId: supervisor.id,
-      supervisorSourceAssignmentId: source.id,
-      supervisorFillRuleId: "ke166-h05-fill",
+      staffId: h05Holder.id,
+      workHours: 2,
     });
+    expect(h05.supervisorSourceAssignmentId).toBeUndefined();
+    expect(h05.supervisorFillRuleId).toBeUndefined();
     expect(h03.staffId, JSON.stringify(snapshot)).toBe(allowedRefill.id);
     expect(h03.staffId, JSON.stringify(snapshot)).not.toBe(halfRestBlocked.id);
   });

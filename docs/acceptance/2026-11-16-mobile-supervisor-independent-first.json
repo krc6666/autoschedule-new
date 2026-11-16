@@ -1,0 +1,162 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-16-mobile-supervisor-independent-first",
+  "title": "所有机动督导人手足够时独立安排，收尾复查兼任",
+  "startedFrom": "2ee5021df0374835bcedcdc227866943a153b4df",
+  "expectation": {
+    "example": "真实配置9，2026-11-18：柜台有安全接替者，却安排督导兼柜台；匿名对应AB100/H05。",
+    "expected": "H05与其他普通柜台一起正常排班，不预先锁给督导或人为留空；先证明柜台和独立督导可组成完整安全方案，再考虑兼任。任何合格普通人接任任何合法柜台均可，不指定某人必须H05；最终安全拆开保留已轮换督导本人。",
+    "unchanged": "互斥、资质、时段和衔接、半休、工时、值班与人工锁定、配置补位边界及跨航班补空；不扩展其他规则。",
+    "fallback": "不存在完整安全方案或超时则原子保留原兼任，不新增空岗、不部分提交。"
+  },
+  "testedVersion": "73c4216d20038be45c085fdc03898eb907b6c5b7d447420d46b6235aa19f3c89",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "匿名固定柜台快照在修改前仍产生不必要兼任，先红后绿；真实配置原始诊断与后续重放相符。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/mobile-supervisor-independence/before-failure.txt",
+          "summary": "修改前2项测试1失败1通过，失败点为存在普通接替者却保留督导兼柜台。",
+          "sha256": "aefd885876439cf43a1d7896616fbfd86074709d2570b3c7d10b42ddc27c93d1"
+        },
+        {
+          "path": "docs/acceptance/evidence/mobile-supervisor-independence/focused-pass.txt",
+          "summary": "7个文件90项定向回归通过：初次独立、配置/通用拆开、完整链、直接优先、引导、锁定、互斥、半休、工时、回退、后置注入、Worker/WASM/Store/Excel/storage及原跨航班补空。",
+          "sha256": "308b9714133fa9ae178c4afb5a2a71b0bf91f575a8d4d4b40bb5e2cf2904e1f8"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "先释放占柜台的合格督导，普通人接替；配置柜台仍参与普通初排，不按姓名或柜台号写特例。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/mobile-supervisor-independence/focused-pass.txt",
+          "summary": "7个文件90项定向回归通过：初次独立、配置/通用拆开、完整链、直接优先、引导、锁定、互斥、半休、工时、回退、后置注入、Worker/WASM/Store/Excel/storage及原跨航班补空。",
+          "sha256": "308b9714133fa9ae178c4afb5a2a71b0bf91f575a8d4d4b40bb5e2cf2904e1f8"
+        },
+        {
+          "path": "docs/acceptance/evidence/mobile-supervisor-independence/actual-replay-pass.txt",
+          "summary": "真实配置9经过公开Excel导入与领域生成；不指定人员必须H05，断言合法普通人接替、督导独立、G12覆盖及原最终安全。",
+          "sha256": "373bf55f578e917a5ea518c7b11261e6e7f3a7e408a25d80ef0f81c866cd5850"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "配置与通用兼任、同航班和重叠航班完整链、所有航班先直接接替再复杂链、真实规模及Worker/WASM均有证据。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/mobile-supervisor-independence/focused-pass.txt",
+          "summary": "7个文件90项定向回归通过：初次独立、配置/通用拆开、完整链、直接优先、引导、锁定、互斥、半休、工时、回退、后置注入、Worker/WASM/Store/Excel/storage及原跨航班补空。",
+          "sha256": "308b9714133fa9ae178c4afb5a2a71b0bf91f575a8d4d4b40bb5e2cf2904e1f8"
+        },
+        {
+          "path": "docs/acceptance/evidence/mobile-supervisor-independence/actual-replay-pass.txt",
+          "summary": "真实配置9经过公开Excel导入与领域生成；不指定人员必须H05，断言合法普通人接替、督导独立、G12覆盖及原最终安全。",
+          "sha256": "373bf55f578e917a5ea518c7b11261e6e7f3a7e408a25d80ef0f81c866cd5850"
+        },
+        {
+          "path": "docs/acceptance/evidence/mobile-supervisor-independence/verify-pass.txt",
+          "summary": "临时单worker完整npm.cmd run verify退出0：218文件2141项功能、7文件19项性能、类型与生产构建。",
+          "sha256": "5d306ebe0516b4505a570cb19703b77e912322b83228fdbfc35fafe5b83cc138"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "真实后置管线后故意注入冗余兼任，最终复查恢复独立且保留源督导；引导/负荷更新，后置均衡后再检查。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/mobile-supervisor-independence/focused-pass.txt",
+          "summary": "7个文件90项定向回归通过：初次独立、配置/通用拆开、完整链、直接优先、引导、锁定、互斥、半休、工时、回退、后置注入、Worker/WASM/Store/Excel/storage及原跨航班补空。",
+          "sha256": "308b9714133fa9ae178c4afb5a2a71b0bf91f575a8d4d4b40bb5e2cf2904e1f8"
+        },
+        {
+          "path": "docs/acceptance/evidence/mobile-supervisor-independence/actual-result-anonymous.json",
+          "summary": "脱敏最终产物独立核对：26个启用常规岗位、0空岗、0原覆盖丢失；柜台恢复2小时/2点，督导独立。",
+          "sha256": "2ed20af0661776330fb80edaecaff4714d1670565e38ea4f4828bbdf9e423f42"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "完整安全回调与原最终守卫仍生效；互斥、资格、锁定、工时、半休及超时/最终拒绝回归保留原子快照，原KE166容量反向回归保持。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/mobile-supervisor-independence/focused-pass.txt",
+          "summary": "7个文件90项定向回归通过：初次独立、配置/通用拆开、完整链、直接优先、引导、锁定、互斥、半休、工时、回退、后置注入、Worker/WASM/Store/Excel/storage及原跨航班补空。",
+          "sha256": "308b9714133fa9ae178c4afb5a2a71b0bf91f575a8d4d4b40bb5e2cf2904e1f8"
+        },
+        {
+          "path": "docs/acceptance/evidence/mobile-supervisor-independence/actual-replay-pass.txt",
+          "summary": "真实配置9经过公开Excel导入与领域生成；不指定人员必须H05，断言合法普通人接替、督导独立、G12覆盖及原最终安全。",
+          "sha256": "373bf55f578e917a5ea518c7b11261e6e7f3a7e408a25d80ef0f81c866cd5850"
+        },
+        {
+          "path": "docs/acceptance/evidence/mobile-supervisor-independence/verify-pass.txt",
+          "summary": "临时单worker完整npm.cmd run verify退出0：218文件2141项功能、7文件19项性能、类型与生产构建。",
+          "sha256": "5d306ebe0516b4505a570cb19703b77e912322b83228fdbfc35fafe5b83cc138"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "原跨航班补空及真正短员配置兼任保持；无新配置/迁移、人工与锁定不自动改。完整类型/功能/性能/构建验证通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/mobile-supervisor-independence/focused-pass.txt",
+          "summary": "7个文件90项定向回归通过：初次独立、配置/通用拆开、完整链、直接优先、引导、锁定、互斥、半休、工时、回退、后置注入、Worker/WASM/Store/Excel/storage及原跨航班补空。",
+          "sha256": "308b9714133fa9ae178c4afb5a2a71b0bf91f575a8d4d4b40bb5e2cf2904e1f8"
+        },
+        {
+          "path": "docs/acceptance/evidence/mobile-supervisor-independence/verify-pass.txt",
+          "summary": "临时单worker完整npm.cmd run verify退出0：218文件2141项功能、7文件19项性能、类型与生产构建。",
+          "sha256": "5d306ebe0516b4505a570cb19703b77e912322b83228fdbfc35fafe5b83cc138"
+        },
+        {
+          "path": "docs/acceptance/evidence/mobile-supervisor-independence/verify-exit.json",
+          "summary": "本地包装直接记录npm子进程退出0、单worker环境；与宿主警告状态分离。",
+          "sha256": "48994767eec1938f59795f5a0d022460f6634b800a389771fe4b105f6413870d"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "真实配置9本地重放及脱敏最终产物已通过独立核对；修后真实页面尚无owner现场证据，未操作浏览器，不以测试代替页面验收。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/mobile-supervisor-independence/actual-replay-pass.txt",
+          "summary": "真实配置9经过公开Excel导入与领域生成；不指定人员必须H05，断言合法普通人接替、督导独立、G12覆盖及原最终安全。",
+          "sha256": "373bf55f578e917a5ea518c7b11261e6e7f3a7e408a25d80ef0f81c866cd5850"
+        },
+        {
+          "path": "docs/acceptance/evidence/mobile-supervisor-independence/actual-result-anonymous.json",
+          "summary": "脱敏最终产物独立核对：26个启用常规岗位、0空岗、0原覆盖丢失；柜台恢复2小时/2点，督导独立。",
+          "sha256": "2ed20af0661776330fb80edaecaff4714d1670565e38ea4f4828bbdf9e423f42"
+        },
+        {
+          "path": "docs/acceptance/evidence/mobile-supervisor-independence/focused-pass.txt",
+          "summary": "7个文件90项定向回归通过：初次独立、配置/通用拆开、完整链、直接优先、引导、锁定、互斥、半休、工时、回退、后置注入、Worker/WASM/Store/Excel/storage及原跨航班补空。",
+          "sha256": "308b9714133fa9ae178c4afb5a2a71b0bf91f575a8d4d4b40bb5e2cf2904e1f8"
+        },
+        {
+          "path": "docs/acceptance/evidence/mobile-supervisor-independence/verify-pass.txt",
+          "summary": "临时单worker完整npm.cmd run verify退出0：218文件2141项功能、7文件19项性能、类型与生产构建。",
+          "sha256": "5d306ebe0516b4505a570cb19703b77e912322b83228fdbfc35fafe5b83cc138"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "before-failure.txt记录修改前不必要兼任，focused-pass.txt及actual-replay-pass.txt证明修后独立方案；人员姓名只是现场例子，验收不固定H05接替者。",
+    "laterChanges": "督导配置补位、通用兼任、重点轮换、恢复和最终均衡会保留或重建关联。唯一模块在督导收尾及全部final-review后消费；后置注入回归、原最终守卫及原子回退保护，见focused-pass.txt。",
+    "finalArtifact": "actual-result-anonymous.json为本次真实配置9生成的脱敏结果，独立核对26个启用普通岗位全覆盖及柜台正常负荷，actual-replay-pass.txt含最终安全断言；Worker/Store/结果Excel回归通过，页面仍未现场验收。"
+  },
+  "review": {
+    "missedScope": "检查初排普通候选、配置和通用兼任、先直接后完整链、后置review与最终均衡、工时疲劳和复用引导、锁定/人工/硬约束、Worker与存储Excel；无新持久化字段。真实页面未验收，不扩大到其他补空规则。",
+    "rootCause": "无空闲督导时直接进入配置短员腾挪，通用航班漏掉普通柜台接替释放独立督导的方案，后置轮换保留原兼任组。第一轮局部修复又发现复杂链会先占用其他航班可直接补柜台的唯一空闲人员，补为所有航班先直接接替再完整链。",
+    "earlyDetection": "改督导收尾前构造“合格督导已占柜台、空闲者只会柜台”与“两航班竞争唯一接替者”失败场景；最终重点轮换/均衡后独立核对关联、实际负荷和全表覆盖；不只验证有没有空岗或某个人进没进H05。"
+  }
+}

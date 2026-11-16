@@ -341,7 +341,7 @@ it("rejects a configured H05 proposal that frees its safe regular worker, preser
   expect(
     assignments
       .find((item) => item.position === "督导")
-      ?.decisionTrace?.some((item) => item.message.includes("腾挪后"))
+      ?.decisionTrace?.some((item) => item.message.includes("独立担任"))
   ).toBe(true);
   expect(
     createKe166SnapshotScheduleGuard().validate(assignments, {
@@ -351,7 +351,7 @@ it("rejects a configured H05 proposal that frees its safe regular worker, preser
   ).toEqual([]);
 });
 
-it("leaves only the KE166 supervisor vacant when fallback sharing still violates capacity", async () => {
+it("uses a complete independent arrangement instead of leaving the KE166 supervisor vacant", async () => {
   const { state, date, helper, assignments } = scenario();
   state.settings.mobileSupervisorFillRules = [];
   state.positionRules = state.positionRules.filter((item) => item.id !== "h05");
@@ -376,17 +376,20 @@ it("leaves only the KE166 supervisor vacant when fallback sharing still violates
     preparation,
     lockedAssignmentIds: new Set(),
   });
-  expect(assignments.filter((item) => item.position !== "督导")).toEqual(
-    originalAssignments
+  expect(assignments.find((item) => item.position === "H03")?.staffId).toBe(
+    helper.id
+  );
+  expect(assignments.find((item) => item.flightNo === "OTHER100")).toEqual(
+    originalAssignments.find((item) => item.flightNo === "OTHER100")
   );
   expect(assignments.find((item) => item.position === "督导")).toMatchObject({
-    staffId: null,
-    status: "unfilled",
+    staffId: state.staff[0]!.id,
+    status: "assigned",
   });
   expect(
     assignments
       .find((item) => item.position === "督导")
-      ?.decisionTrace?.some((item) => item.message.includes("已恢复原柜台安排"))
+      ?.decisionTrace?.some((item) => item.message.includes("独立担任"))
   ).toBe(true);
   expect(
     assignments.every(
@@ -397,21 +400,16 @@ it("leaves only the KE166 supervisor vacant when fallback sharing still violates
     phase: "final",
     ke166SnapshotFacts: { state, date },
   });
-  expect(violations).toEqual([
-    expect.objectContaining({
-      severity: "warning",
-      message: "KE166机动督导未安排，岗位已留空，请人工复核",
-    }),
-  ]);
+  expect(violations).toEqual([]);
   state.assignments = assignments;
   const workbook = buildScheduleWorkbook(state, date);
   const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(
     workbook.Sheets["排班结果"]!
   );
-  expect(rows.find((row) => row["岗位"] === "H03")?.["姓名"]).toBe(
-    originalAssignments[0]!.staffName
+  expect(rows.find((row) => row["岗位"] === "H03")?.["姓名"]).toBe(helper.name);
+  expect(rows.find((row) => row["岗位"] === "督导")?.["姓名"]).toBe(
+    state.staff[0]!.name
   );
-  expect(rows.find((row) => row["岗位"] === "督导")?.["姓名"] ?? "").toBe("");
 });
 
 it("keeps the final guard rejecting a later stage that recreates invalid H05 sharing", async () => {

@@ -47,6 +47,7 @@ import { enforceDailyFlightCountBalance } from "../assignments/daily-flight-coun
 import { recoverLocalScheduleIssues } from "./schedule-local-recovery";
 import { dutyRosterStatusIssues } from "../duty-roster/roster";
 import { fillConfiguredSupervisorTargets } from "../assignments/supervisor-fill";
+import { restoreIndependentMobileSupervisors } from "../coverage/mobile-supervisor-independence";
 import { ScheduleGuardError } from "./schedule-guard";
 import type { SchedulePipelineContext } from "./schedule-pipeline";
 import { guardExplanation } from "../shared/schedule-issue-explanation";
@@ -288,6 +289,32 @@ export async function finalizeSchedule({
       });
     assertFinalSafety(assignments);
   });
+  const validateFinalRegularProposal = (proposed: Assignment[]): boolean => {
+    if (
+      proposed.some(
+        (row) =>
+          lockedAssignmentIds.has(row.id) &&
+          row.staffId !==
+            assignments.find((original) => original.id === row.id)?.staffId
+      )
+    )
+      return false;
+    try {
+      assertFinalSafety(proposed);
+      const balanceProbe = structuredClone(proposed);
+      const balance = enforceDailyFlightCountBalance(state, balanceProbe, {
+        dutyStaffId: runFacts.currentDutyStaffId,
+        halfRestStaffIds: runFacts.halfRest.activeStaffIds,
+        candidateStaffIds,
+        useFullEligibility: true,
+        lockedAssignmentIds,
+      });
+      return balance.spread <= 1 && !balance.changed;
+    } catch (error) {
+      if (!(error instanceof ScheduleGuardError)) throw error;
+      return false;
+    }
+  };
   // A final guard may remove a now-invalid supervisor/counter link after
   // supervisor finalization. Reuse the same configured-fill facts to complete
   // the empty counter with a regular worker; never bypass final safety.
@@ -300,32 +327,7 @@ export async function finalizeSchedule({
     fillConfiguredSupervisorTargets(state, assignments, source, "automatic", {
       dutyStaffId: runFacts.currentDutyStaffId,
       regularOnly: true,
-      validateRegularAssignments: (proposed) => {
-        if (
-          proposed.some(
-            (row) =>
-              lockedAssignmentIds.has(row.id) &&
-              row.staffId !==
-                assignments.find((original) => original.id === row.id)?.staffId
-          )
-        )
-          return false;
-        try {
-          assertFinalSafety(proposed);
-          const balanceProbe = structuredClone(proposed);
-          const balance = enforceDailyFlightCountBalance(state, balanceProbe, {
-            dutyStaffId: runFacts.currentDutyStaffId,
-            halfRestStaffIds: runFacts.halfRest.activeStaffIds,
-            candidateStaffIds,
-            useFullEligibility: true,
-            lockedAssignmentIds,
-          });
-          return balance.spread <= 1 && !balance.changed;
-        } catch (error) {
-          if (!(error instanceof ScheduleGuardError)) throw error;
-          return false;
-        }
-      },
+      validateRegularAssignments: validateFinalRegularProposal,
     });
   }
   assertFinalSafety(assignments);
@@ -348,6 +350,15 @@ export async function finalizeSchedule({
       assignments.splice(0, assignments.length, ...balancedAssignments);
     }
   }
+  await restoreIndependentMobileSupervisors({
+    solver,
+    state,
+    assignments,
+    date,
+    facts: runFacts,
+    lockedAssignmentIds,
+    validateAssignments: validateFinalRegularProposal,
+  });
   assertFinalSafety(assignments);
   for (const staffId of runFacts.halfRest.activeStaffIds) {
     const mode =

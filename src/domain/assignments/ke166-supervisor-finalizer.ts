@@ -35,6 +35,10 @@ import { assertDailyScheduleSafety } from "../kernel/daily-schedule-safety";
 import { ScheduleGuardError } from "../kernel/schedule-guard";
 import { fillAutomaticVacancies } from "../coverage/automatic-vacancy-coverage";
 import {
+  arrangeIndependentMobileSupervisor,
+  restoreIndependentMobileSupervisors,
+} from "../coverage/mobile-supervisor-independence";
+import {
   readableSupervisorRejection,
   supervisorSearchFailureNotes,
 } from "./supervisor-vacancy-explanation";
@@ -413,6 +417,27 @@ export async function finalizeMobileSupervisors({
       }
     }
     if (!selected) {
+      const source = makeUnfilled(task.flight, task.rule.name, task.rule);
+      const proposed = [...structuredClone(assignments), source];
+      if (
+        await arrangeIndependentMobileSupervisor({
+          solver,
+          state,
+          assignments: proposed,
+          source,
+          date,
+          facts: preparation.runFacts,
+          lockedAssignmentIds,
+          validateAssignments: validateRegularAssignments,
+          includeOverlappingFlights: false,
+        })
+      ) {
+        assignments.splice(0, assignments.length, ...proposed);
+        processedTasks.add(task.key);
+        continue;
+      }
+    }
+    if (!selected) {
       const fillPreferred = await preparePreferredConfiguredFill();
       if (fillPreferred) {
         selected = fillPreferred;
@@ -569,5 +594,14 @@ export async function finalizeMobileSupervisors({
     preparation.runFacts,
     validateRegularAssignments
   );
+  await restoreIndependentMobileSupervisors({
+    solver,
+    state,
+    assignments,
+    date,
+    facts: preparation.runFacts,
+    lockedAssignmentIds,
+    validateAssignments: validateRegularAssignments,
+  });
   return assignments;
 }

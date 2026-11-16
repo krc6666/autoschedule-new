@@ -1,0 +1,6 @@
+{
+  "exitCode": 0,
+  "signal": null,
+  "workers": 1,
+  "command": "npm.cmd run verify"
+}

@@ -1,0 +1,67 @@
+
+> autoschedule@1.0.0 verify
+> npm run typecheck && npm test && npm run test:performance && npm run build
+
+
+> autoschedule@1.0.0 typecheck
+> tsc -b --pretty false
+
+
+> autoschedule@1.0.0 test
+> vitest run --exclude tests/performance/**
+
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/architecture/acceptance-gate.test.ts (16 tests | 2 failed) 47000ms
+     × keeps completed historical records while requiring current-version evidence 5569ms
+     × initializes an incomplete record without silently approving it or overwriting it 5207ms
+ ❯ tests/domain/scheduling-kernel.test.ts (135 tests | 1 failed) 117319ms
+     × does not copy one flight's configured guide positions into every other flight 20826ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/architecture/acceptance-gate.test.ts > acceptance release gate > keeps completed historical records while requiring current-version evidence
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ tests/architecture/acceptance-gate.test.ts:253:3
+    251|   });
+    252|
+    253|   it("keeps completed historical records while requiring current-versi…
+       |   ^
+    254|     const root = fixture();
+    255|     save(root, record(root, "previous"));
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  tests/architecture/acceptance-gate.test.ts > acceptance release gate > initializes an incomplete record without silently approving it or overwriting it
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ tests/architecture/acceptance-gate.test.ts:283:3
+    281|   });
+    282|
+    283|   it("initializes an incomplete record without silently approving it o…
+       |   ^
+    284|     const root = fixture();
+    285|     expect(run(root, "--init", "new-task").status).toBe(0);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  tests/domain/scheduling-kernel.test.ts > scheduler domain > does not copy one flight's configured guide positions into every other flight
+Error: Test timed out in 15000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ tests/domain/scheduling-kernel.test.ts:5814:3
+    5812|   });
+    5813|
+    5814|   it("does not copy one flight's configured guide positions into every…
+       |   ^
+    5815|     const state = createOrdinarySchedulingState();
+    5816|     const result = await generateSchedule(state, "2026-07-18");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  2 failed | 216 passed (218)
+      Tests  3 failed | 2138 passed (2141)
+   Start at  21:57:57
+   Duration  120.57s (transform 32.30s, setup 0ms, import 120.10s, tests 463.38s, environment 36.50s)

@@ -1,0 +1,39 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/domain/mobile-supervisor-independence.test.ts (2 tests | 1 failed) 245ms
+   × frees an occupied qualified supervisor by assigning a counter-only spare first 96ms
+npm.cmd :
+所在位置 行:2 字符: 1
++ npm.cmd exec vitest -- run tests/domain/mobile-supervisor-independenc ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/domain/mobile-supervisor-independence.test.ts > frees an occupied qualified supervisor by assigning a coun
+ter-only spare first
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ tests/domain/mobile-supervisor-independence.test.ts:19:60
+     17|   expect(source.staffId).toBe("supervisor");
+     18|   expect(rows.find((a) => a.position === "H07")?.staffId).toBe("bridge…
+     19|   expect(rows.some((a) => a.supervisorSourceAssignmentId)).toBe(false);
+       |                                                            ^
+     20|   expect(rows.every((a) => a.status === "assigned")).toBe(true);
+     21| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 1 passed (2)
+   Start at  21:27:59
+   Duration  1.91s (transform 1.28s, setup 0ms, import 1.46s, tests 245ms, environment 0ms)
