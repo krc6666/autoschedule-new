@@ -25,6 +25,7 @@ import { applyWorkbookImport } from "../../src/app/workbook-actions";
 import { normalizeSupervisorAssignments } from "../../src/domain/assignments/schedule-adjustment";
 import type { ApplicationDialog } from "../../src/app/application-view-state";
 import "../../src/ui/components/policy-page";
+import type { PolicyPageElement } from "../../src/ui/components/policy-page";
 import "../../src/ui/components/position-rules-section";
 import "../../src/ui/components/next-workday-flight-picker-dialog";
 
@@ -156,13 +157,25 @@ describe("unified supervisor fill configuration", () => {
     });
   });
   it("same-flight: provides one flight selector and two position selectors", async () => {
-    const page = await mountElement<
-      HTMLElement & { updateComplete: Promise<unknown> }
-    >("autoschedule-policy-page", { model: scenario() });
-    [...page.querySelectorAll<HTMLButtonElement>("button")]
-      .find((button) => button.textContent?.trim() === "新增补位关系")!
-      .click();
-    await settleLit();
+    const coordinator = createTestApplicationCoordinator(
+      createTestAutoscheduleStore(scenario()),
+      {
+        preferences: {
+          loadScheduleDate: () => null,
+          saveScheduleDate: () => {},
+          loadScheduleZoom: () => null,
+          saveScheduleZoom: () => {},
+        },
+      }
+    );
+    await coordinator.handle({ type: "edit-supervisor-fill" });
+    const page = await mountElement<PolicyPageElement>(
+      "autoschedule-policy-page",
+      {
+        model: coordinator.view().policyEditing!.model,
+        editing: coordinator.view().policyEditing,
+      }
+    );
     const editor = page.querySelector('[aria-label="编辑督导补位关系"]')!;
     expect(editor.querySelectorAll('select[aria-label="航班"]').length).toBe(1);
     expect(editor.querySelector('[aria-label="来源航班"]')).toBeNull();
@@ -366,16 +379,18 @@ describe("unified supervisor fill configuration", () => {
         saveScheduleZoom: () => {},
       },
     });
-    const page = await mountElement<
-      HTMLElement & {
-        model: ReturnType<typeof scenario>;
-        updateComplete: Promise<unknown>;
+    const page = await mountElement<PolicyPageElement>(
+      "autoschedule-policy-page",
+      {
+        model: store.getState().model,
+        editing: coordinator.view().policyEditing,
       }
-    >("autoschedule-policy-page", { model: store.getState().model });
+    );
     let action = Promise.resolve();
     page.addEventListener(UI_COMMAND_EVENT, (event) => {
       action = coordinator.handle((event as UiCommandEvent).detail).then(() => {
-        page.model = store.getState().model;
+        page.model = coordinator.view().policyEditing!.model;
+        page.editing = coordinator.view().policyEditing;
       });
     });
     const clickText = async (text: string) => {
@@ -403,7 +418,7 @@ describe("unified supervisor fill configuration", () => {
       []
     );
     await clickText("新增补位关系");
-    await clickText("保存补位关系");
+    await clickText("完成本条编辑");
     expect(coordinator.view().toast?.tone).toBe("warning");
     expect(
       page.querySelector('[aria-label="编辑督导补位关系"]')
@@ -411,7 +426,11 @@ describe("unified supervisor fill configuration", () => {
     await select("航班", "F100");
     await select("督导岗位", "督导");
     await select("补位岗位", "H05");
-    await clickText("保存补位关系");
+    await clickText("完成本条编辑");
+    expect(store.getState().model.settings.mobileSupervisorFillRules).toEqual(
+      []
+    );
+    await clickText("保存规则");
     expect(store.getState().model.settings.mobileSupervisorFillRules).toEqual([
       expect.objectContaining({
         ...input,
@@ -442,9 +461,25 @@ describe("unified supervisor fill configuration", () => {
   it("invalidates an unfinished draft on template rename and offers the new number", async () => {
     const state = scenario();
     saveSupervisorFillRule(state, input);
-    const page = await mountElement<
-      HTMLElement & { model: typeof state; updateComplete: Promise<unknown> }
-    >("autoschedule-policy-page", { model: state });
+    const store = createTestAutoscheduleStore(state);
+    const coordinator = createTestApplicationCoordinator(store, {
+      preferences: {
+        loadScheduleDate: () => null,
+        saveScheduleDate: () => {},
+        loadScheduleZoom: () => null,
+        saveScheduleZoom: () => {},
+      },
+    });
+    const page = await mountElement<PolicyPageElement>(
+      "autoschedule-policy-page",
+      { model: state, editing: coordinator.view().policyEditing }
+    );
+    page.addEventListener(UI_COMMAND_EVENT, (event) => {
+      void coordinator.handle((event as UiCommandEvent).detail).then(() => {
+        page.model = coordinator.view().policyEditing!.model;
+        page.editing = coordinator.view().policyEditing;
+      });
+    });
     page
       .querySelector<HTMLButtonElement>('[aria-label="编辑补位关系"]')!
       .click();
@@ -457,7 +492,9 @@ describe("unified supervisor fill configuration", () => {
       "flightNo",
       "F200"
     );
-    page.model = renamed;
+    store.getState().replaceModel(renamed);
+    page.model = coordinator.view().policyEditing!.model;
+    page.editing = coordinator.view().policyEditing;
     await settleLit();
     expect(page.querySelector('[aria-label="编辑督导补位关系"]')).toBeNull();
     page

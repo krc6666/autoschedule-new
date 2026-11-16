@@ -2,7 +2,6 @@ import { html, nothing } from "lit";
 import type { AppState } from "../../model";
 import type { MobileSupervisorFillRule } from "../../domain/rules/structured-policy-contract";
 import {
-  fillPositionMatches,
   isSameFlightSupervisorFillRule,
   normalizeFillReference,
 } from "../../domain/coverage/supervisor-fill-configuration";
@@ -20,25 +19,13 @@ export class SupervisorFillSettingsElement extends LightDomElement {
   static override properties = {
     model: { attribute: false },
     query: { type: String },
+    draft: { attribute: false },
   };
   model!: AppState;
   query = "";
-  private draft: MobileSupervisorFillRule | null = null;
-  private draftContext = "";
-
-  private contextKey() {
-    return JSON.stringify([
-      this.model.activeGroupId,
-      this.model.templates,
-      this.model.positionRules,
-      this.model.settings.mobileSupervisorFillRules,
-    ]);
-  }
+  draft: MobileSupervisorFillRule | null = null;
 
   protected override render() {
-    // A group/template/position change invalidates an unfinished selection.
-    if (this.draft && this.draftContext !== this.contextKey())
-      this.draft = null;
     const items = this.model.settings.mobileSupervisorFillRules;
     if (
       !matchesPolicySearch(
@@ -130,38 +117,7 @@ export class SupervisorFillSettingsElement extends LightDomElement {
   }
 
   private edit(rule?: MobileSupervisorFillRule) {
-    this.draft = rule
-      ? { ...rule }
-      : {
-          id: "",
-          enabled: true,
-          sourceFlightNo: "",
-          sourcePositionKeyword: "",
-          targetFlightNo: "",
-          targetPositionKeyword: "",
-          allowAutomatic: true,
-          allowManual: true,
-        };
-    if (rule) {
-      for (const side of ["source", "target"] as const) {
-        const matches = this.model.positionRules.filter(
-          (position) =>
-            fillPositionMatches(
-              position,
-              rule[`${side}FlightNo`],
-              rule[`${side}PositionKeyword`]
-            ) && position.category === (side === "source" ? "机动督导" : "常规")
-        );
-        this.draft[`${side}PositionKeyword`] =
-          matches.length === 1 ? matches[0]!.name : "";
-      }
-    }
-    if (rule && !isSameFlightSupervisorFillRule(rule)) {
-      this.draft.sourceFlightNo = this.draft.targetFlightNo = "";
-      this.draft.sourcePositionKeyword = this.draft.targetPositionKeyword = "";
-    }
-    this.draftContext = this.contextKey();
-    this.requestUpdate();
+    dispatchUiCommand(this, { type: "edit-supervisor-fill", rule });
   }
 
   private flightSelector(draft: MobileSupervisorFillRule) {
@@ -179,11 +135,16 @@ export class SupervisorFillSettingsElement extends LightDomElement {
         ${dynamicSelectValue(draft.sourceFlightNo)}
         .value=${draft.sourceFlightNo}
         @change=${(event: Event) => {
-          draft.sourceFlightNo = draft.targetFlightNo = (
-            event.currentTarget as HTMLSelectElement
-          ).value;
-          draft.sourcePositionKeyword = draft.targetPositionKeyword = "";
-          this.requestUpdate();
+          const flightNo = (event.currentTarget as HTMLSelectElement).value;
+          dispatchUiCommand(this, {
+            type: "update-supervisor-fill-editor",
+            patch: {
+              sourceFlightNo: flightNo,
+              targetFlightNo: flightNo,
+              sourcePositionKeyword: "",
+              targetPositionKeyword: "",
+            },
+          });
         }}
       >
         <option value="">请选择模板航班</option>
@@ -217,8 +178,12 @@ export class SupervisorFillSettingsElement extends LightDomElement {
               ${dynamicSelectValue(draft[field])}
               .value=${draft[field]}
               @change=${(event: Event) => {
-                draft[field] = (event.currentTarget as HTMLSelectElement).value;
-                this.requestUpdate();
+                dispatchUiCommand(this, {
+                  type: "update-supervisor-fill-editor",
+                  patch: {
+                    [field]: (event.currentTarget as HTMLSelectElement).value,
+                  },
+                });
               }}
             >
               <option value="">请选择${label}</option>
@@ -243,27 +208,33 @@ export class SupervisorFillSettingsElement extends LightDomElement {
                 aria-label=${label}
                 .checked=${draft[field]}
                 @change=${(event: Event) => {
-                  draft[field] = (
-                    event.currentTarget as HTMLInputElement
-                  ).checked;
+                  dispatchUiCommand(this, {
+                    type: "update-supervisor-fill-editor",
+                    patch: {
+                      [field]: (event.currentTarget as HTMLInputElement)
+                        .checked,
+                    },
+                  });
                 }}
               />${label}</label
             >`
         )}
       </div>
+      <p class="small text-secondary">
+        本条修改也会随页面上方“保存规则”一起保存。
+      </p>
       <button
         type="button"
         class="btn btn-sm btn-primary me-2"
         @click=${() => dispatchUiCommand(this, { type: "save-supervisor-fill", rule: { ...draft } })}
       >
-        保存补位关系
+        完成本条编辑
       </button>
       <button
         type="button"
         class="btn btn-sm btn-outline-secondary"
         @click=${() => {
-          this.draft = null;
-          this.requestUpdate();
+          dispatchUiCommand(this, { type: "cancel-supervisor-fill-editor" });
         }}
       >
         取消

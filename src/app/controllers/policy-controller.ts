@@ -3,14 +3,12 @@ import type {
   ApplicationContext,
   UiCommandController,
 } from "../application-context";
-import { diagnoseSupervisorFillRuleConfiguration } from "../../domain/coverage/supervisor-fill-facts";
-import { normalizeAirlineMixCodes } from "../../domain/rules/airline-mix-policy";
 
 export class PolicyController implements UiCommandController {
   constructor(private readonly context: ApplicationContext) {}
 
   async handle(command: UiCommand): Promise<boolean> {
-    const policy = this.context.store.getState().policy;
+    const policy = this.context.policyEditing.commands(this.context.model());
     switch (command.type) {
       case "open-supervisor-fill-settings":
         this.context.updateView({
@@ -20,59 +18,51 @@ export class PolicyController implements UiCommandController {
         return true;
       case "save-supervisor-fill": {
         const result = policy.saveSupervisorFill(command.rule);
-        if (result.ok)
-          this.context.commit("督导补位关系已保存；当前班表需重新排班后执行");
-        else this.context.toast(result.error, "warning");
+        if (result.ok) {
+          this.context.policyEditing.cancelSupervisor();
+          this.context.updateView({});
+        } else this.context.toast(result.error, "warning");
         return true;
       }
-      case "apply-policy":
-        policy.apply(command.input);
-        this.context.commit(
-          "排班规则已保存；当前班表需重新排班后才会执行新规则"
+      case "edit-supervisor-fill":
+        if (
+          this.context.policyEditing.hasSupervisorChanges() &&
+          !this.context.confirm(
+            "当前补位关系有未完成的修改，确定放弃本条编辑并打开另一条？其他规则草稿会保留。"
+          )
+        )
+          return true;
+        this.context.policyEditing.editSupervisor(
+          this.context.model(),
+          command.rule
         );
+        this.context.updateView({});
+        return true;
+      case "update-supervisor-fill-editor":
+        this.context.policyEditing.updateSupervisor(command.patch);
+        this.context.updateView({});
+        return true;
+      case "cancel-supervisor-fill-editor":
+        this.context.policyEditing.cancelSupervisor();
+        this.context.updateView({});
+        return true;
+      case "edit-policy-input":
+        this.context.policyEditing.patch(this.context.model(), command.input);
+        this.context.updateView({});
         return true;
       case "update-policy":
-        {
-          if (
-            command.entity === "airline-mix" &&
-            command.field === "airlineCodes" &&
-            normalizeAirlineMixCodes(command.value) === null
-          ) {
-            this.context.toast(
-              "请填写航司代码，例如 FD, AK，不填完整航班号；原设置未更改",
-              "warning"
-            );
-            return true;
-          }
-          const result = policy.updateEntity(
-            command.entity,
-            command.id,
-            command.field,
-            command.value
-          );
-          if (result !== "missing") {
-            this.context.commit();
-            if (command.entity === "supervisor-fill") {
-              const rule = this.context
-                .model()
-                .settings.mobileSupervisorFillRules.find(
-                  (item) => item.id === command.id
-                );
-              const issue = rule
-                ? diagnoseSupervisorFillRuleConfiguration(
-                    this.context.model(),
-                    rule
-                  )
-                : null;
-              if (issue?.severity === "warning")
-                this.context.toast(issue.message, "warning");
-            }
-          }
-        }
+        this.context.policyEditing.updateField(
+          this.context.model(),
+          command.entity,
+          command.id,
+          command.field,
+          command.value
+        );
+        this.context.updateView({});
         return true;
       case "add-ordinary-priority-position":
         policy.addOrdinaryPriorityPosition();
-        this.context.commit("普通重点岗位已新增");
+        this.context.updateView({});
         return true;
       case "delete-ordinary-priority-position":
         if (
@@ -81,17 +71,16 @@ export class PolicyController implements UiCommandController {
             command.position
           )
         )
-          this.context.commit("普通重点岗位已删除");
+          this.context.updateView({});
         return true;
       case "update-ordinary-priority-position":
-        if (
-          policy.updateOrdinaryPriorityPosition(
-            command.index,
-            command.field,
-            command.value
-          )
-        )
-          this.context.commit("普通重点岗位已更新");
+        this.context.policyEditing.updateOrdinaryPosition(
+          this.context.model(),
+          command.index,
+          command.field,
+          command.value
+        );
+        this.context.updateView({});
         return true;
       case "set-team-leader-gap-fill-positions-movable":
         if (
@@ -100,11 +89,7 @@ export class PolicyController implements UiCommandController {
             command.movable
           )
         )
-          this.context.commit(
-            command.movable
-              ? "已允许所选岗位参与分队长补差换人"
-              : "所选岗位已设为分队长补差保护"
-          );
+          this.context.updateView({});
         return true;
       case "add-policy-item":
         if (command.collection === "airline-mix") policy.addAirlineMix();
@@ -124,21 +109,21 @@ export class PolicyController implements UiCommandController {
         else if (command.collection === "supervisor-fill")
           policy.addSupervisorFill();
         else policy.addTransition();
-        this.context.commit("已新增规则项");
+        this.context.updateView({});
         return true;
       case "delete-policy-item":
         return this.deleteItem(command.collection, command.id);
       case "move-duty-priority":
         if (policy.moveDutyPriority(command.id, command.direction))
-          this.context.commit("值班岗位优先顺序已调整");
+          this.context.updateView({});
         return true;
       case "move-cross-workday-reservation":
         if (policy.moveCrossWorkdayReservation(command.id, command.direction))
-          this.context.commit("跨工作日资质预留顺序已调整");
+          this.context.updateView({});
         return true;
       case "move-cross-flight-priority":
         if (policy.moveCrossFlightPriority(command.id, command.direction))
-          this.context.commit("跨航班重点人员优先顺序已调整");
+          this.context.updateView({});
         return true;
       default:
         return false;
@@ -153,7 +138,7 @@ export class PolicyController implements UiCommandController {
     id: string
   ): boolean {
     if (!this.context.confirm("确认删除这条规则配置？")) return true;
-    const policy = this.context.store.getState().policy;
+    const policy = this.context.policyEditing.commands(this.context.model());
     const deleted =
       collection === "airline-mix"
         ? policy.deleteAirlineMix(id)
@@ -174,7 +159,10 @@ export class PolicyController implements UiCommandController {
                       : collection === "supervisor-fill"
                         ? policy.deleteSupervisorFill(id)
                         : policy.deleteTransition(id);
-    if (deleted) this.context.commit("规则配置已删除");
+    if (deleted) {
+      this.context.policyEditing.forgetItemInputs(id);
+      this.context.updateView({});
+    }
     return true;
   }
 }

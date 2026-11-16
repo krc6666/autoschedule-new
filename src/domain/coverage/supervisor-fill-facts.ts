@@ -129,7 +129,9 @@ export function diagnoseSupervisorFillRuleConfiguration(
       "requires-confirmation",
       "此补位关系待确认，不参与补位",
       "旧配置未完整生效，或旧岗位只有补位标记。需要在统一入口核对来源与目标后保存。",
-      ["点击编辑，选择一个模板航班，再选择“督导岗位”和“补位岗位”，保存关系。"]
+      [
+        "点击编辑，选择一个模板航班，再选择“督导岗位”和“补位岗位”，最后点击页面上方“保存规则”。",
+      ]
     );
   if (!rule.enabled)
     return issue(

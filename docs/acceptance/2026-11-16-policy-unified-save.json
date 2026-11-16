@@ -1,0 +1,162 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-16-policy-unified-save",
+  "title": "规则页默认折叠与统一保存提醒",
+  "startedFrom": "2aebdad87ba382b30f37eed5bc25786d05ccb6d4",
+  "expectation": {
+    "example": "Owner确认：同时修改疲劳参数、互斥人员及规则顺序先保留草稿，统一保存规则才一起生效；切页/切组/退出登录/刷新关闭未保存均提醒，取消离开保留草稿。",
+    "expected": "无搜索时所有规则区域默认收起，搜索展开匹配项；整页规则由同一编辑会话管理，统一保存或放弃，督导补位编辑未提交也纳入。保存规则后仍须明确保存到云端，云存不能漏掉尚未保存的规则草稿而假称成功。",
+    "unchanged": "不改变排班规则、优先级、资格、安全或已保存配置；保留Owner原PROJECT_MAP.md。",
+    "fallback": "保存失败/校验失败保留草稿及原正式数据，不报告成功；取消离开保留草稿。明确放弃并离开才丢弃草稿，不以取消提示隐式保存。刷新关闭使用浏览器原生提醒，文案和是否显示由浏览器控制。"
+  },
+  "testedVersion": "38ad8fb2ec70fedc4a61a5057b1743ee35207b67f9b0d0fdc6eda59c27e7bd5a",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "默认折叠与统一草稿均有改前失败证据；最终完整功能测试包含相同断言且通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-policy-unified-save-collapse-before.txt",
+          "summary": "固定展开导致3项失败，旧21项通过。",
+          "sha256": "2e41f279a2afab1901618bb909b4bd02d4335b296fc619a37f4b08732ee528dd"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-policy-unified-save-workflow-before.txt",
+          "summary": "原实现立即改正式Store、未提示离开及缺整页保存命令，3项失败。",
+          "sha256": "f06be0358b65e30d42212f5029305351a14bf704f776a00461da08f8dcaefdd4"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-policy-unified-save-functional.txt",
+          "summary": "最终完整功能测试，209文件2057项通过，单进程且保持原时限；包括编辑保存、云端生命周期、Excel往返与原排班回归。",
+          "sha256": "0bc732f9237aff39545549e4fa36f50d897f08c2d4a3fa4caf910b6a24ae1ff6"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "真实挂载组件捕获未失焦输入，核心/结构化/人员/排序/补差/补位统一保存，正式模型在保存前不变，保存后当前组生效且已有班表仅标待重排。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-policy-unified-save-functional.txt",
+          "summary": "最终完整功能测试，209文件2057项通过，单进程且保持原时限；包括编辑保存、云端生命周期、Excel往返与原排班回归。",
+          "sha256": "0bc732f9237aff39545549e4fa36f50d897f08c2d4a3fa4caf910b6a24ae1ff6"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-continuity-priority-verify-workers2.txt",
+          "summary": "最新联合完整npm run verify通过：213文件2097功能、7文件19性能、类型及生产构建。",
+          "sha256": "7e9ab945236f851a84084deb3dda112d78edd9b77f00ab9d2ba9be1153b2a1a3"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-policy-unified-save-commit-version-check.json",
+          "summary": "核对522受检文件，全部当前源码和测试均覆盖且与完整verify一致；允许Windows换行归一，无产品/构建配置追加修改。",
+          "sha256": "a48860195b14daa6e3dff2d87ece940705b92402f2fa2b6351fe4dd46e45380d"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "取消切页/切组/退出/重置保留草稿；改回原值、清搜索、未完成补位、完成本条编辑、错误输入及保存失败重试均覆盖。真实Excel字节导出→空组导入→持久化重启值保持，另一组隔离。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-policy-unified-save-functional.txt",
+          "summary": "最终完整功能测试，209文件2057项通过，单进程且保持原时限；包括编辑保存、云端生命周期、Excel往返与原排班回归。",
+          "sha256": "0bc732f9237aff39545549e4fa36f50d897f08c2d4a3fa4caf910b6a24ae1ff6"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "外部正式规则改变后拒绝旧草稿覆盖；搜索和卡片收起不丢输入；未保存草稿不能被云端保存误报成功，统一保存后仍需单独云上传，原排班后置与安全测试继续通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-policy-unified-save-functional.txt",
+          "summary": "最终完整功能测试，209文件2057项通过，单进程且保持原时限；包括编辑保存、云端生命周期、Excel往返与原排班回归。",
+          "sha256": "0bc732f9237aff39545549e4fa36f50d897f08c2d4a3fa4caf910b6a24ae1ff6"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "持久化先成功才采用当前组settings，失败原正式数据及草稿保留；未完成或清洗会丢项的规则阻止保存；beforeunload、取消退出及云端成功回执分别验证。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-policy-unified-save-functional.txt",
+          "summary": "最终完整功能测试，209文件2057项通过，单进程且保持原时限；包括编辑保存、云端生命周期、Excel往返与原排班回归。",
+          "sha256": "0bc732f9237aff39545549e4fa36f50d897f08c2d4a3fa4caf910b6a24ae1ff6"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "原排班规则、Worker/最终守卫、导入迁移和云端回归全量通过；没有修改求解实现，保存不改当前人员/历史/另一组，PROJECT_MAP.md原哈希保持。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-policy-unified-save-functional.txt",
+          "summary": "最终完整功能测试，209文件2057项通过，单进程且保持原时限；包括编辑保存、云端生命周期、Excel往返与原排班回归。",
+          "sha256": "0bc732f9237aff39545549e4fa36f50d897f08c2d4a3fa4caf910b6a24ae1ff6"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-policy-unified-save-build.txt",
+          "summary": "最终类型检查及生产构建退出0。",
+          "sha256": "2306eb30b04b55453a5adb1d6ee7ae086f784954787f07bfa4736da9970faf79"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-continuity-priority-verify-workers2.txt",
+          "summary": "最新联合完整npm run verify通过：213文件2097功能、7文件19性能、类型及生产构建。",
+          "sha256": "7e9ab945236f851a84084deb3dda112d78edd9b77f00ab9d2ba9be1153b2a1a3"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-policy-unified-save-commit-version-check.json",
+          "summary": "核对522受检文件，全部当前源码和测试均覆盖且与完整verify一致；允许Windows换行归一，无产品/构建配置追加修改。",
+          "sha256": "a48860195b14daa6e3dff2d87ece940705b92402f2fa2b6351fe4dd46e45380d"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-policy-unified-save-commit-verify-first.txt",
+          "summary": "隔离首轮2056项通过/既有引导原15秒超时；保留失败记录。",
+          "sha256": "abb75a731b3b44bbfd5a874a1385b85966e282eaffd396458fd52f3096e77662"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-policy-unified-save-commit-guide-recheck.txt",
+          "summary": "原引导定向复验22项通过；未改排班实现或时限。",
+          "sha256": "cb09bf138ff29a6f63be956ae76e82bcba6e310367d4a937d2cf6b3fcc337e16"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-policy-unified-save-commit-isolated-functional.txt",
+          "summary": "隔离功能2057项通过；旧基线性能阶段主动停止，此部分运行不作为完整verify通过。",
+          "sha256": "0387839a2fc9764f0336f5b085cf821b482f23cf336e7807efbf06edcbcc2e23"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "本机127.0.0.1:55350已运行本仓源码，HTTP入口与新规则模块200；DOM/最新联合完整verify通过。Owner回复“暂时不方便验收”，Chrome页面折叠、提醒和视觉仍待现场确认；未主动操作浏览器。Owner已授权开发commit；未push、未发布。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-policy-unified-save-functional.txt",
+          "summary": "最终完整功能测试，209文件2057项通过，单进程且保持原时限；包括编辑保存、云端生命周期、Excel往返与原排班回归。",
+          "sha256": "0bc732f9237aff39545549e4fa36f50d897f08c2d4a3fa4caf910b6a24ae1ff6"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-policy-unified-save-build.txt",
+          "summary": "最终类型检查及生产构建退出0。",
+          "sha256": "2306eb30b04b55453a5adb1d6ee7ae086f784954787f07bfa4736da9970faf79"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-16-policy-unified-save-http.txt",
+          "summary": "本机入口及规则模块HTTP200，包含统一保存栏与保存命令；未操作浏览器。",
+          "sha256": "5f22d2d429f500612eabffe4ef8f37380bec7883279a61bb12b7a58dd89f27d3"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "改前折叠3项与工作流3项失败揭示固定展开、混合保存和漏提醒；最终功能日志验证目标行为通过。",
+    "laterChanges": "搜索/失焦/切组/补位子编辑/云端上传/外部改规则都可能丢草稿或错报保存；真实挂载生命周期、存储失败、外部冲突及配置往返回归覆盖。",
+    "finalArtifact": "最终功能日志与build证明自动边界，HTTP记录证明本机入口加载本次代码；Owner暂不方便验收，现场仍未通过，不用自动测试冒充真实Chrome验收。"
+  },
+  "review": {
+    "missedScope": "按传播矩阵核对标量、普通重点、结构化增删启停顺序、批量补差和补位子编辑；全量找出2处旧即时保存/旧文案测试并同步。Chrome视觉及原生关闭提示仍待Owner。",
+    "rootCause": "三套编辑状态分属核心表单、结构化Store直写和补位局部表单，外层dirty仅观察正式数据，未失焦/子编辑漏报；固定open属性造成折叠不一致。",
+    "earlyDetection": "工作流变更前列全写入口/原始输入/正式序列化与离开路径，用未失焦输入→取消离开→整页保存→云端上传及失败重试的真实挂载测试提前发现遗漏。"
+  }
+}

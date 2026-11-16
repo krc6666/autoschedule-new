@@ -1,6 +1,10 @@
 import "./supervisor-fill-settings";
 import { html, nothing } from "lit";
 
+import {
+  policyFieldInputKey,
+  type PolicyEditingView,
+} from "../../app/policy-editing-session";
 import type { AppState } from "../../model";
 import { STRUCTURED_POLICY_DEFINITIONS } from "../../domain/rules/structured-policy-settings";
 import type { StructuredPolicyKey } from "../../domain/rules/structured-policy-contract";
@@ -26,9 +30,11 @@ export class PolicyStructuredRulesElement extends LightDomElement {
   static override properties = {
     model: { attribute: false },
     query: { type: String },
+    editing: { attribute: false },
   };
   model!: AppState;
   query = "";
+  editing?: PolicyEditingView;
 
   protected override render() {
     return html`
@@ -390,9 +396,8 @@ export class PolicyStructuredRulesElement extends LightDomElement {
               .value=${settings.nextWorkdayRecoveryMode}
               @change=${(event: Event) =>
                 dispatchUiCommand(this, {
-                  type: "apply-policy",
+                  type: "edit-policy-input",
                   input: {
-                    ...settings,
                     nextWorkdayRecoveryMode: (
                       event.currentTarget as HTMLSelectElement
                     ).value as "prefer" | "forbid",
@@ -533,6 +538,7 @@ export class PolicyStructuredRulesElement extends LightDomElement {
     return html`<autoschedule-supervisor-fill-settings
       .model=${this.model}
       .query=${this.query}
+      .draft=${this.editing?.supervisorEditor ?? null}
     ></autoschedule-supervisor-fill-settings>`;
   }
 
@@ -631,8 +637,8 @@ export class PolicyStructuredRulesElement extends LightDomElement {
         type=${type}
         placeholder=${placeholder}
         aria-label=${label}
-        .value=${String(value)}
-        @change=${(event: Event) => dispatchUiCommand(this, { type: "update-policy", entity, id, field, value: inputValue(event.currentTarget as HTMLInputElement) })}
+        .value=${String(this.editing?.fieldInputs[policyFieldInputKey(entity, id, field)] ?? value)}
+        @input=${(event: Event) => dispatchUiCommand(this, { type: "update-policy", entity, id, field, value: inputValue(event.currentTarget as HTMLInputElement) })}
     /></label>`;
   }
 

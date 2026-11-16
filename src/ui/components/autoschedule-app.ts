@@ -106,7 +106,7 @@ export class AutoscheduleAppElement extends LightDomElement {
           </label>
           <span class="save-state small text-secondary d-none d-md-inline"
             ><i class="bi bi-check-circle me-1"></i
-            >${this.cloud ? "云端保存状态见上方" : "已保存"}</span
+            >${this.view.policyEditing?.dirty ? "规则未保存" : this.cloud ? "云端保存状态见上方" : "已保存"}</span
           >
         </div>
       </header>
@@ -213,7 +213,8 @@ export class AutoscheduleAppElement extends LightDomElement {
       ></autoschedule-schedule-page>`;
     if (section === "policy")
       return html`<autoschedule-policy-page
-        .model=${this.model}
+        .model=${this.view.policyEditing?.model ?? this.model}
+        .editing=${this.view.policyEditing}
         .query=${this.view.policyQuery ?? ""}
       ></autoschedule-policy-page>`;
     if (section === "statistics")

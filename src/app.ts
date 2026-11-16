@@ -14,6 +14,8 @@ import type { ApplicationPreferences } from "./app/application-preferences";
 export interface MountedAutoscheduleApp {
   dispose(): void;
   canTransferWorkspace(): boolean;
+  hasUnsavedRules(): boolean;
+  confirmLeaveRules(confirm?: (message: string) => boolean): boolean;
 }
 
 export function mountAutoscheduleApp(
@@ -23,6 +25,7 @@ export function mountAutoscheduleApp(
     cloud?: boolean;
     preferences?: ApplicationPreferences;
     shouldWarnOnExit?: () => boolean;
+    onRulesChange?: () => void;
   } = {}
 ): MountedAutoscheduleApp {
   const errorBoundary = installGlobalErrorBoundary(root);
@@ -31,11 +34,6 @@ export function mountAutoscheduleApp(
     createAutoscheduleStore({
       persistence: browserStatePersistence,
     });
-  const removeBrowserExitWarning = installBrowserExitWarning(
-    window,
-    () =>
-      options.shouldWarnOnExit?.() ?? store.getState().hasUnexportedChanges()
-  );
   const restoredScheduleNotice = store.getState().model.assignments.length > 0;
   const restorationIssues = getLastRestorationReport().issues;
   const element: AutoscheduleAppElement =
@@ -47,6 +45,7 @@ export function mountAutoscheduleApp(
       restoredScheduleNotice,
       onViewChange: (view) => {
         element.view = view;
+        options.onRulesChange?.();
       },
     },
     {
@@ -54,10 +53,17 @@ export function mountAutoscheduleApp(
     }
   );
   element.commandHandler = coordinator;
+  const removeBrowserExitWarning = installBrowserExitWarning(
+    window,
+    () =>
+      coordinator.hasUnsavedRules() ||
+      (options.shouldWarnOnExit?.() ?? store.getState().hasUnexportedChanges())
+  );
   element.cloud = options.cloud ?? false;
   element.model = store.getState().model;
   const unsubscribe = store.subscribe((state) => {
     element.model = state.model;
+    element.view = coordinator.view();
   });
   root.replaceChildren(element);
   coordinator.start();
@@ -69,6 +75,8 @@ export function mountAutoscheduleApp(
   }
   return {
     canTransferWorkspace: () => coordinator.canTransferWorkspace(),
+    hasUnsavedRules: () => coordinator.hasUnsavedRules(),
+    confirmLeaveRules: (confirm) => coordinator.confirmLeaveRules(confirm),
     dispose: () => {
       coordinator.scheduleRunner.stopWithoutResult();
       removeBrowserExitWarning();

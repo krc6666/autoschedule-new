@@ -1168,6 +1168,12 @@ select {
   width: 180px;
   color: #59636e;
 }
+.policy-save-bar {
+  position: sticky;
+  top: 0;
+  z-index: 4;
+}
+
 .policy-search {
   display: grid;
   grid-template-columns: 20px minmax(0, 1fr);

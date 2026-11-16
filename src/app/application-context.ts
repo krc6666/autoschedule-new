@@ -4,11 +4,13 @@ import type { ScheduleRunner } from "./schedule-run-controller";
 import type { ApplicationViewState } from "./application-view-state";
 import type { ApplicationPreferences } from "./application-preferences";
 import type { PreflightDialog } from "./preflight-drafts";
+import type { PolicyEditingSession } from "./policy-editing-session";
 
 export interface ApplicationContext {
   readonly store: AutoscheduleStore;
   readonly scheduleRunner: ScheduleRunner;
   readonly preferences: ApplicationPreferences;
+  readonly policyEditing: PolicyEditingSession;
   view(): ApplicationViewState;
   model(): AppState;
   updateView(patch: Partial<ApplicationViewState>): void;

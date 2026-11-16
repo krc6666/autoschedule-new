@@ -128,10 +128,21 @@ describe("configuration controller", () => {
 
     await coordinator.handle({
       type: "save-supervisor-fill",
-      rule: initial.settings.mobileSupervisorFillRules[0]!,
+      rule: {
+        ...initial.settings.mobileSupervisorFillRules[0]!,
+        allowManual: false,
+      },
     });
+    expect(coordinator.hasUnsavedRules()).toBe(true);
+    expect(
+      coordinator.model().settings.mobileSupervisorFillRules[0]?.allowManual
+    ).toBe(true);
+    await coordinator.handle({ type: "save-policy" });
+    expect(
+      coordinator.model().settings.mobileSupervisorFillRules[0]?.allowManual
+    ).toBe(false);
     expect(coordinator.view().toast).toMatchObject({
-      message: "督导补位关系已保存；当前班表需重新排班后执行",
+      message: expect.stringContaining("全部规则已保存"),
       tone: "success",
     });
   });

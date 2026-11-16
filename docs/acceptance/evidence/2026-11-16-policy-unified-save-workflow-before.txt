@@ -1,0 +1,158 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/app/policy-editing-workflow.test.ts (3 tests | 3 failed) 89ms
+     × keeps scalar edits, structured edits and order out of the formal model until one save 72ms
+     × retains the entire draft when navigation is cancelled, and discards only after confirmation 8ms
+     × keeps both formal settings and the draft on persistence failure and permits retry 7ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/app/policy-editing-workflow.test.ts > whole-page policy editing > keeps scalar edits, structured edits and order out of the formal model until one save
+AssertionError: expected { Object (version, shared, ...) } to deeply equal { Object (version, shared, ...) }
+
+- Expected
++ Received
+
+@@ -1151,10 +1151,11 @@
+            ],
+            "remark": "",
+          },
+        ],
+        "schedulePolicyStale": false,
++       "scheduleRuleFingerprint": undefined,
+        "settings": {
+          "adminSupportEnabled": false,
+          "afternoonRestBalanceEnabled": true,
+          "afternoonRestEndTime": "18:00",
+          "afternoonRestMaxDifference": 1,
+@@ -1240,11 +1241,11 @@
+              "matchField": "remark",
+              "nextWorkdayCutoffTime": "",
+            },
+          ],
+          "maxDailyHours": 12,
+-         "maxTodayFatigueDifference": 4,
++         "maxTodayFatigueDifference": 8,
+          "maxWorkHoursDifference": 2,
+          "minimumRegularTransitionMinutes": 90,
+          "mobileSupervisorCoverageRules": [
+            {
+              "enabled": true,
+@@ -1376,11 +1377,21 @@
+          "remarkedPositionHighLoad": true,
+          "rollingLoadMaxFatigue": 8,
+          "rollingLoadProtectionEnabled": true,
+          "rollingLoadWindowMinutes": 360,
+          "sameDayCrossFlightPriorityEnabled": true,
+-         "sameFlightStaffExclusions": [],
++         "sameFlightStaffExclusions": [
++           {
++             "enabled": true,
++             "flightNo": "",
++             "id": "same-flight-staff-exclusion-mwj1yjl5-muwy22",
++             "staffIds": [
++               "1",
++               "2",
++             ],
++           },
++         ],
+          "teamLeaderConcurrentSupervisionMaxOverlapMinutes": 30,
+          "teamLeaderGapFillPositionPolicies": [],
+          "tr121H02CooldownWorkdays": 3,
+          "workloadBalanceEnabled": true,
+        },
+@@ -3906,11 +3917,11 @@
+          "matchField": "remark",
+          "nextWorkdayCutoffTime": "",
+        },
+      ],
+      "maxDailyHours": 12,
+-     "maxTodayFatigueDifference": 4,
++     "maxTodayFatigueDifference": 8,
+      "maxWorkHoursDifference": 2,
+      "minimumRegularTransitionMinutes": 90,
+      "mobileSupervisorCoverageRules": [
+        {
+          "enabled": true,
+@@ -4042,11 +4053,21 @@
+      "remarkedPositionHighLoad": true,
+      "rollingLoadMaxFatigue": 8,
+      "rollingLoadProtectionEnabled": true,
+      "rollingLoadWindowMinutes": 360,
+      "sameDayCrossFlightPriorityEnabled": true,
+-     "sameFlightStaffExclusions": [],
++     "sameFlightStaffExclusions": [
++       {
++         "enabled": true,
++         "flightNo": "",
++         "id": "same-flight-staff-exclusion-mwj1yjl5-muwy22",
++         "staffIds": [
++           "1",
++           "2",
++         ],
++       },
++     ],
+      "teamLeaderConcurrentSupervisionMaxOverlapMinutes": 30,
+      "teamLeaderGapFillPositionPolicies": [],
+      "tr121H02CooldownWorkdays": 3,
+      "workloadBalanceEnabled": true,
+    },
+@@ -4444,11 +4465,11 @@
+        ],
+        "remark": "到岗21:35",
+        "startTime": "21:55",
+      },
+    ],
+-   "updatedAt": "2026-11-16T09:19:53.499Z",
++   "updatedAt": "2026-11-16T09:19:53.514Z",
+    "version": 12,
+    "weeklyFlightPlans": [
+      {
+        "flightNos": [],
+        "weekday": 1,
+
+ ❯ tests/app/policy-editing-workflow.test.ts:18:25
+     16|     await app.handle({ type: "apply-policy", input: { ...before.settin…
+     17|     await app.handle({ type: "add-policy-item", collection: "same-flig…
+     18|     expect(app.model()).toEqual(before);
+       |                         ^
+     19|     expect(save).not.toHaveBeenCalled();
+     20|     expect(app.view().policyEditing?.dirty).toBe(true);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  tests/app/policy-editing-workflow.test.ts > whole-page policy editing > retains the entire draft when navigation is cancelled, and discards only after confirmation
+AssertionError: expected "vi.fn()" to be called with arguments: [ StringContaining "未保存" ]
+
+Number of calls: 0
+
+ ❯ tests/app/policy-editing-workflow.test.ts:35:21
+     33|     await app.handle({ type: "apply-policy", input: { ...before.settin…
+     34|     await app.handle({ type: "navigate", section: "schedule" });
+     35|     expect(confirm).toHaveBeenCalledWith(expect.stringContaining("未保存"…
+       |                     ^
+     36|     expect(app.view().section).toBe("policy");
+     37|     expect(app.view().policyEditing?.model.settings.maxTodayFatigueDif…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  tests/app/policy-editing-workflow.test.ts > whole-page policy editing > keeps both formal settings and the draft on persistence failure and permits retry
+Error: 未处理的界面命令：save-policy
+ ❯ ApplicationCoordinator.handle src/app/application-coordinator.ts:310:13
+    308|         if (await controller.handle(command)) return;
+    309|       }
+    310|       throw new Error(`未处理的界面命令：${command.type}`);
+       |             ^
+    311|     } finally {
+    312|       if (reservesSchedule) this.scheduleCommandPending = false;
+ ❯ tests/app/policy-editing-workflow.test.ts:52:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  3 failed (3)
+   Start at  17:19:51
+   Duration  2.14s (transform 1.57s, setup 0ms, import 1.83s, tests 89ms, environment 0ms)
+Exit code: 1

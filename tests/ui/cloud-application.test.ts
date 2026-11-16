@@ -43,7 +43,12 @@ describe("cloud entry controls and public view", () => {
     let store: AutoscheduleStore | undefined;
     const mountEditor = vi.fn((_root, options): MountedAutoscheduleApp => {
       store = options?.store;
-      return { dispose: vi.fn(), canTransferWorkspace: () => !running };
+      return {
+        dispose: vi.fn(),
+        canTransferWorkspace: () => !running,
+        hasUnsavedRules: () => false,
+        confirmLeaveRules: () => true,
+      };
     });
     const download = vi.fn();
     const alert = vi.fn();

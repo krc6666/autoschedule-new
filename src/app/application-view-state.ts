@@ -26,6 +26,7 @@ import type {
 } from "./workbook-actions";
 import type { DutyRosterAssignment } from "../domain/duty-roster/roster";
 import type { ScheduleFailureDetails } from "../domain/shared/schedule-failure-details";
+import type { PolicyEditingView } from "./policy-editing-session";
 
 export type ApplicationDialog =
   | { kind: "templates" }
@@ -135,6 +136,7 @@ export interface ScheduleProgressView {
 }
 
 export interface ApplicationViewState {
+  policyEditing?: PolicyEditingView;
   policyQuery?: string;
   section: AppSection;
   date: string;

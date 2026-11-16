@@ -184,7 +184,15 @@ export type UiCommand =
   | { type: "open-flight-query" }
   | { type: "run-flight-query"; date: string }
   | { type: "apply-flight-query"; templateIds: string[]; flightIds: string[] }
-  | { type: "apply-policy"; input: SchedulePolicyInput }
+  | { type: "edit-policy-input"; input: Partial<SchedulePolicyInput> }
+  | { type: "save-policy" }
+  | { type: "discard-policy" }
+  | { type: "edit-supervisor-fill"; rule?: MobileSupervisorFillRule }
+  | {
+      type: "update-supervisor-fill-editor";
+      patch: Partial<MobileSupervisorFillRule>;
+    }
+  | { type: "cancel-supervisor-fill-editor" }
   | { type: "save-supervisor-fill"; rule: MobileSupervisorFillRule }
   | { type: "open-supervisor-fill-settings" }
   | {

@@ -1,0 +1,9 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule/.tmp/policy-save-commit-worktree
+
+
+ Test Files  5 passed | 22 skipped (27)
+      Tests  22 passed | 397 skipped (419)
+   Start at  19:05:19
+   Duration  36.66s (transform 5.80s, setup 0ms, import 12.65s, tests 14.42s, environment 3.07s)
+Exit code: 0

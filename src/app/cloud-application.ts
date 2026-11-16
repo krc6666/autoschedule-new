@@ -97,7 +97,8 @@ export function mountCloudApplication(
     if (workspace)
       state = {
         ...state,
-        dirty: workspace.hasUnsavedChanges,
+        dirty:
+          workspace.hasUnsavedChanges || Boolean(editor?.hasUnsavedRules()),
         version: workspace.cloudVersion,
         conflict: workspace.recoveryConflict,
         cacheWarning: workspace.cacheWarning,
@@ -157,6 +158,7 @@ export function mountCloudApplication(
         store: current.store,
         cloud: true,
         preferences: persistence.preferences,
+        onRulesChange: () => render(),
         shouldWarnOnExit: () =>
           current.hasUnsavedChanges || pendingCommand === "save",
       });
@@ -193,6 +195,7 @@ export function mountCloudApplication(
       if (command.type === "workspace") {
         render({ auditOpen: false });
       } else {
+        if (editor && !editor.confirmLeaveRules(confirm)) return;
         if (!audit) {
           audit = new OperationAuditController(backend);
           const page = new OperationAuditPageElement();
@@ -244,6 +247,15 @@ export function mountCloudApplication(
           throw new Error(
             "请先结束排班计算，或保存/取消历史编辑，再进行云端操作。"
           );
+        if (
+          editor.hasUnsavedRules() &&
+          (command.type === "save" ||
+            command.type === "publish" ||
+            command.type === "download")
+        )
+          throw new Error(
+            "规则有未保存的修改，请返回规则页点击“保存规则”，再进行云端保存、发布或下载。"
+          );
         if (command.type === "download") {
           download(workspace.recoveryJson());
           render({
@@ -275,6 +287,7 @@ export function mountCloudApplication(
                   "只把当前浏览器的完整两组资料带入编辑区，不立即上传。确认后请核对并点击保存到云端；原本地资料保留。"
                 )
               ) {
+                if (!editor.confirmLeaveRules(confirm)) break;
                 const local = persistence?.loadLocalModel();
                 if (!local)
                   throw new Error(
@@ -294,6 +307,7 @@ export function mountCloudApplication(
                   "放弃当前设备尚未保存到云端的修改，改用已保存的云端内容？此操作不会改写云端。"
                 )
               ) {
+                if (!editor.confirmLeaveRules(confirm)) break;
                 workspace.discardRecovery();
                 render({ saveFeedback: { phase: "idle" } });
               }
@@ -306,6 +320,7 @@ export function mountCloudApplication(
                   "用此恢复副本替换当前编辑区的两组资料？不会立即改写云端，确认后请核对并重新保存。"
                 )
               ) {
+                if (!editor.confirmLeaveRules(confirm)) break;
                 workspace.restoreRecovery(restored);
                 render({
                   message: "已导入，尚未保存到云端。",
@@ -329,6 +344,7 @@ export function mountCloudApplication(
                 });
                 break;
               }
+              if (!editor.confirmLeaveRules(confirm)) break;
               if (!workspace.recoveryConflict) workspace.stash();
               await backend.signOut();
               ++epoch;

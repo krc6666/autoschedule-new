@@ -7,6 +7,7 @@ import {
 } from "../helpers/application";
 import type { UiCommand } from "../../src/ui/events/ui-command";
 import "../../src/ui/components/policy-page";
+import type { PolicyPageElement } from "../../src/ui/components/policy-page";
 import "../../src/ui/components/app-dialog";
 import { mountElement, settleLit } from "./lit-test-helpers";
 
@@ -40,37 +41,62 @@ it("edits, disables, adds and deletes carrier groups through actual controls, co
       saveScheduleZoom: () => undefined,
     },
   });
-  const element = await mountElement<
-    HTMLElement & { model: typeof initial; updateComplete: Promise<unknown> }
-  >("autoschedule-policy-page", { model: store.getState().model });
+  const element = await mountElement<PolicyPageElement>(
+    "autoschedule-policy-page",
+    { model: store.getState().model, editing: coordinator.view().policyEditing }
+  );
   let pending: Promise<void> | undefined;
-  const unsubscribe = store.subscribe(() => {
-    element.model = store.getState().model;
-  });
   element.addEventListener("autoschedule-command", (event) => {
-    pending = coordinator.handle((event as CustomEvent<UiCommand>).detail);
+    pending = coordinator
+      .handle((event as CustomEvent<UiCommand>).detail)
+      .then(() => {
+        element.model = coordinator.view().policyEditing!.model;
+        element.editing = coordinator.view().policyEditing;
+      });
   });
+  const save = async () => {
+    element
+      .querySelector<HTMLButtonElement>(".policy-save-bar .btn-primary")!
+      .click();
+    await pending;
+    await settleLit();
+  };
   const card = () =>
     element.querySelector<HTMLElement>("[data-airline-mix-policies]")!;
   expect(card().textContent).toContain("当天只有组内航班");
   const input = card().querySelector<HTMLInputElement>('input[type="text"]')!;
   input.value = "cx，tr,KE";
-  input.dispatchEvent(new Event("change", { bubbles: true }));
+  input.dispatchEvent(new Event("input", { bubbles: true }));
   await pending;
   await settleLit();
+  expect(store.getState().model.settings.airlineMixPolicies).toEqual(
+    initial.settings.airlineMixPolicies
+  );
+  expect(element.model.settings.airlineMixPolicies[0]?.airlineCodes).toEqual([
+    "CX",
+    "TR",
+    "KE",
+  ]);
+  await save();
   expect(
     store.getState().model.settings.airlineMixPolicies[0]!.airlineCodes
   ).toEqual(["CX", "TR", "KE"]);
   expect(store.getState().model.schedulePolicyStale).toBe(true);
   const invalid = card().querySelector<HTMLInputElement>('input[type="text"]')!;
   invalid.value = "FD573,AK151";
-  invalid.dispatchEvent(new Event("change", { bubbles: true }));
+  invalid.dispatchEvent(new Event("input", { bubbles: true }));
   await pending;
   await settleLit();
+  await save();
   expect(
     store.getState().model.settings.airlineMixPolicies[0]!.airlineCodes
   ).toEqual(["CX", "TR", "KE"]);
-  expect(coordinator.view().toast?.message).toContain("原设置未更改");
+  expect(coordinator.view().toast?.message).toContain("航司代码");
+  expect(coordinator.hasUnsavedRules()).toBe(true);
+  invalid.value = "CX, TR, KE";
+  invalid.dispatchEvent(new Event("input", { bubbles: true }));
+  await pending;
+  await settleLit();
   const toggle = card().querySelector<HTMLInputElement>(
     'input[type="checkbox"]'
   )!;
@@ -78,6 +104,10 @@ it("edits, disables, adds and deletes carrier groups through actual controls, co
   toggle.dispatchEvent(new Event("change", { bubbles: true }));
   await pending;
   await settleLit();
+  expect(store.getState().model.settings.airlineMixPolicies[0]?.enabled).toBe(
+    true
+  );
+  await save();
   expect(store.getState().model.settings.airlineMixPolicies[0]!.enabled).toBe(
     false
   );
@@ -88,7 +118,8 @@ it("edits, disables, adds and deletes carrier groups through actual controls, co
   card().querySelector<HTMLButtonElement>("button")!.click();
   await pending;
   await settleLit();
-  expect(store.getState().model.settings.airlineMixPolicies).toHaveLength(2);
+  expect(element.model.settings.airlineMixPolicies).toHaveLength(2);
+  expect(store.getState().model.settings.airlineMixPolicies).toHaveLength(1);
   const draft = [
     ...card().querySelectorAll<HTMLElement>("[data-airline-mix-id]"),
   ].at(-1)!;
@@ -97,7 +128,8 @@ it("edits, disables, adds and deletes carrier groups through actual controls, co
   await pending;
   await settleLit();
   expect(store.getState().model.settings.airlineMixPolicies).toHaveLength(1);
-  unsubscribe();
+  expect(element.model.settings.airlineMixPolicies).toHaveLength(1);
+  expect(coordinator.hasUnsavedRules()).toBe(false);
 });
 
 it("finds the preference and the editor by searching its name or a configured carrier", async () => {

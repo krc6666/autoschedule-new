@@ -1,9 +1,11 @@
 import { createStore, type StoreApi } from "zustand/vanilla";
 import { immer } from "zustand/middleware/immer";
+import { produce } from "immer";
+import { markActiveScheduleStale } from "../../domain/kernel/schedule-lifecycle";
 
 import { createDefaultState } from "../../defaults";
 import type { StateSaveResult } from "../../infrastructure/storage";
-import type { AppState, ScheduleGroupId } from "../../model";
+import type { AppState, ScheduleGroupId, ScheduleSettings } from "../../model";
 import {
   createConfigurationCommands,
   type ConfigurationCommands,
@@ -31,6 +33,7 @@ export interface AutoscheduleStoreState {
   hasUnexportedChanges(): boolean;
   markExported(): void;
   persist(): StateSaveResult;
+  savePolicySettings(settings: ScheduleSettings): StateSaveResult;
   reset(): void;
 }
 
@@ -192,6 +195,18 @@ export function createAutoscheduleStore(
         persist: () => {
           set((store) => syncActiveGroupProjection(store.model));
           const result = options.persistence.save(get().model);
+          set({ model: result.state });
+          dirty = false;
+          return result;
+        },
+        savePolicySettings: (settings) => {
+          const candidate = produce(get().model, (model) => {
+            model.settings = structuredClone(settings);
+            markActiveScheduleStale(model);
+            syncActiveGroupProjection(model);
+          });
+          // Persist first: a storage failure must leave formal state untouched.
+          const result = options.persistence.save(candidate);
           set({ model: result.state });
           dirty = false;
           return result;

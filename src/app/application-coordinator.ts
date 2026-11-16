@@ -19,6 +19,7 @@ import { todayIso } from "../utils";
 import type { ApplicationPreferences } from "./application-preferences";
 import { isStorageQuotaExceeded } from "../infrastructure/storage";
 import { halfRestSelectionForDate } from "../domain/records/half-rest-selections";
+import { PolicyEditingSession } from "./policy-editing-session";
 import {
   capturePreflightDraft,
   isPreflightDialog,
@@ -108,6 +109,7 @@ function initialView(
 }
 
 export class ApplicationCoordinator implements ApplicationContext {
+  readonly policyEditing = new PolicyEditingSession();
   readonly scheduleRunner: ScheduleRunner;
   readonly preferences: ApplicationPreferences;
   private currentView: ApplicationViewState;
@@ -193,6 +195,7 @@ export class ApplicationCoordinator implements ApplicationContext {
   view(): ApplicationViewState {
     return {
       ...this.currentView,
+      policyEditing: this.policyEditing.view(this.model()),
       ...halfRestSelectionForDate(this.model(), this.currentView.date),
     };
   }
@@ -207,6 +210,25 @@ export class ApplicationCoordinator implements ApplicationContext {
       !this.scheduleRunner.isRunning() &&
       !this.currentView.historyEditDate
     );
+  }
+
+  hasUnsavedRules(): boolean {
+    return this.policyEditing.view(this.model()).dirty;
+  }
+
+  confirmLeaveRules(
+    confirm = (message: string) => this.confirm(message)
+  ): boolean {
+    if (!this.hasUnsavedRules()) return true;
+    if (
+      !confirm(
+        "规则有未保存的修改。点“取消”返回继续编辑并点击“保存规则”；点“确定”将放弃这些修改并离开。"
+      )
+    )
+      return false;
+    this.policyEditing.discard();
+    this.updateView({});
+    return true;
   }
 
   updateView(patch: Partial<ApplicationViewState>): void {
@@ -300,6 +322,17 @@ export class ApplicationCoordinator implements ApplicationContext {
       this.toast("排班正在计算，请等待当前任务完成", "warning");
       return;
     }
+    if (
+      ((command.type === "navigate" &&
+        command.section !== this.currentView.section) ||
+        command.type === "apply-workbook-import") &&
+      !this.confirmLeaveRules()
+    )
+      return;
+    if (command.type === "export-config" && this.hasUnsavedRules()) {
+      this.toast("规则尚未保存，请先点击“保存规则”，再导出配置。", "warning");
+      return;
+    }
     const reservesSchedule = mayRunSchedule(command);
     if (reservesSchedule) this.scheduleCommandPending = true;
     try {
@@ -315,6 +348,28 @@ export class ApplicationCoordinator implements ApplicationContext {
 
   private handleViewCommand(command: UiCommand): boolean {
     switch (command.type) {
+      case "save-policy":
+        if (!this.hasUnsavedRules()) return true;
+        try {
+          const settings = this.policyEditing.prepareSave(this.model());
+          const result = this.store.getState().savePolicySettings(settings);
+          this.policyEditing.discard();
+          this.toast(
+            result.nearCapacity
+              ? "规则已保存，但浏览器存储接近上限，请及时备份。"
+              : "全部规则已保存；当前班表需重新排班后执行。云端版请再点击顶部“保存到云端”。",
+            result.nearCapacity ? "warning" : "success"
+          );
+        } catch (error) {
+          this.toast(
+            `规则未保存，原规则和草稿均保留：${error instanceof Error ? error.message : "请重试。"}`,
+            "danger"
+          );
+        }
+        return true;
+      case "discard-policy":
+        this.confirmLeaveRules();
+        return true;
       case "navigate":
         this.updateView({ section: command.section });
         return true;
@@ -337,6 +392,11 @@ export class ApplicationCoordinator implements ApplicationContext {
           }
           this.commit("当前组已保存");
         }
+        if (
+          command.groupId !== this.model().activeGroupId &&
+          !this.confirmLeaveRules()
+        )
+          return true;
         this.store.getState().switchGroup(command.groupId);
         this.commit(`已切换到${command.groupId}组`);
         this.updateView({
@@ -352,6 +412,7 @@ export class ApplicationCoordinator implements ApplicationContext {
         return true;
       case "reset-all":
         if (this.confirm("确认恢复初始数据？当前本地数据将被替换。")) {
+          if (!this.confirmLeaveRules()) return true;
           this.store.getState().reset();
           this.preflightDrafts = [];
           this.savePreflightDrafts();

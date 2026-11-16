@@ -1,0 +1,75 @@
+
+> autoschedule@1.0.0 test
+> vitest run --exclude tests/performance/**
+
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+stderr | tests/ui/airline-mix-settings.test.ts
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+
+ ❯ tests/ui/airline-mix-settings.test.ts (3 tests | 1 failed) 247ms
+   × edits, disables, adds and deletes carrier groups through actual controls, controller and Store 151ms
+stderr | tests/infrastructure/policy-diagnostics-roundtrip.test.ts
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+
+ ❯ tests/infrastructure/policy-diagnostics-roundtrip.test.ts (2 tests | 1 failed) 246ms
+     × retains pending confirmation after Excel export and config import 92ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/infrastructure/policy-diagnostics-roundtrip.test.ts > configuration diagnostics after persistence > retains pending confirmation after Excel export and config import
+AssertionError: expected '\n            查看原因与处理方法\n            …' to contain '保存关系'
+
+- Expected
++ Received
+
+- 保存关系
++
++             查看原因与处理方法
++             旧配置未完整生效，或旧岗位只有补位标记。需要在统一入口核对来源与目标后保存。
++
++               点击编辑，选择一个模板航班，再选择“督导岗位”和“补位岗位”，最后点击页面上方“保存规则”。
++
++
+
+ ❯ tests/infrastructure/policy-diagnostics-roundtrip.test.ts:113:33
+    111|     expect(details.open).toBe(false);
+    112|     expect(details.textContent).toContain("点击编辑");
+    113|     expect(details.textContent).toContain("保存关系");
+       |                                 ^
+    114|   });
+    115| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/ui/airline-mix-settings.test.ts > edits, disables, adds and deletes carrier groups through actual controls, controller and Store
+AssertionError: expected [ 'FD', 'AK' ] to deeply equal [ 'CX', 'TR', 'KE' ]
+
+- Expected
++ Received
+
+  [
+-   "CX",
+-   "TR",
+-   "KE",
++   "FD",
++   "AK",
+  ]
+
+ ❯ tests/ui/airline-mix-settings.test.ts:63:5
+     61|   expect(
+     62|     store.getState().model.settings.airlineMixPolicies[0]!.airlineCodes
+     63|   ).toEqual(["CX", "TR", "KE"]);
+       |     ^
+     64|   expect(store.getState().model.schedulePolicyStale).toBe(true);
+     65|   const invalid = card().querySelector<HTMLInputElement>('input[type="…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed | 207 passed (209)
+      Tests  2 failed | 2055 passed (2057)
+   Start at  17:37:01
+   Duration  179.38s (transform 10.29s, setup 0ms, import 53.05s, tests 240.79s, environment 16.28s)
+Exit code: 1

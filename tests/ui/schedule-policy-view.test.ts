@@ -2,16 +2,76 @@
 
 import { describe, expect, it } from "vitest";
 
+import type { AppState } from "../../src/model";
+import type { PolicyPageElement } from "../../src/ui/components/policy-page";
+import {
+  createTestApplicationCoordinator,
+  createTestAutoscheduleStore,
+} from "../helpers/application";
 import { createDefaultState } from "../../src/defaults";
 import { ACTIVE_SCHEDULING_RULES } from "../../src/domain/rules/schedule-rule-contract";
 import "../../src/ui/components/policy-page";
 import { mountElement, settleLit } from "./lit-test-helpers";
 
+async function mountPolicyPage(state: AppState) {
+  const store = createTestAutoscheduleStore(state);
+  let element: PolicyPageElement;
+  const app = createTestApplicationCoordinator(store, {
+    preferences: {
+      loadScheduleDate: () => null,
+      saveScheduleDate: () => {},
+      loadScheduleZoom: () => 1,
+      saveScheduleZoom: () => {},
+    },
+    confirm: () => true,
+    onViewChange: (view) => {
+      if (element) {
+        element.model = view.policyEditing!.model;
+        element.editing = view.policyEditing;
+      }
+    },
+  });
+  element = await mountElement<PolicyPageElement>("autoschedule-policy-page", {
+    model: app.model(),
+    editing: app.view().policyEditing,
+  });
+  element.addEventListener("autoschedule-command", (event) => {
+    void app.handle((event as CustomEvent).detail);
+  });
+  return element;
+}
+
 describe("rules page", () => {
+  it("starts with every rule disclosure collapsed and expands matching cards for search", async () => {
+    const element = await mountPolicyPage(createDefaultState());
+    const disclosures = [
+      ...element.querySelectorAll<HTMLDetailsElement>("details"),
+    ];
+    expect(disclosures.length).toBeGreaterThan(5);
+    expect(disclosures.every((item) => !item.open)).toBe(true);
+    const search = element.querySelector<HTMLInputElement>(
+      'input[type="search"]'
+    )!;
+    search.value = "最大当日疲劳差";
+    search.dispatchEvent(new Event("input", { bubbles: true }));
+    await settleLit();
+    expect(
+      element.querySelector<HTMLDetailsElement>(
+        "autoschedule-policy-settings details"
+      )?.open
+    ).toBe(true);
+    search.value = "";
+    search.dispatchEvent(new Event("input", { bubbles: true }));
+    await settleLit();
+    expect(
+      [...element.querySelectorAll<HTMLDetailsElement>("details")].every(
+        (item) => !item.open
+      )
+    ).toBe(true);
+  });
+
   it("finds the recent actual fatigue supplement through the existing workload rule", async () => {
-    const element = await mountElement<
-      HTMLElement & { updateComplete: Promise<unknown> }
-    >("autoschedule-policy-page", { model: createDefaultState() });
+    const element = await mountPolicyPage(createDefaultState());
     const search = element.querySelector<HTMLInputElement>(
       'input[type="search"]'
     )!;
@@ -27,12 +87,10 @@ describe("rules page", () => {
     );
   });
   it("finds the ordinary staff continuity rule with its exception and fallback", async () => {
-    const element = await mountElement<
-      HTMLElement & { updateComplete: Promise<unknown> }
-    >("autoschedule-policy-page", { model: createDefaultState() });
+    const element = await mountPolicyPage(createDefaultState());
     expect(
       element.querySelector<HTMLDetailsElement>(".policy-ledger")?.open
-    ).toBe(true);
+    ).toBe(false);
     const search = element.querySelector<HTMLInputElement>(
       'input[type="search"]'
     )!;
@@ -52,9 +110,7 @@ describe("rules page", () => {
   it("shows duty afternoon relief and finds it by its rule name", async () => {
     const state = createDefaultState();
     const before = structuredClone(state);
-    const element = await mountElement<
-      HTMLElement & { updateComplete: Promise<unknown> }
-    >("autoschedule-policy-page", { model: state });
+    const element = await mountPolicyPage(state);
     const ruleRow = () =>
       [
         ...element.querySelectorAll<HTMLTableRowElement>(
@@ -64,7 +120,7 @@ describe("rules page", () => {
 
     expect(
       element.querySelector<HTMLDetailsElement>(".policy-ledger")?.open
-    ).toBe(true);
+    ).toBe(false);
     expect(ruleRow()).toBeDefined();
     expect(ruleRow()?.textContent).toContain("按航班开始时间联动下午起止设置");
     expect(ruleRow()?.textContent).toContain("缺员才用值班兜底");
@@ -86,9 +142,7 @@ describe("rules page", () => {
 
   it("saves independent monthly rest switches and target differences through the normal command", async () => {
     const state = createDefaultState();
-    const element = await mountElement<
-      HTMLElement & { updateComplete: Promise<unknown> }
-    >("autoschedule-policy-page", { model: state });
+    const element = await mountPolicyPage(state);
     for (const key of [
       "earlyDepartureBalanceEnabled",
       "afternoonRestBalanceEnabled",
@@ -119,11 +173,11 @@ describe("rules page", () => {
       (event) => (command = event as CustomEvent)
     );
     element
-      .querySelector<HTMLButtonElement>(
-        "autoschedule-policy-settings button.btn-primary"
-      )!
+      .querySelector<HTMLButtonElement>(".policy-save-bar button.btn-primary")!
       .click();
-    expect(command?.detail.input).toMatchObject({
+    await settleLit();
+    expect(command?.detail).toEqual({ type: "save-policy" });
+    expect(element.model.settings).toMatchObject({
       earlyDepartureBalanceEnabled: false,
       earlyDepartureMaxDifference: 3,
       afternoonRestBalanceEnabled: true,
@@ -133,9 +187,7 @@ describe("rules page", () => {
   });
   it("edits all three statistics windows in one compact section and rejects an empty window", async () => {
     const state = createDefaultState();
-    const element = await mountElement<
-      HTMLElement & { updateComplete: Promise<unknown> }
-    >("autoschedule-policy-page", { model: state });
+    const element = await mountPolicyPage(state);
     const section = element.querySelector<HTMLDetailsElement>(
       "details[data-statistics-periods]"
     );
@@ -162,13 +214,12 @@ describe("rules page", () => {
       command = event as CustomEvent;
     });
     const button = element.querySelector<HTMLButtonElement>(
-      "autoschedule-policy-settings button.btn-primary"
+      ".policy-save-bar button.btn-primary"
     )!;
     button.click();
-    expect(command?.detail).toMatchObject({
-      type: "apply-policy",
-      input: values,
-    });
+    await settleLit();
+    expect(command?.detail).toEqual({ type: "save-policy" });
+    expect(element.model.settings).toMatchObject(values);
     expect(state.settings.afternoonRestStartTime).toBe("12:00");
     const start = section!.querySelector<HTMLInputElement>(
       'input[data-policy-setting="afternoonRestStartTime"]'
@@ -177,7 +228,11 @@ describe("rules page", () => {
     start.dispatchEvent(new Event("input", { bubbles: true }));
     await settleLit();
     expect(section!.textContent).toContain("开始和结束不能相同");
-    expect(button.disabled).toBe(true);
+    expect(button.disabled).toBe(false);
+    button.click();
+    await settleLit();
+    expect(element.editing?.dirty).toBe(true);
+    expect(element.model.settings.afternoonRestStartTime).toBe("17:00");
   });
   function tw616FillState() {
     const state = createDefaultState();
@@ -221,9 +276,7 @@ describe("rules page", () => {
 
   it("does not call a configured TW616 template nonexistent when today's plan omits it", async () => {
     const state = tw616FillState();
-    const element = await mountElement<
-      HTMLElement & { updateComplete: Promise<unknown> }
-    >("autoschedule-policy-page", { model: state });
+    const element = await mountPolicyPage(state);
     const card = element.querySelector<HTMLElement>("[data-supervisor-fill]")!;
     expect(card.textContent).not.toContain("TW616 不存在");
     expect(card.textContent).toContain("当前航班计划未包含");
@@ -232,9 +285,7 @@ describe("rules page", () => {
   it("keeps repair instructions collapsed and identifies the field to change", async () => {
     const state = tw616FillState();
     state.settings.mobileSupervisorFillRules[0]!.requiresConfirmation = true;
-    const element = await mountElement<
-      HTMLElement & { updateComplete: Promise<unknown> }
-    >("autoschedule-policy-page", { model: state });
+    const element = await mountPolicyPage(state);
     const card = element.querySelector<HTMLElement>("[data-supervisor-fill]")!;
     const help = card.querySelector<HTMLDetailsElement>(
       "details[data-policy-diagnostic]"
@@ -245,7 +296,7 @@ describe("rules page", () => {
       "查看原因与处理方法"
     );
     expect(help!.textContent).toContain("点击编辑");
-    expect(help!.textContent).toContain("保存关系");
+    expect(help!.textContent).toContain("保存规则");
   });
 
   it("explains unmatched rules beyond supervisor fill and keeps all help closed", async () => {
@@ -266,9 +317,7 @@ describe("rules page", () => {
         staffIds: [],
       },
     ];
-    const element = await mountElement<
-      HTMLElement & { updateComplete: Promise<unknown> }
-    >("autoschedule-policy-page", { model: state });
+    const element = await mountPolicyPage(state);
     const duty = element.querySelector<HTMLElement>(
       '[data-policy-diagnostics="dutyPositionPriorities:missing-duty"]'
     );
@@ -291,9 +340,7 @@ describe("rules page", () => {
   it("shows an obsolete selected late scope and lets the user deselect it", async () => {
     const state = createDefaultState();
     state.settings.latePriorityFlightNumbers = ["MISSING"];
-    const element = await mountElement<
-      HTMLElement & { updateComplete: Promise<unknown> }
-    >("autoschedule-policy-page", { model: state });
+    const element = await mountPolicyPage(state);
     const scope = element.querySelector<HTMLElement>(
       ".late-priority-flight-scope"
     )!;
@@ -314,9 +361,7 @@ describe("rules page", () => {
   it("explains disabled core switches from the current draft before saving", async () => {
     const state = createDefaultState();
     state.settings.highLoadProtectionEnabled = true;
-    const element = await mountElement<
-      HTMLElement & { updateComplete: Promise<unknown> }
-    >("autoschedule-policy-page", { model: state });
+    const element = await mountPolicyPage(state);
     const field = element.querySelector<HTMLInputElement>(
       'input[data-policy-setting="highLoadProtectionEnabled"]'
     )!;
@@ -408,9 +453,7 @@ describe("rules page", () => {
         mode: "forbid",
       },
     ];
-    const element = await mountElement<
-      HTMLElement & { updateComplete: Promise<unknown> }
-    >("autoschedule-policy-page", { model: state });
+    const element = await mountPolicyPage(state);
     for (const [key, id] of [
       ["sameFlightStaffExclusions", "pair"],
       ["crossFlightPriorityPolicies", "priority"],
@@ -433,9 +476,7 @@ describe("rules page", () => {
 
   it("offers the two flight-count exemption checkboxes and saves their values", async () => {
     const state = createDefaultState();
-    const element = await mountElement<
-      HTMLElement & { updateComplete: Promise<unknown> }
-    >("autoschedule-policy-page", { model: state });
+    const element = await mountPolicyPage(state);
     const form = element.querySelector("autoschedule-policy-settings")!;
     const halfRest = form.querySelector<HTMLInputElement>(
       'input[data-policy-setting="dailyFlightCountBalanceExemptHalfRest"]'
@@ -455,14 +496,15 @@ describe("rules page", () => {
 
     halfRest.checked = false;
     halfRest.dispatchEvent(new Event("change", { bubbles: true }));
-    form.querySelector<HTMLButtonElement>("button.btn-primary")!.click();
-
-    expect(command?.detail).toMatchObject({
-      type: "apply-policy",
-      input: {
-        dailyFlightCountBalanceExemptHalfRest: false,
-        dailyFlightCountBalanceExemptTeamLeaders: true,
-      },
+    await settleLit();
+    element
+      .querySelector<HTMLButtonElement>(".policy-save-bar button.btn-primary")!
+      .click();
+    await settleLit();
+    expect(command?.detail).toEqual({ type: "save-policy" });
+    expect(element.model.settings).toMatchObject({
+      dailyFlightCountBalanceExemptHalfRest: false,
+      dailyFlightCountBalanceExemptTeamLeaders: true,
     });
   });
 
@@ -480,9 +522,7 @@ describe("rules page", () => {
         allowManual: false,
       },
     ];
-    const element = await mountElement<
-      HTMLElement & { updateComplete: Promise<unknown> }
-    >("autoschedule-policy-page", { model: state });
+    const element = await mountPolicyPage(state);
     const card = element.querySelector<HTMLElement>("[data-supervisor-fill]")!;
 
     expect(card).not.toBeNull();
@@ -541,9 +581,7 @@ describe("rules page", () => {
       },
     ];
 
-    const element = await mountElement<
-      HTMLElement & { updateComplete: Promise<unknown> }
-    >("autoschedule-policy-page", { model: state });
+    const element = await mountPolicyPage(state);
     const card = element.querySelector<HTMLElement>("[data-supervisor-fill]")!;
 
     expect(card.textContent).toContain("此补位关系待确认");
@@ -560,9 +598,7 @@ describe("rules page", () => {
         staffIds: [selected.id, "B-1"],
       },
     ];
-    const element = await mountElement<
-      HTMLElement & { updateComplete: Promise<unknown> }
-    >("autoschedule-policy-page", { model: state });
+    const element = await mountPolicyPage(state);
     const card = element.querySelector<HTMLElement>(
       "[data-cross-flight-priorities]"
     )!;
@@ -588,9 +624,7 @@ describe("rules page", () => {
         flightNo: "KE166",
       },
     ];
-    const element = await mountElement<
-      HTMLElement & { updateComplete: Promise<unknown> }
-    >("autoschedule-policy-page", { model: state });
+    const element = await mountPolicyPage(state);
     const card = element.querySelector<HTMLElement>(
       "[data-same-flight-staff-exclusions]"
     );
@@ -635,9 +669,7 @@ describe("rules page", () => {
       { airlineCode: "KE", position: "控制" },
       { airlineCode: "MU", position: "送资料" },
     ];
-    const element = await mountElement<
-      HTMLElement & { updateComplete: Promise<unknown> }
-    >("autoschedule-policy-page", { model: state });
+    const element = await mountPolicyPage(state);
     const collection = element.querySelector<HTMLDetailsElement>(
       ".ordinary-priority-position-scope"
     )!;
@@ -675,9 +707,7 @@ describe("rules page", () => {
 
   it("projects settings, structured rules, and the central rule ledger", async () => {
     const state = createDefaultState();
-    const element = await mountElement<
-      HTMLElement & { updateComplete: Promise<unknown> }
-    >("autoschedule-policy-page", { model: state });
+    const element = await mountPolicyPage(state);
     const text = element.textContent ?? "";
 
     expect(text).toContain("排班规则");
@@ -748,9 +778,7 @@ describe("rules page", () => {
 
   it("shows concrete gap-fill positions and emits single-position and category updates", async () => {
     const state = createDefaultState();
-    const element = await mountElement<
-      HTMLElement & { updateComplete: Promise<unknown> }
-    >("autoschedule-policy-page", { model: state });
+    const element = await mountPolicyPage(state);
     const settings = element.querySelector<HTMLElement>(
       "autoschedule-team-leader-gap-fill-protection-settings"
     )!;
@@ -783,9 +811,7 @@ describe("rules page", () => {
 
   it("emits the selected recovery mode from the recovery module", async () => {
     const state = createDefaultState();
-    const element = await mountElement<
-      HTMLElement & { updateComplete: Promise<unknown> }
-    >("autoschedule-policy-page", { model: state });
+    const element = await mountPolicyPage(state);
     const structuredRules = element.querySelector(
       "autoschedule-policy-structured-rules"
     )!;
@@ -800,7 +826,7 @@ describe("rules page", () => {
     select.value = "forbid";
     select.dispatchEvent(new Event("change", { bubbles: true }));
 
-    expect(emitted?.detail.type).toBe("apply-policy");
+    expect(emitted?.detail.type).toBe("edit-policy-input");
     expect(emitted?.detail.input.nextWorkdayRecoveryMode).toBe("forbid");
   });
 
@@ -816,9 +842,7 @@ describe("rules page", () => {
         minimumStaffCount: 1,
       },
     ];
-    const element = await mountElement<
-      HTMLElement & { updateComplete: Promise<unknown> }
-    >("autoschedule-policy-page", { model: state });
+    const element = await mountPolicyPage(state);
     const search = element.querySelector<HTMLInputElement>(
       'input[type="search"]'
     )!;
@@ -845,9 +869,7 @@ describe("rules page", () => {
 
   it("searches field labels and central rule descriptions across the whole page", async () => {
     const state = createDefaultState();
-    const element = await mountElement<
-      HTMLElement & { updateComplete: Promise<unknown> }
-    >("autoschedule-policy-page", { model: state });
+    const element = await mountPolicyPage(state);
     const search = element.querySelector<HTMLInputElement>(
       'input[type="search"]'
     )!;
@@ -880,9 +902,7 @@ describe("rules page", () => {
       minimumStaffCount: 1,
     };
     state.settings.crossWorkdayQualificationReservations = [reservation];
-    const element = await mountElement<
-      HTMLElement & { updateComplete: Promise<unknown> }
-    >("autoschedule-policy-page", { model: state });
+    const element = await mountPolicyPage(state);
     const transitionSelect = element.querySelector<HTMLSelectElement>(
       ".transition-policy-grid select"
     );

@@ -4,7 +4,10 @@ import type { AppState, PositionRule } from "../../model";
 import { teamLeaderGapFillPositionDisposition } from "../../domain/coverage/team-leader-gap-fill-protection";
 import { isOrdinaryPriorityPosition } from "../../domain/reviews/position-rotation-policy";
 import { dispatchUiCommand } from "../events/ui-command";
-import { matchesPolicySearch } from "../projections/policy-search";
+import {
+  matchesPolicySearch,
+  normalizePolicySearchQuery,
+} from "../projections/policy-search";
 import { LightDomElement } from "./light-dom-element";
 import { diagnoseGapFillReferences } from "../../domain/rules/policy-configuration-diagnostics";
 import { renderPolicyDiagnostics } from "./policy-diagnostic";
@@ -54,7 +57,7 @@ export class TeamLeaderGapFillProtectionSettingsElement extends LightDomElement 
 
     return html`<details
       class="policy-rule-card team-leader-gap-fill-protection"
-      open
+      ?open=${Boolean(normalizePolicySearchQuery(this.query))}
     >
       <summary>
         <span
@@ -92,7 +95,10 @@ export class TeamLeaderGapFillProtectionSettingsElement extends LightDomElement 
         (rule) => !teamLeaderGapFillPositionDisposition(this.model, rule).fixed
       )
       .map((rule) => rule.id);
-    return html`<details class="team-leader-gap-fill-protection-group">
+    return html`<details
+      class="team-leader-gap-fill-protection-group"
+      ?open=${Boolean(normalizePolicySearchQuery(this.query))}
+    >
       <summary>
         <span
           ><strong>${category}</strong

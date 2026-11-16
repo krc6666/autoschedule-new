@@ -1,0 +1,8 @@
+Isolated old-baseline verification, captured from actual command output:
+Command: npm run verify; VITEST_MAX_WORKERS=1
+Typecheck passed.
+Test Files 209 passed (209)
+Tests 2057 passed (2057)
+Start at 19:06:20
+Duration 313.53s
+Performance phase was stopped after the concurrent rotation task committed. This partial run is NOT used as a successful verify. The complete joint-version verify and version-check JSON are the commit gate evidence.

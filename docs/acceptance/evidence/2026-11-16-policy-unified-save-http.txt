@@ -1,0 +1,8 @@
+{
+    "Url":  "http://127.0.0.1:55350/",
+    "EntryStatus":  200,
+    "RulesModuleStatus":  200,
+    "HasUnifiedSave":  true,
+    "HasSaveCommand":  true,
+    "BrowserInteractionPerformed":  false
+}

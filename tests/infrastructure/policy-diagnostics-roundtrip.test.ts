@@ -110,6 +110,6 @@ describe("configuration diagnostics after persistence", () => {
     )!;
     expect(details.open).toBe(false);
     expect(details.textContent).toContain("点击编辑");
-    expect(details.textContent).toContain("保存关系");
+    expect(details.textContent).toContain("保存规则");
   });
 });

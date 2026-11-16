@@ -9,7 +9,10 @@ import {
   USER_RULE_FLOW,
   USER_SCHEDULING_RULES,
 } from "../projections/policy-rule-presentation";
-import { matchesPolicySearch } from "../projections/policy-search";
+import {
+  matchesPolicySearch,
+  normalizePolicySearchQuery,
+} from "../projections/policy-search";
 import { LightDomElement } from "./light-dom-element";
 
 export class PolicyRuleLedgerElement extends LightDomElement {
@@ -42,7 +45,10 @@ export class PolicyRuleLedgerElement extends LightDomElement {
       )
     );
     if (this.query.trim() && !rows.length) return nothing;
-    return html`<details class="policy-rule-card policy-ledger" open>
+    return html`<details
+      class="policy-rule-card policy-ledger"
+      ?open=${Boolean(normalizePolicySearchQuery(this.query))}
+    >
       <summary>
         <span><strong>规则如何执行</strong><small>${flow}</small></span
         ><i class="bi bi-chevron-down"></i>

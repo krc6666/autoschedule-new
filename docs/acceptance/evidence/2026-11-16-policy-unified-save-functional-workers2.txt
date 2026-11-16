@@ -1,0 +1,31 @@
+
+> autoschedule@1.0.0 test
+> vitest run --exclude tests/performance/**
+
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/domain/scheduling-kernel.test.ts (135 tests | 1 failed) 70841ms
+     × does not copy one flight's configured guide positions into every other flight 15069ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/domain/scheduling-kernel.test.ts > scheduler domain > does not copy one flight's configured guide positions into every other flight
+Error: Test timed out in 15000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ tests/domain/scheduling-kernel.test.ts:5814:3
+    5812|   });
+    5813|
+    5814|   it("does not copy one flight's configured guide positions into every…
+       |   ^
+    5815|     const state = createOrdinarySchedulingState();
+    5816|     const result = await generateSchedule(state, "2026-07-18");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 208 passed (209)
+      Tests  1 failed | 2056 passed (2057)
+   Start at  17:41:10
+   Duration  173.09s (transform 11.02s, setup 0ms, import 53.32s, tests 227.38s, environment 16.33s)
+Exit code: 1
