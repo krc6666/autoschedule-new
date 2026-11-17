@@ -220,9 +220,14 @@ describe("audit text contains only actual changes", () => {
         p.textContent!.trim()
       )
     ).toEqual([
-      "跨航班人员优先 / AK151 / 人员名单：新增赵六；移除钱七",
-      '备注：旧 → <img src=x onerror="alert(1)">',
+      "2026/11/17 18:00：跨航班人员优先 / AK151 / 人员名单：新增赵六；移除钱七",
+      '2026/11/17 18:00：备注：旧 → <img src=x onerror="alert(1)">',
     ]);
+    expect(
+      [...details.querySelectorAll(".operation-audit-text li time")].map(
+        (time) => time.getAttribute("datetime")
+      )
+    ).toEqual(["2026-11-17T10:00:00Z", "2026-11-17T10:00:00Z"]);
     expect(details.querySelector("img,script")).toBeNull();
     expect(page.textContent).toContain("2 项变化");
     expect(

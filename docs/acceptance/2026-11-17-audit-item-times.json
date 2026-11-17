@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-17-audit-item-times",
+  "title": "操作记录每条修改显示实际保存时间",
+  "startedFrom": "2ad9e77769e5bcdcacf54163e3d72eccfc9e02f7",
+  "expectation": {
+    "example": "一次保存发生在2026-11-17 18:00，里面有换人和备注两项修改。",
+    "expected": "展开详情后，每一条实际变化前都显示这次云端保存的日期和时分，例如“2026/11/17 18:00：人员姓名：张三 → 李四”。",
+    "unchanged": "继续使用服务端记录的occurredAt和查看设备时区；账号、版本、变化项数、分页、失败重试、只显示实际变化和原工作台不变；不新增数据库字段，不声称有单字段编辑时间。",
+    "fallback": "旧记录只有一次保存时间，因此每条明细使用该次保存时间；时间格式异常仍由现有读取校验报错，不猜本地时间。"
+  },
+  "testedVersion": "11bf816aa70864b89a0db91e64821f32fcc90b938f89510f37631c47f78b67da",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "改前页面只有记录头部时间，明细时间断言失败。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-audit-item-times-red.txt",
+          "summary": "旧页面时间明细测试失败。",
+          "sha256": "6605e8ef1f0cc3d1b3e2b2824ee138952485f9547535587db52edaaf7ac8a7c5"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "每条实际变化显示服务端保存日期和时分。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-audit-item-times-focused.txt",
+          "summary": "3个直接测试文件15项通过。",
+          "sha256": "0f46cf044fef362d9f9aed3b92de5926c46a201edb11fcc847b3af0483d94c8c"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "覆盖时间datetime属性、历史记录分页、错误重试、空/零/否和恶意文字。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-audit-item-times-focused.txt",
+          "summary": "边界和直接消费者测试通过。",
+          "sha256": "0f46cf044fef362d9f9aed3b92de5926c46a201edb11fcc847b3af0483d94c8c"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "明细继续读取和记录分页沿用原控制器，时间随每条记录的occurredAt保持。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-audit-item-times-focused.txt",
+          "summary": "分页与重试测试通过。",
+          "sha256": "0f46cf044fef362d9f9aed3b92de5926c46a201edb11fcc847b3af0483d94c8c"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "每条文字行的datetime与保存记录时间相同，没有读取当前时间或重算时间。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-audit-item-times.html",
+          "summary": "匿名页面产物显示两条明细均为2026/11/17 18:00。",
+          "sha256": "4bbf81f7be9c2c9b9e7689262c3f78e58ca82f86bf3ae4f5ffb8d6920a4f3956"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "未改AuditChange、数据库、RPC、保存、账号、版本或分页合同。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-audit-item-times-focused.txt",
+          "summary": "原操作记录页面和app测试保持通过。",
+          "sha256": "0f46cf044fef362d9f9aed3b92de5926c46a201edb11fcc847b3af0483d94c8c"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "已生成匿名页面产物；真实浏览器和真实云端保存后的页面仍待Owner现场查看。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-audit-item-times.html",
+          "summary": "匿名DOM显示每条修改带日期和时分。",
+          "sha256": "4bbf81f7be9c2c9b9e7689262c3f78e58ca82f86bf3ae4f5ffb8d6920a4f3956"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "改前时间明细断言失败，改后15项定向测试通过，证据见red和focused日志。",
+    "laterChanges": "分页继续读取、错误重试、恶意文字和原工作台状态均沿原路径测试；真实页面仍需人工确认时区显示。",
+    "finalArtifact": "匿名DOM产物显示每条明细前都有2026/11/17 18:00和datetime；真实云端页面待Owner查看。"
+  },
+  "review": {
+    "missedScope": "单字段编辑时间不在服务端合同中，已在README/spec和验收记录中明确使用保存时间；真实浏览器未覆盖。",
+    "rootCause": "页面只在保存记录头部渲染occurredAt，明细行没有消费同一时间。",
+    "earlyDetection": "增加审计明细时先检查每条文字行是否带datetime，并用固定时区样例断言日期、时分和服务端原值。"
+  }
+}

@@ -49,6 +49,11 @@
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
+.operation-audit-text li time {
+  color: var(--bs-secondary-color);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
 
 .cloud-panel {
   padding: 12px 20px;

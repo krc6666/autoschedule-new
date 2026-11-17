@@ -45,11 +45,20 @@ export class OperationAuditPageElement extends LightDomElement {
       <div class="operation-audit-list">
         ${view.entries.map((entry) => {
           const detail = view.details[entry.id];
+          const occurredAt = new Date(entry.occurredAt).toLocaleString(
+            "zh-CN",
+            {
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+              hourCycle: "h23",
+            }
+          );
           return html`<article class="operation-audit-entry">
             <div class="d-flex flex-wrap align-items-center gap-2">
-              <time datetime=${entry.occurredAt}
-                >${new Date(entry.occurredAt).toLocaleString("zh-CN", { hourCycle: "h23" })}</time
-              >
+              <time datetime=${entry.occurredAt}>${occurredAt}</time>
               <strong class="audit-account">${entry.actor}</strong
               ><span class="small text-secondary"
                 >保存版本 ${entry.version} · ${entry.changeCount} 项变化</span
@@ -79,7 +88,14 @@ export class OperationAuditPageElement extends LightDomElement {
                           ${projected.action}：${projected.title}
                         </h2>
                         <ul class="operation-audit-text">
-                          ${projected.lines.map((line) => html`<li>${line}</li>`)}
+                          ${projected.lines.map(
+                            (line) =>
+                              html`<li>
+                                <time datetime=${entry.occurredAt}
+                                  >${occurredAt}</time
+                                >：${line}
+                              </li>`
+                          )}
                         </ul>
                       </section>`;
                     })}

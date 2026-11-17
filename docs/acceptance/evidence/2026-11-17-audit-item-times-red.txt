@@ -1,0 +1,46 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+npm.cmd : stderr | tests/ui/operation-audit-changes-only.test.ts
+所在位置 行:2 字符: 296
++ ... '; $output=(& npm.cmd exec vitest -- run tests/ui/operation-audit-cha ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (stderr | tests/...es-only.test.ts:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+
+ ❯ tests/ui/operation-audit-changes-only.test.ts (7 tests | 1 failed) 67ms
+     × renders plain text lines instead of tables, keeps paging metadata and escapes hostile content 46ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/ui/operation-audit-changes-only.test.ts > audit text contains only actual changes > renders plain text lin
+es instead of tables, keeps paging metadata and escapes hostile content
+AssertionError: expected [ …(2) ] to deeply equal [ …(2) ]
+
+- Expected
++ Received
+
+  [
+-   "2026/11/17 18:00：跨航班人员优先 / AK151 / 人员名单：新增赵六；移除钱七",
+-   "2026/11/17 18:00：备注：旧 → <img src=x onerror=\"alert(1)\">",
++   "跨航班人员优先 / AK151 / 人员名单：新增赵六；移除钱七",
++   "备注：旧 → <img src=x onerror=\"alert(1)\">",
+  ]
+
+ ❯ tests/ui/operation-audit-changes-only.test.ts:222:7
+    220|         p.textContent!.trim()
+    221|       )
+    222|     ).toEqual([
+       |       ^
+    223|       "2026/11/17 18:00：跨航班人员优先 / AK151 / 人员名单：新增赵六；移除钱七",
+    224|       '2026/11/17 18:00：备注：旧 → <img src=x onerror="alert(1)">',
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 6 passed (7)
+   Start at  20:04:27
+   Duration  1.13s (transform 258ms, setup 0ms, import 321ms, tests 67ms, environment 451ms)
