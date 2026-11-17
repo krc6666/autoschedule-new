@@ -1,0 +1,27 @@
+{
+  "scope": "Python standard-library JSON and XLSX XML inspection; synthetic records only",
+  "currentHistoryAndConfigAgree": true,
+  "flightNo": "CX937",
+  "actualRoleTime": "08:20–09:20",
+  "originalFlightCutoff": "10:20",
+  "storedWorkHoursAndFatigueRetained": [2, 3],
+  "exportRow": {
+    "日期": "2026-11-18",
+    "航班号": "CX937",
+    "岗位": "督导",
+    "姓名": "同步测试人员2",
+    "开始时间": "08:20",
+    "结束时间": "09:20",
+    "工作时长(小时)": "2",
+    "疲劳点数": "3",
+    "备注": "历史保存的新备注",
+    "状态": "已排",
+    "航班截载时间": "10:20",
+    "系统说明": "",
+    "人员编号": "2",
+    "人工调整证据": "{\"assignmentRemarks\":{\"remark\":\"\",\"manualRemark\":\"历史保存的新备注\"},\"countBaseline\":{\"staffId\":\"1\",\"staffName\":\"同步测试人员1\"}}",
+    "出勤时段": "",
+    "引导安排": ""
+  },
+  "browserAcceptance": false
+}

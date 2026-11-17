@@ -1,0 +1,12 @@
+{
+  "selectedDate": "2026-11-18",
+  "internalDate": null,
+  "source": "history",
+  "visibleDate": "2026-11-18 已保存班表",
+  "visibleTime": "08:30–10:30",
+  "visiblePerson": "同步测试人员1",
+  "expectedHistoryPerson": "同步测试人员1",
+  "expectedHistoryTime": "08:30–10:30",
+  "currentModelUntouched": true,
+  "staleNoticeVisible": false
+}

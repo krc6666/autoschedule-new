@@ -1,0 +1,25 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/app/latest-schedule-date.test.ts (7 tests | 1 failed) 68ms
+     × rejects current-table modification, archiving or export commands while an archived date is being shown 17ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/app/latest-schedule-date.test.ts > latest schedule date on entry and group change > rejects current-table modification, archiving or export commands while an archived date is being shown
+AssertionError: the given combination of arguments (undefined and string) is invalid for this assertion. You can use an array, a map, an object, a set, a string, or a weakset instead of a string
+ ❯ tests/app/latest-schedule-date.test.ts:124:41
+    122|       await app.handle(command);
+    123|       expect(app.model()).toEqual(before);
+    124|       expect(app.view().toast?.message).toContain("请先点击“编辑该日排班”");
+       |                                         ^
+    125|     }
+    126|     await app.handle({ type: "change-date", date: "2026-12-30" });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 6 passed (7)
+   Start at  12:54:24
+   Duration  2.18s (transform 1.63s, setup 0ms, import 1.90s, tests 68ms, environment 0ms)

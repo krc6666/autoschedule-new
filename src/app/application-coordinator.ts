@@ -16,6 +16,11 @@ import type {
 import type { AutoscheduleStore } from "./store/autoschedule-store";
 import { plannedScheduleProgress } from "../domain/kernel/schedule-pipeline";
 import { todayIso } from "../utils";
+import {
+  latestScheduleDate,
+  scheduleDisplaySource,
+} from "../domain/records/schedule-dates";
+import type { AppState } from "../model";
 import type { ApplicationPreferences } from "./application-preferences";
 import { isStorageQuotaExceeded } from "../infrastructure/storage";
 import { halfRestSelectionForDate } from "../domain/records/half-rest-selections";
@@ -82,14 +87,35 @@ function mayRunSchedule(command: UiCommand): boolean {
   );
 }
 
+const COMMANDS_USING_CURRENT_SCHEDULE = new Set<UiCommand["type"]>([
+  "assign-staff",
+  "update-assignment",
+  "create-temporary-assignment",
+  "delete-temporary-assignment",
+  "clear-schedule",
+  "archive-schedule",
+  "archive-next-duty-day",
+  "export-schedule",
+  "export-share-html",
+  "export-share-png",
+  "open-team-leader-gap-fill",
+  "preview-team-leader-gap-fill",
+  "confirm-team-leader-gap-fill",
+  "open-swap-analysis",
+  "select-swap-target",
+  "apply-swap-analysis",
+  "toggle-administrative-mode",
+]);
+
 function initialView(
   preferences: ApplicationPreferences,
+  model: AppState,
   restoredScheduleNotice = false
 ): ApplicationViewState {
   const storedZoom = preferences.loadScheduleZoom();
   return {
     section: "overview",
-    date: preferences.loadScheduleDate() || todayIso(),
+    date: latestScheduleDate(model) ?? todayIso(),
     zoom: Math.min(1.6, Math.max(0.7, storedZoom || 1)),
     halfRestStaffIds: [],
     halfRestModes: {},
@@ -128,6 +154,7 @@ export class ApplicationCoordinator implements ApplicationContext {
     this.preflightDrafts = this.preferences.loadPreflightDrafts?.() ?? [];
     this.currentView = initialView(
       this.preferences,
+      this.model(),
       options.restoredScheduleNotice
     );
     this.scheduleRunner = dependencies.createScheduleRunner({
@@ -323,6 +350,24 @@ export class ApplicationCoordinator implements ApplicationContext {
       return;
     }
     if (
+      !this.currentView.historyEditDate &&
+      this.currentView.section === "schedule" &&
+      scheduleDisplaySource(this.model(), this.currentView.date) !==
+        "current" &&
+      (this.model().assignments.length > 0 ||
+        scheduleDisplaySource(this.model(), this.currentView.date) ===
+          "history") &&
+      COMMANDS_USING_CURRENT_SCHEDULE.has(command.type)
+    ) {
+      this.toast(
+        scheduleDisplaySource(this.model(), this.currentView.date) === "history"
+          ? "当前显示已保存历史，请先点击“编辑该日排班”，再调整或导出。"
+          : "当前日期没有班表，请先生成排班或选择已有班表的日期。",
+        "warning"
+      );
+      return;
+    }
+    if (
       ((command.type === "navigate" &&
         command.section !== this.currentView.section) ||
         command.type === "apply-workbook-import") &&
@@ -400,6 +445,7 @@ export class ApplicationCoordinator implements ApplicationContext {
         this.store.getState().switchGroup(command.groupId);
         this.commit(`已切换到${command.groupId}组`);
         this.updateView({
+          date: latestScheduleDate(this.model()) ?? todayIso(),
           historyEditDate: null,
           restoredScheduleNotice: false,
         });

@@ -3,6 +3,7 @@ import { createRef, ref, type Ref } from "lit/directives/ref.js";
 
 import type { ApplicationViewState } from "../../app/application-view-state";
 import type { AppSection, AppState } from "../../model";
+import { scheduleDisplaySource } from "../../domain/records/schedule-dates";
 import {
   UI_COMMAND_EVENT,
   dispatchUiCommand,
@@ -209,6 +210,7 @@ export class AutoscheduleAppElement extends LightDomElement {
         .halfRestStaffIds=${this.view.halfRestStaffIds}
         .halfRestModes=${this.view.halfRestModes}
         .historyEditDate=${this.view.historyEditDate}
+        .source=${this.view.historyEditDate ? "current" : scheduleDisplaySource(this.model, this.view.date)}
         .restoredScheduleNotice=${this.view.restoredScheduleNotice ?? false}
       ></autoschedule-schedule-page>`;
     if (section === "policy")

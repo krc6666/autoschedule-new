@@ -1,0 +1,60 @@
+{
+  "date": "2026-11-18",
+  "current": [
+    {
+      "flightNo": "CX937",
+      "position": "督导",
+      "staffName": "同步测试人员2",
+      "startTime": "08:30",
+      "endTime": "10:30",
+      "manualRemark": "历史保存的新备注",
+      "fatiguePoints": 3
+    }
+  ],
+  "history": [
+    {
+      "flightNo": "CX937",
+      "position": "督导",
+      "staffName": "同步测试人员2",
+      "fatiguePoints": 3,
+      "assignmentRemarks": {
+        "remark": "",
+        "manualRemark": "历史保存的新备注"
+      }
+    }
+  ],
+  "ruleStaleAfterReload": false,
+  "fatigue": [
+    {
+      "name": "同步测试人员1",
+      "today": 0,
+      "month": 3
+    },
+    {
+      "name": "同步测试人员2",
+      "today": 3,
+      "month": 3
+    }
+  ],
+  "resultRows": [
+    {
+      "日期": "2026-11-18",
+      "航班号": "CX937",
+      "岗位": "督导",
+      "姓名": "同步测试人员2",
+      "开始时间": "08:30",
+      "结束时间": "10:30",
+      "工作时长(小时)": 2,
+      "疲劳点数": 3,
+      "备注": "历史保存的新备注",
+      "状态": "已排",
+      "航班截载时间": "10:30",
+      "系统说明": "",
+      "人员编号": "2",
+      "人工调整证据": "{\"assignmentRemarks\":{\"remark\":\"\",\"manualRemark\":\"历史保存的新备注\"},\"countBaseline\":{\"staffId\":\"1\",\"staffName\":\"同步测试人员1\"}}",
+      "出勤时段": "",
+      "引导安排": ""
+    }
+  ],
+  "otherGroupPreserved": true
+}

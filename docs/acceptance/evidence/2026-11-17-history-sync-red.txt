@@ -1,0 +1,1222 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+npm.cmd : stderr | tests/ui/history-current-sync.test.ts
+所在位置 行:3 字符: 1
++ npm.cmd exec vitest -- run tests/app/history-current-sync.test.ts tes ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (stderr | tests/...nt-sync.test.ts:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+
+xx·x··xxx·x
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 7 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/app/history-current-sync.test.ts > history saves synchronize the active date > commits the edited facts to
+ current, history, stored reload and result Excel without touching the other date/group
+AssertionError: expected [ { id: 'sync-slot', …(13) } ] to deeply equal [ { …(15) } ]
+
+- Expected
++ Received
+
+  [
+    {
+-     "countBaseline": {
+-       "staffId": "1",
+-       "staffName": "同步测试人员1",
+-     },
+      "endTime": "10:30",
+      "fatiguePoints": 3,
+-     "flightId": "historical-2026-11-18-flight-cx937",
++     "flightId": "flight-cx937",
+      "flightNo": "CX937",
+-     "id": "assignment-mwk2shyu-pmi7j9",
+-     "manualRemark": "历史保存的新备注",
++     "id": "sync-slot",
++     "manualRemark": "原备注",
+      "position": "督导",
+      "positionRuleId": "position-cx937-%E7%9D%A3%E5%AF%BC",
+      "remark": "",
+-     "staffId": "2",
+-     "staffName": "同步测试人员2",
++     "staffId": "1",
++     "staffName": "同步测试人员1",
+      "startTime": "08:30",
+      "status": "assigned",
+      "workHours": 2,
+    },
+  ]
+
+ ❯ tests/app/history-current-sync.test.ts:40:37
+     38|     const edited = await edit(app);
+     39|     await app.handle({ type: "save-history-edit" });
+     40|     expect(app.model().assignments).toEqual(edited);
+       |                                     ^
+     41|     expect(app.model().activeScheduleDate).toBe(syncDate);
+     42|     expect(app.view().restoredScheduleNotice).toBe(false);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/7]⎯
+
+ FAIL  tests/app/history-current-sync.test.ts > history saves synchronize the active date > does not certify a stale or
+iginal rule fingerprint by saving historical edits
+AssertionError: expected [ { id: 'sync-slot', …(13) } ] to deeply equal [ { …(15) } ]
+
+- Expected
++ Received
+
+  [
+    {
+-     "countBaseline": {
+-       "staffId": "1",
+-       "staffName": "同步测试人员1",
+-     },
+      "endTime": "10:30",
+      "fatiguePoints": 3,
+-     "flightId": "historical-2026-11-18-flight-cx937",
++     "flightId": "flight-cx937",
+      "flightNo": "CX937",
+-     "id": "assignment-mwk2si03-ermkls",
+-     "manualRemark": "历史保存的新备注",
++     "id": "sync-slot",
++     "manualRemark": "原备注",
+      "position": "督导",
+      "positionRuleId": "position-cx937-%E7%9D%A3%E5%AF%BC",
+      "remark": "",
+-     "staffId": "2",
+-     "staffName": "同步测试人员2",
++     "staffId": "1",
++     "staffName": "同步测试人员1",
+      "startTime": "08:30",
+      "status": "assigned",
+      "workHours": 2,
+    },
+  ]
+
+ ❯ tests/app/history-current-sync.test.ts:101:37
+     99|     const edited = await edit(app);
+    100|     await app.handle({ type: "save-history-edit" });
+    101|     expect(app.model().assignments).toEqual(edited);
+       |                                     ^
+    102|     expect(app.model().schedulePolicyStale).toBe(true);
+    103|     expect(persistence.load().schedulePolicyStale).toBe(true);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/7]⎯
+
+ FAIL  tests/app/history-current-sync.test.ts > history saves synchronize the active date > does not certify a missing
+original rule fingerprint by saving historical edits
+AssertionError: expected [ { id: 'sync-slot', …(13) } ] to deeply equal [ { …(15) } ]
+
+- Expected
++ Received
+
+  [
+    {
+-     "countBaseline": {
+-       "staffId": "1",
+-       "staffName": "同步测试人员1",
+-     },
+      "endTime": "10:30",
+      "fatiguePoints": 3,
+-     "flightId": "historical-2026-11-18-flight-cx937",
++     "flightId": "flight-cx937",
+      "flightNo": "CX937",
+-     "id": "assignment-mwk2si0b-10n7hh",
+-     "manualRemark": "历史保存的新备注",
++     "id": "sync-slot",
++     "manualRemark": "原备注",
+      "position": "督导",
+      "positionRuleId": "position-cx937-%E7%9D%A3%E5%AF%BC",
+      "remark": "",
+-     "staffId": "2",
+-     "staffName": "同步测试人员2",
++     "staffId": "1",
++     "staffName": "同步测试人员1",
+      "startTime": "08:30",
+      "status": "assigned",
+      "workHours": 2,
+    },
+  ]
+
+ ❯ tests/app/history-current-sync.test.ts:101:37
+     99|     const edited = await edit(app);
+    100|     await app.handle({ type: "save-history-edit" });
+    101|     expect(app.model().assignments).toEqual(edited);
+       |                                     ^
+    102|     expect(app.model().schedulePolicyStale).toBe(true);
+    103|     expect(persistence.load().schedulePolicyStale).toBe(true);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/7]⎯
+
+ FAIL  tests/app/history-current-sync.test.ts > history saves synchronize the active date > does not certify a mismatch
+ original rule fingerprint by saving historical edits
+AssertionError: expected [ { id: 'sync-slot', …(13) } ] to deeply equal [ { …(15) } ]
+
+- Expected
++ Received
+
+  [
+    {
+-     "countBaseline": {
+-       "staffId": "1",
+-       "staffName": "同步测试人员1",
+-     },
+      "endTime": "10:30",
+      "fatiguePoints": 3,
+-     "flightId": "historical-2026-11-18-flight-cx937",
++     "flightId": "flight-cx937",
+      "flightNo": "CX937",
+-     "id": "assignment-mwk2si0i-cwmsy2",
+-     "manualRemark": "历史保存的新备注",
++     "id": "sync-slot",
++     "manualRemark": "原备注",
+      "position": "督导",
+      "positionRuleId": "position-cx937-%E7%9D%A3%E5%AF%BC",
+      "remark": "",
+-     "staffId": "2",
+-     "staffName": "同步测试人员2",
++     "staffId": "1",
++     "staffName": "同步测试人员1",
+      "startTime": "08:30",
+      "status": "assigned",
+      "workHours": 2,
+    },
+  ]
+
+ ❯ tests/app/history-current-sync.test.ts:101:37
+     99|     const edited = await edit(app);
+    100|     await app.handle({ type: "save-history-edit" });
+    101|     expect(app.model().assignments).toEqual(edited);
+       |                                     ^
+    102|     expect(app.model().schedulePolicyStale).toBe(true);
+    103|     expect(persistence.load().schedulePolicyStale).toBe(true);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/7]⎯
+
+ FAIL  tests/app/history-current-sync.test.ts > history saves synchronize the active date > keeps the synchronized page
+ but reports persistence failure and preserves the previous stored version
+AssertionError: expected [ { id: 'sync-slot', …(13) } ] to deeply equal [ { …(15) } ]
+
+- Expected
++ Received
+
+  [
+    {
+-     "countBaseline": {
+-       "staffId": "1",
+-       "staffName": "同步测试人员1",
+-     },
+      "endTime": "10:30",
+      "fatiguePoints": 3,
+-     "flightId": "historical-2026-11-18-flight-cx937",
++     "flightId": "flight-cx937",
+      "flightNo": "CX937",
+-     "id": "assignment-mwk2si11-qkxtvz",
+-     "manualRemark": "历史保存的新备注",
++     "id": "sync-slot",
++     "manualRemark": "原备注",
+      "position": "督导",
+      "positionRuleId": "position-cx937-%E7%9D%A3%E5%AF%BC",
+      "remark": "",
+-     "staffId": "2",
+-     "staffName": "同步测试人员2",
++     "staffId": "1",
++     "staffName": "同步测试人员1",
+      "startTime": "08:30",
+      "status": "assigned",
+      "workHours": 2,
+    },
+  ]
+
+ ❯ tests/app/history-current-sync.test.ts:133:37
+    131|     save.mockImplementationOnce(() => { throw new Error("disk unavaila…
+    132|     await app.handle({ type: "save-history-edit" });
+    133|     expect(app.model().assignments).toEqual(edited);
+       |                                     ^
+    134|     expect(app.view().toast).toMatchObject({ tone: "danger", message: …
+    135|     expect(persistence.load().assignments).toEqual(stored.assignments);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/7]⎯
+
+ FAIL  tests/ui/history-current-sync.test.ts > same-date history through the mounted application > shows saved history
+edits on the schedule page and after a real storage reload without a false old-table notice
+AssertionError: expected '\n      \n      \n        \n        \…' not to contain '这是旧班表'
+
+- Expected
++ Received
+
+- 这是旧班表
++
++
++
++
++
++       重新排班
++
++
++       分队长补差
++
++
++       归档并排后天
++
++
++       导出结果
++
++
++
++
++
++
++
++
++       仅归档
++
++
++       对比上一班
++
++
++
++
++
++
++
++
++         半休人员
++
++
++
++
++
++               同步测试人员1
++
++                 下午半休
++                 上午半休
++
++
++
++               同步测试人员2
++
++                 下午半休
++                 上午半休
++
++
++
++
++
++
++
++
++           100%
++
++
++
++
++
++
++
++
++
++           是否启用行政支援模式
++
++         2026-11-18
++
++
++
++       这是旧班表，请重新排班后再使用。
++
++
++
++
++
++           常规人员2
++             人可用
++
++
++
++
++       1
++       同步测试人员1
++
++
++       2
++       同步测试人员2
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++                       CX93708:30–10:30到岗08:05
++
++
++
++
++
++             岗位人员
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++                     督导
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++                   引导岗位
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++           当日轮值
++           2026-11-18
++
++
++
++
++
++           CX航前未配置
++
++
++           值班人员同步测试人员2本次值班
++             +0 疲劳点
++
++
++           次日备勤人员同步测试人员1、未配置2026-11-19
++
++
++
++
++
++
++           当日轻松班次
++           2026-11-18
++
++
++
++
++
++
++             提前下班人员
++
++
++
++
++                           同步测试人员1
++                           CX937 / 10:30
++
++                         本月 2 次
++
++
++
++
++
++             下午无航班人员
++
++
++             12:00—18:00，当天有航班且个人无岗位重叠才计次
++
++
++             今日暂无
++
++
++
++
++
++
++
++
++
++           人员当日航班
++           全部常规人员（含病休），同一航班只统计一次；假别按当前人员状态显示
++
++
++           查询工作日
++
++
++
++
++               统计日期 2026-11-18
++               人员总数 2
++               1 人有航班
++               1 人未安排
++               总航班 1
++
++
++
++               全天未安排航班：
++               同步测试人员2
++
++
++               人员排序
++
++                 航班数从多到少
++                 航班数从少到多
++                 人员原顺序
++
++
++
++
++
++
++             序号
++             人员
++             航班数
++             承担航班
++
++
++
++
++                 1
++
++                   同步测试人员1
++
++                 1
++
++                   CX937
++
++
++                 2
++
++                   同步测试人员2
++
++                 0
++
++                   未安排
++
++
++
++
++
++
++
++
++
++           排班反馈
++           2026-11-18 · 自动核对当前结果、负荷和规则执行
++
++
++
++
++         一、航班安排反馈（航班与人员安排）航班密度、人员覆盖、工时与航班衔接
++
++
++
++       人员覆盖需复核
++       当天 1 个航班，无相邻航班密集区间；同步测试人员2为 0 工时；未安排的具体原因未记录，需要人工复核。
++                 查看具体原因
++                 当天 1 个航班，无相邻航班密集区间；同步测试人员2为 0 工时；未安排的具体原因未记录，需要人工复核。
++
++
++
++       负荷均衡已执行
++       航班负荷宽松；工时差 2.0 小时（同步测试人员2 0.0h，同步测试人员1 2.0h）；滚动工时差 4.0 小时；当日疲劳差 3.0 点（同步测试人员2 0.0，同步测试人员1 3.0）；总疲劳最高为同步测试人员1 6.
+0 点。规则目标为工时差不超过 2.0 小时、当日疲劳差不超过 4.0 点。最近7天已保存岗位点数加本班，近期累计疲劳差 6.0 点；作为补充尽量拉近，不要求相等，资格、覆盖、恢复和重点公平优先。
++
++
++       航班衔接已执行
++       未发生同一人员跨航班连续任务。
++
++
++       人工调整提醒已执行
++       当前班表没有人工突破自动排班限制的岗位。
++
++
++
++
++         二、规则执行反馈（规则执行情况）逐条标明已执行、需复核或暂无历史基准
++
++
++
++       12点前岗位完整性已执行
++       共 1 个12点前常规岗位，已按单岗位可胜任人数从少到多安排且全部填满，未突破严格限制。
++
++
++       跨工作日资质预留无基准
++       尚未配置跨工作日资质预留目标。
++
++
++       连续高负荷已执行
++       0 个高负荷岗位均未由同一人员在 360 分钟恢复期内连续承担。
++
++
++       跨工作班动态平衡已执行
++       2026-11-16 与本班没有出现需要由跨工作班负荷差裁决的同级候选人。
++
++
++       重点岗位频率均衡无基准
++       一号、申报、督导、控制和送资料岗位未出现需要调整的同岗高频安排。
++
++
++       连续轮岗复核无基准
++       没有触发连续轮岗复核；上一工作班未出现同一人员承担相同航班与岗位的连续记录。
++
++
++       上一工作日晚班人员跟踪已执行
++       2026-11-16 最后一批晚班没有命中已配置的末班重点岗位，无需跨工作日保护。
++
++
++       本班末班人员预告已执行
++       本班没有已安排的最后一批晚班岗位，下个工作日无需新增恢复保护人员。
++
++
++       值班与轮值需复核
++       CX航前未配置；值班同步测试人员2（+0 点疲劳）；备勤同步测试人员1（CX937/督导）、未配置（未配置）。备勤资质人员不足，空缺席位保持未配置；轮值未完整配置，或值班与备勤发生冲突，需要调整；CX航前与值班、备勤均允…
++                 查看具体原因
++                 CX航前未配置；值班同步测试人员2（+0 点疲劳）；备勤同步测试人员1（CX937/督导）、未配置（未配置）。备勤资质人员不足，空缺席位保持未配置；轮值未完整配置，或值班与备勤发生冲突，需要调整；CX航
+前与值班、备勤均允许人工同人。12点前上午航班规则无法核验。 下午避排优先，按航班开始时间判断12:00—18:00（含起点、不含终点）；未安排下午开始的航班。
++
++
++
++       同一工作班航班数均衡已执行
++       2026-11-18参与比较的正常常规人员不足两人，不构成航班数差距。
++
++
++       普通员工早晚任务集中已执行
++       最终班表未发现普通员工上午做完后直等末班、中间没有其他任务的安排；值班人员豁免。人工调整后按最终实际出勤重新检查。
++
++
++       航司搭配偏好已执行
++       最终班表没有发现多班全部落在已配置航司组内的人员；单班不强行增加任务。
++
++
++
++
+
+ ❯ assertSchedule tests/ui/history-current-sync.test.ts:51:81
+     49|     await app.command({ type: "navigate", section: "schedule" });
+     50|     const assertSchedule = (root: HTMLElement) => {
+     51|       expect(root.querySelector("autoschedule-schedule-page")?.textCon…
+       |                                                                                 ^
+     52|       expect(root.querySelector("autoschedule-schedule-page")?.textCon…
+     53|       expect([...root.querySelectorAll<HTMLInputElement>("input")].som…
+ ❯ tests/ui/history-current-sync.test.ts:56:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/7]⎯
+
+ FAIL  tests/ui/history-current-sync.test.ts > same-date history through the mounted application > does not mark a vali
+d restored schedule old just because assignments exist
+AssertionError: expected '\n      \n        当前组\n        \n    …' not to contain '这是旧班表'
+
+- Expected
++ Received
+
+- 这是旧班表
++
++
++         当前组
++
++
++             A 组
++
++
++             B 组
++
++
++
++
++
++
++
++
++
++             自动排班
++
++               机场地勤 · 本地工作台
++
++
++
++
++
++
++           已保存
++
++
++
++
++
++                 总览
++
++                 配置
++
++                 航班
++
++                 排班
++
++                 规则
++
++                 统计
++
++                 历史
++
++
++
++             导入数据
++
++
++             导出配置
++
++
++
++
++
++               排班
++
++                 1 个航班 ·
++                 2
++                 人可用 · 1
++                 个岗位已排
++
++
++
++
++       航班核对：本季航班固定以A组为准，B组跟随更新；各组岗位性质和人员资质仍独立，备用模板继续保留。两组一致且B组岗位已配齐后，此提醒自动消失。
++
++
++         以 A 组为准，核对 B 组（3 项）
++
++
++
++
++
++
++
++
++
++       重新排班
++
++
++       分队长补差
++
++
++       归档并排后天
++
++
++       导出结果
++
++
++
++
++
++
++
++
++       仅归档
++
++
++       对比上一班
++
++
++
++
++
++
++
++
++         半休人员
++
++
++
++
++
++               同步测试人员1
++
++                 下午半休
++                 上午半休
++
++
++
++               同步测试人员2
++
++                 下午半休
++                 上午半休
++
++
++
++
++
++
++
++
++           100%
++
++
++
++
++
++
++
++
++
++           是否启用行政支援模式
++
++         2026-11-18
++
++
++
++       这是旧班表，请重新排班后再使用。
++
++
++
++
++
++           常规人员2
++             人可用
++
++
++
++
++       1
++       同步测试人员1
++
++
++       2
++       同步测试人员2
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++                       CX93708:30–10:30到岗08:05
++
++
++
++
++
++             岗位人员
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++                     督导
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++                   引导岗位
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++           当日轮值
++           2026-11-18
++
++
++
++
++
++           CX航前未配置
++
++
++           值班人员同步测试人员2本次值班
++             +0 疲劳点
++
++
++           次日备勤人员同步测试人员1、未配置2026-11-19
++
++
++
++
++
++
++           当日轻松班次
++           2026-11-18
++
++
++
++
++
++
++             提前下班人员
++
++
++
++
++                           同步测试人员1
++                           CX937 / 10:30
++
++                         本月 2 次
++
++
++
++
++
++             下午无航班人员
++
++
++             12:00—18:00，当天有航班且个人无岗位重叠才计次
++
++
++             今日暂无
++
++
++
++
++
++
++
++
++
++           人员当日航班
++           全部常规人员（含病休），同一航班只统计一次；假别按当前人员状态显示
++
++
++           查询工作日
++
++
++
++
++               统计日期 2026-11-18
++               人员总数 2
++               1 人有航班
++               1 人未安排
++               总航班 1
++
++
++
++               全天未安排航班：
++               同步测试人员2
++
++
++               人员排序
++
++                 航班数从多到少
++                 航班数从少到多
++                 人员原顺序
++
++
++
++
++
++
++             序号
++             人员
++             航班数
++             承担航班
++
++
++
++
++                 1
++
++                   同步测试人员1
++
++                 1
++
++                   CX937
++
++
++                 2
++
++                   同步测试人员2
++
++                 0
++
++                   未安排
++
++
++
++
++
++
++
++
++
++           排班反馈
++           2026-11-18 · 自动核对当前结果、负荷和规则执行
++
++
++
++
++         一、航班安排反馈（航班与人员安排）航班密度、人员覆盖、工时与航班衔接
++
++
++
++       人员覆盖需复核
++       当天 1 个航班，无相邻航班密集区间；同步测试人员2为 0 工时；未安排的具体原因未记录，需要人工复核。
++                 查看具体原因
++                 当天 1 个航班，无相邻航班密集区间；同步测试人员2为 0 工时；未安排的具体原因未记录，需要人工复核。
++
++
++
++       负荷均衡已执行
++       航班负荷宽松；工时差 2.0 小时（同步测试人员2 0.0h，同步测试人员1 2.0h）；滚动工时差 4.0 小时；当日疲劳差 3.0 点（同步测试人员2 0.0，同步测试人员1 3.0）；总疲劳最高为同步测试人员1 6.
+0 点。规则目标为工时差不超过 2.0 小时、当日疲劳差不超过 4.0 点。最近7天已保存岗位点数加本班，近期累计疲劳差 6.0 点；作为补充尽量拉近，不要求相等，资格、覆盖、恢复和重点公平优先。
++
++
++       航班衔接已执行
++       未发生同一人员跨航班连续任务。
++
+
++
++       人工调整提醒已执行
++       当前班表没有人工突破自动排班限制的岗位。
++
++
++
++
++         二、规则执行反馈（规则执行情况）逐条标明已执行、需复核或暂无历史基准
++
++
+ Test Files  2 failed (2)
+      Tests  7 failed | 4 passed (11)
+   Start at  10:30:51
+   Duration  5.64s (transform 3.69s, setup 0ms, import 4.45s, tests 432ms, environment 352ms)
+
++
++       12点前岗位完整性已执行
++       共 1 个12点前常规岗位，已按单岗位可胜任人数从少到多安排且全部填满，未突破严格限制。
++
++
++       跨工作日资质预留无基准
++       尚未配置跨工作日资质预留目标。
++
++
++       连续高负荷已执行
++       0 个高负荷岗位均未由同一人员在 360 分钟恢复期内连续承担。
++
++
++       跨工作班动态平衡已执行
++       2026-11-16 与本班没有出现需要由跨工作班负荷差裁决的同级候选人。
++
++
++       重点岗位频率均衡无基准
++       一号、申报、督导、控制和送资料岗位未出现需要调整的同岗高频安排。
++
++
++       连续轮岗复核无基准
++       没有触发连续轮岗复核；上一工作班未出现同一人员承担相同航班与岗位的连续记录。
++
++
++       上一工作日晚班人员跟踪已执行
++       2026-11-16 最后一批晚班没有命中已配置的末班重点岗位，无需跨工作日保护。
++
++
++       本班末班人员预告已执行
++       本班没有已安排的最后一批晚班岗位，下个工作日无需新增恢复保护人员。
++
++
++       值班与轮值需复核
++       CX航前未配置；值班同步测试人员2（+0 点疲劳）；备勤同步测试人员1（CX937/督导）、未配置（未配置）。备勤资质人员不足，空缺席位保持未配置；轮值未完整配置，或值班与备勤发生冲突，需要调整；CX航前与值班、备勤均允…
++                 查看具体原因
++                 CX航前未配置；值班同步测试人员2（+0 点疲劳）；备勤同步测试人员1（CX937/督导）、未配置（未配置）。备勤资质人员不足，空缺席位保持未配置；轮值未完整配置，或值班与备勤发生冲突，需要调整；CX航
+前与值班、备勤均允许人工同人。12点前上午航班规则无法核验。 下午避排优先，按航班开始时间判断12:00—18:00（含起点、不含终点）；未安排下午开始的航班。
++
++
++
++       同一工作班航班数均衡已执行
++       2026-11-18参与比较的正常常规人员不足两人，不构成航班数差距。
++
++
++       普通员工早晚任务集中已执行
++       最终班表未发现普通员工上午做完后直等末班、中间没有其他任务的安排；值班人员豁免。人工调整后按最终实际出勤重新检查。
++
++
++       航司搭配偏好已执行
++       最终班表没有发现多班全部落在已配置航司组内的人员；单班不强行增加任务。
++
++
++
++
++
++
++
++
++
++         排班进度
++         0%
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
+
+ ❯ tests/ui/history-current-sync.test.ts:66:38
+     64|   it("does not mark a valid restored schedule old just because assignm…
+     65|     const app = await mount();
+     66|     expect(app.root.textContent).not.toContain("这是旧班表");
+       |                                      ^
+     67|   });
+     68|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/7]⎯

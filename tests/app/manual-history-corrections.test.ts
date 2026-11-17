@@ -284,7 +284,10 @@ describe("manual qualification override history contract", () => {
         expect.objectContaining({ code: "position-qualification" }),
       ]),
     });
-    expect(app.model().assignments).toEqual(originalAssignments);
+    expect(app.model().assignments[0]).toMatchObject({
+      staffId: people[2]!.id,
+      countBaseline: { staffId: people[0]!.id },
+    });
   });
 
   it("automatically merges a historical qualification override into existing corrections and the current schedule", async () => {

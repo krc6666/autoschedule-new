@@ -1,0 +1,2 @@
+验收材料检查失败：
+2026-11-17-latest-schedule-view / finalArtifact：尚未验收通过（unverified）

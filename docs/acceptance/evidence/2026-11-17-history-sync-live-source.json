@@ -1,0 +1,22 @@
+{
+  "entry": "http://127.0.0.1:64773/",
+  "mode": "Vite development server",
+  "checkedBy": "Read-only HTTP requests; no browser or user data accessed",
+  "files": [
+    {
+      "path": "src/app.ts",
+      "sha256": "d6d67ab2bb50b67f0011cf88e6d091c7734099ac20fd7a6ebe966d9ddcaa35a1",
+      "markers": {
+        "restoredModel.schedulePolicyStale": true
+      }
+    },
+    {
+      "path": "src/app/controllers/records-controller.ts",
+      "sha256": "a011ecc0b92fb419581bcf585d3389cb20f66603cebdaf6442437c4c99bf3b8f",
+      "markers": {
+        "syncCurrent": true,
+        "rulesWereCurrent": true
+      }
+    }
+  ]
+}

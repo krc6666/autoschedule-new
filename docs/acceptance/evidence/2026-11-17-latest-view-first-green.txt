@@ -1,0 +1,209 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+npm.cmd : stderr | tests/ui/history-current-sync.test.ts
+所在位置 行:4 字符: 1
++ npm.cmd exec vitest -- run tests/app/latest-schedule-date.test.ts tes ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (stderr | tests/...nt-sync.test.ts:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+
+······x···············
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/ui/history-current-sync.test.ts > same-date history through the mounted application > keeps actual rule-st
+aleness warnings after the same-date manual save and reload
+AssertionError: expected '\n      \n        当前组\n        \n    …' to contain '这是旧班表'
+
+- Expected
++ Received
+
+- 这是旧班表
++
++
++         当前组
++
++
++             A 组
++
++
++             B 组
++
++
++
++
++
++
++
++
++
++             自动排班
++
++               机场地勤 · 本地工作台
++
++
++
++
++
++
++           已保存
++
++
++
++
++
++                 总览
++
++                 配置
++
++                 航班
++
++                 排班
++
++                 规则
++
++                 统计
++
++                 历史
++
++
++
++             导入数据
++
++
++             导出配置
++
++
++
++
++
++               排班
++
++                 1 个航班 ·
++                 2
++                 人可用 · 1
++                 个岗位已排
++
++
++
++
++       航班核对：本季航班固定以A组为准，B组跟随更新；各组岗位性质和人员资质仍独立，备用模板继续保留。两组一致且B组岗位已配齐后，此提醒自动消失。
++
++
++         以 A 组为准，核对 B 组（3 项）
++
++
++
++
++
++
++
++             2026-11-18 已保存班表
++
++               人员和时段来自该日历史记录。需要调整或导出时，请先编辑该日排班。
++
++
++
++             编辑该日排班
++
++
++             重新排班
++
++
++
++
++
++
++
++
++
++
++
++
++                       CX93708:30–10:30
++
++
++
++
++
++             岗位人员
++
++
++
++
++
++
++
++             督导原备注
++
++
++
++
++           同步测试人员12.0h · 疲劳
++             3.0
++
++
++
++
++
++
++
++
++
++
++
++
++
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  1 failed | 21 passed (22)
+   Start at  12:28:55
+   Duration  6.50s (transform 3.78s, setup 0ms, import 4.80s, tests 679ms, environment 361ms)
+
++         排班进度
++         0%
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
+
+ ❯ tests/ui/history-current-sync.test.ts:196:34
+    194|     state.schedulePolicyStale = true;
+    195|     const app = await mount(state);
+    196|     expect(app.root.textContent).toContain("这是旧班表");
+       |                                  ^
+    197|     await app.command({ type: "edit-history-date", date: syncDate });
+    198|     await app.command({ type: "save-history-edit" });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯

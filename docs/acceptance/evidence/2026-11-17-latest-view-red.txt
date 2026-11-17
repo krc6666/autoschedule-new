@@ -1,0 +1,580 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+npm.cmd : stderr | tests/ui/history-current-sync.test.ts
+所在位置 行:3 字符: 1
++ npm.cmd exec vitest -- run tests/app/latest-schedule-date.test.ts tes ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (stderr | tests/...nt-sync.test.ts:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+
+xxxx···xxxx·
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 8 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/app/latest-schedule-date.test.ts > latest schedule date on entry and group change > uses the actual curren
+t date rather than today's date or an unrelated saved preference
+AssertionError: expected '2020-01-01' to be '2026-11-18' // Object.is equality
+
+Expected: "2026-11-18"
+Received: "2020-01-01"
+
+ ❯ tests/app/latest-schedule-date.test.ts:19:29
+     17|   it("uses the actual current date rather than today's date or an unre…
+     18|     const { app } = setup();
+     19|     expect(app.view().date).toBe(syncDate);
+       |                             ^
+     20|   });
+     21|   it("uses a later complete archive but ignores partial-only, mixed pa…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/8]⎯
+
+ FAIL  tests/app/latest-schedule-date.test.ts > latest schedule date on entry and group change > uses a later complete
+archive but ignores partial-only, mixed partial and duty-only days
+AssertionError: expected '2020-01-01' to be '2026-11-20' // Object.is equality
+
+Expected: "2026-11-20"
+Received: "2020-01-01"
+
+ ❯ tests/app/latest-schedule-date.test.ts:28:42
+     26|       { ...row, id: "mixed", date: "2026-11-22" },
+     27|       { ...row, id: "roster", date: "2026-11-24", flightNo: "轮值" });
+     28|     expect(setup(state).app.view().date).toBe("2026-11-20");
+       |                                          ^
+     29|   });
+     30|   it("uses today only when no dated roster exists and preserves manual…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/8]⎯
+
+ FAIL  tests/app/latest-schedule-date.test.ts > latest schedule date on entry and group change > uses today only when n
+o dated roster exists and preserves manual date selection during navigation
+AssertionError: expected '2020-01-01' to be '2026-11-17' // Object.is equality
+
+Expected: "2026-11-17"
+Received: "2020-01-01"
+
+ ❯ tests/app/latest-schedule-date.test.ts:32:29
+     30|   it("uses today only when no dated roster exists and preserves manual…
+     31|     const { app } = setup(createDefaultState());
+     32|     expect(app.view().date).toBe(todayIso());
+       |                             ^
+     33|     await app.handle({ type: "change-date", date: "2026-12-01" });
+     34|     await app.handle({ type: "navigate", section: "schedule" });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/8]⎯
+
+ FAIL  tests/app/latest-schedule-date.test.ts > latest schedule date on entry and group change > selects each group's l
+atest date and never uses the other group's date
+AssertionError: expected '2020-01-01' to be '2026-12-02' // Object.is equality
+
+Expected: "2026-12-02"
+Received: "2020-01-01"
+
+ ❯ tests/app/latest-schedule-date.test.ts:42:29
+     40|     const { app } = setup(state);
+     41|     await app.handle({ type: "switch-group", groupId: "B" });
+     42|     expect(app.view().date).toBe("2026-12-02");
+       |                             ^
+     43|     await app.handle({ type: "switch-group", groupId: "A" });
+     44|     expect(app.view().date).toBe(syncDate);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/8]⎯
+
+ FAIL  tests/ui/history-current-sync.test.ts > same-date history through the mounted application > opens the latest arc
+hive with original people and time when the active table has a different date or no date
+AssertionError: expected null not to be null
+ ❯ tests/ui/history-current-sync.test.ts:60:25
+     58|       expect(app.root.querySelector<HTMLInputElement>('input[type="dat…
+     59|       const board = app.root.querySelector("autoschedule-schedule-page…
+     60|       expect(board).not.toBeNull();
+       |                         ^
+     61|       expect(board.textContent).toContain("08:30–10:30");
+     62|       expect(board.textContent).toContain(state.history[0]!.staffName);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/8]⎯
+
+ FAIL  tests/ui/history-current-sync.test.ts > same-date history through the mounted application > shows saved history
+instead of a stale same-day current table, while retaining underlying staleness
+AssertionError: expected null not to be null
+ ❯ tests/ui/history-current-sync.test.ts:77:23
+     75|     const app = await mount(state);
+     76|     const board = app.root.querySelector("autoschedule-schedule-page a…
+     77|     expect(board).not.toBeNull();
+       |                       ^
+     78|     expect(board.textContent).toContain(state.history[0]!.staffName);
+     79|     expect(board.textContent).not.toContain("旧表人员");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/8]⎯
+
+ FAIL  tests/ui/history-current-sync.test.ts > same-date history through the mounted application > keeps the edited his
+torical date visible after saving while preserving a different active roster
+AssertionError: expected '2026-11-20' to be '2026-11-18' // Object.is equality
+
+Expected: "2026-11-18"
+Received: "2026-11-20"
+
+ ❯ tests/ui/history-current-sync.test.ts:95:83
+     93|     await app.command({ type: "save-history-edit" });
+     94|     await app.command({ type: "navigate", section: "schedule" });
+     95|     expect(app.root.querySelector<HTMLInputElement>('input[type="date"…
+       |                                                                                   ^
+     96|     expect(app.root.querySelector("autoschedule-schedule-page autosche…
+     97|     expect(app.store.getState().model.assignments).toEqual(before);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/8]⎯
+
+ FAIL  tests/ui/history-current-sync.test.ts > same-date history through the mounted application > does not relabel ano
+ther date's current roster when the chosen date has no saved result
+AssertionError: expected <autoschedule-schedule-grid>…(1)</autoschedule-schedule-grid> to be null
+
+- Expected:
+null
+
++ Received:
+<autoschedule-schedule-grid>
+  <!---->
+  <div
+    class="table-responsive schedule-board"
+  >
+
+
+    <table
+      class="table table-sm table-bordered align-middle mb-0 schedule-grid-table"
+      style="--flight-count: 1; --schedule-column-width: 64px; --schedule-person-column-width: 56px; --schedule-flight-
+width: 120px; --schedule-header-height: 50px; --schedule-cell-height: 36px; --schedule-flight-size: 14px; --schedule-po
+sition-size: 11px; --schedule-small-size: 10px; --schedule-tiny-size: 9px; --schedule-input-height: 19px; --schedule-na
+me-width: 48px; --schedule-divider-height: 20px;"
+    >
+
+
+      <colgroup>
+
+
+        <!--?lit$869770636$-->
+        <!---->
+        <col
+          class="schedule-position-column"
+        />
+        <!---->
+        <!---->
+        <col
+          class="schedule-person-column"
+        />
+        <!---->
+
+
+      </colgroup>
+
+
+      <thead>
+
+
+        <tr>
+
+
+          <!--?lit$869770636$-->
+          <!---->
+          <th
+            colspan="2"
+            scope="col"
+          >
+
+
+            <div
+              class="schedule-flight-head"
+            >
+
+
+              <div>
+
+
+                <strong … />
+                <span … />
+                <!--?lit$869770636$-->
+                <small … />
+
+
+              </div>
+
+
+            </div>
+
+
+          </th>
+          <!---->
+
+
+        </tr>
+
+
+        <tr
+          class="schedule-subhead-row"
+        >
+
+
+          <!--?lit$869770636$-->
+          <!---->
+          <th
+            class="schedule-subhead-position"
+            scope="col"
+          >
+            岗位
+          </th>
+          <!---->
+          <!---->
+          <th
+            class="schedule-subhead-person"
+            scope="col"
+          >
+            人员
+          </th>
+          <!---->
+
+
+        </tr>
+
+
+      </thead>
+
+
+      <tbody>
+
+
+        <!--?lit$869770636$-->
+        <!---->
+        <tr>
+
+
+          <!--?lit$869770636$-->
+          <!---->
+          <!---->
+          <td
+            class="schedule-grid-slot schedule-position-slot"
+          >
+
+
+            <article
+              class="schedule-cell schedule-position-cell is-assigned"
+            >
+
+
+              <div
+                class="schedule-cell-actions schedule-position-actions"
+              >
+
+
+                <!-- candidate actions live in the position cell -->
+
+
+                <button … />
+
+
+                <button … />
+
+
+                <!--?lit$869770636$-->
+
+
+              </div>
+
+
+              <div
+                class="schedule-position-content"
+              >
+
+
+                <!--?lit$869770636$-->
+                <button … />
+
+
+                <!--?lit$869770636$-->
+
+
+              </div>
+
+
+              <!--?lit$869770636$-->
+
+
+            </article>
+
+
+          </td>
+          <!---->
+          <!---->
+          <td
+            class="schedule-grid-slot schedule-person-slot"
+          >
+
+
+            <article
+              class="schedule-cell schedule-person-cell is-assigned"
+              data-assignment-id="sync-slot"
+              title=""
+            >
+
+
+              <div
+                class="schedule-person-edit"
+                draggable="true"
+                title="按住姓名可拖动调整岗位"
+              >
+
+
+                <!--?lit$869770636$-->
+                <i … />
+
+
+                <button … />
+
+
+                <!--?lit$869770636$-->
+
+
+                <input … />
+
+
+              </div>
+
+
+              <div
+                class="schedule-cell-actions legacy-person-actions"
+              >
+
+
+                <button … />
+
+
+              </div>
+
+
+              <input
+                aria-label="督导临时备注"
+                class="schedule-manual-remark"
+                placeholder=" "
+                title="输入临时备注"
+              />
+
+
+              <!--?lit$869770636$-->
+
+
+            </article>
+
+
+          </td>
+          <!---->
+          <!---->
+
+
+        </tr>
+        <!---->
+
+ Test Files  2 failed (2)
+      Tests  8 failed | 4 passed (12)
+   Start at  12:24:12
+   Duration  5.78s (transform 3.72s, setup 0ms, import 4.36s, tests 606ms, environment 369ms)
+
+        <!---->
+        <tr>
+
+
+          <!--?lit$869770636$-->
+          <!---->
+          <!---->
+          <td
+            class="schedule-grid-slot schedule-position-slot"
+          >
+
+
+            <div
+              class="schedule-cell schedule-cell-placeholder schedule-position-cell"
+            >
+
+
+              <input
+                aria-label="新增临时岗位"
+                class="schedule-empty-input schedule-empty-position"
+                placeholder="岗位"
+              />
+
+
+            </div>
+
+
+          </td>
+          <!---->
+          <!---->
+          <td
+            class="schedule-grid-slot schedule-person-slot"
+          >
+
+
+            <div
+              class="schedule-cell schedule-cell-placeholder schedule-person-cell"
+            >
+
+
+              <input
+                aria-label="新增临时人员"
+                class="schedule-empty-input schedule-empty-name"
+                placeholder="人员"
+              />
+
+
+            </div>
+
+
+          </td>
+          <!---->
+          <!---->
+
+
+        </tr>
+        <!---->
+
+
+        <tr
+          class="schedule-divider-row"
+        >
+
+
+          <!--?lit$869770636$-->
+          <!---->
+          <td
+            colspan="2"
+          >
+
+
+            <div
+              class="support-divider"
+            >
+              <span>
+                引导岗位
+              </span>
+            </div>
+
+
+          </td>
+          <!---->
+
+
+        </tr>
+
+
+        <!--?lit$869770636$-->
+        <!---->
+        <tr>
+
+
+          <!--?lit$869770636$-->
+          <!---->
+          <!---->
+          <td
+            class="schedule-grid-slot schedule-position-slot"
+          >
+
+
+            <div
+              class="schedule-cell schedule-cell-placeholder schedule-position-cell"
+            >
+
+
+              <input
+                aria-label="新增临时岗位"
+                class="schedule-empty-input schedule-empty-position"
+                placeholder="岗位"
+              />
+
+
+            </div>
+
+
+          </td>
+          <!---->
+          <!---->
+          <td
+            class="schedule-grid-slot schedule-person-slot"
+          >
+
+
+            <div
+              class="schedule-cell schedule-cell-placeholder schedule-person-cell"
+            >
+
+
+              <input
+                aria-label="新增临时人员"
+                class="schedule-empty-input schedule-empty-name"
+                placeholder="人员"
+              />
+
+
+            </div>
+
+
+          </td>
+          <!---->
+          <!---->
+
+
+        </tr>
+        <!---->
+
+
+      </tbody>
+
+
+    </table>
+
+
+    <datalist
+      id="schedule-staff-names"
+    >
+
+
+      <!--?lit$869770636$-->
+      <!---->
+      <option
+        value="同步测试人员1"
+      />
+      <!---->
+      <!---->
+      <option
+        value="同步测试人员2"
+      />
+      <!---->
+
+
+    </datalist>
+
+
+    <!--?lit$869770636$-->
+    <!---->
+    <datalist
+      id="schedule-guide-staff-0"
+    >
+      <!--?lit$869770636$-->
+      <!---->
+      <option
+        value="同步测试人员1"
+      />
+      <!---->
+    </datalist>
+    <!---->
+
+
+  </div>
+</autoschedule-schedule-grid>
+
+ ❯ tests/ui/history-current-sync.test.ts:106:66
+    104|     const app = await mount();
+    105|     await app.command({ type: "change-date", date: "2026-12-30" });
+    106|     expect(app.root.querySelector("autoschedule-schedule-grid")).toBeN…
+       |                                                                  ^
+    107|     expect(app.root.querySelector("autoschedule-schedule-page")!.textC…
+    108|     expect(app.root.querySelector("autoschedule-schedule-page")!.textC…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/8]⎯

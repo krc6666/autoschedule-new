@@ -1282,6 +1282,7 @@ describe("next workday flight picker workflow", () => {
 
   function stateWithCurrentSchedule(includeCurrentWeekdayPlan = false) {
     const state = createDefaultState();
+    state.activeScheduleDate = "2026-08-15";
     state.weeklyFlightPlans = replaceWeeklyFlightPlan(
       state.weeklyFlightPlans,
       1,
@@ -1507,7 +1508,7 @@ describe("next workday flight picker workflow", () => {
         : null
     ).toBe(128);
     expect(coordinator.model().history).toHaveLength(0);
-    expect(coordinator.model().activeScheduleDate).toBeNull();
+    expect(coordinator.model().activeScheduleDate).toBe("2026-08-15");
     expect(calculate).not.toHaveBeenCalled();
   });
 

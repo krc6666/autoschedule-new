@@ -1,0 +1,197 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-17-history-current-sync",
+  "title": "历史保存同步同日期当前班表并保留规则失效保护",
+  "startedFrom": "8db403abaa47152a68eb6b7f3f96c5e665589bc4",
+  "expectation": {
+    "example": "Owner报告在历史记录手改18号并保存成功，同日期排班页仍显示旧安排和旧班表提示；已明确确认两边选中同一天。具体年月、组和人员未提供，自动回归使用匿名固定日期。",
+    "expected": "历史编辑日期等于编辑前有效当前班表日期时，保存同时更新当前航班和岗位事实，刷新恢复仍一致。恢复提示只在实际规则失效时出现，不能仅凭存在班表判旧。",
+    "unchanged": "异日保存和取消仍恢复编辑前当前班表；另一组、其他日、原轮值、半休、次数基准和人工警告保留；不重新排班、不自动上传或发布，不使已失效班表恢复有效。",
+    "fallback": "不完整历史匹配禁止覆盖，拒绝确认保留草稿；本机持久化失败沿现有错误提示保留页面修改和原持久化副本，不能宣称已存入浏览器。"
+  },
+  "testedVersion": "7778000e00f21fb6d626aaa4c0ccf22d59542ac147c91b41cfe359d43e47751b",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "改前定向11项中7项失败，原人员/备注被快照覆盖，有效恢复仍提示旧表；其余保护项通过。首轮spy冻结对象的测试夹具问题已纠正后重新留存红灯。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-history-sync-red.txt",
+          "sha256": "004472e46a1610007865b890cefbeeb202b9b9df7281fe034b458d32795c396a",
+          "summary": "Pre-fix: 7 of 11 targeted checks failed on old facts and false restored notice."
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-history-sync-green.txt",
+          "sha256": "c60a28c6278365f0b7e9f14826a4fae4903c3bfb6248e98bae72394509df7ba8",
+          "summary": "Final targeted run: 3 files, 24 tests passed; mounted DOM, storage, XLSX, staleness, cancellation and failures."
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "定向3文件24项通过，真实挂载DOM触发换人、备注change和保存按钮，返回当前页及实际存储重载后均显示新人员备注；类型检查通过。固定测试日期不冒充owner具体年月。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-history-sync-green.txt",
+          "sha256": "c60a28c6278365f0b7e9f14826a4fae4903c3bfb6248e98bae72394509df7ba8",
+          "summary": "Final targeted run: 3 files, 24 tests passed; mounted DOM, storage, XLSX, staleness, cancellation and failures."
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-history-sync-typecheck.txt",
+          "sha256": "4b3f7cf1ed06cba39ee3b0608990fffcf42e1ff315949a5353a62ce478a2683c",
+          "summary": "npm.cmd run typecheck: exit 0."
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-history-sync-full-test.txt",
+          "sha256": "d46ba2861f36a1d336d4b55fcbc1497f7896cd007832c1334afb7da5db0999fc",
+          "summary": "npm.cmd test: exit 0; 222 files and 2178 functional tests passed in 297.51 seconds; one worker."
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "取消、异日、另一组、拒绝确认、不完整匹配、存储写入失败、重复保存和清空人员覆盖；原轮值/半休及其他日期合同由完整回归继续验证。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-history-sync-green.txt",
+          "sha256": "c60a28c6278365f0b7e9f14826a4fae4903c3bfb6248e98bae72394509df7ba8",
+          "summary": "Final targeted run: 3 files, 24 tests passed; mounted DOM, storage, XLSX, staleness, cancellation and failures."
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-history-sync-full-test.txt",
+          "sha256": "d46ba2861f36a1d336d4b55fcbc1497f7896cd007832c1334afb7da5db0999fc",
+          "summary": "npm.cmd test: exit 0; 222 files and 2178 functional tests passed in 297.51 seconds; one worker."
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "同日保存后实际存储恢复、A-B-A切组、重复历史保存不恢复旧人；后续保存规则仍让当前表失效；Excel实际字节和配置历史往返保留新人员与基准。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-history-sync-green.txt",
+          "sha256": "c60a28c6278365f0b7e9f14826a4fae4903c3bfb6248e98bae72394509df7ba8",
+          "summary": "Final targeted run: 3 files, 24 tests passed; mounted DOM, storage, XLSX, staleness, cancellation and failures."
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-history-sync-full-test.txt",
+          "sha256": "d46ba2861f36a1d336d4b55fcbc1497f7896cd007832c1334afb7da5db0999fc",
+          "summary": "npm.cmd test: exit 0; 222 files and 2178 functional tests passed in 297.51 seconds; one worker."
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-history-sync-result.xlsx",
+          "sha256": "c2ac7fb38db165780a15c255bceb2bb7763ddbcb83bb00fb7f0eb96d6222c108",
+          "summary": "Actual XLSX bytes from the synchronized schedule; read back and independently checked."
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "原失效、缺失指纹、不匹配三条路径保存后仍失效；匹配不完整禁止覆盖，拒绝确认不提交。没有调用自动安装或生成安全凭证；自动求解硬约束不修改。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-history-sync-green.txt",
+          "sha256": "c60a28c6278365f0b7e9f14826a4fae4903c3bfb6248e98bae72394509df7ba8",
+          "summary": "Final targeted run: 3 files, 24 tests passed; mounted DOM, storage, XLSX, staleness, cancellation and failures."
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-history-sync-full-test.txt",
+          "sha256": "d46ba2861f36a1d336d4b55fcbc1497f7896cd007832c1334afb7da5db0999fc",
+          "summary": "npm.cmd test: exit 0; 222 files and 2178 functional tests passed in 297.51 seconds; one worker."
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "同日取消恢复原表/指纹，异日保留原当前表，另一组及其他历史保持；原人工次数基准与资质警告回归通过。同日当前/历史月疲劳独立核对为3点加另日3点，总6点而非9点。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-history-sync-green.txt",
+          "sha256": "c60a28c6278365f0b7e9f14826a4fae4903c3bfb6248e98bae72394509df7ba8",
+          "summary": "Final targeted run: 3 files, 24 tests passed; mounted DOM, storage, XLSX, staleness, cancellation and failures."
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-history-sync-full-test.txt",
+          "sha256": "d46ba2861f36a1d336d4b55fcbc1497f7896cd007832c1334afb7da5db0999fc",
+          "summary": "npm.cmd test: exit 0; 222 files and 2178 functional tests passed in 297.51 seconds; one worker."
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-history-sync-independent.json",
+          "sha256": "d0f4835015c3c7e361ae7064b202fedcb0f766682605846bc476e1ee229d900a",
+          "summary": "Independent Python check of JSON and XLSX XML; current/history agree and month fatigue is 6, without same-day duplication."
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "自动产物HTML、JSON、结果XLSX及生产包已独立核对，开发阶段曾核对本机64773提供本轮源码；本次提交前复查该端口已无法连接；没有主动操作浏览器，owner尚未刷新验收真实页面。前一轮owner报告未同步，不能用本轮自动测试代替现场通过；需核对默认最新日期、历史人员原时间、编辑保存后的返回显示和A/B切换。Owner已授权本地提交；真实页面待验收，不push或部署。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-history-sync-final.json",
+          "sha256": "1751638cb1c5b5bd0aa27dbf2ffed57c34889f291ce09940311c757185dec49f",
+          "summary": "Anonymized current/history staff, remarks, result rows and fatigue totals after storage reload."
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-history-sync-result.xlsx",
+          "sha256": "c2ac7fb38db165780a15c255bceb2bb7763ddbcb83bb00fb7f0eb96d6222c108",
+          "summary": "Actual XLSX bytes from the synchronized schedule; read back and independently checked."
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-history-sync-independent.json",
+          "sha256": "d0f4835015c3c7e361ae7064b202fedcb0f766682605846bc476e1ee229d900a",
+          "summary": "Independent Python check of JSON and XLSX XML; current/history agree and month fatigue is 6, without same-day duplication."
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-history-sync-build.txt",
+          "sha256": "908aafcaf63502949e7ed8608b26f9886b5ae4e5db5df7c4109fa5489a5448f5",
+          "summary": "npm.cmd run build: exit 0; Vite 7.28 seconds; existing large chunk and node:module notices retained."
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "红灯直接比较保存后的当前assignments与历史编辑结果，捕获旧快照回盖；挂载入口同时捕获仅凭非空安排误报旧表。证据为history-sync-red.txt。",
+    "laterChanges": "可能被快照恢复、持久化解析、切组投影、重复历史编辑和后续规则保存改变；24项定向回归分别检查，并由完整功能门禁覆盖直接及隐式消费者。",
+    "finalArtifact": "history-sync-final.json及history-sync-result.xlsx保存同日新人员、新备注与真实导出行；history-sync-independent.json独立核对实际岗位疲劳与月总和。真实页面仍未验收。"
+  },
+  "review": {
+    "missedScope": "第一轮只核对内部同日，遗漏可见日期与当前表分离、历史载入套模板及后续确认按钮；本轮按current/history/empty矩阵补齐。真实页面和原浏览器内部日期仍缺证据；旧记录从未存下的时段不能凭空恢复，空时段沿原模板回退。",
+    "rootCause": "历史保存沿用异日隔离编辑的无条件恢复策略，造成同日当前与历史出现两份不同事实；启动提示又未消费已有规则失效事实。保留历史航班后必须使原有效指纹随实际航班ID重绑定。",
+    "earlyDetection": "设计历史保存时先列同日/异日/取消矩阵，测试最终当前人员与历史人员而非只断言历史；在恢复、切组和导出后重验，并单独验证真失效不被人工保存洗白。"
+  },
+  "automaticVerification": {
+    "targetedFiles": 3,
+    "targetedTests": 24,
+    "functionalFiles": 222,
+    "functionalTests": 2178,
+    "typecheckExit": 0,
+    "testExit": 0,
+    "buildExit": 0,
+    "maxWorkers": 1,
+    "performance": "Not run: no algorithm or performance path changed; L2 validation.",
+    "verify": "Not run: no commit, push or deployment requested for this fix."
+  },
+  "externalActions": {
+    "commit": false,
+    "push": false,
+    "deployment": false,
+    "cloudUpload": false,
+    "actualBrowserAcceptance": false
+  },
+  "followUp": {
+    "taskId": "2026-11-17-latest-schedule-view",
+    "reason": "第一轮owner现场反馈失败；第二轮已授权默认最新日期、按日投影及保留历史时段。新验证及当前版本见后续任务，原测试轮次保留，不冒充现场通过。"
+  },
+  "commitValidation": {
+    "authorization": "Owner明确授权“可以 commit”；仅本地提交本次修复，PROJECT_MAP.md排除。",
+    "verifyExit": 0,
+    "evidence": {
+      "path": "docs/acceptance/evidence/2026-11-17-latest-view-verify-final.txt",
+      "sha256": "6f7c27db90666dcf0dbc2325562bf7c1c56c71a38ce24895e7f4d3662a56f448",
+      "summary": "Complete npm.cmd run verify exited zero: typecheck, 223 functional files / 2193 tests, 7 performance files / 19 tests, and production build. One worker; original thresholds unchanged."
+    },
+    "actualBrowserAcceptance": false,
+    "push": false,
+    "deployment": false
+  }
+}

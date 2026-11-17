@@ -9,6 +9,7 @@ import {
   replaceHistoryForDate,
 } from "../history-actions";
 import type { AppState } from "../../model";
+import { scheduleRuleFingerprint } from "../../domain/rules/schedule-rule-fingerprint";
 
 export class RecordsController implements UiCommandController {
   private historicalEditSnapshot: {
@@ -16,6 +17,8 @@ export class RecordsController implements UiCommandController {
     assignments: AppState["assignments"];
     activeScheduleDate: AppState["activeScheduleDate"];
     schedulePolicyStale: AppState["schedulePolicyStale"];
+    scheduleRuleFingerprint: AppState["scheduleRuleFingerprint"];
+    rulesWereCurrent: boolean;
   } | null = null;
   private historicalEditWarnings: string[] = [];
 
@@ -55,6 +58,11 @@ export class RecordsController implements UiCommandController {
           assignments: structuredClone(this.context.model().assignments),
           activeScheduleDate: this.context.model().activeScheduleDate,
           schedulePolicyStale: this.context.model().schedulePolicyStale,
+          scheduleRuleFingerprint: this.context.model().scheduleRuleFingerprint,
+          rulesWereCurrent:
+            !this.context.model().schedulePolicyStale &&
+            this.context.model().scheduleRuleFingerprint ===
+              scheduleRuleFingerprint(this.context.model()),
         };
         this.historicalEditWarnings = draft.warnings;
         const nextState = structuredClone(this.context.model());
@@ -97,24 +105,35 @@ export class RecordsController implements UiCommandController {
             )
         );
         const restored = structuredClone(this.context.model());
-        restored.flights =
-          this.historicalEditSnapshot?.flights ?? restored.flights;
-        restored.assignments =
-          this.historicalEditSnapshot?.assignments ?? restored.assignments;
-        restored.activeScheduleDate =
-          this.historicalEditSnapshot?.activeScheduleDate ??
-          restored.activeScheduleDate;
-        restored.schedulePolicyStale =
-          this.historicalEditSnapshot?.schedulePolicyStale ??
-          restored.schedulePolicyStale;
+        const snapshot = this.historicalEditSnapshot;
+        const syncCurrent = snapshot?.activeScheduleDate === date;
+        if (snapshot) {
+          if (syncCurrent) {
+            // Historical flights have draft IDs. Rebind only an already-current
+            // rules fingerprint; manual edits cannot certify an outdated table.
+            restored.schedulePolicyStale = !snapshot.rulesWereCurrent;
+            restored.scheduleRuleFingerprint = snapshot.rulesWereCurrent
+              ? scheduleRuleFingerprint(restored)
+              : snapshot.scheduleRuleFingerprint;
+          } else {
+            restored.flights = snapshot.flights;
+            restored.assignments = snapshot.assignments;
+            restored.activeScheduleDate = snapshot.activeScheduleDate;
+            restored.schedulePolicyStale = snapshot.schedulePolicyStale;
+            restored.scheduleRuleFingerprint = snapshot.scheduleRuleFingerprint;
+          }
+        }
         replaceHistoryForDate(restored, date, replacement);
         this.context.store.getState().replaceModel(restored);
         this.historicalEditSnapshot = null;
         this.historicalEditWarnings = [];
         this.context.updateView({
           section: "history",
-          date: restored.activeScheduleDate ?? date,
+          date,
           historyEditDate: null,
+          restoredScheduleNotice: syncCurrent
+            ? false
+            : this.context.view().restoredScheduleNotice,
         });
         this.context.commit("历史排班已更新");
         return true;
@@ -128,6 +147,8 @@ export class RecordsController implements UiCommandController {
           this.historicalEditSnapshot.activeScheduleDate;
         restored.schedulePolicyStale =
           this.historicalEditSnapshot.schedulePolicyStale;
+        restored.scheduleRuleFingerprint =
+          this.historicalEditSnapshot.scheduleRuleFingerprint;
         this.context.store.getState().replaceModel(restored);
         const restoredDate =
           restored.activeScheduleDate ?? this.context.view().date;

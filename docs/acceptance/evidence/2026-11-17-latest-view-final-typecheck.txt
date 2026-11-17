@@ -1,0 +1,5 @@
+
+> autoschedule@1.0.0 typecheck
+> tsc -b --pretty false
+
+tests/app/history-current-sync.test.ts(92,7): error TS2532: Object is possibly 'undefined'.

@@ -1,0 +1,78 @@
+{
+  "date": "2026-11-18",
+  "current": [
+    {
+      "id": "assignment-mwk8kqfl-r3m9qq",
+      "flightId": "historical-2026-11-18-flight-cx937",
+      "flightNo": "CX937",
+      "positionRuleId": "position-cx937-%E7%9D%A3%E5%AF%BC",
+      "position": "督导",
+      "staffId": "2",
+      "staffName": "同步测试人员2",
+      "startTime": "08:20",
+      "endTime": "09:20",
+      "workHours": 2,
+      "fatiguePoints": 3,
+      "remark": "",
+      "manualRemark": "历史保存的新备注",
+      "status": "assigned",
+      "countBaseline": {
+        "staffId": "1",
+        "staffName": "同步测试人员1"
+      }
+    }
+  ],
+  "history": {
+    "id": "history-mwk8kqg0-jktouf",
+    "date": "2026-11-18",
+    "flightNo": "CX937",
+    "position": "督导",
+    "staffId": "2",
+    "staffName": "同步测试人员2",
+    "startTime": "08:20",
+    "endTime": "09:20",
+    "flightCutoffTime": "10:20",
+    "workHours": 2,
+    "fatiguePoints": 3,
+    "remark": "历史保存的新备注",
+    "assignmentRemarks": {
+      "remark": "",
+      "manualRemark": "历史保存的新备注"
+    },
+    "countBaseline": {
+      "staffId": "1",
+      "staffName": "同步测试人员1"
+    }
+  },
+  "flight": {
+    "id": "historical-2026-11-18-flight-cx937",
+    "flightNo": "CX937",
+    "startTime": "08:20",
+    "endTime": "10:20",
+    "bookedPassengers": 0,
+    "positions": ["督导"],
+    "remark": "到岗08:05"
+  },
+  "configHistory": {
+    "id": "history-mwk8kqg0-jktouf",
+    "date": "2026-11-18",
+    "flightNo": "CX937",
+    "position": "督导",
+    "staffId": "2",
+    "staffName": "同步测试人员2",
+    "startTime": "08:20",
+    "endTime": "09:20",
+    "flightCutoffTime": "10:20",
+    "workHours": 2,
+    "fatiguePoints": 3,
+    "remark": "历史保存的新备注",
+    "assignmentRemarks": {
+      "remark": "",
+      "manualRemark": "历史保存的新备注"
+    },
+    "countBaseline": {
+      "staffId": "1",
+      "staffName": "同步测试人员1"
+    }
+  }
+}

@@ -10,6 +10,7 @@ import {
 import type { Assignment } from "../model";
 import { isClearedCountRecord } from "../domain/statistics/manual-count-evidence";
 import { additionalAttendanceByAssignment } from "../domain/statistics/attendance-intervals";
+import { operationalInterval, timeToMinutes } from "../domain/shared/time";
 
 export interface HistoricalScheduleDraft {
   flights: AppState["flights"];
@@ -56,10 +57,35 @@ export function buildHistoricalScheduleDraft(
       unmatchedFlightNos.add(flightNo);
       return [];
     }
+    const timedRecords = assignableRecords
+      .filter((record) => record.flightNo === flightNo)
+      .flatMap((record) => {
+        const endTime = Number.isFinite(
+          timeToMinutes(record.flightCutoffTime ?? "")
+        )
+          ? record.flightCutoffTime!
+          : record.endTime;
+        const interval = operationalInterval(
+          record.startTime,
+          endTime,
+          state.settings.nightEnd
+        );
+        return interval
+          ? [{ startTime: record.startTime, endTime, interval }]
+          : [];
+      });
+    const first = [...timedRecords].sort(
+      (a, b) => a.interval[0] - b.interval[0]
+    )[0];
+    const last = [...timedRecords].sort(
+      (a, b) => b.interval[1] - a.interval[1]
+    )[0];
     return [
       {
         ...source,
         id: `historical-${date}-${source.id}`,
+        startTime: first?.startTime ?? source.startTime,
+        endTime: last?.endTime ?? source.endTime,
         bookedPassengers:
           state.flights.find((item) => item.flightNo === flightNo)
             ?.bookedPassengers ?? 0,
@@ -93,6 +119,10 @@ export function buildHistoricalScheduleDraft(
     unmatched.delete(record.id);
     assignment.staffId = record.staffId || null;
     assignment.staffName = record.staffName;
+    if (Number.isFinite(timeToMinutes(record.startTime)))
+      assignment.startTime = record.startTime;
+    if (Number.isFinite(timeToMinutes(record.endTime)))
+      assignment.endTime = record.endTime;
     if (!isClearedCountRecord(record)) {
       assignment.workHours = record.workHours;
       assignment.fatiguePoints = record.fatiguePoints;

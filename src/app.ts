@@ -34,7 +34,9 @@ export function mountAutoscheduleApp(
     createAutoscheduleStore({
       persistence: browserStatePersistence,
     });
-  const restoredScheduleNotice = store.getState().model.assignments.length > 0;
+  const restoredModel = store.getState().model;
+  const restoredScheduleNotice =
+    restoredModel.assignments.length > 0 && restoredModel.schedulePolicyStale;
   const restorationIssues = getLastRestorationReport().issues;
   const element: AutoscheduleAppElement =
     document.createElement("autoschedule-app");

@@ -188,6 +188,7 @@ describe("dated half-rest selection", () => {
     const id = state.staff.find(
       (p) => p.status === "正常" && p.staffType === "常规"
     )!.id;
+    await coordinator.handle({ type: "change-date", date: "2026-11-10" });
     await coordinator.handle({
       type: "set-half-rest-staff",
       staffIds: [id],
@@ -204,6 +205,7 @@ describe("dated half-rest selection", () => {
       createTestAutoscheduleStore(restored),
       { preferences, confirm: () => true }
     );
+    await resumed.handle({ type: "change-date", date: "2026-11-10" });
     expect(resumed.view().halfRestStaffIds).toEqual([id]);
     expect(resumed.view().halfRestModes).toEqual({ [id]: "late-start" });
     await resumed.handle({ type: "change-date", date: "2026-11-12" });
@@ -213,6 +215,8 @@ describe("dated half-rest selection", () => {
     await resumed.handle({ type: "switch-group", groupId: "B" });
     expect(resumed.view().halfRestStaffIds).toEqual([]);
     await resumed.handle({ type: "switch-group", groupId: "A" });
+    expect(resumed.view().halfRestStaffIds).toEqual([]);
+    await resumed.handle({ type: "change-date", date: "2026-11-10" });
     expect(resumed.view().halfRestStaffIds).toEqual([id]);
     await resumed.handle({ type: "set-half-rest-staff", staffIds: [] });
     expect(resumed.view().halfRestStaffIds).toEqual([]);

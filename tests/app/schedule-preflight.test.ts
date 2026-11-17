@@ -884,6 +884,7 @@ it("统计页轮值保存并恢复后仍在生成预检中回显", async () => {
     createTestAutoscheduleStore(restored),
     { preferences }
   );
+  await reopened.handle({ type: "change-date", date });
   await reopened.handle({ type: "generate-schedule" });
   expect(reopened.view().dialog?.kind).toBe("schedule-preflight");
   expect(reopened.view().dialog).toMatchObject({

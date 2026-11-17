@@ -1,0 +1,244 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-17-latest-schedule-view",
+  "title": "默认显示当前组最新班表日期并按选中日期展示真实内容",
+  "startedFrom": "8db403abaa47152a68eb6b7f3f96c5e665589bc4",
+  "expectation": {
+    "example": "Owner在127.0.0.1:64773提供A组2026-11-18现场截图，排班页与同日历史人员及时段不同；随后明确确认启动/切组取当前组当前班表与完整历史中最新日期。",
+    "expected": "启动与切组按当前组最新班表日期选择，有记录时不使用今天或旧偏好；对应当前表显示可编辑当前结果，对应完整历史显示原始历史事实并可进入既有历史编辑，保存后展示立即更新。无班表用今天；无所选日结果不冒用其他日期班表。 Owner随后确认保留过去的时间、航班号；进入编辑、换人后保存及重启均保留已有历史岗位时段及原截载，不套当前模板时间。",
+    "unchanged": "查看历史不覆盖当前工作表、不自动重排/保存/上传/发布；各组隔离。当前同日人工保存沿原同步修复；真规则失效保持。仅末班部分历史和仅轮值不当完整班表；历史编辑取消与不完整匹配禁止覆盖保持。",
+    "fallback": "没有完整历史或匹配失败时明确提示，不把其他日安排贴上所选日期。切组取消保持原日期。历史查看无修改/导出当前错表入口，需先进入既有历史编辑才可调整或导出。"
+  },
+  "testedVersion": "24e0cc49f66b4b0eeadc1579c420b754fed563f369854a2e8ab061f83fc6acec",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "日期与内容红灯、历史时段红灯及后续命令红灯均保留；失败分别捕获旧偏好、错日当前表、模板时段覆盖及漏掉后续确认。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-latest-view-red.txt",
+          "summary": "Pre-change latest-date and mounted display tests: eight of twelve checks failed.",
+          "sha256": "33d9e3f7c69a698c466edbe9958f5f28927e94f320a4a40c2db9c29f654d3718"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-history-times-red.txt",
+          "summary": "Pre-change preserved-time tests: three of seventeen checks failed.",
+          "sha256": "6744da03418f6da2f4e97af48e88d7356eda53c66c4702779bbc78fe92fa3456"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-latest-view-post-command-red.txt",
+          "summary": "Before extending the guard, follow-up swap commands lacked the selected-date protection. Each command clears earlier toasts.",
+          "sha256": "1ed72784ac6b9c89913ce55673e74ae68330162e6ba9dd901746e168565ff05d"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-latest-view-complete-focused.txt",
+          "summary": "Final six-file run: 95 tests passed, including post-dialog commands, preserved historical times, mounted DOM, restoration and Excel bytes.",
+          "sha256": "788d850e93dd1a1bb64f091d78a15b86a835e0fcdd70584bca519eadfb7afd7e"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "启动/切组取该组最新完整日期，按所选日期显示当前或原始历史；挂载DOM证明原时间人员和无误报。历史换人保存/重启与Excel实际字节保持时段。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-latest-view-complete-focused.txt",
+          "summary": "Final six-file run: 95 tests passed, including post-dialog commands, preserved historical times, mounted DOM, restoration and Excel bytes.",
+          "sha256": "788d850e93dd1a1bb64f091d78a15b86a835e0fcdd70584bca519eadfb7afd7e"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-latest-view-complete-test.txt",
+          "summary": "223 functional files, 2193 tests passed; one worker, unchanged limits.",
+          "sha256": "f21d9a5127aa650f734b0f1fa4f8932f97b4dbd27af83edc2cba4d9deffbc72b"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-latest-view-independent.json",
+          "summary": "Independent generated HTML and built asset inspection passed; local development endpoint was reachable in the implementation turn but is unavailable during commit preparation.",
+          "sha256": "2d37683ed428569e5ebdc3b128083d49b38b79ab7c32cfbe934ed0fa55acb9e4"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-history-time-independent.json",
+          "summary": "Python stdlib inspection of JSON and actual XLSX XML: archived role time and original flight cutoff retained.",
+          "sha256": "8c0014a6d2ef2ddbeb8b7860eee12bbc6473ca4523c3f03ac5e082468cfd0b70"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-latest-view-typecheck-final.txt",
+          "summary": "Final typecheck exited zero.",
+          "sha256": "4b3f7cf1ed06cba39ee3b0608990fffcf42e1ff315949a5353a62ce478a2683c"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "覆盖A/B隔离、切组取消、旧偏好、无班表今天、手选保留、部分及混合部分/仅轮值排除、内部日期缺失、异日保存、跨午夜/提前释放与空历史时间回退。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-latest-view-complete-focused.txt",
+          "summary": "Final six-file run: 95 tests passed, including post-dialog commands, preserved historical times, mounted DOM, restoration and Excel bytes.",
+          "sha256": "788d850e93dd1a1bb64f091d78a15b86a835e0fcdd70584bca519eadfb7afd7e"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-latest-view-complete-test.txt",
+          "summary": "223 functional files, 2193 tests passed; one worker, unchanged limits.",
+          "sha256": "f21d9a5127aa650f734b0f1fa4f8932f97b4dbd27af83edc2cba4d9deffbc72b"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "保存后保持历史编辑日期；异日当前表恢复不变；存储重启、重复编辑/取消、配置和结果XLSX往返检查实际时间。换岗和补差后续按钮与打开入口消费同一日期来源守卫。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-latest-view-complete-focused.txt",
+          "summary": "Final six-file run: 95 tests passed, including post-dialog commands, preserved historical times, mounted DOM, restoration and Excel bytes.",
+          "sha256": "788d850e93dd1a1bb64f091d78a15b86a835e0fcdd70584bca519eadfb7afd7e"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-latest-view-complete-test.txt",
+          "summary": "223 functional files, 2193 tests passed; one worker, unchanged limits.",
+          "sha256": "f21d9a5127aa650f734b0f1fa4f8932f97b4dbd27af83edc2cba4d9deffbc72b"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-history-time-independent.json",
+          "summary": "Python stdlib inspection of JSON and actual XLSX XML: archived role time and original flight cutoff retained.",
+          "sha256": "8c0014a6d2ef2ddbeb8b7860eee12bbc6473ca4523c3f03ac5e082468cfd0b70"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-history-time-result.xlsx",
+          "summary": "Actual output workbook retaining archived time after editing staff and storage reload.",
+          "sha256": "fcfbc0e05d01088efd5ded1c490affa85c2a20889f5e6fa35bce86a12d462c7f"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "当前不同日或原失效且有完整历史时读取原历史，不洗白失效事实；历史/空日期不能误换人、清空、归档或导出另一份当前表。预览与确认同样受守卫；完整性、原人工警告及自动安全链保持。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-latest-view-post-command-red.txt",
+          "summary": "Before extending the guard, follow-up swap commands lacked the selected-date protection. Each command clears earlier toasts.",
+          "sha256": "1ed72784ac6b9c89913ce55673e74ae68330162e6ba9dd901746e168565ff05d"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-latest-view-complete-focused.txt",
+          "summary": "Final six-file run: 95 tests passed, including post-dialog commands, preserved historical times, mounted DOM, restoration and Excel bytes.",
+          "sha256": "788d850e93dd1a1bb64f091d78a15b86a835e0fcdd70584bca519eadfb7afd7e"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-latest-view-complete-test.txt",
+          "summary": "223 functional files, 2193 tests passed; one worker, unchanged limits.",
+          "sha256": "f21d9a5127aa650f734b0f1fa4f8932f97b4dbd27af83edc2cba4d9deffbc72b"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "完整功能回归含排班安全、统计疲劳不双计、Worker/WASM、Excel/存储、预检草稿、停止采用结果及原云端流程。未改算法、schema或导出列，不自动重排/上传/发布；owner原PROJECT_MAP哈希保持。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-latest-view-complete-test.txt",
+          "summary": "223 functional files, 2193 tests passed; one worker, unchanged limits.",
+          "sha256": "f21d9a5127aa650f734b0f1fa4f8932f97b4dbd27af83edc2cba4d9deffbc72b"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-latest-view-complete-focused.txt",
+          "summary": "Final six-file run: 95 tests passed, including post-dialog commands, preserved historical times, mounted DOM, restoration and Excel bytes.",
+          "sha256": "788d850e93dd1a1bb64f091d78a15b86a835e0fcdd70584bca519eadfb7afd7e"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-history-time-independent.json",
+          "summary": "Python stdlib inspection of JSON and actual XLSX XML: archived role time and original flight cutoff retained.",
+          "sha256": "8c0014a6d2ef2ddbeb8b7860eee12bbc6473ca4523c3f03ac5e082468cfd0b70"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-latest-view-independent.json",
+          "summary": "Independent generated HTML and built asset inspection passed; local development endpoint was reachable in the implementation turn but is unavailable during commit preparation.",
+          "sha256": "2d37683ed428569e5ebdc3b128083d49b38b79ab7c32cfbe934ed0fa55acb9e4"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-latest-view-final-build.txt",
+          "summary": "Production build exited zero; Vite 8.26 seconds; original chunk/externalization notices retained.",
+          "sha256": "da6d611997c683bc76c129df0b2865cc2b3ff1a26e19d8d3db18912120ca357c"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-latest-view-verify-final.txt",
+          "sha256": "6f7c27db90666dcf0dbc2325562bf7c1c56c71a38ce24895e7f4d3662a56f448",
+          "summary": "Complete npm.cmd run verify exited zero: typecheck, 223 functional files / 2193 tests, 7 performance files / 19 tests, and production build. One worker; original thresholds unchanged."
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "自动产物HTML、JSON、结果XLSX及生产包已独立核对，开发阶段曾核对本机64773提供本轮源码；本次提交前复查该端口已无法连接；没有主动操作浏览器，owner尚未刷新验收真实页面。前一轮owner报告未同步，不能用本轮自动测试代替现场通过；需核对默认最新日期、历史人员原时间、编辑保存后的返回显示和A/B切换。Owner已授权本地提交；真实页面待验收，不push或部署。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-latest-view-independent.json",
+          "summary": "Independent generated HTML and built asset inspection passed; local development endpoint was reachable in the implementation turn but is unavailable during commit preparation.",
+          "sha256": "2d37683ed428569e5ebdc3b128083d49b38b79ab7c32cfbe934ed0fa55acb9e4"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-latest-view.html",
+          "summary": "Rendered mounted-application HTML for anonymous historical date, read independently.",
+          "sha256": "329f68e7b682dc3ac173acf47d449c1610ef81c8d46ed46a675a1721284fec2c"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-history-time-independent.json",
+          "summary": "Python stdlib inspection of JSON and actual XLSX XML: archived role time and original flight cutoff retained.",
+          "sha256": "8c0014a6d2ef2ddbeb8b7860eee12bbc6473ca4523c3f03ac5e082468cfd0b70"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-history-time-result.xlsx",
+          "summary": "Actual output workbook retaining archived time after editing staff and storage reload.",
+          "sha256": "fcfbc0e05d01088efd5ded1c490affa85c2a20889f5e6fa35bce86a12d462c7f"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-latest-view-final-build.txt",
+          "summary": "Production build exited zero; Vite 8.26 seconds; original chunk/externalization notices retained.",
+          "sha256": "da6d611997c683bc76c129df0b2865cc2b3ff1a26e19d8d3db18912120ca357c"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "latest-view-red.txt抓到旧偏好和错日内容；history-times-red.txt抓到历史被模板替换；post-command-red抓漏后续确认。最终95项定向及完整功能均通过，现场原内部日期未获证实。",
+    "laterChanges": "初始化/切组、保存快照、草稿重建、规则失效、存储恢复、导出与换岗/补差确认均可能改坏结果；定向及全量回归覆盖，Python核对真实XLSX字节。",
+    "finalArtifact": "latest-view.html及independent.json证明挂载入口原历史投影；history-time-result.xlsx及independent.json证明保存/恢复后原时间及截载。生产包构建通过，本机提供新源码，真实页面仍待owner验收。"
+  },
+  "review": {
+    "missedScope": "第一轮只核对内部同日，遗漏可见日期与当前表分离、历史载入套模板及后续确认按钮；本轮按current/history/empty矩阵补齐。真实页面和原浏览器内部日期仍缺证据；旧记录从未存下的时段不能凭空恢复，空时段沿原模板回退。",
+    "rootCause": "历史保存无条件恢复快照且启动按非空误报；更深一层是日期选择只更新view却无按日内容投影，历史草稿又使用当前模板时段。第一轮自动测试只用内部日期相同的匿名夹具，未覆盖现场可见同日而底层来源不同。",
+    "earlyDetection": "改日期和历史流程前把页面日期/当前内部日期/历史日期三者分别列入输入矩阵；先用不同日期与不同时间的匿名失败测试，再核对保存、取消、刷新、导出及后续确认。每条命令清除旧toast，避免用上一条提示假绿；真实页面另验。"
+  },
+  "automaticVerification": {
+    "functionalFiles": 223,
+    "functionalTests": 2193,
+    "focusedFiles": 6,
+    "focusedTests": 95,
+    "typecheckExit": 0,
+    "testExit": 0,
+    "buildExit": 0,
+    "maxWorkers": 1,
+    "performance": "7 files and 19 tests passed as part of the required commit gate.",
+    "verify": "Complete npm.cmd run verify exited zero before committing."
+  },
+  "externalActions": {
+    "commit": false,
+    "push": false,
+    "deployment": false,
+    "cloudUpload": false,
+    "browserAcceptance": false,
+    "sourceHttpChecked": true
+  },
+  "commitValidation": {
+    "authorization": "Owner明确授权“可以 commit”；仅本地提交本次修复，PROJECT_MAP.md排除。",
+    "verifyExit": 0,
+    "evidence": {
+      "path": "docs/acceptance/evidence/2026-11-17-latest-view-verify-final.txt",
+      "sha256": "6f7c27db90666dcf0dbc2325562bf7c1c56c71a38ce24895e7f4d3662a56f448",
+      "summary": "Complete npm.cmd run verify exited zero: typecheck, 223 functional files / 2193 tests, 7 performance files / 19 tests, and production build. One worker; original thresholds unchanged."
+    },
+    "actualBrowserAcceptance": false,
+    "push": false,
+    "deployment": false
+  }
+}

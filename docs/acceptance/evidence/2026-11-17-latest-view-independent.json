@@ -1,0 +1,30 @@
+{
+  "scope": "Independent read of generated anonymous HTML, local Vite HTTP source and compiled assets; no browser operation or cloud upload",
+  "actual": {
+    "heading": "2026-11-18 已保存班表",
+    "person": "同步测试人员1",
+    "time": "08:30–10:30",
+    "oldNotice": false
+  },
+  "live": [
+    {
+      "error": "TypeError: fetch failed"
+    },
+    {
+      "error": "TypeError: fetch failed"
+    },
+    {
+      "error": "TypeError: fetch failed"
+    },
+    {
+      "error": "TypeError: fetch failed"
+    }
+  ],
+  "ownerFileSha256": "49f304c96afd07eb7d784593ae87fcaa18832a015406f475656df6bdc77b0cfd",
+  "compiledAssets": [
+    {
+      "path": "dist/assets/index-DipHOc_n.js",
+      "sha256": "aab12c29f94d881b0aada64eba84c26e319f310dc39b324f7328cf7080df95f9"
+    }
+  ]
+}

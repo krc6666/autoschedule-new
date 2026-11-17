@@ -12,7 +12,7 @@ const emptyAssignments = (state: AppState) => {
   state.assignments = [];
 };
 
-function openGenerate(state: AppState, viewDate: string) {
+async function openGenerate(state: AppState, viewDate: string) {
   const coordinator = createTestApplicationCoordinator(
     createTestAutoscheduleStore(state),
     {
@@ -24,10 +24,12 @@ function openGenerate(state: AppState, viewDate: string) {
       },
     }
   );
-  return coordinator.handle({ type: "generate-schedule" }).then(() => ({
+  await coordinator.handle({ type: "change-date", date: viewDate });
+  await coordinator.handle({ type: "generate-schedule" });
+  return {
     coordinator,
     dialog: coordinator.view().dialog,
-  }));
+  };
 }
 
 describe("empty schedule weekly flight defaults", () => {
@@ -159,6 +161,7 @@ describe("empty schedule weekly flight defaults", () => {
     setTestScheduleRunner(coordinator, { calculate, isRunning: () => false });
     const before = structuredClone(coordinator.model());
 
+    await coordinator.handle({ type: "change-date", date: "2026-08-22" });
     await coordinator.handle({ type: "generate-schedule" });
     const dialog = coordinator.view().dialog;
     if (dialog?.kind !== "schedule-preflight")

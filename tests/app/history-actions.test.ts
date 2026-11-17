@@ -9,6 +9,7 @@ import {
   currentScheduleHistory,
   replaceHistoryForDate,
 } from "../../src/app/history-actions";
+import { historySyncState, syncDate } from "../helpers/history-sync";
 
 function assignment(
   id: string,
@@ -89,7 +90,7 @@ describe("history actions", () => {
     ]);
   });
 
-  it("rebuilds an archived day from the matching current flight template", () => {
+  it("keeps archived times and flight numbers while matching the current configuration", () => {
     const state = createOrdinarySchedulingState();
     const person = state.staff[0]!;
     state.flights = [
@@ -159,8 +160,8 @@ describe("history actions", () => {
     expect(draft.flights).toMatchObject([
       {
         flightNo: "CX937(早)",
-        startTime: "08:30",
-        endTime: "10:30",
+        startTime: "08:20",
+        endTime: "10:20",
       },
     ]);
     expect(draft.assignments).toMatchObject([
@@ -169,13 +170,76 @@ describe("history actions", () => {
         position: "G01",
         staffId: person.id,
         staffName: person.name,
-        startTime: "08:30",
-        endTime: "10:30",
+        startTime: "08:20",
+        endTime: "10:20",
         remark: "历史备注",
         manualRemark: "",
         status: "assigned",
       },
     ]);
+  });
+
+  it.each([
+    ["08:20", "09:20", "10:20", "09:00", "10:00"],
+    ["23:20", "00:20", "01:20", "00:00", "01:00"],
+  ])(
+    "preserves separate role times and the original cutoff (%s)",
+    (start, released, cutoff, otherStart, otherEnd) => {
+      const state = historySyncState();
+      const row = state.history[0]!;
+      Object.assign(row, {
+        startTime: start,
+        endTime: released,
+        flightCutoffTime: cutoff,
+      });
+      state.positionRules.push({
+        ...state.positionRules[0]!,
+        id: "second-role",
+        name: "第二岗位",
+      });
+      state.history.push({
+        ...row,
+        id: "second-role-row",
+        position: "第二岗位",
+        startTime: otherStart,
+        endTime: otherEnd,
+      });
+      const draft = buildHistoricalScheduleDraft(state, syncDate);
+      expect(draft.warnings).toEqual([]);
+      expect(draft.flights[0]).toMatchObject({
+        startTime: start,
+        endTime: cutoff,
+        flightNo: row.flightNo,
+      });
+      expect(draft.assignments).toMatchObject([
+        {
+          startTime: start,
+          endTime: released,
+          workHours: row.workHours,
+          fatiguePoints: row.fatiguePoints,
+        },
+        { startTime: otherStart, endTime: otherEnd },
+      ]);
+      expect(state.history[0]).toBe(row);
+    }
+  );
+
+  it("uses template times only where the archive has no usable time", () => {
+    const state = historySyncState();
+    Object.assign(state.history[0]!, {
+      startTime: "",
+      endTime: "",
+      flightCutoffTime: undefined,
+    });
+    const draft = buildHistoricalScheduleDraft(state, syncDate);
+    expect(draft.flights[0]).toMatchObject({
+      startTime: state.templates[0]!.startTime,
+      endTime: state.templates[0]!.endTime,
+    });
+    expect(draft.assignments[0]).toMatchObject({
+      startTime: state.templates[0]!.startTime,
+      endTime: state.templates[0]!.endTime,
+    });
   });
 
   it("refuses a partial archive or records missing from current configuration", () => {

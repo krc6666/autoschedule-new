@@ -1,0 +1,23 @@
+{
+  "purpose": "Diagnostic only; not evidence of owner browser state",
+  "observations": [
+    {
+      "selectedBeforeEdit": "2026-11-18",
+      "internalBeforeEdit": "2026-11-18",
+      "synchronized": true,
+      "restoredNoticeAfterSave": false
+    },
+    {
+      "selectedBeforeEdit": "2026-11-18",
+      "internalBeforeEdit": "2026-11-20",
+      "synchronized": false,
+      "restoredNoticeAfterSave": true
+    },
+    {
+      "selectedBeforeEdit": "2026-11-18",
+      "internalBeforeEdit": null,
+      "synchronized": false,
+      "restoredNoticeAfterSave": true
+    }
+  ]
+}

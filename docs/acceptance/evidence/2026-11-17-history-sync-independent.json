@@ -1,0 +1,14 @@
+{
+  "source": "Independent Python check of generated JSON and actual XLSX XML; no app calculation imported",
+  "samePersonAndRemark": true,
+  "currentDateFatigue": 3,
+  "monthFatigue": 6,
+  "noSameDateDoubleCount": true,
+  "otherGroupPreserved": true,
+  "rulesStaleAfterReload": false,
+  "resultExcelContainsNewPersonAndRemark": true,
+  "sha256": {
+    "2026-11-17-history-sync-result.xlsx": "c2ac7fb38db165780a15c255bceb2bb7763ddbcb83bb00fb7f0eb96d6222c108",
+    "2026-11-17-history-sync-final.json": "1751638cb1c5b5bd0aa27dbf2ffed57c34889f291ce09940311c757185dec49f"
+  }
+}

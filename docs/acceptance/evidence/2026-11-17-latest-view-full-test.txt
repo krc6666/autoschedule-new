@@ -1,0 +1,305 @@
+
+> autoschedule@1.0.0 test
+> vitest run --exclude tests/performance/**
+
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/app/schedule-preflight.test.ts (55 tests | 1 failed) 993ms
+   × 统计页轮值保存并恢复后仍在生成预检中回显 17ms
+ ❯ tests/app/preflight-admin-mode.test.ts (31 tests | 1 failed) 734ms
+     × 'archive-next-duty-day' adopts a stopped result and its mode only with a safety credential (true) 21ms
+ ❯ tests/architecture/scheduling-facts-boundary.test.ts (1 test | 1 failed) 316ms
+     × 完整 AppState 只进入投影和应用状态职责 315ms
+ ❯ tests/app/half-rest-selection-persistence.test.ts (7 tests | 1 failed) 129ms
+     × survives actual save/restore, group/date switches and an explicit clear 18ms
+ ❯ tests/app/schedule-preflight-weekly-defaults.test.ts (14 tests | 10 failed) 92ms
+     × uses the displayed date 2026-08-16 weekday 7, even with leftover flights 29ms
+     × uses the displayed date 2026-08-17 weekday 1, even with leftover flights 5ms
+     × uses the displayed date 2026-08-18 weekday 2, even with leftover flights 5ms
+     × uses the displayed date 2026-08-19 weekday 3, even with leftover flights 4ms
+     × uses the displayed date 2026-08-20 weekday 4, even with leftover flights 5ms
+     × uses the displayed date 2026-08-21 weekday 5, even with leftover flights 4ms
+     × uses the displayed date 2026-08-22 weekday 6, even with leftover flights 7ms
+     × uses the displayed date 2026-08-31 weekday 1, even with leftover flights 4ms
+     × uses the displayed date 2026-09-01 weekday 2, even with leftover flights 4ms
+     × lets the user add a flight beyond the weekly default before running 9ms
+npm.cmd :
+所在位置 行:4 字符: 1
++ npm.cmd test *> docs/acceptance/evidence/2026-11-17-latest-view-full- ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 14 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/app/half-rest-selection-persistence.test.ts > dated half-rest selection > survives actual save/restore, gr
+oup/date switches and an explicit clear
+AssertionError: expected [] to deeply equal [ '1' ]
+
+- Expected
++ Received
+
+- [
+-   "1",
+- ]
++ []
+
+ ❯ tests/app/half-rest-selection-persistence.test.ts:212:45
+    210|     expect(resumed.view().halfRestStaffIds).toEqual([]);
+    211|     await resumed.handle({ type: "change-date", date: "2026-11-10" });
+    212|     expect(resumed.view().halfRestStaffIds).toEqual([id]);
+       |                                             ^
+    213|     await resumed.handle({ type: "switch-group", groupId: "B" });
+    214|     expect(resumed.view().halfRestStaffIds).toEqual([]);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/14]⎯
+
+ FAIL  tests/app/preflight-admin-mode.test.ts > preflight administrative mode draft > 'archive-next-duty-day' adopts a
+stopped result and its mode only with a safety credential (true)
+TypeError: Cannot convert undefined or null to object
+ ❯ tests/app/preflight-admin-mode.test.ts:371:41
+    369|       }
+    370|       await coordinator.handle({ type: entry });
+    371|       expect(coordinator.view().dialog).toHaveProperty(
+       |                                         ^
+    372|         "adminSupportEnabled",
+    373|         true
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/14]⎯
+
+ FAIL  tests/app/schedule-preflight-weekly-defaults.test.ts > empty schedule weekly flight defaults > uses the displaye
+d date 2026-08-16 weekday 7, even with leftover flights
+AssertionError: expected '2026-11-17' to be '2026-08-16' // Object.is equality
+
+Expected: "2026-08-16"
+Received: "2026-11-17"
+
+ ❯ tests/app/schedule-preflight-weekly-defaults.test.ts:75:27
+     73|         throw new Error("missing schedule preflight");
+     74|
+     75|       expect(dialog.date).toBe(viewDate);
+       |                           ^
+     76|       expect(dialog.groupId).toBe(state.activeGroupId);
+     77|       expect(
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/14]⎯
+
+ FAIL  tests/app/schedule-preflight-weekly-defaults.test.ts > empty schedule weekly flight defaults > uses the displaye
+d date 2026-08-17 weekday 1, even with leftover flights
+AssertionError: expected '2026-11-17' to be '2026-08-17' // Object.is equality
+
+Expected: "2026-08-17"
+Received: "2026-11-17"
+
+ ❯ tests/app/schedule-preflight-weekly-defaults.test.ts:75:27
+     73|         throw new Error("missing schedule preflight");
+     74|
+     75|       expect(dialog.date).toBe(viewDate);
+       |                           ^
+     76|       expect(dialog.groupId).toBe(state.activeGroupId);
+     77|       expect(
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/14]⎯
+
+ FAIL  tests/app/schedule-preflight-weekly-defaults.test.ts > empty schedule weekly flight defaults > uses the displaye
+d date 2026-08-18 weekday 2, even with leftover flights
+AssertionError: expected '2026-11-17' to be '2026-08-18' // Object.is equality
+
+Expected: "2026-08-18"
+Received: "2026-11-17"
+
+ ❯ tests/app/schedule-preflight-weekly-defaults.test.ts:75:27
+     73|         throw new Error("missing schedule preflight");
+     74|
+     75|       expect(dialog.date).toBe(viewDate);
+       |                           ^
+     76|       expect(dialog.groupId).toBe(state.activeGroupId);
+     77|       expect(
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/14]⎯
+
+ FAIL  tests/app/schedule-preflight-weekly-defaults.test.ts > empty schedule weekly flight defaults > uses the displaye
+d date 2026-08-19 weekday 3, even with leftover flights
+AssertionError: expected '2026-11-17' to be '2026-08-19' // Object.is equality
+
+Expected: "2026-08-19"
+Received: "2026-11-17"
+
+ ❯ tests/app/schedule-preflight-weekly-defaults.test.ts:75:27
+     73|         throw new Error("missing schedule preflight");
+     74|
+     75|       expect(dialog.date).toBe(viewDate);
+       |                           ^
+     76|       expect(dialog.groupId).toBe(state.activeGroupId);
+     77|       expect(
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/14]⎯
+
+ FAIL  tests/app/schedule-preflight-weekly-defaults.test.ts > empty schedule weekly flight defaults > uses the displaye
+d date 2026-08-20 weekday 4, even with leftover flights
+AssertionError: expected '2026-11-17' to be '2026-08-20' // Object.is equality
+
+Expected: "2026-08-20"
+Received: "2026-11-17"
+
+ ❯ tests/app/schedule-preflight-weekly-defaults.test.ts:75:27
+     73|         throw new Error("missing schedule preflight");
+     74|
+     75|       expect(dialog.date).toBe(viewDate);
+       |                           ^
+     76|       expect(dialog.groupId).toBe(state.activeGroupId);
+     77|       expect(
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/14]⎯
+
+ FAIL  tests/app/schedule-preflight-weekly-defaults.test.ts > empty schedule weekly flight defaults > uses the displaye
+d date 2026-08-21 weekday 5, even with leftover flights
+AssertionError: expected '2026-11-17' to be '2026-08-21' // Object.is equality
+
+Expected: "2026-08-21"
+Received: "2026-11-17"
+
+ ❯ tests/app/schedule-preflight-weekly-defaults.test.ts:75:27
+     73|         throw new Error("missing schedule preflight");
+     74|
+     75|       expect(dialog.date).toBe(viewDate);
+       |                           ^
+     76|       expect(dialog.groupId).toBe(state.activeGroupId);
+     77|       expect(
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/14]⎯
+
+ FAIL  tests/app/schedule-preflight-weekly-defaults.test.ts > empty schedule weekly flight defaults > uses the displaye
+d date 2026-08-22 weekday 6, even with leftover flights
+AssertionError: expected '2026-11-17' to be '2026-08-22' // Object.is equality
+
+Expected: "2026-08-22"
+Received: "2026-11-17"
+
+ ❯ tests/app/schedule-preflight-weekly-defaults.test.ts:75:27
+     73|         throw new Error("missing schedule preflight");
+     74|
+     75|       expect(dialog.date).toBe(viewDate);
+       |                           ^
+     76|       expect(dialog.groupId).toBe(state.activeGroupId);
+
+ Test Files  5 failed | 218 passed (223)
+      Tests  14 failed | 2175 passed (2189)
+   Start at  12:41:37
+   Duration  298.27s (transform 8.15s, setup 0ms, import 45.36s, tests 194.69s, environment 14.78s)
+
+     77|       expect(
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/14]⎯
+
+ FAIL  tests/app/schedule-preflight-weekly-defaults.test.ts > empty schedule weekly flight defaults > uses the displaye
+d date 2026-08-31 weekday 1, even with leftover flights
+AssertionError: expected '2026-11-17' to be '2026-08-31' // Object.is equality
+
+Expected: "2026-08-31"
+Received: "2026-11-17"
+
+ ❯ tests/app/schedule-preflight-weekly-defaults.test.ts:75:27
+     73|         throw new Error("missing schedule preflight");
+     74|
+     75|       expect(dialog.date).toBe(viewDate);
+       |                           ^
+     76|       expect(dialog.groupId).toBe(state.activeGroupId);
+     77|       expect(
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/14]⎯
+
+ FAIL  tests/app/schedule-preflight-weekly-defaults.test.ts > empty schedule weekly flight defaults > uses the displaye
+d date 2026-09-01 weekday 2, even with leftover flights
+AssertionError: expected '2026-11-17' to be '2026-09-01' // Object.is equality
+
+Expected: "2026-09-01"
+Received: "2026-11-17"
+
+ ❯ tests/app/schedule-preflight-weekly-defaults.test.ts:75:27
+     73|         throw new Error("missing schedule preflight");
+     74|
+     75|       expect(dialog.date).toBe(viewDate);
+       |                           ^
+     76|       expect(dialog.groupId).toBe(state.activeGroupId);
+     77|       expect(
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/14]⎯
+
+ FAIL  tests/app/schedule-preflight-weekly-defaults.test.ts > empty schedule weekly flight defaults > lets the user add
+ a flight beyond the weekly default before running
+AssertionError: expected [ 'FD573' ] to deeply equal [ 'CX937', 'FD573' ]
+
+- Expected
++ Received
+
+  [
+-   "CX937",
+    "FD573",
+  ]
+
+ ❯ tests/app/schedule-preflight-weekly-defaults.test.ts:184:7
+    182|     expect(
+    183|       calculate.mock.calls[0]![0].flights.map((flight) => flight.fligh…
+    184|     ).toEqual([defaultTemplate!.flightNo, addedTemplate!.flightNo].sor…
+       |       ^
+    185|     expect(coordinator.model()).toEqual(before);
+    186|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/14]⎯
+
+ FAIL  tests/app/schedule-preflight.test.ts > 统计页轮值保存并恢复后仍在生成预检中回显
+AssertionError: expected { kind: 'schedule-preflight', …(7) } to match object { dutyRoster: ObjectContaining{…} }
+(14 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+    "dutyRoster": {
+-     "dutyStaffId": "1",
++     "adjusted": false,
++     "cxPreflightStaffId": null,
++     "date": "2026-11-17",
++     "dutyStaffId": "2",
++     "standbyStaffIds": [
++       "1",
++       null,
++     ],
+    },
+  }
+
+ ❯ tests/app/schedule-preflight.test.ts:889:34
+    887|   await reopened.handle({ type: "generate-schedule" });
+    888|   expect(reopened.view().dialog?.kind).toBe("schedule-preflight");
+    889|   expect(reopened.view().dialog).toMatchObject({
+       |                                  ^
+    890|     dutyRoster: expect.objectContaining({ dutyStaffId: person.id }),
+    891|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/14]⎯
+
+ FAIL  tests/architecture/scheduling-facts-boundary.test.ts > 排班事实依赖边界 > 完整 AppState 只进入投影和应用状态职责
+AssertionError: expected [ …(5) ] to deeply equal [ …(4) ]
+
+- Expected
++ Received
+
+  [
+    "src/domain/flights/flight-plan-reconciliation.ts",
+    "src/domain/kernel/schedule-lifecycle.ts",
++   "src/domain/records/schedule-dates.ts",
+    "src/domain/rules/schedule-rule-fingerprint.ts",
+    "src/domain/shared/scheduling-facts.ts",
+  ]
+
+ ❯ tests/architecture/scheduling-facts-boundary.test.ts:58:27
+     56|       .sort();
+     57|
+     58|     expect(directImports).toEqual([...allowedAppStateImports].sort());
+       |                           ^
+     59|   });
+     60| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/14]⎯
