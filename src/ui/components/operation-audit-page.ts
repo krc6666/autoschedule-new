@@ -73,31 +73,14 @@ export class OperationAuditPageElement extends LightDomElement {
                         change,
                         detail.data!.staffLabels
                       );
+                      if (!projected.lines.length) return null;
                       return html`<section class="operation-audit-change">
                         <h2 class="h6">
                           ${projected.action}：${projected.title}
                         </h2>
-                        <div class="audit-table-scroll">
-                          <table class="table table-sm mb-0">
-                            <thead>
-                              <tr>
-                                <th>修改内容</th>
-                                <th>修改前</th>
-                                <th>修改后</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              ${projected.fields.map(
-                                (field) =>
-                                  html`<tr>
-                                    <th scope="row">${field.label}</th>
-                                    <td>${field.before}</td>
-                                    <td>${field.after}</td>
-                                  </tr>`
-                              )}
-                            </tbody>
-                          </table>
-                        </div>
+                        <ul class="operation-audit-text">
+                          ${projected.lines.map((line) => html`<li>${line}</li>`)}
+                        </ul>
                       </section>`;
                     })}
                     ${detail.loading ? html`<div role="status">正在读取修改详情…</div>` : null}

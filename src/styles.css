@@ -40,18 +40,12 @@
   border-top: 1px solid var(--as-border);
   padding: 12px 0;
 }
-.audit-table-scroll {
-  max-width: 100%;
-  overflow-x: auto;
+.operation-audit-text {
+  margin: 0;
+  padding-left: 1.25rem;
+  line-height: 1.8;
 }
-.operation-audit-change table {
-  min-width: 480px;
-  table-layout: fixed;
-}
-.operation-audit-change th:first-child {
-  width: 24%;
-}
-.operation-audit-change td {
+.operation-audit-text li {
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }

@@ -43,21 +43,9 @@ describe("audit query and display contract", () => {
       { before: { A: { one: "旧名字" } }, after: { A: { one: "新名字" } } }
     );
     expect(projection.title).toContain("CX931 / G14");
-    expect(projection.fields).toContainEqual({
-      label: "资质人员",
-      before: "旧名字（one）",
-      after: "（空列表）",
-    });
-    expect(projection.fields).toContainEqual({
-      label: "疲劳点数",
-      before: "4",
-      after: "0",
-    });
-    expect(projection.fields).toContainEqual({
-      label: "手动补位",
-      before: "是",
-      after: "否",
-    });
+    expect(projection.lines).toContain("资质人员：移除旧名字");
+    expect(projection.lines).toContain("疲劳点数：4 → 0");
+    expect(projection.lines).toContain("手动补位：是 → 否");
     expect(auditValue(undefined)).toBe("（未设置）");
     expect(auditValue("")).toBe("（空）");
   });

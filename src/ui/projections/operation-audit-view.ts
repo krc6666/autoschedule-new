@@ -99,6 +99,19 @@ const FIELDS: Record<string, string> = {
   historyCoverage: "历史完整性",
   flightCutoffTime: "航班截载时间",
   attendanceIntervals: "实际出勤时段",
+  movable: "允许调动",
+  minimumGapMinutes: "最少间隔分钟",
+  minimumStaffCount: "最少人数",
+  sourcePositions: "来源岗位",
+  targetPosition: "目标岗位",
+  positionKeyword: "岗位",
+  keyword: "匹配内容",
+  matchField: "匹配方式",
+  mode: "执行方式",
+  nextWorkdayCutoffTime: "下一班最早上岗时间",
+  countBaseline: "次数原人员",
+  assignmentRemarks: "岗位备注",
+  manualOverrideWarnings: "人工调整提醒",
 };
 const VALUES: Record<string, string> = {
   ...Object.fromEntries(
@@ -133,7 +146,7 @@ export function auditValue(
   if (typeof value === "number") return String(value);
   if (typeof value === "string")
     return Object.hasOwn(names, value)
-      ? `${names[value]}（${value}）`
+      ? names[value]!
       : (VALUES[value] ?? value);
   if (depth > 8) return JSON.stringify(value);
   if (Array.isArray(value))
@@ -150,6 +163,167 @@ export function auditValue(
           .join("\n")
       : "（空内容）";
   return String(value);
+}
+
+// Only formats server snapshots; never consults today's configuration or rewrites audit data.
+function equal(before: unknown, after: unknown): boolean {
+  if (before === after) return true;
+  if (Array.isArray(before) && Array.isArray(after))
+    return (
+      before.length === after.length &&
+      before.every((v, i) => equal(v, after[i]))
+    );
+  if (record(before) && record(after)) {
+    const keys = Object.keys(before);
+    return (
+      keys.length === Object.keys(after).length &&
+      keys.every(
+        (key) => Object.hasOwn(after, key) && equal(before[key], after[key])
+      )
+    );
+  }
+  return false;
+}
+
+function itemKey(value: unknown): string | undefined {
+  if (!record(value)) return undefined;
+  if (typeof value.id === "string" && value.id) return value.id;
+  if (typeof value.flightNo === "string") {
+    const position = value.position ?? value.positionKeyword;
+    if (typeof position === "string")
+      return `${value.flightNo}\u0000${position}`;
+  }
+  return undefined;
+}
+
+function itemLabel(value: unknown, fallback: string): string {
+  if (!record(value)) return fallback;
+  return (
+    [
+      value.name,
+      value.flightNo ?? value.sourceFlightNo,
+      value.position ?? value.positionKeyword ?? value.sourcePositionKeyword,
+    ]
+      .filter((v) => typeof v === "string" && v)
+      .join(" / ") || fallback
+  );
+}
+
+function changeLines(
+  before: unknown,
+  after: unknown,
+  path: string,
+  beforeNames: Record<string, string>,
+  afterNames: Record<string, string>
+): string[] {
+  if (equal(before, after)) return [];
+  if (record(before) || record(after)) {
+    const old = record(before) ? before : {};
+    const next = record(after) ? after : {};
+    // Replacing an object with a scalar must still show both sides.
+    if (
+      (before != null && !record(before)) ||
+      (after != null && !record(after))
+    )
+      return [
+        `${path}：${auditValue(before, beforeNames)} → ${auditValue(after, afterNames)}`,
+      ];
+    const keys = [...new Set([...Object.keys(old), ...Object.keys(next)])];
+    return keys
+      .filter((key) => {
+        if (["id", "flightId", "positionRuleId"].includes(key)) return false;
+        // A saved assignment contains both identity and display name for the same occupant.
+        if (
+          key === "staffId" &&
+          typeof old.staffName === "string" &&
+          typeof next.staffName === "string" &&
+          old.staffName !== next.staffName
+        )
+          return false;
+        return true;
+      })
+      .flatMap((key) =>
+        changeLines(
+          old[key],
+          next[key],
+          [path, afterNames[key] ?? beforeNames[key] ?? auditFieldLabel(key)]
+            .filter(Boolean)
+            .join(" / "),
+          beforeNames,
+          afterNames
+        )
+      );
+  }
+  if (Array.isArray(before) && Array.isArray(after)) {
+    const oldKeys = before.map(itemKey);
+    const nextKeys = after.map(itemKey);
+    const keyed =
+      [...oldKeys, ...nextKeys].every((key) => key !== undefined) &&
+      new Set(oldKeys).size === oldKeys.length &&
+      new Set(nextKeys).size === nextKeys.length;
+    if (keyed) {
+      const old = new Map(before.map((item, i) => [oldKeys[i]!, item]));
+      const next = new Map(after.map((item, i) => [nextKeys[i]!, item]));
+      const lines = [...new Set([...old.keys(), ...next.keys()])].flatMap(
+        (key) => {
+          const prior = old.get(key),
+            current = next.get(key);
+          const label = [path, itemLabel(current ?? prior, key)]
+            .filter(Boolean)
+            .join(" / ");
+          if (!old.has(key))
+            return [`${label}：新增；${auditValue(current, afterNames)}`];
+          if (!next.has(key))
+            return [`${label}：删除；${auditValue(prior, beforeNames)}`];
+          return changeLines(prior, current, label, beforeNames, afterNames);
+        }
+      );
+      const retainedBefore = oldKeys.filter((key) => next.has(key!));
+      const retainedAfter = nextKeys.filter((key) => old.has(key!));
+      if (!equal(retainedBefore, retainedAfter))
+        lines.push(
+          `${path} / 顺序：${retainedBefore.map((key) => itemLabel(old.get(key!), key!)).join("、")} → ${retainedAfter.map((key) => itemLabel(next.get(key!), key!)).join("、")}`
+        );
+      return lines;
+    }
+    // Without stable IDs, equal-length object lists can only be identified by position.
+    if (before.length === after.length && [...before, ...after].every(record))
+      return before.flatMap((value, i) =>
+        changeLines(
+          value,
+          after[i],
+          `${path} / 第${i + 1}项`,
+          beforeNames,
+          afterNames
+        )
+      );
+    const remaining = [...before];
+    const added: unknown[] = [];
+    for (const value of after) {
+      const index = remaining.findIndex((old) => equal(old, value));
+      if (index < 0) added.push(value);
+      else remaining.splice(index, 1);
+    }
+    const parts = [
+      added.length
+        ? `新增${added.map((v) => auditValue(v, afterNames)).join("、")}`
+        : "",
+      remaining.length
+        ? `移除${remaining.map((v) => auditValue(v, beforeNames)).join("、")}`
+        : "",
+    ].filter(Boolean);
+    if (parts.length) return [`${path}：${parts.join("；")}`];
+    return [
+      `${path} / 顺序：${before.map((v) => auditValue(v, beforeNames)).join("、")} → ${after.map((v) => auditValue(v, afterNames)).join("、")}`,
+    ];
+  }
+  if (before === undefined)
+    return [`${path}：新增${auditValue(after, afterNames)}`];
+  if (after === undefined)
+    return [`${path}：删除${auditValue(before, beforeNames)}`];
+  return [
+    `${path}：${auditValue(before, beforeNames)} → ${auditValue(after, afterNames)}`,
+  ];
 }
 
 export function projectAuditChange(
@@ -179,35 +353,22 @@ export function projectAuditChange(
           : change.key === "$value"
             ? ""
             : change.key);
-  const keys = [
-    ...new Set([...Object.keys(before), ...Object.keys(after)]),
-  ].filter(
-    (key) =>
-      !["id", "flightId", "positionRuleId"].includes(key) &&
-      JSON.stringify(before[key]) !== JSON.stringify(after[key])
+  const label =
+    change.key === "$order"
+      ? "显示顺序"
+      : change.area === "settings"
+        ? auditFieldLabel(change.key)
+        : area;
+  const lines = changeLines(
+    change.before,
+    change.after,
+    record(change.before) || record(change.after) ? "" : label,
+    beforeNames,
+    afterNames
   );
-  const fields =
-    record(change.before) || record(change.after)
-      ? keys.map((key) => ({
-          label: auditFieldLabel(key),
-          before: auditValue(before[key], beforeNames),
-          after: auditValue(after[key], afterNames),
-        }))
-      : [
-          {
-            label:
-              change.key === "$order"
-                ? "显示顺序"
-                : change.area === "settings"
-                  ? auditFieldLabel(change.key)
-                  : area,
-            before: auditValue(change.before, beforeNames),
-            after: auditValue(change.after, afterNames),
-          },
-        ];
   return {
     title: `${change.scope === "shared" ? "共用资料" : `${change.scope}组`} · ${area}${target ? ` · ${target}` : ""}`,
     action: { add: "新增", update: "修改", delete: "删除" }[change.operation],
-    fields,
+    lines,
   };
 }

@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-17-audit-changes-only",
+  "title": "操作记录只显示实际变化的中文文字",
+  "startedFrom": "772d24b0d9480a0494c0b49340638ca0c3f85d2e",
+  "expectation": {
+    "example": "Owner确认示例：班表岗位张三→李四；规则3班→4班；资质新增赵六、移除钱七，其他未变字段和名单不显示。",
+    "expected": "操作详情由三列表格改为中文文字列表；嵌套规则和名单只显示变化叶子及必要定位上下文，保留新增/删除、顺序变化、空/零/否的区别。",
+    "unchanged": "原数据库记录、查询RPC/保存触发器/身份/时间/版本/50项分页和总变化项数、登录退出隔离、读失败重试与原工作台数据均不改；不重新安装SQL、不发布、不commit。",
+    "fallback": "字段未知时保留原键以免吞变更；未知无稳定标识数组不猜身份，按位置或增删显示；页面读取失败继续明确报错，不冒充空记录。历史教训：数据库前后快照是唯一事实，UI不能重新写审计；分页合并和旧名字快照必须保留，不能把本地DOM或构建当现场验收。"
+  },
+  "testedVersion": "e48ea31fdfd9d1c07044fd477ed2728d3e3d345391b8ebd4504fd87714eea151",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "改前投影没有lines且页面仍渲染三列表格；失败证据保留。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-audit-text-red.txt",
+          "summary": "改前7项定向断言失败。",
+          "sha256": "203470e52bf9714f707ef7d56db745869609505aae3fc6a2633843b7e44faf8b"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "班表换人、规则名单增删和岗位字段只输出实际变化。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-audit-text-focused.txt",
+          "summary": "3个直接测试文件15项通过。",
+          "sha256": "20ed1c9c18c81c7b0e58cd878b67f3949970177391707ae3acc258729790abad"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "覆盖仅排序、无稳定键数组、重复项、未知字段和大列表。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-audit-text-focused.txt",
+          "summary": "边界测试通过，未变规则不生成文字行。",
+          "sha256": "20ed1c9c18c81c7b0e58cd878b67f3949970177391707ae3acc258729790abad"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "分页详情继续读取时保留已有内容；页面只消费同一projectAuditChange结果。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-audit-text-focused.txt",
+          "summary": "分页按钮、详情继续读取和变化项显示通过。",
+          "sha256": "20ed1c9c18c81c7b0e58cd878b67f3949970177391707ae3acc258729790abad"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "changeCount、账号、时间、版本和原工作台状态保持；没有重算服务端计数。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-audit-text-focused.txt",
+          "summary": "页面元数据和原工作台保持断言通过。",
+          "sha256": "20ed1c9c18c81c7b0e58cd878b67f3949970177391707ae3acc258729790abad"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "旧操作记录、数据库快照和RPC未改；直接审计数据库回归仍由原测试覆盖。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-audit-text-focused.txt",
+          "summary": "本次只改UI投影和页面；数据库/RPC未改，直接消费者定向测试通过。",
+          "sha256": "20ed1c9c18c81c7b0e58cd878b67f3949970177391707ae3acc258729790abad"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "匿名DOM产物已核对；真实浏览器和真实云端保存后的页面仍待Owner现场验收。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-audit-text.html",
+          "summary": "匿名页面产物无table，变化行可见且恶意内容按文字显示。",
+          "sha256": "9a1a64fefb0ca192f623da571419cb2cd8396768ee7bdc758366e5228a35e50c"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "改前失败证据显示投影缺少lines且页面仍有table；改后15项定向测试通过，见audit-text-red.txt与audit-text-focused.txt。",
+    "laterChanges": "递归投影后的页面仍可能被分页继续读取、HTML文字转义或空变化处理改坏；同一测试覆盖分页、恶意文字、空/零/否和无显示行。真实云端现场尚未验证。",
+    "finalArtifact": "匿名DOM产物audit-text.html证明详情为文字列表、无table、只显示变化行；真实浏览器观感待Owner验收。"
+  },
+  "review": {
+    "missedScope": "初版边界检查发现空对象和字段类型变化风险，已保留递归回退和边界测试；真实浏览器宽窄屏仍未覆盖。",
+    "rootCause": "旧投影只比较审计项顶层字段，嵌套对象/数组整块渲染，导致未变内容混在变化里。",
+    "earlyDetection": "改投影前先用嵌套规则、班表换人、名单增删和分页样例跑失败测试，并独立核对无变化项不生成DOM行。"
+  }
+}

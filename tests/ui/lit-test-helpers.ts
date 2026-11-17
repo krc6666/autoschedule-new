@@ -1,4 +1,4 @@
-interface LitTestElement extends HTMLElement {
+export interface LitTestElement extends HTMLElement {
   updateComplete: Promise<unknown>;
 }
 
