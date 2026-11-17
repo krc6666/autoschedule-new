@@ -236,7 +236,11 @@ export class StatisticsPageElement extends LightDomElement {
                     <thead>
                       <tr>
                         <th>人员</th>
-                        <th>${this.latePriorityCategoryColumnLabel()}</th>
+                        <th
+                          class=${this.selectedLatePriorityCategory !== "全部" ? "statistics-position-selected" : ""}
+                        >
+                          ${this.latePriorityCategoryColumnLabel()}
+                        </th>
                         ${flightNumbers.map((flightNo) => html`<th>${flightNo}</th>`)}
                       </tr>
                     </thead>
@@ -249,6 +253,7 @@ export class StatisticsPageElement extends LightDomElement {
                             </td>
                             <td
                               data-label=${this.latePriorityCategoryColumnLabel()}
+                              class=${this.selectedLatePriorityCategory !== "全部" ? "statistics-position-selected" : ""}
                             >
                               <strong>${this.latePriorityRowCount(row)}</strong>
                             </td>
@@ -354,7 +359,9 @@ export class StatisticsPageElement extends LightDomElement {
                     <th>合计</th>
                     ${columns.map(
                       (column) =>
-                        html`<th>
+                        html`<th
+                          class=${selectedKey === column.key ? "statistics-position-selected" : ""}
+                        >
                           ${column.airlineCode} / ${column.position}
                         </th>`
                     )}
@@ -373,7 +380,10 @@ export class StatisticsPageElement extends LightDomElement {
                         ${columns.map((column) => {
                           const cell = row.cells.get(column.key)!;
                           const label = `${column.airlineCode} / ${column.position}`;
-                          return html`<td data-label=${label}>
+                          return html`<td
+                            data-label=${label}
+                            class=${selectedKey === column.key ? "statistics-position-selected" : ""}
+                          >
                             ${
                               cell.qualified ||
                               cell.actualCount ||
@@ -558,6 +568,7 @@ export class StatisticsPageElement extends LightDomElement {
       ${LATE_PRIORITY_STATISTICS_CATEGORIES.map(
         (category) =>
           html`<span
+            class=${this.selectedLatePriorityCategory === category ? "statistics-position-selected" : ""}
             >${category}最高 / 最低
             <strong>${ranges[category].max} / ${ranges[category].min}</strong>
             <small>允许差值 ${ranges[category].allowedDifference}</small></span
@@ -586,7 +597,7 @@ export class StatisticsPageElement extends LightDomElement {
         ${flight.applicableCategories.map((category) => {
           const own = flight.categories[category];
           return html`<div
-            class="late-priority-adjustment-row"
+            class=${`late-priority-adjustment-row${this.selectedLatePriorityCategory === category ? " statistics-position-selected" : ""}`}
             data-staff-id=${staffId}
             data-late-priority-category=${category}
           >

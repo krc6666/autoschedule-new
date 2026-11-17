@@ -1,0 +1,78 @@
+RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+npm.cmd : stderr | tests/ui/statistics-position-highlight.test.ts
+所在位置 行:2 字符: 1
++ npm.cmd exec vitest -- run tests/ui/statistics-position-highlight.tes ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (stderr | tests/...ghlight.test.ts:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+
+ ❯ tests/ui/statistics-position-highlight.test.ts (3 tests | 3 failed) 286ms
+     × marks the selected ordinary column, transfers and clears it without changing counts or commands 135ms
+     × marks late category totals and details independently and retains selection after month updates 76ms
+     × falls back to all when a selected ordinary position disappears 74ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/ui/statistics-position-highlight.test.ts > statistics position selection visibility > marks the selected o
+rdinary column, transfers and clears it without changing counts or commands
+AssertionError: expected [] to deeply equal [ 'AK / G08' ]
+
+- Expected
++ Received
+
+- [
+-   "AK / G08",
+- ]
++ []
+
+ ❯ tests/ui/statistics-position-highlight.test.ts:42:92
+     40|     expect(table().querySelector(selected)).toBeNull();
+     41|     await choose(page, "普通重点岗位筛选：AK / G08");
+     42|     expect([...table().querySelectorAll(`th${selected}`)].map(p => p.t…
+       |                                                                                            ^
+     43|     expect(table().querySelectorAll(`td${selected}[data-label="AK / G0…
+     44|     const detail = table().querySelector<HTMLDetailsElement>("details"…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  tests/ui/statistics-position-highlight.test.ts > statistics position selection visibility > marks late category
+totals and details independently and retains selection after month updates
+AssertionError: expected undefined to be '一号' // Object.is equality
+
+- Expected:
+"一号"
+
++ Received:
+undefined
+
+ ❯ tests/ui/statistics-position-highlight.test.ts:67:72
+     65|     await choose(page, "末班重点岗位统计类别：一号");
+     66|     const late = () => page.querySelector(".late-priority-statistics")…
+     67|     expect(late().querySelector(`th${selected}`)?.textContent!.trim())…
+       |                                                                        ^
+     68|     expect(late().querySelectorAll(`td${selected}[data-label="一号"]`)).…
+     69|     expect(late().querySelector(`.late-priority-range-summary ${select…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  tests/ui/statistics-position-highlight.test.ts > statistics position selection visibility > falls back to all wh
+en a selected ordinary position disappears
+AssertionError: expected null not to be null
+ ❯ tests/ui/statistics-position-highlight.test.ts:98:84
+     96|     const page = await mountElement<Page>("autoschedule-statistics-pag…
+     97|     await choose(page, "普通重点岗位筛选：AK / G08");
+     98|     expect(page.querySelector(`.ordinary-priority-summary-table ${sele…
+       |                                                                                    ^
+     99|     const next = structuredClone(state);
+    100|     next.settings.ordinaryPriorityPositions = [{ airlineCode: "TR", po…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  3 failed (3)
+   Start at  15:39:23
+   Duration  1.27s (transform 329ms, setup 0ms, import 404ms, tests 286ms, environment 368ms)

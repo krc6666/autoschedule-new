@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-17-statistics-position-highlight",
+  "title": "统计表选中岗位突出显示",
+  "startedFrom": "b16126c7078c8a26cca2777f562b6a99508f1db6",
+  "expectation": {
+    "example": "普通重点筛选AK / G08时，对应整列突出；末班重点选择一号时，对应汇总和展开明细突出。",
+    "expected": "浅蓝背景、边线及表头强调选中位置；切换岗位转移标记，选全部清除，窄屏单元格仍有标记。",
+    "unchanged": "原筛选人员和排序、次数计算、日期展开、月份隔离、加减命令、AppState和持久化不变。",
+    "fallback": "岗位集合更新移除选项时沿原逻辑显示全部，不保留不存在列的标记；无数据保持原空态。历史教训：普通重点日期案例要求展开/切月/筛选/加减同时验证；紧凑岗位案例要求检查窄屏隐藏表头后的实际消费点。"
+  },
+  "testedVersion": "f76eb85141b2ef090dfc6ed5ef43ed3751882a81171b21d8cca0aa7ba3c53163",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "3项新交互测试改前均缺高亮失败，改后通过；原功能不变有邻近回归。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-statistics-highlight-red.txt",
+          "summary": "Before change: three selection tests failed on missing highlight.",
+          "sha256": "6064a357d8b219dcffc0485dde9ed2dfa92e18c4eeec64d209a690c6f876ec93"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-statistics-highlight-focused.txt",
+          "summary": "Six files, 75 tests passed: selection, months, dates, commands and unchanged counts.",
+          "sha256": "59258d92611127022245071c67d3cc6d7d134c84499d007b3f768ec93ffb352e"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "6文件75项定向通过：普通整列、末班汇总/摘要/明细、切换/全部和原统计操作。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-statistics-highlight-focused.txt",
+          "summary": "Six files, 75 tests passed: selection, months, dates, commands and unchanged counts.",
+          "sha256": "59258d92611127022245071c67d3cc6d7d134c84499d007b3f768ec93ffb352e"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-statistics-highlight.html",
+          "summary": "Anonymous mounted component after public filter clicks and detail expansion; no browser visual acceptance.",
+          "sha256": "37eba8e2188037f600d32cf568db8da938b67943fb4436a3efeb7d593287fac9"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-statistics-highlight-audit.json",
+          "summary": "Independent DOM and static CSS audit; production CSS/entry marker checked.",
+          "sha256": "1959a7c2a6de27a68acbe87a74e436ab7f0f1fef81b23df54ce1fc8fcb66f3bf"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "两表独立、切月保留、岗位失效回退及原空态分支已核对；CSS标记落到td，窄屏布局仍消费，实际窄屏视觉待现场验收。无新搜索或求解分支。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-statistics-highlight-focused.txt",
+          "summary": "Six files, 75 tests passed: selection, months, dates, commands and unchanged counts.",
+          "sha256": "59258d92611127022245071c67d3cc6d7d134c84499d007b3f768ec93ffb352e"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-statistics-highlight-audit.json",
+          "summary": "Independent DOM and static CSS audit; production CSS/entry marker checked.",
+          "sha256": "1959a7c2a6de27a68acbe87a74e436ab7f0f1fef81b23df54ce1fc8fcb66f3bf"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "公共入口测试在已有选择后切换岗位/全部/月份并替换model，验证标记正确转移或清除；没有排班写入或求解后置路径。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-statistics-highlight-focused.txt",
+          "summary": "Six files, 75 tests passed: selection, months, dates, commands and unchanged counts.",
+          "sha256": "59258d92611127022245071c67d3cc6d7d134c84499d007b3f768ec93ffb352e"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "not_applicable",
+      "reason": "仅组件局部选择投影，无新增排班硬约束、持久化或守卫材料，不需最终assignments不变量。最终DOM和数据不变分别在普通路径与周边规则验证。",
+      "evidence": []
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "定向测试验证原计数、人员筛选/排序、日期展开、月份隔离、加减命令和model不变；npm.cmd run verify退出0，229文件2219项功能、7文件19项性能、类型和构建通过，阈值及钩子未调整。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-statistics-highlight-focused.txt",
+          "summary": "Six files, 75 tests passed: selection, months, dates, commands and unchanged counts.",
+          "sha256": "59258d92611127022245071c67d3cc6d7d134c84499d007b3f768ec93ffb352e"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-statistics-highlight-verify.txt",
+          "summary": "npm.cmd run verify exit 0: 2219 functional, 19 performance, typecheck and production build.",
+          "sha256": "ddd7cf6f0f401daed047db5aa9c81ecaf0a1360362407bab207d21a8130b9a05"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "匿名组件HTML与独立解析、静态CSS已核对；未主动运行浏览器，桌面和手机真实页面观感尚无现场证据。开发提交不代表发布验收通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-statistics-highlight.html",
+          "summary": "Anonymous mounted component after public filter clicks and detail expansion; no browser visual acceptance.",
+          "sha256": "37eba8e2188037f600d32cf568db8da938b67943fb4436a3efeb7d593287fac9"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-statistics-highlight-audit.json",
+          "summary": "Independent DOM and static CSS audit; production CSS/entry marker checked.",
+          "sha256": "1959a7c2a6de27a68acbe87a74e436ab7f0f1fef81b23df54ce1fc8fcb66f3bf"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "改前3项选择高亮测试均因缺少目标标记失败，改后6文件75项通过，分别见statistics-highlight-red.txt和statistics-highlight-focused.txt；原筛选入口而非私有字段驱动测试。",
+    "laterChanges": "切换筛选、切月和更新model会重渲染，测试验证标记转移、全部清除、两表月份/选择独立及失效岗位回退；不经过求解、补缺或排班后置改写，不新增最终排班不变量。",
+    "finalArtifact": "statistics-highlight.html是匿名挂载组件实际点击两表筛选和展开后生成的DOM，独立HTML解析核对2个表头、4个单元格、2条类别明细和1个摘要；audit.json记录静态CSS含窄屏td消费点。它只能证明结构和样式规则接入，真实浏览器观感仍未验收。"
+  },
+  "review": {
+    "missedScope": "检查两表、空态/失效选项、全部、月份、展开、加减和数据不变；标记应用到td以覆盖窄屏隐藏表头。实际桌面/窄屏颜色与可读性尚未现场验收，不把组件或静态CSS检查冒充真实页面。",
+    "rootCause": "原筛选状态未投影到表格内部；普通表仍保留所有岗位列，末班展开保留所有类别，只有工具栏按钮有选中反馈。",
+    "earlyDetection": "UI筛选变更前从按钮入口同时检查选择状态和对应内容的定位反馈；先写缺少表内标记的失败测试，再检查通用表头背景与窄屏隐藏表头的覆盖，最后单列真实页面证据。"
+  }
+}

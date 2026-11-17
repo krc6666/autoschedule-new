@@ -1489,6 +1489,30 @@ select {
 .late-priority-range-summary {
   border-top: 1px solid var(--as-border);
 }
+.ordinary-priority-summary-table th.statistics-position-selected,
+.ordinary-priority-summary-table td.statistics-position-selected,
+.late-priority-summary-table th.statistics-position-selected,
+.late-priority-summary-table td.statistics-position-selected {
+  --bs-table-bg: #e8f2ff;
+  --bs-table-accent-bg: transparent;
+  --bs-table-bg-state: transparent;
+  --bs-table-bg-type: transparent;
+  border-inline: 2px solid #85b5ed;
+}
+.ordinary-priority-summary-table th.statistics-position-selected,
+.late-priority-summary-table th.statistics-position-selected {
+  --bs-table-bg: #d6e8ff;
+  background: #d6e8ff;
+  border-top: 3px solid #2869ad;
+  color: #184f89;
+}
+.late-priority-range-summary .statistics-position-selected,
+.late-priority-adjustment-row.statistics-position-selected {
+  border-left: 3px solid #2869ad;
+  background: #e8f2ff;
+  padding: 4px 8px;
+  color: #184f89;
+}
 .late-priority-range-summary span {
   display: inline-flex;
   align-items: baseline;

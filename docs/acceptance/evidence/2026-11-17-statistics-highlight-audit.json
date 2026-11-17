@@ -1,0 +1,22 @@
+{
+  "source": "docs/acceptance/evidence/2026-11-17-statistics-highlight.html",
+  "ordinaryHighlightedHeader": "AK / G08",
+  "lateHighlightedHeader": "number-one",
+  "highlightedCells": 4,
+  "lateHighlightedDetailRows": 2,
+  "lateHighlightedRangeSummaries": 1,
+  "cellBackgroundAndBorderRules": true,
+  "mobileCellSelectorPreserved": true,
+  "limitations": "DOM artifact and static CSS inspection only; no browser/viewport visual acceptance",
+  "formattedDomRechecked": true,
+  "productionCss": {
+    "file": "style-BCMd6Dab.css",
+    "sha256": "20b3391506a4ae4baa4ba0b87f04d76b6ddbf4afccf2f322b23e223bba59fdc2",
+    "selectionRulesPresent": true
+  },
+  "productionEntry": {
+    "file": "index-BANr9wvY.js",
+    "sha256": "009556105a83a7b011ab87595af9932d71fb0695e06284f0f6dcc88f95bee873",
+    "selectionMarkerPresent": true
+  }
+}

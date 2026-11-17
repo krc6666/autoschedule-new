@@ -1,0 +1,2352 @@
+<autoschedule-statistics-page
+  ><!---->
+  <autoschedule-staff-load-table
+    ><!---->
+    <section class="workspace-section staff-fatigue-statistics">
+      <div class="section-heading">
+        <div>
+          <h3>人员岗位疲劳</h3>
+          <span
+            >当日：<!--?lit$275618139$-->2026-11-18 ·
+            <!--?lit$275618139$-->2026-11累计<!--?lit$275618139$-->暂无班表</span
+          >
+        </div>
+        <div class="load-sort-controls">
+          <label class="d-inline-flex align-items-center gap-2 mb-0">
+            <span class="small text-body-secondary">统计月份</span>
+            <input
+              class="form-control form-control-sm"
+              type="month"
+              aria-label="人员疲劳统计月份"
+            />
+          </label>
+          <select class="form-select form-select-sm" aria-label="疲劳排序字段">
+            <option value="todayFatigue">当日岗位疲劳</option>
+            <option value="monthFatigue">月份累计岗位疲劳</option>
+          </select>
+          <select class="form-select form-select-sm" aria-label="疲劳排序方向">
+            <option value="desc">从高到低</option>
+            <option value="asc">从低到高</option>
+          </select>
+        </div>
+      </div>
+      <p class="small text-body-secondary mb-2">
+        按班表记录的疲劳点数逐日累加，包含值班额外疲劳；各月分别计算，同日不重复，不加连续工作惩罚。
+      </p>
+      <div class="table-responsive">
+        <table
+          class="table table-sm align-middle data-table staff-fatigue-table"
+        >
+          <thead>
+            <tr>
+              <th>人员</th>
+              <th>状态</th>
+              <th>当日岗位疲劳</th>
+              <th>月份累计岗位疲劳</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!--?lit$275618139$--><!---->
+            <tr>
+              <td><!--?lit$275618139$-->测试人员1</td>
+              <td><!--?lit$275618139$-->正常</td>
+              <td><!--?lit$275618139$-->0.0</td>
+              <td><!--?lit$275618139$-->0.0</td>
+            </tr>
+            <!----><!---->
+            <tr>
+              <td><!--?lit$275618139$-->测试人员2</td>
+              <td><!--?lit$275618139$-->正常</td>
+              <td><!--?lit$275618139$-->0.0</td>
+              <td><!--?lit$275618139$-->0.0</td>
+            </tr>
+            <!---->
+          </tbody>
+        </table>
+      </div>
+    </section></autoschedule-staff-load-table
+  >
+  <autoschedule-duty-roster-details
+    ><!---->
+    <section class="workspace-section duty-roster-details-section">
+      <div class="section-heading">
+        <div>
+          <h3>月度轮值明细</h3>
+          <span
+            ><!--?lit$275618139$-->2026-11-18 ·
+            值班对应工作班，备勤对应次日休息日</span
+          >
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+          <label class="d-inline-flex align-items-center gap-2 mb-0">
+            <span class="small text-body-secondary">轮值月份</span>
+            <input
+              class="form-control form-control-sm"
+              type="month"
+              aria-label="值班与备勤轮换月份"
+            />
+          </label>
+          <button
+            class="btn btn-sm btn-outline-secondary"
+            type="button"
+            aria-label="下载值班备勤模板"
+          >
+            <i class="bi bi-download me-1"></i>下载值班备勤模板
+          </button>
+          <button class="btn btn-sm btn-primary" type="button">
+            <i class="bi bi-file-earmark-arrow-up me-1"></i>导入值班备勤表
+          </button>
+        </div>
+      </div>
+      <div class="duty-roster-groups">
+        <!--?lit$275618139$-->
+        <details class="duty-roster-details">
+          <summary>
+            <span><i class="bi bi-airplane-engines me-2"></i>CX航前轮换</span
+            ><i class="bi bi-chevron-down"></i>
+          </summary>
+          <div class="duty-roster-detail-body">
+            <div class="duty-balance-summary">
+              <span
+                >资质人员 <strong><!--?lit$275618139$-->0</strong></span
+              ><span
+                >次数范围
+                <strong
+                  ><!--?lit$275618139$-->0-<!--?lit$275618139$-->0</strong
+                ></span
+              ><span
+                >航前差值 <strong><!--?lit$275618139$-->0</strong></span
+              >
+            </div>
+            <div class="table-responsive">
+              <table
+                class="table table-sm align-middle duty-roster-fairness-table"
+              >
+                <thead>
+                  <tr>
+                    <th>资格人员</th>
+                    <th>本月次数</th>
+                    <th>轮值日期</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!--?lit$275618139$-->
+                  <tr>
+                    <td colspan="3" class="text-secondary">
+                      暂无符合条件的人员
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="table-responsive duty-roster-table-wrap">
+              <table class="table table-sm align-middle duty-roster-table">
+                <thead>
+                  <tr>
+                    <th>工作日</th>
+                    <th>CX航前</th>
+                    <th class="action-col"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!--?lit$275618139$--><!---->
+                  <tr class="">
+                    <td>
+                      <strong><!--?lit$275618139$-->11-02</strong
+                      ><!--?lit$275618139$-->
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-02 CX航前"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$-->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><button
+                        class="btn btn-sm btn-light icon-btn"
+                        type="button"
+                        title="恢复该日全部顺序轮值"
+                        aria-label="恢复该日全部顺序轮值"
+                        disabled=""
+                      >
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  <!----><!---->
+                  <tr class="">
+                    <td>
+                      <strong><!--?lit$275618139$-->11-04</strong
+                      ><!--?lit$275618139$-->
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-04 CX航前"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$-->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><button
+                        class="btn btn-sm btn-light icon-btn"
+                        type="button"
+                        title="恢复该日全部顺序轮值"
+                        aria-label="恢复该日全部顺序轮值"
+                        disabled=""
+                      >
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  <!----><!---->
+                  <tr class="">
+                    <td>
+                      <strong><!--?lit$275618139$-->11-06</strong
+                      ><!--?lit$275618139$-->
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-06 CX航前"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$-->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><button
+                        class="btn btn-sm btn-light icon-btn"
+                        type="button"
+                        title="恢复该日全部顺序轮值"
+                        aria-label="恢复该日全部顺序轮值"
+                        disabled=""
+                      >
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  <!----><!---->
+                  <tr class="">
+                    <td>
+                      <strong><!--?lit$275618139$-->11-08</strong
+                      ><!--?lit$275618139$-->
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-08 CX航前"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$-->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><button
+                        class="btn btn-sm btn-light icon-btn"
+                        type="button"
+                        title="恢复该日全部顺序轮值"
+                        aria-label="恢复该日全部顺序轮值"
+                        disabled=""
+                      >
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  <!----><!---->
+                  <tr class="">
+                    <td>
+                      <strong><!--?lit$275618139$-->11-10</strong
+                      ><!--?lit$275618139$-->
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-10 CX航前"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$-->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><button
+                        class="btn btn-sm btn-light icon-btn"
+                        type="button"
+                        title="恢复该日全部顺序轮值"
+                        aria-label="恢复该日全部顺序轮值"
+                        disabled=""
+                      >
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  <!----><!---->
+                  <tr class="">
+                    <td>
+                      <strong><!--?lit$275618139$-->11-12</strong
+                      ><!--?lit$275618139$-->
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-12 CX航前"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$-->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><button
+                        class="btn btn-sm btn-light icon-btn"
+                        type="button"
+                        title="恢复该日全部顺序轮值"
+                        aria-label="恢复该日全部顺序轮值"
+                        disabled=""
+                      >
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  <!----><!---->
+                  <tr class="">
+                    <td>
+                      <strong><!--?lit$275618139$-->11-14</strong
+                      ><!--?lit$275618139$-->
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-14 CX航前"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$-->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><button
+                        class="btn btn-sm btn-light icon-btn"
+                        type="button"
+                        title="恢复该日全部顺序轮值"
+                        aria-label="恢复该日全部顺序轮值"
+                        disabled=""
+                      >
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  <!----><!---->
+                  <tr class="">
+                    <td>
+                      <strong><!--?lit$275618139$-->11-16</strong
+                      ><!--?lit$275618139$-->
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-16 CX航前"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$-->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><button
+                        class="btn btn-sm btn-light icon-btn"
+                        type="button"
+                        title="恢复该日全部顺序轮值"
+                        aria-label="恢复该日全部顺序轮值"
+                        disabled=""
+                      >
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  <!----><!---->
+                  <tr class="is-current">
+                    <td>
+                      <strong><!--?lit$275618139$-->11-18</strong
+                      ><!--?lit$275618139$-->
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-18 CX航前"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$-->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><button
+                        class="btn btn-sm btn-light icon-btn"
+                        type="button"
+                        title="恢复该日全部顺序轮值"
+                        aria-label="恢复该日全部顺序轮值"
+                        disabled=""
+                      >
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  <!----><!---->
+                  <tr class="">
+                    <td>
+                      <strong><!--?lit$275618139$-->11-20</strong
+                      ><!--?lit$275618139$-->
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-20 CX航前"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$-->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><button
+                        class="btn btn-sm btn-light icon-btn"
+                        type="button"
+                        title="恢复该日全部顺序轮值"
+                        aria-label="恢复该日全部顺序轮值"
+                        disabled=""
+                      >
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  <!----><!---->
+                  <tr class="">
+                    <td>
+                      <strong><!--?lit$275618139$-->11-22</strong
+                      ><!--?lit$275618139$-->
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-22 CX航前"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$-->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><button
+                        class="btn btn-sm btn-light icon-btn"
+                        type="button"
+                        title="恢复该日全部顺序轮值"
+                        aria-label="恢复该日全部顺序轮值"
+                        disabled=""
+                      >
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  <!----><!---->
+                  <tr class="">
+                    <td>
+                      <strong><!--?lit$275618139$-->11-24</strong
+                      ><!--?lit$275618139$-->
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-24 CX航前"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$-->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><button
+                        class="btn btn-sm btn-light icon-btn"
+                        type="button"
+                        title="恢复该日全部顺序轮值"
+                        aria-label="恢复该日全部顺序轮值"
+                        disabled=""
+                      >
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  <!----><!---->
+                  <tr class="">
+                    <td>
+                      <strong><!--?lit$275618139$-->11-26</strong
+                      ><!--?lit$275618139$-->
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-26 CX航前"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$-->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><button
+                        class="btn btn-sm btn-light icon-btn"
+                        type="button"
+                        title="恢复该日全部顺序轮值"
+                        aria-label="恢复该日全部顺序轮值"
+                        disabled=""
+                      >
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  <!----><!---->
+                  <tr class="">
+                    <td>
+                      <strong><!--?lit$275618139$-->11-28</strong
+                      ><!--?lit$275618139$-->
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-28 CX航前"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$-->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><button
+                        class="btn btn-sm btn-light icon-btn"
+                        type="button"
+                        title="恢复该日全部顺序轮值"
+                        aria-label="恢复该日全部顺序轮值"
+                        disabled=""
+                      >
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  <!----><!---->
+                  <tr class="">
+                    <td>
+                      <strong><!--?lit$275618139$-->11-30</strong
+                      ><!--?lit$275618139$-->
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-30 CX航前"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$-->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><button
+                        class="btn btn-sm btn-light icon-btn"
+                        type="button"
+                        title="恢复该日全部顺序轮值"
+                        aria-label="恢复该日全部顺序轮值"
+                        disabled=""
+                      >
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  <!---->
+                </tbody>
+              </table>
+            </div>
+            <!--?lit$275618139$-->
+            <div class="duty-roster-warning">
+              <i class="bi bi-exclamation-triangle"></i
+              ><span><!--?lit$275618139$-->尚未配置CX航前资质人员</span>
+            </div>
+          </div>
+        </details>
+        <!--?lit$275618139$-->
+        <details class="duty-roster-details">
+          <summary>
+            <span><i class="bi bi-people me-2"></i>值班与备勤轮换</span
+            ><i class="bi bi-chevron-down"></i>
+          </summary>
+          <div class="duty-roster-detail-body">
+            <div class="duty-balance-summary">
+              <span
+                >值班席位 <strong><!--?lit$275618139$-->15</strong></span
+              ><span
+                >资质人员 <strong><!--?lit$275618139$-->2</strong></span
+              ><span
+                >首轮覆盖
+                <strong
+                  ><!--?lit$275618139$-->2/<!--?lit$275618139$-->2</strong
+                ></span
+              ><span
+                >值班差值 <strong><!--?lit$275618139$-->1</strong></span
+              ><span
+                >备勤差值 <strong><!--?lit$275618139$-->1</strong></span
+              ><span
+                >备勤资质 <strong><!--?lit$275618139$-->2</strong></span
+              ><span>备勤保底 <strong>2 次</strong></span
+              ><span
+                >每次值班 <strong><!--?lit$275618139$-->12 点</strong></span
+              >
+            </div>
+            <!--?lit$275618139$-->
+            <!--?lit$275618139$-->
+            <div class="duty-balance-alert is-attention">
+              <i class="bi bi-exclamation-triangle-fill"></i>
+              <div>
+                <strong>备勤资质人员不足</strong
+                ><span
+                  >本月
+                  <!--?lit$275618139$-->15
+                  个次日备勤未满两人，空缺席位保持未配置。请在人员信息中开启备勤资质，或人工选择其他具备资质的人员。</span
+                >
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table
+                class="table table-sm align-middle duty-roster-fairness-table"
+              >
+                <thead>
+                  <tr>
+                    <th>人员</th>
+                    <th>值班保障</th>
+                    <th>本月值班</th>
+                    <th>计划疲劳</th>
+                    <th>本月备勤</th>
+                    <th>轮值日期</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!--?lit$275618139$--><!---->
+                  <tr>
+                    <td>
+                      <strong><!--?lit$275618139$-->测试人员1</strong
+                      ><!--?lit$275618139$-->
+                      <!--?lit$275618139$-->
+                    </td>
+                    <td>
+                      <span class="duty-coverage-badge is-complete"
+                        ><!--?lit$275618139$-->已进入第 7 轮</span
+                      >
+                    </td>
+                    <td><!--?lit$275618139$-->7</td>
+                    <td>
+                      <strong class="duty-planned-fatigue"
+                        ><!--?lit$275618139$-->84 点</strong
+                      >
+                    </td>
+                    <td><!--?lit$275618139$-->8</td>
+                    <td>
+                      <!--?lit$275618139$-->11-04值班、11-06值班、11-12值班、11-14值班、11-20值班、11-22值班、11-28值班、11-03备勤、11-09备勤、11-11备勤、11-17备勤、11-19备勤、11-25备勤、11-27备勤、12-01备勤
+                    </td>
+                  </tr>
+                  <!----><!---->
+                  <tr>
+                    <td>
+                      <strong><!--?lit$275618139$-->测试人员2</strong
+                      ><!--?lit$275618139$-->
+                      <!--?lit$275618139$-->
+                    </td>
+                    <td>
+                      <span class="duty-coverage-badge is-complete"
+                        ><!--?lit$275618139$-->已进入第 8 轮</span
+                      >
+                    </td>
+                    <td><!--?lit$275618139$-->8</td>
+                    <td>
+                      <strong class="duty-planned-fatigue"
+                        ><!--?lit$275618139$-->96 点</strong
+                      >
+                    </td>
+                    <td><!--?lit$275618139$-->7</td>
+                    <td>
+                      <!--?lit$275618139$-->11-02值班、11-08值班、11-10值班、11-16值班、11-18值班、11-24值班、11-26值班、11-30值班、11-05备勤、11-07备勤、11-13备勤、11-15备勤、11-21备勤、11-23备勤、11-29备勤
+                    </td>
+                  </tr>
+                  <!---->
+                </tbody>
+              </table>
+            </div>
+            <div class="table-responsive duty-roster-table-wrap">
+              <table class="table table-sm align-middle duty-roster-table">
+                <thead>
+                  <tr>
+                    <th>工作班日期</th>
+                    <th>值班人员</th>
+                    <th>次日备勤一</th>
+                    <th>次日备勤二</th>
+                    <th class="action-col"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!--?lit$275618139$--><!---->
+                  <tr class="">
+                    <td>
+                      <strong><!--?lit$275618139$-->11-02</strong
+                      ><small class="d-block text-secondary"
+                        >次日
+                        <!--?lit$275618139$-->11-03</small
+                      ><!--?lit$275618139$-->
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-02 值班人员"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$--><!---->
+                        <option value="highlight-0">
+                          <!--?lit$275618139$-->测试人员1
+                        </option>
+                        <!----><!---->
+                        <option value="highlight-1">
+                          <!--?lit$275618139$-->测试人员2
+                        </option>
+                        <!---->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-02 次日备勤一"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$--><!---->
+                        <option value="highlight-0">
+                          <!--?lit$275618139$-->测试人员1
+                        </option>
+                        <!---->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-02 次日备勤二"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$--><!---->
+                        <option value="highlight-0">
+                          <!--?lit$275618139$-->测试人员1
+                        </option>
+                        <!---->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><button
+                        class="btn btn-sm btn-light icon-btn"
+                        type="button"
+                        title="恢复该日全部顺序轮值"
+                        aria-label="恢复该日全部顺序轮值"
+                        disabled=""
+                      >
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  <!----><!---->
+                  <tr class="">
+                    <td>
+                      <strong><!--?lit$275618139$-->11-04</strong
+                      ><small class="d-block text-secondary"
+                        >次日
+                        <!--?lit$275618139$-->11-05</small
+                      ><!--?lit$275618139$-->
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-04 值班人员"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$--><!---->
+                        <option value="highlight-0">
+                          <!--?lit$275618139$-->测试人员1
+                        </option>
+                        <!----><!---->
+                        <option value="highlight-1">
+                          <!--?lit$275618139$-->测试人员2
+                        </option>
+                        <!---->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-04 次日备勤一"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$--><!---->
+                        <option value="highlight-1">
+                          <!--?lit$275618139$-->测试人员2
+                        </option>
+                        <!---->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-04 次日备勤二"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$--><!---->
+                        <option value="highlight-1">
+                          <!--?lit$275618139$-->测试人员2
+                        </option>
+                        <!---->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><button
+                        class="btn btn-sm btn-light icon-btn"
+                        type="button"
+                        title="恢复该日全部顺序轮值"
+                        aria-label="恢复该日全部顺序轮值"
+                        disabled=""
+                      >
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  <!----><!---->
+                  <tr class="">
+                    <td>
+                      <strong><!--?lit$275618139$-->11-06</strong
+                      ><small class="d-block text-secondary"
+                        >次日
+                        <!--?lit$275618139$-->11-07</small
+                      ><!--?lit$275618139$-->
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-06 值班人员"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$--><!---->
+                        <option value="highlight-0">
+                          <!--?lit$275618139$-->测试人员1
+                        </option>
+                        <!----><!---->
+                        <option value="highlight-1">
+                          <!--?lit$275618139$-->测试人员2
+                        </option>
+                        <!---->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-06 次日备勤一"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$--><!---->
+                        <option value="highlight-1">
+                          <!--?lit$275618139$-->测试人员2
+                        </option>
+                        <!---->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-06 次日备勤二"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$--><!---->
+                        <option value="highlight-1">
+                          <!--?lit$275618139$-->测试人员2
+                        </option>
+                        <!---->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><button
+                        class="btn btn-sm btn-light icon-btn"
+                        type="button"
+                        title="恢复该日全部顺序轮值"
+                        aria-label="恢复该日全部顺序轮值"
+                        disabled=""
+                      >
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  <!----><!---->
+                  <tr class="">
+                    <td>
+                      <strong><!--?lit$275618139$-->11-08</strong
+                      ><small class="d-block text-secondary"
+                        >次日
+                        <!--?lit$275618139$-->11-09</small
+                      ><!--?lit$275618139$-->
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-08 值班人员"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$--><!---->
+                        <option value="highlight-0">
+                          <!--?lit$275618139$-->测试人员1
+                        </option>
+                        <!----><!---->
+                        <option value="highlight-1">
+                          <!--?lit$275618139$-->测试人员2
+                        </option>
+                        <!---->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-08 次日备勤一"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$--><!---->
+                        <option value="highlight-0">
+                          <!--?lit$275618139$-->测试人员1
+                        </option>
+                        <!---->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-08 次日备勤二"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$--><!---->
+                        <option value="highlight-0">
+                          <!--?lit$275618139$-->测试人员1
+                        </option>
+                        <!---->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><button
+                        class="btn btn-sm btn-light icon-btn"
+                        type="button"
+                        title="恢复该日全部顺序轮值"
+                        aria-label="恢复该日全部顺序轮值"
+                        disabled=""
+                      >
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  <!----><!---->
+                  <tr class="">
+                    <td>
+                      <strong><!--?lit$275618139$-->11-10</strong
+                      ><small class="d-block text-secondary"
+                        >次日
+                        <!--?lit$275618139$-->11-11</small
+                      ><!--?lit$275618139$-->
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-10 值班人员"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$--><!---->
+                        <option value="highlight-0">
+                          <!--?lit$275618139$-->测试人员1
+                        </option>
+                        <!----><!---->
+                        <option value="highlight-1">
+                          <!--?lit$275618139$-->测试人员2
+                        </option>
+                        <!---->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-10 次日备勤一"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$--><!---->
+                        <option value="highlight-0">
+                          <!--?lit$275618139$-->测试人员1
+                        </option>
+                        <!---->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-10 次日备勤二"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$--><!---->
+                        <option value="highlight-0">
+                          <!--?lit$275618139$-->测试人员1
+                        </option>
+                        <!---->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><button
+                        class="btn btn-sm btn-light icon-btn"
+                        type="button"
+                        title="恢复该日全部顺序轮值"
+                        aria-label="恢复该日全部顺序轮值"
+                        disabled=""
+                      >
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  <!----><!---->
+                  <tr class="">
+                    <td>
+                      <strong><!--?lit$275618139$-->11-12</strong
+                      ><small class="d-block text-secondary"
+                        >次日
+                        <!--?lit$275618139$-->11-13</small
+                      ><!--?lit$275618139$-->
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-12 值班人员"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$--><!---->
+                        <option value="highlight-0">
+                          <!--?lit$275618139$-->测试人员1
+                        </option>
+                        <!----><!---->
+                        <option value="highlight-1">
+                          <!--?lit$275618139$-->测试人员2
+                        </option>
+                        <!---->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-12 次日备勤一"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$--><!---->
+                        <option value="highlight-1">
+                          <!--?lit$275618139$-->测试人员2
+                        </option>
+                        <!---->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-12 次日备勤二"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$--><!---->
+                        <option value="highlight-1">
+                          <!--?lit$275618139$-->测试人员2
+                        </option>
+                        <!---->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><button
+                        class="btn btn-sm btn-light icon-btn"
+                        type="button"
+                        title="恢复该日全部顺序轮值"
+                        aria-label="恢复该日全部顺序轮值"
+                        disabled=""
+                      >
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  <!----><!---->
+                  <tr class="">
+                    <td>
+                      <strong><!--?lit$275618139$-->11-14</strong
+                      ><small class="d-block text-secondary"
+                        >次日
+                        <!--?lit$275618139$-->11-15</small
+                      ><!--?lit$275618139$-->
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-14 值班人员"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$--><!---->
+                        <option value="highlight-0">
+                          <!--?lit$275618139$-->测试人员1
+                        </option>
+                        <!----><!---->
+                        <option value="highlight-1">
+                          <!--?lit$275618139$-->测试人员2
+                        </option>
+                        <!---->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-14 次日备勤一"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$--><!---->
+                        <option value="highlight-1">
+                          <!--?lit$275618139$-->测试人员2
+                        </option>
+                        <!---->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-14 次日备勤二"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$--><!---->
+                        <option value="highlight-1">
+                          <!--?lit$275618139$-->测试人员2
+                        </option>
+                        <!---->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><button
+                        class="btn btn-sm btn-light icon-btn"
+                        type="button"
+                        title="恢复该日全部顺序轮值"
+                        aria-label="恢复该日全部顺序轮值"
+                        disabled=""
+                      >
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  <!----><!---->
+                  <tr class="">
+                    <td>
+                      <strong><!--?lit$275618139$-->11-16</strong
+                      ><small class="d-block text-secondary"
+                        >次日
+                        <!--?lit$275618139$-->11-17</small
+                      ><!--?lit$275618139$-->
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-16 值班人员"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$--><!---->
+                        <option value="highlight-0">
+                          <!--?lit$275618139$-->测试人员1
+                        </option>
+                        <!----><!---->
+                        <option value="highlight-1">
+                          <!--?lit$275618139$-->测试人员2
+                        </option>
+                        <!---->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-16 次日备勤一"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$--><!---->
+                        <option value="highlight-0">
+                          <!--?lit$275618139$-->测试人员1
+                        </option>
+                        <!---->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-16 次日备勤二"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$--><!---->
+                        <option value="highlight-0">
+                          <!--?lit$275618139$-->测试人员1
+                        </option>
+                        <!---->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><button
+                        class="btn btn-sm btn-light icon-btn"
+                        type="button"
+                        title="恢复该日全部顺序轮值"
+                        aria-label="恢复该日全部顺序轮值"
+                        disabled=""
+                      >
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  <!----><!---->
+                  <tr class="is-current">
+                    <td>
+                      <strong><!--?lit$275618139$-->11-18</strong
+                      ><small class="d-block text-secondary"
+                        >次日
+                        <!--?lit$275618139$-->11-19</small
+                      ><!--?lit$275618139$-->
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-18 值班人员"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$--><!---->
+                        <option value="highlight-0">
+                          <!--?lit$275618139$-->测试人员1
+                        </option>
+                        <!----><!---->
+                        <option value="highlight-1">
+                          <!--?lit$275618139$-->测试人员2
+                        </option>
+                        <!---->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-18 次日备勤一"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$--><!---->
+                        <option value="highlight-0">
+                          <!--?lit$275618139$-->测试人员1
+                        </option>
+                        <!---->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-18 次日备勤二"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$--><!---->
+                        <option value="highlight-0">
+                          <!--?lit$275618139$-->测试人员1
+                        </option>
+                        <!---->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><button
+                        class="btn btn-sm btn-light icon-btn"
+                        type="button"
+                        title="恢复该日全部顺序轮值"
+                        aria-label="恢复该日全部顺序轮值"
+                        disabled=""
+                      >
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  <!----><!---->
+                  <tr class="">
+                    <td>
+                      <strong><!--?lit$275618139$-->11-20</strong
+                      ><small class="d-block text-secondary"
+                        >次日
+                        <!--?lit$275618139$-->11-21</small
+                      ><!--?lit$275618139$-->
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-20 值班人员"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$--><!---->
+                        <option value="highlight-0">
+                          <!--?lit$275618139$-->测试人员1
+                        </option>
+                        <!----><!---->
+                        <option value="highlight-1">
+                          <!--?lit$275618139$-->测试人员2
+                        </option>
+                        <!---->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-20 次日备勤一"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$--><!---->
+                        <option value="highlight-1">
+                          <!--?lit$275618139$-->测试人员2
+                        </option>
+                        <!---->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-20 次日备勤二"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$--><!---->
+                        <option value="highlight-1">
+                          <!--?lit$275618139$-->测试人员2
+                        </option>
+                        <!---->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><button
+                        class="btn btn-sm btn-light icon-btn"
+                        type="button"
+                        title="恢复该日全部顺序轮值"
+                        aria-label="恢复该日全部顺序轮值"
+                        disabled=""
+                      >
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  <!----><!---->
+                  <tr class="">
+                    <td>
+                      <strong><!--?lit$275618139$-->11-22</strong
+                      ><small class="d-block text-secondary"
+                        >次日
+                        <!--?lit$275618139$-->11-23</small
+                      ><!--?lit$275618139$-->
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-22 值班人员"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$--><!---->
+                        <option value="highlight-0">
+                          <!--?lit$275618139$-->测试人员1
+                        </option>
+                        <!----><!---->
+                        <option value="highlight-1">
+                          <!--?lit$275618139$-->测试人员2
+                        </option>
+                        <!---->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-22 次日备勤一"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$--><!---->
+                        <option value="highlight-1">
+                          <!--?lit$275618139$-->测试人员2
+                        </option>
+                        <!---->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-22 次日备勤二"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$--><!---->
+                        <option value="highlight-1">
+                          <!--?lit$275618139$-->测试人员2
+                        </option>
+                        <!---->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><button
+                        class="btn btn-sm btn-light icon-btn"
+                        type="button"
+                        title="恢复该日全部顺序轮值"
+                        aria-label="恢复该日全部顺序轮值"
+                        disabled=""
+                      >
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  <!----><!---->
+                  <tr class="">
+                    <td>
+                      <strong><!--?lit$275618139$-->11-24</strong
+                      ><small class="d-block text-secondary"
+                        >次日
+                        <!--?lit$275618139$-->11-25</small
+                      ><!--?lit$275618139$-->
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-24 值班人员"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$--><!---->
+                        <option value="highlight-0">
+                          <!--?lit$275618139$-->测试人员1
+                        </option>
+                        <!----><!---->
+                        <option value="highlight-1">
+                          <!--?lit$275618139$-->测试人员2
+                        </option>
+                        <!---->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-24 次日备勤一"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$--><!---->
+                        <option value="highlight-0">
+                          <!--?lit$275618139$-->测试人员1
+                        </option>
+                        <!---->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-24 次日备勤二"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$--><!---->
+                        <option value="highlight-0">
+                          <!--?lit$275618139$-->测试人员1
+                        </option>
+                        <!---->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><button
+                        class="btn btn-sm btn-light icon-btn"
+                        type="button"
+                        title="恢复该日全部顺序轮值"
+                        aria-label="恢复该日全部顺序轮值"
+                        disabled=""
+                      >
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  <!----><!---->
+                  <tr class="">
+                    <td>
+                      <strong><!--?lit$275618139$-->11-26</strong
+                      ><small class="d-block text-secondary"
+                        >次日
+                        <!--?lit$275618139$-->11-27</small
+                      ><!--?lit$275618139$-->
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-26 值班人员"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$--><!---->
+                        <option value="highlight-0">
+                          <!--?lit$275618139$-->测试人员1
+                        </option>
+                        <!----><!---->
+                        <option value="highlight-1">
+                          <!--?lit$275618139$-->测试人员2
+                        </option>
+                        <!---->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-26 次日备勤一"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$--><!---->
+                        <option value="highlight-0">
+                          <!--?lit$275618139$-->测试人员1
+                        </option>
+                        <!---->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-26 次日备勤二"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$--><!---->
+                        <option value="highlight-0">
+                          <!--?lit$275618139$-->测试人员1
+                        </option>
+                        <!---->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><button
+                        class="btn btn-sm btn-light icon-btn"
+                        type="button"
+                        title="恢复该日全部顺序轮值"
+                        aria-label="恢复该日全部顺序轮值"
+                        disabled=""
+                      >
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  <!----><!---->
+                  <tr class="">
+                    <td>
+                      <strong><!--?lit$275618139$-->11-28</strong
+                      ><small class="d-block text-secondary"
+                        >次日
+                        <!--?lit$275618139$-->11-29</small
+                      ><!--?lit$275618139$-->
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-28 值班人员"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$--><!---->
+                        <option value="highlight-0">
+                          <!--?lit$275618139$-->测试人员1
+                        </option>
+                        <!----><!---->
+                        <option value="highlight-1">
+                          <!--?lit$275618139$-->测试人员2
+                        </option>
+                        <!---->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-28 次日备勤一"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$--><!---->
+                        <option value="highlight-1">
+                          <!--?lit$275618139$-->测试人员2
+                        </option>
+                        <!---->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-28 次日备勤二"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$--><!---->
+                        <option value="highlight-1">
+                          <!--?lit$275618139$-->测试人员2
+                        </option>
+                        <!---->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><button
+                        class="btn btn-sm btn-light icon-btn"
+                        type="button"
+                        title="恢复该日全部顺序轮值"
+                        aria-label="恢复该日全部顺序轮值"
+                        disabled=""
+                      >
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  <!----><!---->
+                  <tr class="">
+                    <td>
+                      <strong><!--?lit$275618139$-->11-30</strong
+                      ><small class="d-block text-secondary"
+                        >次日
+                        <!--?lit$275618139$-->12-01</small
+                      ><!--?lit$275618139$-->
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-30 值班人员"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$--><!---->
+                        <option value="highlight-0">
+                          <!--?lit$275618139$-->测试人员1
+                        </option>
+                        <!----><!---->
+                        <option value="highlight-1">
+                          <!--?lit$275618139$-->测试人员2
+                        </option>
+                        <!---->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-30 次日备勤一"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$--><!---->
+                        <option value="highlight-0">
+                          <!--?lit$275618139$-->测试人员1
+                        </option>
+                        <!---->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><select
+                        class="form-select form-select-sm"
+                        aria-label="2026-11-30 次日备勤二"
+                      >
+                        <option value="">未配置</option>
+                        <!--?lit$275618139$--><!---->
+                        <option value="highlight-0">
+                          <!--?lit$275618139$-->测试人员1
+                        </option>
+                        <!---->
+                      </select>
+                    </td>
+                    <td>
+                      <!--?lit$275618139$--><button
+                        class="btn btn-sm btn-light icon-btn"
+                        type="button"
+                        title="恢复该日全部顺序轮值"
+                        aria-label="恢复该日全部顺序轮值"
+                        disabled=""
+                      >
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  <!---->
+                </tbody>
+              </table>
+            </div>
+            <!--?lit$275618139$-->
+          </div>
+        </details>
+      </div>
+    </section></autoschedule-duty-roster-details
+  >
+  <!--?lit$275618139$-->
+  <section class="workspace-section relaxed-shift-statistics">
+    <div class="section-heading">
+      <div>
+        <h3>月度轻松班次统计</h3>
+        <span
+          ><!--?lit$275618139$-->2026-11 · 仅统计实际参加排班的常规人员</span
+        >
+      </div>
+    </div>
+    <div class="relaxed-shift-today">
+      <div>
+        <strong>今日提前下班</strong
+        ><small
+          >任一航班截载晚于 23:00 不计；否则最后航班截载严格早于
+          <!--?lit$275618139$-->12:00，排除当日值班</small
+        >
+        <div>
+          <!--?lit$275618139$--><span class="is-empty"
+            >今日没有符合节点的提前下班人员</span
+          >
+        </div>
+      </div>
+      <div>
+        <strong>今日下午无航班</strong
+        ><small
+          ><!--?lit$275618139$-->12:00-<!--?lit$275618139$-->18:00
+          当天该时段有航班，个人无已排岗位重叠才计次；值班和备勤照常计入</small
+        >
+        <div>
+          <!--?lit$275618139$--><span class="is-empty"
+            >今日没有下午无航班人员</span
+          >
+        </div>
+      </div>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-sm align-middle data-table relaxed-shift-table">
+        <thead>
+          <tr>
+            <th>常规人员</th>
+            <th>提前下班次数</th>
+            <th>提前下班日期 / 最后航班 / 截载</th>
+            <th>下午无航班次数</th>
+            <th>下午无航班日期</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!--?lit$275618139$--><!---->
+          <tr>
+            <td>
+              <strong><!--?lit$275618139$-->测试人员1</strong>
+            </td>
+            <td><!--?lit$275618139$-->0</td>
+            <td><!--?lit$275618139$-->-</td>
+            <td><!--?lit$275618139$-->0</td>
+            <td><!--?lit$275618139$-->-</td>
+          </tr>
+          <!----><!---->
+          <tr>
+            <td>
+              <strong><!--?lit$275618139$-->测试人员2</strong>
+            </td>
+            <td><!--?lit$275618139$-->0</td>
+            <td><!--?lit$275618139$-->-</td>
+            <td><!--?lit$275618139$-->0</td>
+            <td><!--?lit$275618139$-->-</td>
+          </tr>
+          <!---->
+        </tbody>
+      </table>
+    </div>
+  </section>
+  <!--?lit$275618139$-->
+  <section class="workspace-section ordinary-priority-statistics">
+    <div class="section-heading">
+      <div>
+        <h3>普通重点岗位</h3>
+        <span
+          ><!--?lit$275618139$-->2026-11 ·
+          只统计集合内岗位；次数进入一般同岗轮换</span
+        >
+      </div>
+      <div class="ordinary-priority-toolbar">
+        <label class="d-inline-flex align-items-center gap-2 mb-0">
+          <span class="small text-body-secondary">统计月份</span>
+          <input
+            class="form-control form-control-sm"
+            type="month"
+            aria-label="普通重点岗位统计月份"
+          />
+        </label>
+        <div
+          class="ordinary-priority-filter"
+          role="group"
+          aria-label="普通重点岗位筛选"
+        >
+          <!--?lit$275618139$--><!----><button
+            type="button"
+            class="btn btn-sm btn-outline-secondary"
+            aria-label="普通重点岗位筛选：全部"
+            aria-pressed="false"
+          >
+            <!--?lit$275618139$-->全部</button
+          ><!----><!----><button
+            type="button"
+            class="btn btn-sm btn-primary"
+            aria-label="普通重点岗位筛选：AK / G08"
+            aria-pressed="true"
+          >
+            <!--?lit$275618139$-->AK / G08</button
+          ><!----><!----><button
+            type="button"
+            class="btn btn-sm btn-outline-secondary"
+            aria-label="普通重点岗位筛选：TR / H02"
+            aria-pressed="false"
+          >
+            <!--?lit$275618139$-->TR / H02</button
+          ><!---->
+        </div>
+      </div>
+    </div>
+    <!--?lit$275618139$-->
+    <div class="table-responsive">
+      <table
+        class="table table-sm align-middle data-table ordinary-priority-summary-table"
+      >
+        <thead>
+          <tr>
+            <th>人员</th>
+            <th>合计</th>
+            <!--?lit$275618139$--><!---->
+            <th class="statistics-position-selected">
+              <!--?lit$275618139$-->AK /
+              <!--?lit$275618139$-->G08
+            </th>
+            <!----><!---->
+            <th class="">
+              <!--?lit$275618139$-->TR /
+              <!--?lit$275618139$-->H02
+            </th>
+            <!---->
+          </tr>
+        </thead>
+        <tbody>
+          <!--?lit$275618139$--><!---->
+          <tr>
+            <td data-label="人员">
+              <strong><!--?lit$275618139$-->测试人员1</strong>
+            </td>
+            <td data-label="合计">
+              <strong><!--?lit$275618139$-->0</strong>
+            </td>
+            <!--?lit$275618139$--><!---->
+            <td data-label="AK / G08" class="statistics-position-selected">
+              <!--?lit$275618139$-->
+              <details
+                class="ordinary-priority-count-detail"
+                data-staff-id="highlight-0"
+                data-airline-code="AK"
+                data-position="G08"
+              >
+                <summary title="展开普通重点岗位次数">
+                  <!--?lit$275618139$-->0
+                </summary>
+                <div>
+                  <div class="late-priority-adjustment-row">
+                    <strong
+                      ><!--?lit$275618139$-->AK /
+                      <!--?lit$275618139$-->G08</strong
+                    >
+                    <span class="late-priority-adjustments">
+                      <button
+                        class="btn btn-sm btn-outline-secondary"
+                        type="button"
+                        aria-label="AK/G08减少一次"
+                        disabled=""
+                      >
+                        −</button
+                      ><output><!--?lit$275618139$-->0</output
+                      ><button
+                        class="btn btn-sm btn-outline-secondary"
+                        type="button"
+                        aria-label="AK/G08增加一次"
+                      >
+                        +
+                      </button>
+                    </span>
+                    <small
+                      >实际
+                      <!--?lit$275618139$-->0 · 修正
+                      <!--?lit$275618139$-->+<!--?lit$275618139$-->0</small
+                    >
+                    <!--?lit$275618139$-->
+                  </div>
+                </div>
+              </details>
+            </td>
+            <!----><!---->
+            <td data-label="TR / H02" class="">
+              <!--?lit$275618139$-->
+              <details
+                class="ordinary-priority-count-detail"
+                data-staff-id="highlight-0"
+                data-airline-code="TR"
+                data-position="H02"
+              >
+                <summary title="展开普通重点岗位次数">
+                  <!--?lit$275618139$-->0
+                </summary>
+                <div>
+                  <div class="late-priority-adjustment-row">
+                    <strong
+                      ><!--?lit$275618139$-->TR /
+                      <!--?lit$275618139$-->H02</strong
+                    >
+                    <span class="late-priority-adjustments">
+                      <button
+                        class="btn btn-sm btn-outline-secondary"
+                        type="button"
+                        aria-label="TR/H02减少一次"
+                        disabled=""
+                      >
+                        −</button
+                      ><output><!--?lit$275618139$-->0</output
+                      ><button
+                        class="btn btn-sm btn-outline-secondary"
+                        type="button"
+                        aria-label="TR/H02增加一次"
+                      >
+                        +
+                      </button>
+                    </span>
+                    <small
+                      >实际
+                      <!--?lit$275618139$-->0 · 修正
+                      <!--?lit$275618139$-->+<!--?lit$275618139$-->0</small
+                    >
+                    <!--?lit$275618139$-->
+                  </div>
+                </div>
+              </details>
+            </td>
+            <!---->
+          </tr>
+          <!----><!---->
+          <tr>
+            <td data-label="人员">
+              <strong><!--?lit$275618139$-->测试人员2</strong>
+            </td>
+            <td data-label="合计">
+              <strong><!--?lit$275618139$-->0</strong>
+            </td>
+            <!--?lit$275618139$--><!---->
+            <td data-label="AK / G08" class="statistics-position-selected">
+              <!--?lit$275618139$-->
+              <details
+                class="ordinary-priority-count-detail"
+                data-staff-id="highlight-1"
+                data-airline-code="AK"
+                data-position="G08"
+              >
+                <summary title="展开普通重点岗位次数">
+                  <!--?lit$275618139$-->0
+                </summary>
+                <div>
+                  <div class="late-priority-adjustment-row">
+                    <strong
+                      ><!--?lit$275618139$-->AK /
+                      <!--?lit$275618139$-->G08</strong
+                    >
+                    <span class="late-priority-adjustments">
+                      <button
+                        class="btn btn-sm btn-outline-secondary"
+                        type="button"
+                        aria-label="AK/G08减少一次"
+                        disabled=""
+                      >
+                        −</button
+                      ><output><!--?lit$275618139$-->0</output
+                      ><button
+                        class="btn btn-sm btn-outline-secondary"
+                        type="button"
+                        aria-label="AK/G08增加一次"
+                      >
+                        +
+                      </button>
+                    </span>
+                    <small
+                      >实际
+                      <!--?lit$275618139$-->0 · 修正
+                      <!--?lit$275618139$-->+<!--?lit$275618139$-->0</small
+                    >
+                    <!--?lit$275618139$-->
+                  </div>
+                </div>
+              </details>
+            </td>
+            <!----><!---->
+            <td data-label="TR / H02" class="">
+              <!--?lit$275618139$-->
+              <details
+                class="ordinary-priority-count-detail"
+                data-staff-id="highlight-1"
+                data-airline-code="TR"
+                data-position="H02"
+              >
+                <summary title="展开普通重点岗位次数">
+                  <!--?lit$275618139$-->0
+                </summary>
+                <div>
+                  <div class="late-priority-adjustment-row">
+                    <strong
+                      ><!--?lit$275618139$-->TR /
+                      <!--?lit$275618139$-->H02</strong
+                    >
+                    <span class="late-priority-adjustments">
+                      <button
+                        class="btn btn-sm btn-outline-secondary"
+                        type="button"
+                        aria-label="TR/H02减少一次"
+                        disabled=""
+                      >
+                        −</button
+                      ><output><!--?lit$275618139$-->0</output
+                      ><button
+                        class="btn btn-sm btn-outline-secondary"
+                        type="button"
+                        aria-label="TR/H02增加一次"
+                      >
+                        +
+                      </button>
+                    </span>
+                    <small
+                      >实际
+                      <!--?lit$275618139$-->0 · 修正
+                      <!--?lit$275618139$-->+<!--?lit$275618139$-->0</small
+                    >
+                    <!--?lit$275618139$-->
+                  </div>
+                </div>
+              </details>
+            </td>
+            <!---->
+          </tr>
+          <!---->
+        </tbody>
+      </table>
+    </div>
+  </section>
+  <!--?lit$275618139$-->
+  <section
+    class="workspace-section late-priority-statistics"
+    data-late-priority-flights="TR121"
+  >
+    <div class="section-heading">
+      <div>
+        <h3>末班重点岗位统计</h3>
+        <span
+          ><!--?lit$275618139$-->2026-11 · 当前统计航班：<!--?lit$275618139$-->TR121
+          · 实际结束晚于
+          <!--?lit$275618139$-->23:00</span
+        >
+      </div>
+      <div class="late-priority-toolbar">
+        <label class="d-inline-flex align-items-center gap-2 mb-0">
+          <span class="small text-body-secondary">统计月份</span>
+          <input
+            class="form-control form-control-sm"
+            type="month"
+            aria-label="末班重点岗位统计月份"
+          />
+        </label>
+        <div
+          class="late-priority-category-filter"
+          role="group"
+          aria-label="末班重点岗位统计类别"
+        >
+          <!--?lit$275618139$--><!----><button
+            type="button"
+            class="btn btn-sm btn-outline-secondary"
+            aria-label="末班重点岗位统计类别：全部"
+            aria-pressed="false"
+          >
+            <!--?lit$275618139$-->全部</button
+          ><!----><!----><button
+            type="button"
+            class="btn btn-sm btn-outline-secondary"
+            aria-label="末班重点岗位统计类别：督导"
+            aria-pressed="false"
+          >
+            <!--?lit$275618139$-->督导</button
+          ><!----><!----><button
+            type="button"
+            class="btn btn-sm btn-primary"
+            aria-label="末班重点岗位统计类别：一号"
+            aria-pressed="true"
+          >
+            <!--?lit$275618139$-->一号</button
+          ><!----><!----><button
+            type="button"
+            class="btn btn-sm btn-outline-secondary"
+            aria-label="末班重点岗位统计类别：申报"
+            aria-pressed="false"
+          >
+            <!--?lit$275618139$-->申报</button
+          ><!----><!----><button
+            type="button"
+            class="btn btn-sm btn-outline-secondary"
+            aria-label="末班重点岗位统计类别：送资料"
+            aria-pressed="false"
+          >
+            <!--?lit$275618139$-->送资料</button
+          ><!---->
+        </div>
+        <!--?lit$275618139$--><button
+          class="btn btn-sm btn-outline-secondary"
+          type="button"
+          title="导入当前月份末班重点岗位次数"
+        >
+          <i class="bi bi-file-earmark-arrow-up me-1"></i>导入次数
+        </button>
+        <button
+          class="btn btn-sm btn-outline-secondary"
+          type="button"
+          title="导出当前月份末班重点岗位次数"
+        >
+          <i class="bi bi-file-earmark-arrow-down me-1"></i>导出次数
+        </button>
+        <button
+          class="btn btn-sm btn-outline-secondary"
+          type="button"
+          title="清零当前统计月份的末班重点岗位次数；其他月份和历史记录保留"
+        >
+          <i class="bi bi-arrow-counterclockwise me-1"></i>当月次数清零
+        </button>
+      </div>
+    </div>
+    <!--?lit$275618139$--><!--?lit$275618139$-->
+    <div class="duty-balance-summary late-priority-range-summary">
+      <!--?lit$275618139$--><!----><span class=""
+        ><!--?lit$275618139$-->督导最高 / 最低
+        <strong
+          ><!--?lit$275618139$-->0 /
+          <!--?lit$275618139$-->0</strong
+        >
+        <small
+          >允许差值
+          <!--?lit$275618139$-->1</small
+        ></span
+      ><!----><!----><span class="statistics-position-selected"
+        ><!--?lit$275618139$-->一号最高 / 最低
+        <strong
+          ><!--?lit$275618139$-->0 /
+          <!--?lit$275618139$-->0</strong
+        >
+        <small
+          >允许差值
+          <!--?lit$275618139$-->1</small
+        ></span
+      ><!----><!----><span class=""
+        ><!--?lit$275618139$-->申报最高 / 最低
+        <strong
+          ><!--?lit$275618139$-->0 /
+          <!--?lit$275618139$-->0</strong
+        >
+        <small
+          >允许差值
+          <!--?lit$275618139$-->2</small
+        ></span
+      ><!----><!----><span class=""
+        ><!--?lit$275618139$-->送资料最高 / 最低
+        <strong
+          ><!--?lit$275618139$-->0 /
+          <!--?lit$275618139$-->0</strong
+        >
+        <small
+          >允许差值
+          <!--?lit$275618139$-->2</small
+        ></span
+      ><!---->
+    </div>
+    <div class="table-responsive">
+      <table
+        class="table table-sm align-middle data-table late-priority-summary-table"
+      >
+        <thead>
+          <tr>
+            <th>人员</th>
+            <th class="statistics-position-selected">
+              <!--?lit$275618139$-->一号
+            </th>
+            <!--?lit$275618139$--><!---->
+            <th><!--?lit$275618139$-->TR121</th>
+            <!---->
+          </tr>
+        </thead>
+        <tbody>
+          <!--?lit$275618139$--><!---->
+          <tr>
+            <td data-label="人员">
+              <strong><!--?lit$275618139$-->测试人员1</strong>
+            </td>
+            <td data-label="一号" class="statistics-position-selected">
+              <strong><!--?lit$275618139$-->0</strong>
+            </td>
+            <!--?lit$275618139$--><!---->
+            <td data-label="TR121">
+              <!--?lit$275618139$-->
+              <details
+                class="late-priority-count-detail"
+                data-staff-id="highlight-0"
+                data-flight-no="TR121"
+                open=""
+              >
+                <summary title="展开重点岗位次数">
+                  <!--?lit$275618139$-->0
+                </summary>
+                <div class="late-priority-flight-breakdown">
+                  <!--?lit$275618139$--><!---->
+                  <div
+                    class="late-priority-adjustment-row statistics-position-selected"
+                    data-staff-id="highlight-0"
+                    data-late-priority-category="一号"
+                  >
+                    <strong><!--?lit$275618139$-->一号</strong>
+                    <!--?lit$275618139$--><!--?lit$275618139$--><span
+                      class="late-priority-adjustments"
+                    >
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-outline-secondary"
+                        aria-label="TR121一号减少一次"
+                        disabled=""
+                      >
+                        −
+                      </button>
+                      <output aria-label="TR121一号最终次数"
+                        ><!--?lit$275618139$-->0</output
+                      >
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-outline-secondary"
+                        aria-label="TR121一号增加一次"
+                      >
+                        +
+                      </button> </span
+                    ><small
+                      >实际
+                      <!--?lit$275618139$-->0 · 修正
+                      <!--?lit$275618139$-->+<!--?lit$275618139$-->0</small
+                    >
+                    <!--?lit$275618139$-->
+                  </div>
+                  <!----><!---->
+                  <div
+                    class="late-priority-adjustment-row"
+                    data-staff-id="highlight-0"
+                    data-late-priority-category="送资料"
+                  >
+                    <strong><!--?lit$275618139$-->送资料</strong>
+                    <!--?lit$275618139$--><!--?lit$275618139$--><span
+                      class="late-priority-adjustments"
+                    >
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-outline-secondary"
+                        aria-label="TR121送资料减少一次"
+                        disabled=""
+                      >
+                        −
+                      </button>
+                      <output aria-label="TR121送资料最终次数"
+                        ><!--?lit$275618139$-->0</output
+                      >
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-outline-secondary"
+                        aria-label="TR121送资料增加一次"
+                      >
+                        +
+                      </button> </span
+                    ><small
+                      >实际
+                      <!--?lit$275618139$-->0 · 修正
+                      <!--?lit$275618139$-->+<!--?lit$275618139$-->0</small
+                    >
+                    <!--?lit$275618139$-->
+                  </div>
+                  <!---->
+                </div>
+              </details>
+            </td>
+            <!---->
+          </tr>
+          <!----><!---->
+          <tr>
+            <td data-label="人员">
+              <strong><!--?lit$275618139$-->测试人员2</strong>
+            </td>
+            <td data-label="一号" class="statistics-position-selected">
+              <strong><!--?lit$275618139$-->0</strong>
+            </td>
+            <!--?lit$275618139$--><!---->
+            <td data-label="TR121">
+              <!--?lit$275618139$-->
+              <details
+                class="late-priority-count-detail"
+                data-staff-id="highlight-1"
+                data-flight-no="TR121"
+              >
+                <summary title="展开重点岗位次数">
+                  <!--?lit$275618139$-->0
+                </summary>
+                <div class="late-priority-flight-breakdown">
+                  <!--?lit$275618139$--><!---->
+                  <div
+                    class="late-priority-adjustment-row statistics-position-selected"
+                    data-staff-id="highlight-1"
+                    data-late-priority-category="一号"
+                  >
+                    <strong><!--?lit$275618139$-->一号</strong>
+                    <!--?lit$275618139$--><!--?lit$275618139$--><span
+                      class="late-priority-adjustments"
+                    >
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-outline-secondary"
+                        aria-label="TR121一号减少一次"
+                        disabled=""
+                      >
+                        −
+                      </button>
+                      <output aria-label="TR121一号最终次数"
+                        ><!--?lit$275618139$-->0</output
+                      >
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-outline-secondary"
+                        aria-label="TR121一号增加一次"
+                      >
+                        +
+                      </button> </span
+                    ><small
+                      >实际
+                      <!--?lit$275618139$-->0 · 修正
+                      <!--?lit$275618139$-->+<!--?lit$275618139$-->0</small
+                    >
+                    <!--?lit$275618139$-->
+                  </div>
+                  <!----><!---->
+                  <div
+                    class="late-priority-adjustment-row"
+                    data-staff-id="highlight-1"
+                    data-late-priority-category="送资料"
+                  >
+                    <strong><!--?lit$275618139$-->送资料</strong>
+                    <!--?lit$275618139$--><!--?lit$275618139$--><span
+                      class="late-priority-adjustments"
+                    >
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-outline-secondary"
+                        aria-label="TR121送资料减少一次"
+                        disabled=""
+                      >
+                        −
+                      </button>
+                      <output aria-label="TR121送资料最终次数"
+                        ><!--?lit$275618139$-->0</output
+                      >
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-outline-secondary"
+                        aria-label="TR121送资料增加一次"
+                      >
+                        +
+                      </button> </span
+                    ><small
+                      >实际
+                      <!--?lit$275618139$-->0 · 修正
+                      <!--?lit$275618139$-->+<!--?lit$275618139$-->0</small
+                    >
+                    <!--?lit$275618139$-->
+                  </div>
+                  <!---->
+                </div>
+              </details>
+            </td>
+            <!---->
+          </tr>
+          <!---->
+        </tbody>
+      </table>
+    </div>
+  </section>
+</autoschedule-statistics-page>
