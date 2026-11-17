@@ -14,6 +14,7 @@ import {
 } from "./state-restoration";
 import type { CloudConfiguration } from "./supabase-config";
 import { parseAuditDetails, parseAuditPage } from "./operation-audit-response";
+import { parseWorkspaceVersions } from "./workspace-version-response";
 
 function record(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -151,6 +152,11 @@ export function parsePublicSchedule(value: unknown): PublicSchedule {
 }
 
 function fail(error: { message: string; code?: string }): never {
+  if (error.message.includes("VERSION_NOT_FOUND"))
+    throw new CloudError(
+      "invalid",
+      "此历史版本已不存在，可能已被自动清理，请刷新历史列表。"
+    );
   if (error.message.includes("WORKSPACE_CONFLICT")) {
     throw new CloudError(
       "conflict",
@@ -265,6 +271,29 @@ export function createSupabaseBackend(
       return parseAuditPage(
         await rpc("cloud_list_audit", { p_before_id: beforeId })
       );
+    },
+    async listVersions() {
+      return parseWorkspaceVersions(await rpc("cloud_list_workspace_versions"));
+    },
+    async restoreVersion(expectedVersion, id) {
+      if (!/^[1-9]\d*$/.test(id))
+        throw new CloudError("invalid", "历史版本编号不正确。");
+      const model = restoreCloudModel(
+        await rpc("cloud_read_workspace_version", { p_version_id: id })
+      );
+      const version = await rpc("cloud_restore_workspace_version", {
+        p_expected_version: expectedVersion,
+        p_version_id: id,
+      });
+      if (
+        !Number.isSafeInteger(version) ||
+        Number(version) !== expectedVersion + 1
+      )
+        throw new CloudError(
+          "invalid",
+          "历史恢复回执不正确，请重新读取云端后核对。"
+        );
+      return { version: Number(version), model };
     },
     async auditDetails(entryId, afterIndex = 0) {
       return parseAuditDetails(

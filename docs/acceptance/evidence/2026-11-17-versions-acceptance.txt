@@ -1,0 +1,8 @@
+node : 验收材料检查失败：
+所在位置 行:2 字符: 1
++ node scripts/check-acceptance.mjs --record 2026-11-17-cloud-workspace ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (验收材料检查失败：:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+2026-11-17-cloud-workspace-versions / finalArtifact：尚未验收通过（unverified）

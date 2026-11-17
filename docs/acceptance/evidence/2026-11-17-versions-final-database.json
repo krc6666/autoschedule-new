@@ -1,0 +1,10 @@
+{
+  "environment": "PGlite PostgreSQL, synthetic Auth and data; not real Supabase",
+  "version": 23,
+  "remark": "artifact-7",
+  "versions": 20,
+  "oldest": 3,
+  "newest": 22,
+  "uploaders": ["original@example.invalid"],
+  "audits": 23
+}

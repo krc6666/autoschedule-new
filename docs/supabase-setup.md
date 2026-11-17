@@ -2,6 +2,35 @@
 
 本仓库支持单管理员云端工作区。Supabase 负责 Auth 和数据库，网页由 GitHub Pages 托管；排班仍在浏览器运行。没有配置环境变量时，原本地系统照常工作。
 
+## 历史版本增量启用（2026-11-17，远端尚未执行）
+
+本次SQL为[202611170001_workspace_versions.sql](../supabase/migrations/202611170001_workspace_versions.sql)。先保留数据库备份，确认前两份迁移已安装，再经Supabase迁移工具或SQL Editor完整执行新文件；不要重跑已部署旧迁移。执行远端迁移和发布前端仍需owner明确授权。迁移有事务保护，报错应先确认事务已回滚；迁移工具用迁移版本记录避免重复安装，SQL Editor不要重复执行已成功文件。
+
+新增schedule_versions表含id、content JSONB、created_at原保存时间、workspace_version以及原上传账号ID/显示值；主工作区新增上传账号元数据但不改变model JSON。已有工作区内容、版本号、更新时间、发布快照与审计保留，不回填历史上传者。先安装SQL再发布前端；旧前端仍调用原cloud_save_workspace，自动受到触发器保护。新前端遇未安装RPC会明确报错，不显示假空列表。若需退回旧前端，可保留新增表/触发器继续留档，无需删数据或回滚原工作区；数据库回退不要直接drop历史表。
+
+前端通过现有backend边界使用以下逻辑（实际实现位于supabase-backend.ts与cloud-workspace.ts）：
+
+```ts
+// 普通保存接口保持。服务端同事务先留旧内容、清理至20份、写入新内容及审计。
+await backend.save(currentVersion, model);
+
+// 列表只读取摘要：id、version、createdAt、actor。
+const versions = await backend.listVersions();
+
+// 用户确认后调用；内部先读取/严格校验指定内容，再由服务端CAS恢复。
+// 不传入上传账号，不把旧版本号写回主表，不由客户端DELETE历史。
+const restored = await backend.restoreVersion(currentVersion, selectedId);
+// 只有成功回执后，CloudWorkspace才提交Store、版本、基线及本机恢复副本。
+```
+
+触发器是唯一留档/清理点：在工作区更新行锁内保存OLD.model与其原上传账号、原保存时间，并按workspace_version倒序删除第21份及更旧数据。初次保存无旧数据不留档，同值保存也生成旧版本；时间相同也按版本号准确排序。每次更新后最多20个旧版本加1个当前版本，没有额外7天限制。版本上限不保证固定字节容量，频繁保存会挤掉更早版本。
+
+回退先锁工作区并比较当前版本，再取历史，调用原cloud_save_workspace。当前资料自动入历史，版本号递增，可再恢复以撤销；选中版本已清理或设备过期则拒绝。留档、清理、主表写入、审计任一步失败均回滚，本机未上传内容保留。匿名/非管理员不能读取或恢复，客户端无法直接修改历史或伪造上传账号。历史自动清理不影响操作审计；完整数据库备份才包含这两类独立记录。
+
+现场验收：保存两次不同的脱敏资料，核对历史原保存时间与上传账号；恢复旧版，核对A/B及共用资料和新版本号，再恢复刚被替换的版本；旧设备恢复应冲突。保存超过21次核对只剩20个旧版本、操作记录仍在。取消恢复、断网、未保存规则离开、退出与读取失败应保留/明确报错。公开班表仍显示上次发布内容，需另行发布。共用账号无法识别具体同事；启用前资料上传者未知。
+
+本地PostgreSQL/PGlite、官方SDK及DOM验证与真实Supabase/公网页面验收分别报告。当前尚未执行远端SQL或发布前端，不把自动测试当成现场证据。
+
 ## 当前使用方式
 
 [公网管理入口](https://krc6666.github.io/autoschedule-new/)已上线。使用在 Supabase 中创建并绑定的管理员邮箱、密码登录。首次导入配置后点击“保存到云端”；以后登录会读取已上传的配置，修改后再点保存，不需要每次导入导出。班表继续通过原有 Excel、HTML 或 PNG 导出发送。

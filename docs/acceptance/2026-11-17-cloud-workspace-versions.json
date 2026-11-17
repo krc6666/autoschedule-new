@@ -1,0 +1,218 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-17-cloud-workspace-versions",
+  "title": "云端完整工作区历史版本、上传账号与最近20份自动清理",
+  "startedFrom": "7e1d8ea057a66301f2b18f222121759be8335098",
+  "expectation": {
+    "example": "Owner确认最近20个旧版本，补充每份显示原上传账号。版本10保存为11时留存10；恢复10内容时留存11并生成12。",
+    "expected": "数据库同事务留存旧完整A/B及共用JSON、原保存时间和原上传账号快照并按版本清理；管理员历史页面查看和确认恢复，恢复经CAS；启用前上传者未知，不伪造。",
+    "unchanged": "单管理员认证、旧设备CAS、操作审计不清理、公开发布快照需另行发布、排班规则、本地版、Excel/工作区恢复JSON合同保持。PROJECT_MAP.md原修改保留。",
+    "fallback": "留档、覆盖、清理或审计失败整次事务回滚；过期/已清理版本拒绝恢复；取消及失败保留本机编辑/草稿与云端；退出清除页面及迟到响应。真实Supabase和页面未验收时保持待验收。"
+  },
+  "testedVersion": "12c5511d3c00e0c845a486a6e93e1cc4b3f565f5accf06a855febca34f18bab5",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "改前缺少数据库迁移和历史入口；UI六项因缺入口失败，改后完整功能通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-versions-ui-red.txt",
+          "summary": "改前6项页面行为测试全部因不存在历史入口失败。",
+          "sha256": "9940ca1c54cfc0a788d4415463fcf1ab5c43d37d8c6ff66da20b500a47d05fba"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-versions-red.txt",
+          "summary": "改前真实PostgreSQL测试因缺增量迁移失败。",
+          "sha256": "33b2c3a7abd876cb0604d281edf57428a739340f28ee232ca31569dda693df2c"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-versions-functional-final.txt",
+          "summary": "220文件2165项完整功能测试通过，单worker，原门禁/时限不变。",
+          "sha256": "1194a8f3561670ac13d2105dde41c1b3b7ac5869a8bbc9f8f046bae3aa5e8ebd"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "保存旧完整两组及共用资料、原服务端时间和原上传账号；列表及确认恢复同步Store和缓存。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-versions-focused.txt",
+          "summary": "11文件104项定向测试通过，含真实编辑器、原Excel/JSON与新数据库迁移。",
+          "sha256": "1a04d0ef3a487faf03c21da5f1737e913c36be435e18f2c66e17a8aa62ba7120"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-versions-correction.txt",
+          "summary": "3文件24项通过：架构注释纠正、新数据库恢复与原上传账号/公开快照、页面。",
+          "sha256": "9ddc850567cbd450056647a95b1555f72886452c34e367addd416fb9a8b10d45"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-versions-functional-final.txt",
+          "summary": "220文件2165项完整功能测试通过，单worker，原门禁/时限不变。",
+          "sha256": "1194a8f3561670ac13d2105dde41c1b3b7ac5869a8bbc9f8f046bae3aa5e8ebd"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-versions-final-database.json",
+          "summary": "实际PostgreSQL合成数据：22次保存后恢复版本7，当前版本23；历史20份，最早3最新22，上传账号快照保留，审计23条。",
+          "sha256": "2d28f69f120bdde3c6da29f8e2f5281e1b8113f1981f1458686e12f26e772b27"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "首次空保存、旧资料未知上传者、邮箱改名、同值保存、超过20份/同时间排序、旧客户端、原Excel/JSON保存、读失败重试、坏资料拒绝、缓存失败、匿名/非管理员及会话失效已覆盖。真实双设备/真实账号现场仍未验证。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-versions-functional-final.txt",
+          "summary": "220文件2165项完整功能测试通过，单worker，原门禁/时限不变。",
+          "sha256": "1194a8f3561670ac13d2105dde41c1b3b7ac5869a8bbc9f8f046bae3aa5e8ebd"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-versions-focused.txt",
+          "summary": "11文件104项定向测试通过，含真实编辑器、原Excel/JSON与新数据库迁移。",
+          "sha256": "1a04d0ef3a487faf03c21da5f1737e913c36be435e18f2c66e17a8aa62ba7120"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-versions-correction.txt",
+          "summary": "3文件24项通过：架构注释纠正、新数据库恢复与原上传账号/公开快照、页面。",
+          "sha256": "9ddc850567cbd450056647a95b1555f72886452c34e367addd416fb9a8b10d45"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "恢复继续调用原保存并先归档当前资料；恢复再撤销、后续旧设备写入、审计与清理失败回滚及公开发布快照保持均有反向回归。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-versions-correction.txt",
+          "summary": "3文件24项通过：架构注释纠正、新数据库恢复与原上传账号/公开快照、页面。",
+          "sha256": "9ddc850567cbd450056647a95b1555f72886452c34e367addd416fb9a8b10d45"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-versions-functional-final.txt",
+          "summary": "220文件2165项完整功能测试通过，单worker，原门禁/时限不变。",
+          "sha256": "1194a8f3561670ac13d2105dde41c1b3b7ac5869a8bbc9f8f046bae3aa5e8ebd"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-versions-final-database.json",
+          "summary": "实际PostgreSQL合成数据：22次保存后恢复版本7，当前版本23；历史20份，最早3最新22，上传账号快照保留，审计23条。",
+          "sha256": "2d28f69f120bdde3c6da29f8e2f5281e1b8113f1981f1458686e12f26e772b27"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "主行锁与原CAS拒绝旧版本、已清理ID拒绝恢复、留档/清理/审计失败保持主表/版本/历史；管理员窄RPC与客户端禁止直改历史已由实际SQL执行验证。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-versions-correction.txt",
+          "summary": "3文件24项通过：架构注释纠正、新数据库恢复与原上传账号/公开快照、页面。",
+          "sha256": "9ddc850567cbd450056647a95b1555f72886452c34e367addd416fb9a8b10d45"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-versions-functional-final.txt",
+          "summary": "220文件2165项完整功能测试通过，单worker，原门禁/时限不变。",
+          "sha256": "1194a8f3561670ac13d2105dde41c1b3b7ac5869a8bbc9f8f046bae3aa5e8ebd"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-versions-commit-verify.txt",
+          "summary": "owner授权commit后执行完整npm.cmd run verify，退出0；220文件2165项功能、7文件19项性能、类型检查与构建通过，单worker且原阈值不变。",
+          "sha256": "874cc51be32f025c019fe297fff6f8175cacd3e23d3b206d761108d73415673d"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "原排班/Excel/JSON/审计/公开快照合同保持，第一二份已部署迁移与原PROJECT_MAP.md未改写。Owner授权本地commit后完整verify退出0；性能19项通过。云端和页面未验收。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-versions-functional-final.txt",
+          "summary": "220文件2165项完整功能测试通过，单worker，原门禁/时限不变。",
+          "sha256": "1194a8f3561670ac13d2105dde41c1b3b7ac5869a8bbc9f8f046bae3aa5e8ebd"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-versions-build.txt",
+          "summary": "npm.cmd run build退出0，类型编译与Vite生产构建完成。",
+          "sha256": "2b6b833966c0df04a630426e24be488daae0fab3951a8304eeab91b476650964"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-versions-typecheck-final.txt",
+          "summary": "npm.cmd run typecheck退出0。",
+          "sha256": "4b3f7cf1ed06cba39ee3b0608990fffcf42e1ff315949a5353a62ce478a2683c"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-versions-production.json",
+          "summary": "实际生产构建云端动态chunk包含历史列表/读取/恢复RPC和未知账号提示，附文件哈希；未连接真实Supabase。",
+          "sha256": "107e6ab524bc17491a2e26da657130243120764092139d75ad2ff4e1167c57fa"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-versions-commit-verify.txt",
+          "summary": "owner授权commit后执行完整npm.cmd run verify，退出0；220文件2165项功能、7文件19项性能、类型检查与构建通过，单worker且原阈值不变。",
+          "sha256": "874cc51be32f025c019fe297fff6f8175cacd3e23d3b206d761108d73415673d"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "已独立核对本地真实PostgreSQL最终产物、真实编辑器DOM及生产动态chunk；尚未在真实Supabase安装SQL、发布前端并由owner完成页面验收，故保持未验收，不以测试冒充现场。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-versions-final-database.json",
+          "summary": "实际PostgreSQL合成数据：22次保存后恢复版本7，当前版本23；历史20份，最早3最新22，上传账号快照保留，审计23条。",
+          "sha256": "2d28f69f120bdde3c6da29f8e2f5281e1b8113f1981f1458686e12f26e772b27"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-versions-production.json",
+          "summary": "实际生产构建云端动态chunk包含历史列表/读取/恢复RPC和未知账号提示，附文件哈希；未连接真实Supabase。",
+          "sha256": "107e6ab524bc17491a2e26da657130243120764092139d75ad2ff4e1167c57fa"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-versions-functional-final.txt",
+          "summary": "220文件2165项完整功能测试通过，单worker，原门禁/时限不变。",
+          "sha256": "1194a8f3561670ac13d2105dde41c1b3b7ac5869a8bbc9f8f046bae3aa5e8ebd"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "versions-ui-red.txt显示改前6项缺历史入口失败，versions-red.txt显示缺迁移；最终functional-final完整通过。原CAS只防旧设备覆盖，操作审计不是可恢复完整工作区。",
+    "laterChanges": "所有覆盖写入统一数据库before触发器；恢复调用原保存，真实SQL验证恢复后当前资料留档、再撤销、旧CAS及三类失败回滚；原Excel/JSON保存与公开发布不受影响，见functional-final/correction/final-database。",
+    "finalArtifact": "本地final-database.json独立核对版本23/历史20份/原账号/23条审计，production.json绑定实际动态chunk哈希，DOM测试挂载真实编辑器；真实Supabase与公网页面未验收，不能据此宣称上线。"
+  },
+  "review": {
+    "missedScope": "仍缺真实Supabase迁移、真实双设备与真实浏览器/公网验收；数据库并发测试使用PGlite单实例排队，不能冒充独立PostgREST连接。已查原Excel/JSON/审计/公开快照、原上传者/恢复操作者、缓存失败和认证迟到回执；架构注释误报已纠正并保留失败日志。 Owner后续仅授权本地commit，完整verify已通过；真实入口未验收状态不因提交改变。",
+    "rootCause": "原主表覆盖只带当前版本和完整JSON，没有旧完整快照或原上传者元数据；审计只记差异，不能直接充当可恢复版本。在覆盖时猜原上传者会把新操作者误标为旧作者，客户端三步请求还会漏旧客户端并产生竞态。",
+    "earlyDetection": "新增云端写入/恢复能力时先画保存消费者矩阵，先失败测试覆盖旧客户端与后置恢复；在数据库事务中统一归档/清理并独立数行及核对原作者/时间；完整架构与构建检查提前检查文本门禁和动态入口，最后单独取得现场证据。"
+  },
+  "validation": {
+    "level": "L4 提交前完整验证",
+    "functionalFiles": 220,
+    "functionalTests": 2165,
+    "commands": [
+      "npm.cmd run typecheck",
+      "npm.cmd test -- --maxWorkers=1",
+      "npm.cmd run build",
+      "VITEST_MAX_WORKERS=1 npm.cmd run verify"
+    ],
+    "performance": "本次提交前已执行：7文件19项性能测试通过，单worker，原阈值不变。",
+    "firstFullRun": "220文件2164项中2163通过、1项注释触发架构文本扫描，原日志functional.txt保留；不修改门禁。",
+    "commitVerify": {
+      "command": "npm.cmd run verify",
+      "exitCode": 0,
+      "maxWorkers": 1,
+      "functionalFiles": 220,
+      "functionalTests": 2165,
+      "performanceFiles": 7,
+      "performanceTests": 19
+    }
+  },
+  "externalActions": {
+    "commit": false,
+    "push": false,
+    "remoteMigration": false,
+    "deployment": false,
+    "actualBrowserAcceptance": false,
+    "commitAuthorized": true,
+    "note": "提交前快照；owner仅授权本地commit，提交结果以Git为准；未授权push、远端迁移或部署。"
+  }
+}

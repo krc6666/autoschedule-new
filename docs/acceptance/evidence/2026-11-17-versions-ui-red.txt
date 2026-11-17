@@ -1,0 +1,111 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+npm.cmd : stderr | tests/ui/workspace-versions.test.ts
+所在位置 行:2 字符: 1
++ npm.cmd exec vitest -- run tests/ui/workspace-versions.test.ts --maxW ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (stderr | tests/...ersions.test.ts:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+
+ ❯ tests/ui/workspace-versions.test.ts (6 tests | 6 failed) 105ms
+     × lists original uploader/time, preserves edits when browsing, and restores only after confirmation 42ms
+     × shows list failures with retry rather than empty history, and handles unknown pre-feature uploader 12ms
+     × keeps editing state/cache/version on restore failure, including unsaved rules 11ms
+     × blocks entry when rule departure is cancelled and blocks restoration while calculating 10ms
+     × ignores late history results and late restore receipts after session expiry 17ms
+     × disables repeated restoration and never updates the old editor after sign out 12ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/ui/workspace-versions.test.ts > workspace version history through cloud entry > lists original uploader/ti
+me, preserves edits when browsing, and restores only after confirmation
+AssertionError: versions: expected null not to be null
+ ❯ Object.click tests/ui/workspace-versions.test.ts:36:31
+     34|   const click=async(action:string)=>{
+     35|     const button=root.querySelector<HTMLButtonElement>(`[data-cloud-ac…
+     36|     expect(button,action).not.toBeNull(); button!.click();await settle…
+       |                               ^
+     37|   };
+     38|   return {fixture,root,confirm,click,rules,persistence,getStore:()=>st…
+ ❯ tests/ui/workspace-versions.test.ts:46:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  tests/ui/workspace-versions.test.ts > workspace version history through cloud entry > shows list failures with r
+etry rather than empty history, and handles unknown pre-feature uploader
+AssertionError: versions: expected null not to be null
+ ❯ Object.click tests/ui/workspace-versions.test.ts:36:31
+     34|   const click=async(action:string)=>{
+     35|     const button=root.querySelector<HTMLButtonElement>(`[data-cloud-ac…
+     36|     expect(button,action).not.toBeNull(); button!.click();await settle…
+       |                               ^
+     37|   };
+     38|   return {fixture,root,confirm,click,rules,persistence,getStore:()=>st…
+ ❯ tests/ui/workspace-versions.test.ts:71:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+ FAIL  tests/ui/workspace-versions.test.ts > workspace version history through cloud entry > keeps editing state/cache/
+version on restore failure, including unsaved rules
+AssertionError: versions: expected null not to be null
+ ❯ Object.click tests/ui/workspace-versions.test.ts:36:31
+     34|   const click=async(action:string)=>{
+     35|     const button=root.querySelector<HTMLButtonElement>(`[data-cloud-ac…
+     36|     expect(button,action).not.toBeNull(); button!.click();await settle…
+       |                               ^
+     37|   };
+     38|   return {fixture,root,confirm,click,rules,persistence,getStore:()=>st…
+ ❯ tests/ui/workspace-versions.test.ts:81:48
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯
+
+ FAIL  tests/ui/workspace-versions.test.ts > workspace version history through cloud entry > blocks entry when rule dep
+arture is cancelled and blocks restoration while calculating
+AssertionError: versions: expected null not to be null
+ ❯ Object.click tests/ui/workspace-versions.test.ts:36:31
+     34|   const click=async(action:string)=>{
+     35|     const button=root.querySelector<HTMLButtonElement>(`[data-cloud-ac…
+     36|     expect(button,action).not.toBeNull(); button!.click();await settle…
+       |                               ^
+     37|   };
+     38|   return {fixture,root,confirm,click,rules,persistence,getStore:()=>st…
+ ❯ tests/ui/workspace-versions.test.ts:99:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/6]⎯
+
+ FAIL  tests/ui/workspace-versions.test.ts > workspace version history through cloud entry > ignores late history resul
+ts and late restore receipts after session expiry
+AssertionError: versions: expected null not to be null
+ ❯ Object.click tests/ui/workspace-versions.test.ts:36:31
+     34|   const click=async(action:string)=>{
+     35|     const button=root.querySelector<HTMLButtonElement>(`[data-cloud-ac…
+     36|     expect(button,action).not.toBeNull(); button!.click();await settle…
+       |                               ^
+     37|   };
+     38|   return {fixture,root,confirm,click,rules,persistence,getStore:()=>st…
+ ❯ tests/ui/workspace-versions.test.ts:111:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/6]⎯
+
+ FAIL  tests/ui/workspace-versions.test.ts > workspace version history through cloud entry > disables repeated restorat
+ion and never updates the old editor after sign out
+AssertionError: versions: expected null not to be null
+ ❯ Object.click tests/ui/workspace-versions.test.ts:36:31
+     34|   const click=async(action:string)=>{
+     35|     const button=root.querySelector<HTMLButtonElement>(`[data-cloud-ac…
+     36|     expect(button,action).not.toBeNull(); button!.click();await settle…
+       |                               ^
+     37|   };
+     38|   return {fixture,root,confirm,click,rules,persistence,getStore:()=>st…
+ ❯ tests/ui/workspace-versions.test.ts:118:48
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/6]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  6 failed (6)
+   Start at  09:17:19
+   Duration  3.69s (transform 2.25s, setup 0ms, import 2.71s, tests 105ms, environment 663ms)

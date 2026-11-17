@@ -1,0 +1,26 @@
+{
+  "environment": "Local production build only; no real browser or Supabase connection",
+  "markers": {
+    "历史版本": true,
+    "cloud_list_workspace_versions": true,
+    "cloud_read_workspace_version": true,
+    "cloud_restore_workspace_version": true,
+    "上传账号未知": true
+  },
+  "cloudChunks": [
+    {
+      "path": "dist/assets/cloud-application-DAZHz3UT.js",
+      "bytes": 38402,
+      "sha256": "c4bd40fae74b63adcc8631cf51f849e272404ded2e58f794e78e6a2395b88855"
+    },
+    {
+      "path": "dist/assets/supabase-backend-D66sPPen.js",
+      "bytes": 233739,
+      "sha256": "fc4a2504aab43ec88dc25044ab3a8d4a843198740f94eb9c84f3bdf6c35db685"
+    }
+  ],
+  "migration": {
+    "path": "supabase/migrations/202611170001_workspace_versions.sql",
+    "sha256": "e0243e2a5005f704c3a736746b390d85520ea8b73b2b2ba269d108deccdc09f6"
+  }
+}

@@ -36,6 +36,7 @@ export class CloudWorkspace {
   private pending = false;
   private conflict = false;
   private recovery: RecoveryCopy | null = null;
+  private disposed = false;
   cacheWarning = "";
   onChange: () => void = () => {};
   private readonly unsubscribe: () => void;
@@ -209,7 +210,24 @@ export class CloudWorkspace {
     });
   }
 
+  async restoreVersion(id: string): Promise<void> {
+    return this.run(async () => {
+      const restored = await this.backend.restoreVersion(this.version, id);
+      if (this.disposed) return;
+      // Only a successful server receipt replaces local edits and the recovery baseline.
+      this.version = restored.version;
+      this.baseline = workspaceFingerprint(restored.model);
+      this.store.getState().replaceModel(restored.model);
+      try {
+        this.stash();
+      } catch {
+        this.cacheWarning = "云端已恢复，但本机恢复副本未更新，请下载备份。";
+      }
+    });
+  }
+
   dispose(): void {
+    this.disposed = true;
     this.unsubscribe();
   }
 }

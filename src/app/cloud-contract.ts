@@ -1,5 +1,6 @@
 import type { AppState, ScheduleGroupId } from "../model";
 import type { AuditDetails, AuditPage } from "./operation-audit-contract";
+import type { WorkspaceVersion } from "./workspace-version-contract";
 
 export interface PublicScheduleRow {
   flightNo: string;
@@ -40,6 +41,11 @@ export interface CloudBackend {
   save(expectedVersion: number, model: AppState): Promise<number>;
   listAudit(beforeId?: string | null): Promise<AuditPage>;
   auditDetails(entryId: string, afterIndex?: number): Promise<AuditDetails>;
+  listVersions(): Promise<WorkspaceVersion[]>;
+  restoreVersion(
+    expectedVersion: number,
+    id: string
+  ): Promise<{ version: number; model: AppState }>;
   publish(
     expectedVersion: number,
     groupId: ScheduleGroupId

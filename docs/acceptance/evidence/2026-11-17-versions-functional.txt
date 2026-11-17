@@ -1,0 +1,44 @@
+
+> autoschedule@1.0.0 test
+> vitest run --exclude tests/performance/** --maxWorkers=1
+
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/architecture/no-facade-migration.test.ts (5 tests | 1 failed) 250ms
+     × 领域层不反向依赖基础设施，应用层不直接访问浏览器存储 46ms
+npm.cmd :
+所在位置 行:2 字符: 1
++ npm.cmd test -- --maxWorkers=1 2>&1 | Out-File -Encoding utf8 docs/ac ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/architecture/no-facade-migration.test.ts > 断裂式重建架构门禁 > 领域层不反向依赖基础设施，应用层不直接访问浏览器存储
+AssertionError: expected [ Array(1) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "src/app/workspace-version-contract.ts: direct localStorage",
++ ]
+
+ ❯ tests/architecture/no-facade-migration.test.ts:68:24
+     66|     });
+     67|
+     68|     expect(violations).toEqual([]);
+       |                        ^
+     69|   });
+     70|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 219 passed (220)
+      Tests  1 failed | 2163 passed (2164)
+   Start at  09:28:19
+   Duration  307.13s (transform 8.92s, setup 0ms, import 46.75s, tests 202.19s, environment 14.75s)

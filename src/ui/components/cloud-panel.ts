@@ -5,6 +5,7 @@ import { LightDomElement } from "./light-dom-element";
 export type CloudCommand =
   | { type: "login"; email: string; password: string }
   | { type: "restore"; file: File }
+  | { type: "restore-version"; id: string }
   | {
       type:
         | "save"
@@ -15,6 +16,7 @@ export type CloudCommand =
         | "discard"
         | "retry"
         | "audit"
+        | "versions"
         | "workspace";
     };
 
@@ -31,6 +33,7 @@ export interface CloudPanelState {
   cacheWarning: string;
   shareUrl: string;
   auditOpen?: boolean;
+  versionsOpen?: boolean;
 }
 
 const FAILURE_LABELS = {
@@ -201,6 +204,15 @@ export class CloudPanelElement extends LightDomElement {
                   @click=${() => this.command({ type: "audit" })}
                 >
                   操作记录
+                </button>
+                <button
+                  class="btn btn-outline-secondary btn-sm"
+                  data-cloud-action="versions"
+                  aria-pressed=${Boolean(s.versionsOpen)}
+                  ?disabled=${s.busy}
+                  @click=${() => this.command({ type: "versions" })}
+                >
+                  历史版本
                 </button>
                 <details class="cloud-more">
                   <summary aria-label="更多操作" title="更多操作">…</summary>

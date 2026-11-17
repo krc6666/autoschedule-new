@@ -90,6 +90,48 @@ describe("cloud workspace lifecycle", () => {
     reload.dispose();
   });
 
+  it("restores using current CAS and writes the new recovery baseline; later local edits still need upload", async () => {
+    const { backend } = cloudFixture();
+    const cache = persistence().recovery;
+    const workspace = new CloudWorkspace(backend, await backend.load(), cache);
+    workspace.store.getState().configuration.addStaff();
+    const restored = cloudModel();
+    restored.staff[0]!.remark = restored.groups.A.staff[0]!.remark = "restored";
+    backend.restoreVersion.mockResolvedValue({ version: 2, model: restored });
+    await workspace.restoreVersion("1");
+    expect(backend.restoreVersion).toHaveBeenCalledWith(1, "1");
+    expect(workspace.cloudVersion).toBe(2);
+    expect(workspace.hasUnsavedChanges).toBe(false);
+    expect(cache.read()).toMatchObject({
+      baseVersion: 2,
+      unsaved: false,
+      model: restored,
+    });
+    workspace.store.getState().configuration.addStaff();
+    expect(workspace.hasUnsavedChanges).toBe(true);
+    workspace.dispose();
+  });
+
+  it("reports a local cache failure separately after a successful cloud restore", async () => {
+    const { backend } = cloudFixture();
+    backend.restoreVersion.mockResolvedValue({
+      version: 2,
+      model: cloudModel(),
+    });
+    const cache = persistence().recovery;
+    const workspace = new CloudWorkspace(backend, await backend.load(), {
+      ...cache,
+      write: () => {
+        throw new Error("disk full");
+      },
+    });
+    await workspace.restoreVersion("1");
+    expect(workspace.cloudVersion).toBe(2);
+    expect(workspace.hasUnsavedChanges).toBe(false);
+    expect(workspace.cacheWarning).toContain("云端已恢复");
+    workspace.dispose();
+  });
+
   it("does not call publication for unsaved, empty or stale schedules", async () => {
     const { backend } = cloudFixture();
     const workspace = new CloudWorkspace(

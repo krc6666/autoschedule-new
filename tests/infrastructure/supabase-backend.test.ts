@@ -96,6 +96,72 @@ describe("official Supabase SDK adapter", () => {
     });
   });
 
+  it("reads uploader snapshots and validates selected content before invoking atomic restore without actor/model input", async () => {
+    const entry = {
+      id: "1",
+      version: 1,
+      createdAt: "2026-11-17T01:00:00Z",
+      actor: "original@example.invalid",
+    };
+    const model = cloudModel();
+    const { backend, fetcher } = adapter([
+      { data: [entry] },
+      { data: model },
+      { data: 3 },
+    ]);
+    expect(await backend.listVersions()).toEqual([entry]);
+    expect(await backend.restoreVersion(2, "1")).toEqual({ version: 3, model });
+    expect(String(fetcher.mock.calls[1]![0])).toContain(
+      "/rpc/cloud_read_workspace_version"
+    );
+    expect(JSON.parse(String(fetcher.mock.calls[1]![1]!.body))).toEqual({
+      p_version_id: "1",
+    });
+    expect(String(fetcher.mock.calls[2]![0])).toContain(
+      "/rpc/cloud_restore_workspace_version"
+    );
+    expect(JSON.parse(String(fetcher.mock.calls[2]![1]!.body))).toEqual({
+      p_expected_version: 2,
+      p_version_id: "1",
+    });
+  });
+
+  it("rejects malformed history and corrupt content before any restore write", async () => {
+    const { backend, fetcher } = adapter([
+      { data: [{ id: "1", version: 1, createdAt: "bad", actor: "x" }] },
+      { data: {} },
+    ]);
+    await expect(backend.listVersions()).rejects.toMatchObject({
+      kind: "invalid",
+    });
+    await expect(backend.restoreVersion(2, "1")).rejects.toMatchObject({
+      kind: "invalid",
+    });
+    expect(fetcher).toHaveBeenCalledTimes(2);
+    await expect(backend.restoreVersion(2, "not-an-id")).rejects.toMatchObject({
+      kind: "invalid",
+    });
+    expect(fetcher).toHaveBeenCalledTimes(2);
+  });
+
+  it("reports expired versions, stale restore CAS and invalid receipts as failures", async () => {
+    const model = cloudModel();
+    const { backend } = adapter([
+      { data: { code: "P0001", message: "VERSION_NOT_FOUND" }, status: 400 },
+      { data: model },
+      { data: { code: "P0001", message: "WORKSPACE_CONFLICT" }, status: 400 },
+      { data: model },
+      { data: 2 },
+    ]);
+    await expect(backend.restoreVersion(2, "1")).rejects.toThrow("自动清理");
+    await expect(backend.restoreVersion(2, "1")).rejects.toMatchObject({
+      kind: "conflict",
+    });
+    await expect(backend.restoreVersion(2, "1")).rejects.toMatchObject({
+      kind: "invalid",
+    });
+  });
+
   it("maps permission and version failures and does not invent a successful save", async () => {
     const { backend } = adapter([
       { data: { code: "P0001", message: "WORKSPACE_CONFLICT" }, status: 400 },

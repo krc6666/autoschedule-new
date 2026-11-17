@@ -119,6 +119,10 @@ export function cloudFixture(model = cloudModel()) {
       nextCursor: null,
       staffLabels: {},
     })),
+    listVersions: vi.fn<CloudBackend["listVersions"]>(async () => []),
+    restoreVersion: vi.fn<CloudBackend["restoreVersion"]>(async () => {
+      throw new CloudError("invalid", "未配置测试历史版本");
+    }),
     publish: vi.fn(async (_expected: number, _group: "A" | "B") => publication),
     readPublication: vi.fn(async (_token: string) => publication.snapshot),
   } satisfies CloudBackend;

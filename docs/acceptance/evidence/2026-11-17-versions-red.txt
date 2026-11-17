@@ -1,0 +1,32 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/infrastructure/workspace-versions-database.test.ts (9 tests | 9 skipped) 1937ms
+npm.cmd :
+所在位置 行:2 字符: 1
++ npm.cmd exec vitest -- run tests/infrastructure/workspace-versions-da ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/infrastructure/workspace-versions-database.test.ts > workspace time machine through actual PostgreSQL writ
+es
+Error: ENOENT: no such file or directory, open 'D:\autoschedule-migrate\autoschedule\supabase\migrations\202611170001_w
+orkspace_versions.sql'
+ ❯ tests/infrastructure/workspace-versions-database.test.ts:29:19
+     27|     existing = cloudModel();
+     28|     await save(0, existing);
+     29|     await db.exec(readFileSync(migration, "utf8"));
+       |                   ^
+     30|     const current = await load();
+     31|     expect(current).toEqual({ version: 1, model: existing });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  9 skipped (9)
+   Start at  09:15:41
+   Duration  3.52s (transform 1.14s, setup 0ms, import 1.36s, tests 1.94s, environment 0ms)

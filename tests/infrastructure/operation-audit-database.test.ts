@@ -29,6 +29,7 @@ describe("cloud modification audit through actual workspace RPC", () => {
     for (const path of [
       "supabase/migrations/202611150001_cloud_workspace.sql",
       "supabase/migrations/202611150002_operation_audit.sql",
+      "supabase/migrations/202611170001_workspace_versions.sql",
     ])
       await db.exec(readFileSync(path, "utf8"));
     await db.query("insert into public.autoschedule_admin values(true, $1)", [
@@ -38,7 +39,7 @@ describe("cloud modification audit through actual workspace RPC", () => {
   afterAll(async () => db?.close());
   beforeEach(async () => {
     await db.exec(
-      "reset role; truncate public.autoschedule_audit_entries cascade; truncate public.autoschedule_workspace;"
+      "reset role; truncate public.schedule_versions; truncate public.autoschedule_audit_entries cascade; truncate public.autoschedule_workspace;"
     );
     await db.query("select set_config('request.jwt.claim.sub', $1, false)", [
       admin,

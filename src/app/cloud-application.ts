@@ -18,6 +18,11 @@ import {
   OperationAuditPageElement,
   type AuditPageCommand,
 } from "../ui/components/operation-audit-page";
+import { WorkspaceVersionsController } from "./workspace-versions-controller";
+import {
+  WorkspaceVersionsPageElement,
+  type WorkspaceVersionsCommand,
+} from "../ui/components/workspace-versions-page";
 
 const TOKEN_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -70,9 +75,12 @@ export function mountCloudApplication(
   const panel = new CloudPanelElement();
   const editorRoot = document.createElement("div");
   const auditRoot = document.createElement("div");
+  const versionsRoot = document.createElement("div");
+  versionsRoot.hidden = true;
   auditRoot.hidden = true;
-  root.replaceChildren(panel, editorRoot, auditRoot);
+  root.replaceChildren(panel, editorRoot, auditRoot, versionsRoot);
   let audit: OperationAuditController | null = null;
+  let versions: WorkspaceVersionsController | null = null;
   let workspace: CloudWorkspace | null = null;
   let editor: MountedAutoscheduleApp | null = null;
   let epoch = 0;
@@ -105,20 +113,43 @@ export function mountCloudApplication(
         canImport: workspace.cloudVersion === 0,
       };
     editorRoot.inert = state.busy || state.conflict;
-    editorRoot.hidden = state.conflict || Boolean(state.auditOpen);
+    editorRoot.hidden =
+      state.conflict || Boolean(state.auditOpen) || Boolean(state.versionsOpen);
     auditRoot.hidden = state.phase !== "editor" || !state.auditOpen;
+    versionsRoot.hidden = state.phase !== "editor" || !state.versionsOpen;
+    const versionsPage =
+      versionsRoot.firstElementChild as WorkspaceVersionsPageElement | null;
+    if (versionsPage) {
+      versionsPage.busy = state.busy;
+      versionsPage.canRestore = !state.conflict;
+    }
     panel.state = state;
   };
   const closeEditor = () => {
+    versions?.dispose();
+    versions = null;
+    versionsRoot.replaceChildren();
     audit?.dispose();
     audit = null;
     auditRoot.replaceChildren();
-    state = { ...state, auditOpen: false };
+    state = { ...state, auditOpen: false, versionsOpen: false };
     editor?.dispose();
     workspace?.dispose();
     editor = null;
     workspace = null;
     editorRoot.replaceChildren();
+  };
+  const mountEditor = (current: CloudWorkspace) => {
+    editor = (options.mountEditor ?? mountAutoscheduleApp)(editorRoot, {
+      store: current.store,
+      cloud: true,
+      preferences: persistence!.preferences,
+      onRulesChange: () => render(),
+      shouldWarnOnExit: () =>
+        current.hasUnsavedChanges ||
+        pendingCommand === "save" ||
+        pendingCommand === "restore-version",
+    });
   };
   const connect = async () => {
     const request = ++epoch;
@@ -154,14 +185,7 @@ export function mountCloudApplication(
       workspace = new CloudWorkspace(backend, remote, persistence.recovery);
       const current = workspace;
       current.onChange = () => render();
-      editor = (options.mountEditor ?? mountAutoscheduleApp)(editorRoot, {
-        store: current.store,
-        cloud: true,
-        preferences: persistence.preferences,
-        onRulesChange: () => render(),
-        shouldWarnOnExit: () =>
-          current.hasUnsavedChanges || pendingCommand === "save",
-      });
+      mountEditor(current);
       render({
         phase: "editor",
         busy: false,
@@ -190,10 +214,42 @@ export function mountCloudApplication(
       ));
   const handle = async (command: CloudCommand) => {
     if (pendingCommand !== null || disposed) return;
+    if (command.type === "versions") {
+      if (!workspace || state.phase !== "editor") return;
+      if (!state.versionsOpen && editor && !editor.confirmLeaveRules(confirm))
+        return;
+      if (!versions) {
+        versions = new WorkspaceVersionsController(backend);
+        const page = new WorkspaceVersionsPageElement();
+        page.view = versions.view;
+        const currentVersions = versions;
+        versions.onChange = (view) => {
+          page.view = view;
+        };
+        page.addEventListener("versions-command", (event) => {
+          if (
+            disposed ||
+            currentVersions !== versions ||
+            pendingCommand !== null
+          )
+            return;
+          const action = (event as CustomEvent<WorkspaceVersionsCommand>)
+            .detail;
+          if (action.type === "back") void handle({ type: "workspace" });
+          else if (action.type === "refresh") void currentVersions.load();
+          else if (action.type === "restore")
+            void handle({ type: "restore-version", id: action.id });
+        });
+        versionsRoot.replaceChildren(page);
+      }
+      render({ versionsOpen: true, auditOpen: false });
+      await versions.load();
+      return;
+    }
     if (command.type === "audit" || command.type === "workspace") {
       if (!workspace || state.phase !== "editor") return;
       if (command.type === "workspace") {
-        render({ auditOpen: false });
+        render({ auditOpen: false, versionsOpen: false });
       } else {
         if (editor && !editor.confirmLeaveRules(confirm)) return;
         if (!audit) {
@@ -218,10 +274,37 @@ export function mountCloudApplication(
           });
           auditRoot.replaceChildren(page);
         }
-        render({ auditOpen: true });
+        render({ auditOpen: true, versionsOpen: false });
         await audit.load();
       }
       return;
+    }
+    if (command.type === "restore-version") {
+      if (
+        !workspace ||
+        !state.versionsOpen ||
+        !versions ||
+        versions.view.loading ||
+        workspace.recoveryConflict
+      )
+        return;
+      const entry = versions.view.entries.find(
+        (entry) => entry.id === command.id
+      );
+      if (!entry) return;
+      if (!editor?.canTransferWorkspace()) {
+        render({
+          message: "请先结束排班计算，或保存/取消历史编辑，再进行云端操作。",
+          notice: "error",
+        });
+        return;
+      }
+      if (
+        !confirm(
+          `将云端完整资料恢复到 ${new Date(entry.createdAt).toLocaleString("zh-CN")}（版本${entry.version}，上传账号：${entry.actor ?? "未知"}）。\n包含A/B两组及共用资料；当前云端资料会先自动备份，已发布班表不变。${workspace.hasUnsavedChanges || editor.hasUnsavedRules() ? "\n本机尚有未上传修改或未保存规则，成功恢复后将放弃这些修改；取消或失败仍保留。" : ""}\n是否继续？`
+        )
+      )
+        return;
     }
     pendingCommand = command.type;
     const actionWorkspace = workspace;
@@ -264,6 +347,21 @@ export function mountCloudApplication(
           });
         } else {
           switch (command.type) {
+            case "restore-version":
+              await workspace.restoreVersion(command.id);
+              if (workspace !== actionWorkspace || disposed) return;
+              // Dispose old editor drafts only after a successful restore receipt.
+              editor.dispose();
+              editorRoot.replaceChildren();
+              mountEditor(workspace);
+              render({
+                versionsOpen: false,
+                auditOpen: false,
+                message: "已恢复所选历史版本，云端和本机工作区已同步。",
+                notice: "info",
+                saveFeedback: { phase: "saved", savedAt: now() },
+              });
+              break;
             case "save":
               await workspace.save();
               if (workspace !== actionWorkspace) return;
