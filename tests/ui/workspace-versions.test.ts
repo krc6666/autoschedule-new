@@ -180,7 +180,11 @@ describe("workspace version history through cloud entry", () => {
     });
     await app.click("version-restore-1");
     expect(app.confirm.mock.calls[0]![0]).toContain("未上传");
-    expect(app.fixture.backend.restoreVersion).toHaveBeenCalledWith(1, "1");
+    expect(app.fixture.backend.restoreVersion).toHaveBeenCalledWith(
+      1,
+      "1",
+      expect.any(String)
+    );
     expect(app.getStore().getState().model).toEqual(restored);
     expect(app.persistence.recovery.read()).toMatchObject({
       baseVersion: 2,

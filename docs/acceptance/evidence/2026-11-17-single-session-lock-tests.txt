@@ -1,0 +1,11 @@
+Task: 2026-11-17-single-session-lock
+Environment: local Vitest with PGlite synthetic Auth/PostgreSQL; no remote Supabase credentials.
+
+Targeted command:
+npm.cmd exec vitest -- run tests/infrastructure/single-editor-session-database.test.ts tests/infrastructure/supabase-backend.test.ts tests/app/cloud-workspace.test.ts tests/ui/cloud-panel.test.ts tests/ui/cloud-application.test.ts tests/ui/policy-editing-lifecycle.test.ts tests/ui/workspace-versions.test.ts --pool=forks --maxWorkers=1
+Result: 7 test files passed, 77 tests passed.
+Coverage: one active session, SESSION_ACTIVE, takeover, expiry, old session rejection, locked writes, CAS conflict, heartbeat failure closes editor, local recovery retention, takeover button.
+
+Full command:
+npm.cmd test -- --maxWorkers=1 --testTimeout=60000
+Result: 231 test files passed, 2234 tests passed.

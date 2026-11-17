@@ -1,0 +1,131 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-17-single-session-lock",
+  "title": "Single editor session lock per account",
+  "startedFrom": "43c599f7bd4a5a6510f3e4badd4e740bcb0c86db",
+  "expectation": {
+    "example": "同一个管理员账号在浏览器甲已进入编辑页，浏览器乙再登录；乙点击接管后进入编辑，甲停止编辑。甲崩溃后等待租约过期，新的地点可以重新进入。",
+    "expected": "第二个地点默认提示账号已在别处使用；接管后旧地点的心跳、保存、发布和历史恢复都被拒绝，新地点可以继续编辑和保存。",
+    "unchanged": "公开班表查看不受限制；工作区版本 CAS 冲突保护仍保留；旧工作区数据和本机恢复副本不丢失；会话锁只限制编辑和写入。",
+    "fallback": "接管或心跳失败时关闭编辑器并保留本机恢复副本；网络中断不自动覆盖云端，恢复网络后可重新获取或接管。"
+  },
+  "testedVersion": "23e405019ba3b8cd028d8f8ec124b32e7cf3d26301d4e0436d09e358f89e2048",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "The new PGlite regression test demonstrates the previously unprotected concurrent-session path and asserts SESSION_ACTIVE.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-single-session-lock-tests.txt",
+          "sha256": "22181eadd70e8229bde222a1faf8def61bd3d637deac04de42b1dc8a9028bbd2",
+          "summary": "Targeted lease, adapter, workspace, UI and lifecycle tests: 7 files and 77 tests passed; full suite: 231 files and 2233 tests passed."
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "Lease acquisition, editor mount, heartbeat, locked save and locked restore pass in the targeted suite.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-single-session-lock-tests.txt",
+          "sha256": "22181eadd70e8229bde222a1faf8def61bd3d637deac04de42b1dc8a9028bbd2",
+          "summary": "Targeted lease, adapter, workspace, UI and lifecycle tests: 7 files and 77 tests passed; full suite: 231 files and 2233 tests passed."
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-single-session-lock-build.txt",
+          "sha256": "0f44ddfa998445d5d081f02e3834f059f54ac4034d600a3bd4200b787b34155e",
+          "summary": "Typecheck and production build exited 0; remote migration and live browser acceptance remain owner actions."
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "Takeover and expired-lease paths pass; the old session heartbeat and writes are rejected.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-single-session-lock-tests.txt",
+          "sha256": "22181eadd70e8229bde222a1faf8def61bd3d637deac04de42b1dc8a9028bbd2",
+          "summary": "Targeted lease, adapter, workspace, UI and lifecycle tests: 7 files and 77 tests passed; full suite: 231 files and 2233 tests passed."
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "Heartbeat rejection closes the editor and preserves the local recovery path; CAS remains active after takeover.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-single-session-lock-tests.txt",
+          "sha256": "22181eadd70e8229bde222a1faf8def61bd3d637deac04de42b1dc8a9028bbd2",
+          "summary": "Targeted lease, adapter, workspace, UI and lifecycle tests: 7 files and 77 tests passed; full suite: 231 files and 2233 tests passed."
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "Old two-argument write RPCs reject with SESSION_REQUIRED, while locked writes retain WORKSPACE_CONFLICT behavior.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-single-session-lock-tests.txt",
+          "sha256": "22181eadd70e8229bde222a1faf8def61bd3d637deac04de42b1dc8a9028bbd2",
+          "summary": "Targeted lease, adapter, workspace, UI and lifecycle tests: 7 files and 77 tests passed; full suite: 231 files and 2233 tests passed."
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "The full existing suite passes, including public schedule reads, audit/version reads, local recovery and existing CAS tests.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-single-session-lock-tests.txt",
+          "sha256": "22181eadd70e8229bde222a1faf8def61bd3d637deac04de42b1dc8a9028bbd2",
+          "summary": "Targeted lease, adapter, workspace, UI and lifecycle tests: 7 files and 77 tests passed; full suite: 231 files and 2233 tests passed."
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "verified",
+      "reason": "The migration, client adapter, editor lifecycle and tests compile and build successfully; live Supabase/browser evidence is still pending.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-single-session-lock-build.txt",
+          "sha256": "0f44ddfa998445d5d081f02e3834f059f54ac4034d600a3bd4200b787b34155e",
+          "summary": "Typecheck and production build exited 0; remote migration and live browser acceptance remain owner actions."
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-single-session-lock-tests.txt",
+          "sha256": "22181eadd70e8229bde222a1faf8def61bd3d637deac04de42b1dc8a9028bbd2",
+          "summary": "Targeted lease, adapter, workspace, UI and lifecycle tests: 7 files and 77 tests passed; full suite: 231 files and 2233 tests passed."
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "Before this change, the server had no account-scoped editor lease; the new PGlite regression test now covers the concurrent-session entry and rejects the second session.",
+    "laterChanges": "A takeover can invalidate the old editor between heartbeats, so save, publish and history restore also carry the lease id; CAS remains the final version guard.",
+    "finalArtifact": "202611170002_single_editor_session.sql plus the locked CloudBackend calls and 231-file full test result prove the local implementation. Live Supabase execution and two-browser acceptance still require the owner."
+  },
+  "review": {
+    "missedScope": "The first design could have protected only save; the propagation matrix and locked publish/restore tests cover every write entry and heartbeat failure.",
+    "rootCause": "The original system had version CAS but no server-side account session ownership, so concurrent editors were detected only after a save.",
+    "earlyDetection": "For future cross-device editing changes, update the propagation matrix before coding and test acquire, takeover, expiry, every write RPC, recovery retention and CAS together."
+  },
+  "automaticVerification": {
+    "targetedFiles": 7,
+    "targetedTests": 77,
+    "functionalFiles": 231,
+    "functionalTests": 2234,
+    "typecheckExit": 0,
+    "testExit": 0,
+    "buildExit": 0,
+    "maxWorkers": 1,
+    "performance": "Passed: 7 files and 19 tests.",
+    "verify": "Passed: typecheck, full tests, performance tests and production build."
+  },
+  "externalActions": {
+    "commit": false,
+    "push": false,
+    "deployment": false,
+    "cloudUpload": false,
+    "actualBrowserAcceptance": false
+  }
+}

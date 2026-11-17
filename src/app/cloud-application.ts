@@ -27,6 +27,21 @@ import {
 const TOKEN_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+function editorSessionId(scope: string): string {
+  const key = `autoschedule.editor-session:${scope}`;
+  try {
+    const existing = sessionStorage.getItem(key);
+    if (existing) return existing;
+    const value =
+      globalThis.crypto?.randomUUID?.() ??
+      `session-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    sessionStorage.setItem(key, value);
+    return value;
+  } catch {
+    return `session-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  }
+}
+
 export interface CloudApplicationOptions {
   persistence?: (scope: string, userId: string) => BrowserCloudPersistence;
   location?: Pick<Location, "href" | "hash">;
@@ -86,6 +101,9 @@ export function mountCloudApplication(
   let epoch = 0;
   let pendingCommand: CloudCommand["type"] | null = null;
   let persistence: BrowserCloudPersistence | null = null;
+  const sessionId = editorSessionId(scope);
+  let sessionHeld = false;
+  let heartbeatTimer: number | undefined;
   let state: CloudPanelState = {
     phase: "loading",
     busy: true,
@@ -98,6 +116,7 @@ export function mountCloudApplication(
     canImport: false,
     cacheWarning: "",
     shareUrl: "",
+    sessionActive: false,
   };
   const render = (patch: Partial<CloudPanelState> = {}) => {
     if (disposed) return;
@@ -126,6 +145,12 @@ export function mountCloudApplication(
     panel.state = state;
   };
   const closeEditor = () => {
+    window.clearInterval(heartbeatTimer);
+    heartbeatTimer = undefined;
+    if (sessionHeld) {
+      sessionHeld = false;
+      void backend.releaseSession(sessionId).catch(() => {});
+    }
     versions?.dispose();
     versions = null;
     versionsRoot.replaceChildren();
@@ -151,7 +176,7 @@ export function mountCloudApplication(
         pendingCommand === "restore-version",
     });
   };
-  const connect = async () => {
+  const connect = async (takeover = false) => {
     const request = ++epoch;
     closeEditor();
     render({
@@ -173,29 +198,66 @@ export function mountCloudApplication(
           dirty: false,
           conflict: false,
           cacheWarning: "",
+          sessionActive: false,
         });
         return;
       }
+      await backend.acquireSession(sessionId, takeover);
+      sessionHeld = true;
       const remote = await backend.load();
       if (disposed || request !== epoch) return;
       persistence = (options.persistence ?? createBrowserCloudPersistence)(
         scope,
         userId
       );
-      workspace = new CloudWorkspace(backend, remote, persistence.recovery);
+      workspace = new CloudWorkspace(
+        backend,
+        remote,
+        persistence.recovery,
+        sessionId
+      );
       const current = workspace;
       current.onChange = () => render();
       mountEditor(current);
+      heartbeatTimer = window.setInterval(() => {
+        void backend.touchSession(sessionId).catch((error) => {
+          if (disposed || !sessionHeld) return;
+          try {
+            if (!current.recoveryConflict && editor?.canTransferWorkspace())
+              current.stash();
+          } catch {
+            /* Keep the existing recovery copy when the browser is full. */
+          }
+          closeEditor();
+          render({
+            phase: "error",
+            busy: false,
+            sessionActive: true,
+            message:
+              error instanceof Error
+                ? error.message
+                : "编辑会话已失效，请重新获取或接管此账号。",
+            notice: "error",
+          });
+        });
+      }, 30_000);
       render({
         phase: "editor",
         busy: false,
         message: "",
+        sessionActive: false,
       });
     } catch (error) {
+      if (sessionHeld && !workspace) {
+        sessionHeld = false;
+        void backend.releaseSession(sessionId).catch(() => {});
+      }
       if (!disposed && request === epoch)
         render({
           phase: "error",
           busy: false,
+          sessionActive:
+            error instanceof CloudError && error.kind === "session",
           message:
             error instanceof Error
               ? error.message
@@ -320,6 +382,8 @@ export function mountCloudApplication(
       if (command.type === "login") {
         await backend.signIn(command.email, command.password);
         await connect();
+      } else if (command.type === "takeover") {
+        await connect(true);
       } else if (command.type === "retry") {
         await connect();
       } else if (command.type === "logout" && !workspace) {
@@ -444,9 +508,9 @@ export function mountCloudApplication(
               }
               if (!editor.confirmLeaveRules(confirm)) break;
               if (!workspace.recoveryConflict) workspace.stash();
+              closeEditor();
               await backend.signOut();
               ++epoch;
-              closeEditor();
               render({
                 phase: "login",
                 dirty: false,
@@ -465,6 +529,22 @@ export function mountCloudApplication(
       if (!disposed && (!actionWorkspace || workspace === actionWorkspace)) {
         const message =
           error instanceof Error ? error.message : "操作未成功，请重试。";
+        if (error instanceof CloudError && error.kind === "session") {
+          try {
+            if (workspace && !workspace.recoveryConflict) workspace.stash();
+          } catch {
+            /* Keep any previously committed recovery copy. */
+          }
+          closeEditor();
+          render({
+            phase: "error",
+            message,
+            notice: "error",
+            sessionActive: true,
+            dirty: false,
+          });
+          return;
+        }
         render(
           command.type === "save"
             ? {

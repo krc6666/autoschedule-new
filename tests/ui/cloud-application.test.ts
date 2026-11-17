@@ -109,6 +109,46 @@ describe("cloud entry controls and public view", () => {
     expect(app.root.querySelector("time")).toBeNull();
   });
 
+  it("closes the editor when the lease heartbeat is rejected", async () => {
+    vi.useFakeTimers();
+    const fixture = cloudFixture();
+    fixture.backend.touchSession.mockRejectedValueOnce(
+      new CloudError("session", "账号已在其他地方登录")
+    );
+    const app = mount(fixture);
+    await settle();
+    expect(app.mountEditor).toHaveBeenCalledOnce();
+    await vi.advanceTimersByTimeAsync(30_000);
+    await settle();
+    expect(app.mountEditor.mock.results[0]!.value.dispose).toHaveBeenCalled();
+    const panel = app.root.querySelector<CloudPanelElement>(
+      "autoschedule-cloud-panel"
+    )!;
+    expect(panel.state.phase).toBe("error");
+    expect(panel.state.sessionActive).toBe(true);
+    vi.useRealTimers();
+  });
+
+  it("shows takeover after an active-session rejection and reconnects after takeover", async () => {
+    const fixture = cloudFixture();
+    fixture.backend.acquireSession.mockRejectedValueOnce(
+      new CloudError("session", "此账号已在别处使用")
+    );
+    const app = mount(fixture);
+    await settle();
+    const panel = app.root.querySelector<CloudPanelElement>(
+      "autoschedule-cloud-panel"
+    )!;
+    expect(panel.state.phase).toBe("error");
+    expect(panel.state.sessionActive).toBe(true);
+    await app.command({ type: "takeover" });
+    expect(fixture.backend.acquireSession).toHaveBeenLastCalledWith(
+      expect.any(String),
+      true
+    );
+    expect(app.mountEditor).toHaveBeenCalledOnce();
+  });
+
   it("leaves no password after failed login and returns an empty password input after logout", async () => {
     const fixture = cloudFixture();
     fixture.setUser(null);

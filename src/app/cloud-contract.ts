@@ -36,26 +36,36 @@ export interface CloudBackend {
   currentUser(): Promise<string | null>;
   signIn(email: string, password: string): Promise<void>;
   signOut(): Promise<void>;
+  acquireSession(sessionId: string, takeover?: boolean): Promise<void>;
+  touchSession(sessionId: string): Promise<void>;
+  releaseSession(sessionId: string): Promise<void>;
   onSignedOut(callback: () => void): () => void;
   load(): Promise<{ version: number; model: AppState | null }>;
-  save(expectedVersion: number, model: AppState): Promise<number>;
+  save(
+    expectedVersion: number,
+    model: AppState,
+    sessionId?: string
+  ): Promise<number>;
   listAudit(beforeId?: string | null): Promise<AuditPage>;
   auditDetails(entryId: string, afterIndex?: number): Promise<AuditDetails>;
   listVersions(): Promise<WorkspaceVersion[]>;
   restoreVersion(
     expectedVersion: number,
-    id: string
+    id: string,
+    sessionId?: string
   ): Promise<{ version: number; model: AppState }>;
   publish(
     expectedVersion: number,
-    groupId: ScheduleGroupId
+    groupId: ScheduleGroupId,
+    sessionId?: string
   ): Promise<CloudPublication>;
   readPublication(token: string): Promise<PublicSchedule | null>;
 }
 
 export class CloudError extends Error {
   constructor(
-    readonly kind: "conflict" | "unauthorized" | "unavailable" | "invalid",
+    readonly kind:
+      "conflict" | "unauthorized" | "unavailable" | "invalid" | "session",
     message: string
   ) {
     super(message);

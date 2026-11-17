@@ -94,6 +94,9 @@ export function cloudFixture(model = cloudModel()) {
       user = null;
       signedOut();
     }),
+    acquireSession: vi.fn(async (_sessionId: string, _takeover = false) => {}),
+    touchSession: vi.fn(async (_sessionId: string) => {}),
+    releaseSession: vi.fn(async (_sessionId: string) => {}),
     onSignedOut: vi.fn((callback: () => void) => {
       signedOut = callback;
       return () => {
@@ -104,12 +107,14 @@ export function cloudFixture(model = cloudModel()) {
       version,
       model: structuredClone(saved),
     })),
-    save: vi.fn(async (expected: number, next: AppState) => {
-      if (expected !== version)
-        throw new CloudError("conflict", "WORKSPACE_CONFLICT");
-      saved = structuredClone(next);
-      return ++version;
-    }),
+    save: vi.fn(
+      async (expected: number, next: AppState, _sessionId: string) => {
+        if (expected !== version)
+          throw new CloudError("conflict", "WORKSPACE_CONFLICT");
+        saved = structuredClone(next);
+        return ++version;
+      }
+    ),
     listAudit: vi.fn<CloudBackend["listAudit"]>(async () => ({
       entries: [],
       nextCursor: null,
@@ -123,7 +128,10 @@ export function cloudFixture(model = cloudModel()) {
     restoreVersion: vi.fn<CloudBackend["restoreVersion"]>(async () => {
       throw new CloudError("invalid", "未配置测试历史版本");
     }),
-    publish: vi.fn(async (_expected: number, _group: "A" | "B") => publication),
+    publish: vi.fn(
+      async (_expected: number, _group: "A" | "B", _sessionId: string) =>
+        publication
+    ),
     readPublication: vi.fn(async (_token: string) => publication.snapshot),
   } satisfies CloudBackend;
   return {

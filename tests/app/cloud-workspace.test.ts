@@ -99,7 +99,7 @@ describe("cloud workspace lifecycle", () => {
     restored.staff[0]!.remark = restored.groups.A.staff[0]!.remark = "restored";
     backend.restoreVersion.mockResolvedValue({ version: 2, model: restored });
     await workspace.restoreVersion("1");
-    expect(backend.restoreVersion).toHaveBeenCalledWith(1, "1");
+    expect(backend.restoreVersion).toHaveBeenCalledWith(1, "1", "test-session");
     expect(workspace.cloudVersion).toBe(2);
     expect(workspace.hasUnsavedChanges).toBe(false);
     expect(cache.read()).toMatchObject({
@@ -236,7 +236,7 @@ describe("cloud workspace lifecycle", () => {
       persistence().recovery
     );
     expect(await workspace.publish()).toEqual(publication);
-    expect(backend.publish).toHaveBeenCalledWith(1, "A");
+    expect(backend.publish).toHaveBeenCalledWith(1, "A", "test-session");
     backend.publish.mockRejectedValueOnce(new Error("offline"));
     await expect(workspace.publish()).rejects.toThrow("offline");
     expect(workspace.cloudVersion).toBe(1);

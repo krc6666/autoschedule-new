@@ -33,6 +33,40 @@ describe("official Supabase SDK adapter", () => {
     return { backend: createSupabaseBackend(config, client), fetcher };
   }
 
+  it("uses server session leases and exposes an active-session error", async () => {
+    const { backend, fetcher } = adapter([
+      { data: { expiresAt: "2026-11-17T00:01:30Z" } },
+      { data: null },
+      { data: null },
+      { data: { code: "P0001", message: "SESSION_ACTIVE" }, status: 400 },
+    ]);
+    await backend.acquireSession("session-one");
+    await backend.touchSession("session-one");
+    await backend.releaseSession("session-one");
+    expect(JSON.parse(String(fetcher.mock.calls[0]![1]!.body))).toEqual({
+      p_session_id: "session-one",
+      p_takeover: false,
+    });
+    await expect(backend.acquireSession("session-two")).rejects.toMatchObject({
+      kind: "session",
+    });
+    expect(String(fetcher.mock.calls[3]![0])).toContain(
+      "/rpc/cloud_acquire_editor_session"
+    );
+  });
+
+  it("passes the lease id to locked workspace writes", async () => {
+    const { backend, fetcher } = adapter([{ data: 2 }]);
+    expect(await backend.save(1, cloudModel(), "session-one")).toBe(2);
+    expect(String(fetcher.mock.calls[0]![0])).toContain(
+      "/rpc/cloud_save_workspace_locked"
+    );
+    expect(JSON.parse(String(fetcher.mock.calls[0]![1]!.body))).toMatchObject({
+      p_expected_version: 1,
+      p_session_id: "session-one",
+    });
+  });
+
   it("sends RPC arguments through the real SDK and preserves explicit empty workspace", async () => {
     const { backend, fetcher } = adapter([
       { data: { version: 0, model: null } },

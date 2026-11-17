@@ -101,6 +101,24 @@ describe("minimal cloud toolbar", () => {
     ).toBe(true);
   });
 
+  it("offers takeover when another editor owns the account session", async () => {
+    const element = await panel({
+      phase: "error",
+      sessionActive: true,
+      message: "此账号已在别处使用",
+    });
+    const handler = vi.fn();
+    element.addEventListener("cloud-command", handler);
+    const takeover = [...element.querySelectorAll("button")].find((button) =>
+      button.textContent?.includes("接管")
+    );
+    expect(takeover).toBeTruthy();
+    takeover!.click();
+    expect((handler.mock.calls[0]![0] as CustomEvent).detail).toEqual({
+      type: "takeover",
+    });
+  });
+
   it("shows the completion time for five seconds and retains the full tooltip afterward", async () => {
     vi.useFakeTimers();
     const at = new Date(2026, 10, 15, 14, 30, 15).getTime();

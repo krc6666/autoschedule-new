@@ -44,7 +44,8 @@ export class CloudWorkspace {
   constructor(
     private readonly backend: CloudBackend,
     remote: { version: number; model: AppState | null },
-    private readonly cache: CloudRecoveryStore
+    private readonly cache: CloudRecoveryStore,
+    private readonly sessionId = "test-session"
   ) {
     this.version = remote.version;
     let initial = remote.model ?? createDefaultState();
@@ -180,7 +181,11 @@ export class CloudWorkspace {
       } catch {
         this.cacheWarning = "本机恢复副本保存失败，请下载副本备份。";
       }
-      const nextVersion = await this.backend.save(this.version, snapshot);
+      const nextVersion = await this.backend.save(
+        this.version,
+        snapshot,
+        this.sessionId
+      );
       this.version = nextVersion;
       this.baseline = workspaceFingerprint(snapshot);
       try {
@@ -206,13 +211,21 @@ export class CloudWorkspace {
           "当前没有可发布的有效班表，请先重新排班。"
         );
       }
-      return this.backend.publish(this.version, model.activeGroupId);
+      return this.backend.publish(
+        this.version,
+        model.activeGroupId,
+        this.sessionId
+      );
     });
   }
 
   async restoreVersion(id: string): Promise<void> {
     return this.run(async () => {
-      const restored = await this.backend.restoreVersion(this.version, id);
+      const restored = await this.backend.restoreVersion(
+        this.version,
+        id,
+        this.sessionId
+      );
       if (this.disposed) return;
       // Only a successful server receipt replaces local edits and the recovery baseline.
       this.version = restored.version;

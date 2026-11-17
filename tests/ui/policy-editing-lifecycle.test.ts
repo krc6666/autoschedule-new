@@ -252,7 +252,8 @@ describe("rules drafts and the cloud shell", () => {
       1,
       expect.objectContaining({
         settings: expect.objectContaining({ maxTodayFatigueDifference: 8 }),
-      })
+      }),
+      expect.any(String)
     );
     expect(panel.state.saveFeedback.phase).toBe("saved");
     expect(warnsOnClose()).toBe(false);

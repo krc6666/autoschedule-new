@@ -152,6 +152,19 @@ export function parsePublicSchedule(value: unknown): PublicSchedule {
 }
 
 function fail(error: { message: string; code?: string }): never {
+  if (
+    error.message.includes("SESSION_ACTIVE") ||
+    error.message.includes("SESSION_EXPIRED") ||
+    error.message.includes("SESSION_REQUIRED") ||
+    error.message.includes("SESSION_INVALID")
+  ) {
+    throw new CloudError(
+      "session",
+      error.message.includes("SESSION_ACTIVE")
+        ? "此账号已在别处使用。可以接管此账号，接管后另一处会停止编辑。"
+        : "编辑会话已失效，请重新获取或接管此账号。"
+    );
+  }
   if (error.message.includes("VERSION_NOT_FOUND"))
     throw new CloudError(
       "invalid",
@@ -227,6 +240,18 @@ export function createSupabaseBackend(
       const { error } = await client.auth.signOut({ scope: "local" });
       if (error) fail(error);
     },
+    async acquireSession(sessionId, takeover = false) {
+      await rpc("cloud_acquire_editor_session", {
+        p_session_id: sessionId,
+        p_takeover: takeover,
+      });
+    },
+    async touchSession(sessionId) {
+      await rpc("cloud_touch_editor_session", { p_session_id: sessionId });
+    },
+    async releaseSession(sessionId) {
+      await rpc("cloud_release_editor_session", { p_session_id: sessionId });
+    },
     onSignedOut(callback) {
       const { data } = client.auth.onAuthStateChange((event) => {
         if (event === "SIGNED_OUT") callback();
@@ -251,11 +276,15 @@ export function createSupabaseBackend(
         model: data.model === null ? null : restoreCloudModel(data.model),
       };
     },
-    async save(expectedVersion, model) {
-      const version = await rpc("cloud_save_workspace", {
-        p_expected_version: expectedVersion,
-        p_model: model,
-      });
+    async save(expectedVersion, model, sessionId) {
+      const version = await rpc(
+        sessionId ? "cloud_save_workspace_locked" : "cloud_save_workspace",
+        {
+          p_expected_version: expectedVersion,
+          p_model: model,
+          ...(sessionId ? { p_session_id: sessionId } : {}),
+        }
+      );
       if (
         !Number.isSafeInteger(version) ||
         Number(version) !== expectedVersion + 1
@@ -275,16 +304,22 @@ export function createSupabaseBackend(
     async listVersions() {
       return parseWorkspaceVersions(await rpc("cloud_list_workspace_versions"));
     },
-    async restoreVersion(expectedVersion, id) {
+    async restoreVersion(expectedVersion, id, sessionId) {
       if (!/^[1-9]\d*$/.test(id))
         throw new CloudError("invalid", "历史版本编号不正确。");
       const model = restoreCloudModel(
         await rpc("cloud_read_workspace_version", { p_version_id: id })
       );
-      const version = await rpc("cloud_restore_workspace_version", {
-        p_expected_version: expectedVersion,
-        p_version_id: id,
-      });
+      const version = await rpc(
+        sessionId
+          ? "cloud_restore_workspace_version_locked"
+          : "cloud_restore_workspace_version",
+        {
+          p_expected_version: expectedVersion,
+          p_version_id: id,
+          ...(sessionId ? { p_session_id: sessionId } : {}),
+        }
+      );
       if (
         !Number.isSafeInteger(version) ||
         Number(version) !== expectedVersion + 1
@@ -303,11 +338,15 @@ export function createSupabaseBackend(
         })
       );
     },
-    async publish(expectedVersion, groupId) {
-      const data = await rpc("cloud_publish_schedule", {
-        p_expected_version: expectedVersion,
-        p_group_id: groupId,
-      });
+    async publish(expectedVersion, groupId, sessionId) {
+      const data = await rpc(
+        sessionId ? "cloud_publish_schedule_locked" : "cloud_publish_schedule",
+        {
+          p_expected_version: expectedVersion,
+          p_group_id: groupId,
+          ...(sessionId ? { p_session_id: sessionId } : {}),
+        }
+      );
       if (!record(data) || typeof data.token !== "string")
         throw new CloudError("invalid", "发布回执不完整。");
       return {

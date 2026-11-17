@@ -18,7 +18,8 @@ export type CloudCommand =
         | "audit"
         | "versions"
         | "workspace";
-    };
+    }
+  | { type: "takeover" };
 
 export interface CloudPanelState {
   phase: "loading" | "login" | "editor" | "error";
@@ -32,6 +33,7 @@ export interface CloudPanelState {
   canImport: boolean;
   cacheWarning: string;
   shareUrl: string;
+  sessionActive?: boolean;
   auditOpen?: boolean;
   versionsOpen?: boolean;
 }
@@ -42,6 +44,7 @@ const FAILURE_LABELS = {
   conflict: "版本冲突",
   invalid: "数据校验未通过",
   unknown: "原因待确认",
+  session: "session active",
 } as const;
 
 export class CloudPanelElement extends LightDomElement {
@@ -306,7 +309,7 @@ export class CloudPanelElement extends LightDomElement {
       }
       ${s.message && (s.phase === "error" || s.phase === "login" || s.notice) ? html`<div class="cloud-panel-notice" role=${s.notice === "error" || s.phase === "error" ? "alert" : "status"}>${s.message}</div>` : null}
       ${s.conflict ? html`<div class="cloud-panel-notice" role="alert">云端版本已变化，编辑已暂停。<button class="btn btn-link btn-sm" ?disabled=${s.busy} @click=${() => this.command({ type: "discard" })}>放弃本机未保存修改，使用云端内容</button></div>` : null}
-      ${s.phase === "error" ? html`<div class="d-flex gap-2 mt-2"><button class="btn btn-outline-secondary btn-sm" ?disabled=${s.busy} @click=${() => this.command({ type: "retry" })}>重新连接</button><button class="btn btn-link btn-sm" ?disabled=${s.busy} @click=${() => this.command({ type: "logout" })}>退出当前登录</button></div>` : null}
+      ${s.phase === "error" ? html`<div class="d-flex gap-2 mt-2">${s.sessionActive ? html`<button class="btn btn-primary btn-sm" ?disabled=${s.busy} @click=${() => this.command({ type: "takeover" })}>接管此账号</button>` : html`<button class="btn btn-outline-secondary btn-sm" ?disabled=${s.busy} @click=${() => this.command({ type: "retry" })}>重新连接</button>`}<button class="btn btn-link btn-sm" ?disabled=${s.busy} @click=${() => this.command({ type: "logout" })}>退出当前登录</button></div>` : null}
     </section>`;
   }
 

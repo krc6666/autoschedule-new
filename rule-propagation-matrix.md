@@ -2659,3 +2659,19 @@ Owner确认：上一班甲10点、乙6点，下一班条件允许时甲6点、�
 | 回归/产物                    | 改前失败；最早/次早/同刻/同班替代岗位、重复重点/跨航班软规则、凌晨/12点/半休/无上午、晚撤/覆盖/KE166、大分支、真实后置改坏拒绝/回退、最终产物独立核对 |
 
 接入核对：输入、所有合法上午choices与同刻selector模型、覆盖后具体最早时间目标、重排requirement、共享方案退步判断、管线原子回退、最终review提交前检查、实际反馈与规则说明均接入。硬安全先清理无效岗位，再保护安全上午基准，避免软偏好阻断整表。人工权限保持，无新增持久化字段或凭证材料。7文件61项定向通过，实际Worker/WASM与安全快照、Store安装、存储恢复及配置/结果Excel字节已验证；匿名JSON/XLSX由独立Python枚举与XML解析核对，3岗全满、值班07:00且晚撤保留。完整npm.cmd run verify退出0：228文件2216项功能、7文件19项性能、类型与生产构建通过；现场仍未验收，finalArtifact保持unverified。任务记录`docs/acceptance/2026-11-17-duty-earliest-morning.json`。不commit/push/部署。
+
+## 2026-11-17：同一账号单编辑会话锁
+
+- 唯一事实源：`autoschedule_editor_sessions` 数据库表及其 RPC；客户端只保存当前标签页的 session id，不能自行判定锁是否有效。
+- 传播清单：登录后的会话获取/接管、心跳、释放、工作区读取、保存、发布、历史恢复、失败回滚、本机 `sessionStorage`、Supabase migration、前端状态与测试。
+- 不变项：公开查看继续只读；工作区版本 CAS 仍是第二道保护；历史/操作记录读取不需要编辑锁；现有云端数据不迁移、不覆盖。
+
+| 路径               | 唯一事实源与消费点                                                           | 验证                                           |
+| ------------------ | ---------------------------------------------------------------------------- | ---------------------------------------------- |
+| 登录/接管          | `cloud_acquire_editor_session`；登录后连接和接管按钮                         | 第二地点收到 `SESSION_ACTIVE`，接管后获得锁    |
+| 心跳/释放          | `cloud_touch_editor_session`、`cloud_release_editor_session`；编辑器生命周期 | 旧 session 心跳/释放无权写入，过期后可重新获取 |
+| 工作区读取         | `cloud_load_workspace`；获取锁后读取                                         | 锁只保护编辑，读操作仍可用                     |
+| 保存/发布/历史恢复 | 带 session id 的写 RPC；旧签名明确拒绝                                       | 接管后的旧写入被拒绝，CAS 冲突仍有效           |
+| 失败回滚           | `CloudWorkspace` 本机恢复副本 + 连接失败关闭编辑器                           | 心跳/网络失败保留恢复副本                      |
+| 持久化/迁移        | `sessionStorage` 标签页 id、Supabase migration                               | 无业务模型/Excel/localStorage 字段迁移         |
+| UI/测试            | `CloudPanelState.sessionActive` 与接管命令                                   | 按钮、状态、端到端连接流程回归                 |

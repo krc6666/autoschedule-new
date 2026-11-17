@@ -1,0 +1,15 @@
+Task: 2026-11-17-single-session-lock
+
+npm.cmd run typecheck
+Result: exit 0.
+
+npm.cmd test -- --maxWorkers=1 --testTimeout=60000
+Result: exit 0; 231 test files and 2234 tests passed.
+
+npm.cmd run test:performance
+Result: exit 0; 7 test files and 19 tests passed.
+
+npm.cmd run build
+Result: exit 0; Vite production build completed. Existing large-chunk and node:module externalization notices remain.
+
+Remote Supabase migration and real browser two-device acceptance: not run from this environment; owner must execute the migration SQL and verify the live flow.
