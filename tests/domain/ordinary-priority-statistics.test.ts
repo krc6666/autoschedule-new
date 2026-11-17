@@ -4,6 +4,56 @@ import { createDefaultState } from "../../src/defaults";
 import { buildOrdinaryPriorityStatistics } from "../../src/domain/statistics/ordinary-priority-statistics";
 
 describe("ordinary priority statistics", () => {
+  it("keeps one date per actual occurrence without inventing dates for numeric corrections", () => {
+    const state = createDefaultState();
+    const person = state.staff.find((p) => p.staffType === "常规")!;
+    state.staff = [person];
+    state.assignments = [];
+    state.settings.ordinaryPriorityPositions = [
+      { airlineCode: "AK", position: "G08" },
+    ];
+    const record = {
+      id: "one",
+      date: "2026-11-02",
+      flightNo: "AK151",
+      position: "G08",
+      staffId: person.id,
+      staffName: person.name,
+      startTime: "08:00",
+      endTime: "10:00",
+      workHours: 2,
+      fatiguePoints: 3,
+      remark: "",
+    };
+    state.history = [record, { ...record, id: "two", flightNo: "AK153" }];
+    state.ordinaryPriorityFrequencyAdjustments = [
+      {
+        month: "2026-11",
+        staffId: person.id,
+        airlineCode: "AK",
+        position: "G08",
+        delta: 3,
+      },
+    ];
+    expect(
+      buildOrdinaryPriorityStatistics(state, "2026-11-18")[0]
+    ).toMatchObject({
+      actualCount: 2,
+      manualCorrection: 3,
+      effectiveCount: 5,
+      dates: ["2026-11-02", "2026-11-02"],
+    });
+    state.history = [];
+    expect(
+      buildOrdinaryPriorityStatistics(state, "2026-11-18")[0]
+    ).toMatchObject({
+      actualCount: 0,
+      manualCorrection: 3,
+      effectiveCount: 3,
+      dates: [],
+    });
+  });
+
   it.each(["常规", "机动督导", "分流", "引导", "行政支援"] as const)(
     "counts the configured supervisor independently of category %s",
     (category) => {
@@ -46,10 +96,12 @@ describe("ordinary priority statistics", () => {
       expect(row.qualified).toBe(true);
       expect(row.actualCount).toBe(1);
       expect(row.effectiveCount).toBe(1);
+      expect(row.dates).toEqual(["2026-07-16"]);
       state.history = [];
       const empty = buildOrdinaryPriorityStatistics(state, "2026-07-18")[0]!;
       expect(empty.qualified).toBe(true);
       expect(empty.effectiveCount).toBe(0);
+      expect(empty.dates).toEqual([]);
     }
   );
 
@@ -138,6 +190,7 @@ describe("ordinary priority statistics", () => {
         qualified: true,
         actualCount: 2,
         effectiveCount: 2,
+        dates: ["2026-07-16", "2026-07-18"],
       });
     }
   );

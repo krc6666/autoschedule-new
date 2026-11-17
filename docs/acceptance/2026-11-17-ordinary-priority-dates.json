@@ -1,0 +1,191 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-17-ordinary-priority-dates",
+  "title": "普通重点岗位次数展开显示承担日期",
+  "startedFrom": "8aa3d6997c8599f59c02ef4a5315ab7737843748",
+  "expectation": {
+    "example": "Owner要求普通重点岗位点击次数后像下方末班重点表一样展开，并明确仅显示日期，不加航班号或岗位文本。",
+    "expected": "点击普通重点次数，原加减及实际/修正说明下展示该人员在所选月份的实际承担日期，沿用末班明细样式和MM-DD格式；切月后日期随统计更新。",
+    "unchanged": "现有次数、计次口径、手工修正、资格、月份独立、A/B隔离、末班表、自动排班、存储和Excel格式保持；不为无记录的数值加减编造日期。",
+    "fallback": "没有已知承担记录时不显示日期列表。人工换人以最终承担人员展示日期，原基础人员不冒认实际承担；当前表替代同日历史，不重复列出同一份当前与历史。"
+  },
+  "testedVersion": "eebb64784611a21d19718f027c7d0e6e2161b8caa10043b7b9702e5b571469d1",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "改前挂载组件两项均因缺日期失败；修复后普通重点日期列表、同日当前替代与最终承担人员测试通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-ordinary-dates-red.txt",
+          "summary": "Before implementation, both mounted UI tests failed because date lists were absent.",
+          "sha256": "cb1c1fd1049a887cb3c96a9c33ab07ecb41050c855bccf1707700ed7178e4d08"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-ordinary-dates-final-tests.txt",
+          "summary": "Nine files and 97 tests passed: date UI, statistics, manual corrections, storage and unchanged late-priority statistics.",
+          "sha256": "134abf0b8f337b9d89719ed38e426adeb627adbeaced742c4140285c2f309bf8"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "summary真实点击展开，沿用末班明细class，只有MM-DD日期；加次数仍发原命令、原月份和岗位。独立解析匿名HTML核对实际日期条数和原汇总。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-ordinary-dates-final-tests.txt",
+          "summary": "Nine files and 97 tests passed: date UI, statistics, manual corrections, storage and unchanged late-priority statistics.",
+          "sha256": "134abf0b8f337b9d89719ed38e426adeb627adbeaced742c4140285c2f309bf8"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-ordinary-dates.html",
+          "summary": "Anonymous mounted statistics HTML after summary click and position filtering.",
+          "sha256": "a92f64b759f12e6650472f55e20963f2747f3eb115a3991db05e21c1d1da60f8"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-ordinary-dates-independent.json",
+          "summary": "Independent HTML parse: three known date occurrences, date-only formatting, counts 3 and 1, original plus/minus buttons and November heading.",
+          "sha256": "cdf74ac50335ae07ff5e450b170ae38df2e8b8041c642402980424e8980a605b"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-ordinary-dates-typecheck.txt",
+          "summary": "npm.cmd run typecheck exited zero.",
+          "sha256": "4b3f7cf1ed06cba39ee3b0608990fffcf42e1ff315949a5353a62ce478a2683c"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "切月、岗位筛选、无资质已有记录、纯数值修正无日期、同日不同航班多次承担保留多项、空记录不显示均通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-ordinary-dates-final-tests.txt",
+          "summary": "Nine files and 97 tests passed: date UI, statistics, manual corrections, storage and unchanged late-priority statistics.",
+          "sha256": "134abf0b8f337b9d89719ed38e426adeb627adbeaced742c4140285c2f309bf8"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-ordinary-dates-boundaries.txt",
+          "summary": "Three files and 20 tests passed: actual Excel counts, historical qualification facts and history/current synchronization.",
+          "sha256": "47a793d4eb6ac8e4066d1522e99fcc5047ae0cb52805142ec93d5069d42be5b0"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "人工换人仅最终人员显示日期，基础人员不冒认；清空后无日期，同日当前覆盖历史不双列；模型更新后重新投影。原历史保存/恢复及Excel回归通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-ordinary-dates-final-tests.txt",
+          "summary": "Nine files and 97 tests passed: date UI, statistics, manual corrections, storage and unchanged late-priority statistics.",
+          "sha256": "134abf0b8f337b9d89719ed38e426adeb627adbeaced742c4140285c2f309bf8"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-ordinary-dates-boundaries.txt",
+          "summary": "Three files and 20 tests passed: actual Excel counts, historical qualification facts and history/current synchronization.",
+          "sha256": "47a793d4eb6ac8e4066d1522e99fcc5047ae0cb52805142ec93d5069d42be5b0"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "not_applicable",
+      "reason": "只读展示，不新增排班、安全或次数规则，不安装assignments，不创建凭证。日期直接从原统计finalRecords投影；人工和次数守卫仍沿原入口，已由相关回归确认。",
+      "evidence": []
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "日期不参与计数/手工加减逻辑，无新schema、持久化或Excel列；末班统计、人工基准和越权、Excel与存储回归保持。查看/筛选/切月不修改输入模型，原PROJECT_MAP哈希保持。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-ordinary-dates-final-tests.txt",
+          "summary": "Nine files and 97 tests passed: date UI, statistics, manual corrections, storage and unchanged late-priority statistics.",
+          "sha256": "134abf0b8f337b9d89719ed38e426adeb627adbeaced742c4140285c2f309bf8"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-ordinary-dates-boundaries.txt",
+          "summary": "Three files and 20 tests passed: actual Excel counts, historical qualification facts and history/current synchronization.",
+          "sha256": "47a793d4eb6ac8e4066d1522e99fcc5047ae0cb52805142ec93d5069d42be5b0"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-ordinary-dates-typecheck.txt",
+          "summary": "npm.cmd run typecheck exited zero.",
+          "sha256": "4b3f7cf1ed06cba39ee3b0608990fffcf42e1ff315949a5353a62ce478a2683c"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-ordinary-dates-build.txt",
+          "summary": "npm.cmd run build exited zero; Vite 7.50 seconds; existing externalization and chunk-size notices retained.",
+          "sha256": "1b680e62b6e8f7b925fa41de7bd929ed6988d38cd0a2e425314437e353c0f058"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-ordinary-dates-verify.txt",
+          "sha256": "0d4fd8a6b016993a2fc791c2cb972fb71caaca3ce47ec06ae29fd978ea7342e8",
+          "summary": "Complete npm.cmd run verify exited zero: 224 functional files / 2196 tests; 7 performance files / 19 tests; typecheck and production build. Single worker; original thresholds."
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "匿名挂载HTML及独立解析已证明日期和原次数/按钮符合期望，生产构建通过；按协作边界未主动打开浏览器，owner尚未刷新真实页面核对，不能用组件测试替代真实页面验收。Owner已授权本次本地提交；真实页面仍待验收，不push或部署。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-ordinary-dates.html",
+          "summary": "Anonymous mounted statistics HTML after summary click and position filtering.",
+          "sha256": "a92f64b759f12e6650472f55e20963f2747f3eb115a3991db05e21c1d1da60f8"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-ordinary-dates-independent.json",
+          "summary": "Independent HTML parse: three known date occurrences, date-only formatting, counts 3 and 1, original plus/minus buttons and November heading.",
+          "sha256": "cdf74ac50335ae07ff5e450b170ae38df2e8b8041c642402980424e8980a605b"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-ordinary-dates-build.txt",
+          "summary": "npm.cmd run build exited zero; Vite 7.50 seconds; existing externalization and chunk-size notices retained.",
+          "sha256": "1b680e62b6e8f7b925fa41de7bd929ed6988d38cd0a2e425314437e353c0f058"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "ordinary-dates-red.txt中2项日期缺失红灯；final-tests.txt中新增交互及领域/周边回归通过。",
+    "laterChanges": "月份选择、岗位筛选、人工换人/清空、同日当前覆盖历史及数值修正可能造成日期错误；9文件97项与边界20项覆盖，并独立核对生成HTML。",
+    "finalArtifact": "ordinary-dates.html为挂载组件summary展开并筛选后的输出，independent.json独立核对3条已知日期、仅日期格式及原次数3/1和按钮；真实页面待owner确认。"
+  },
+  "review": {
+    "missedScope": "盘点UI和statistics-actions两个消费者，UI使用dates，加减入口仍只用原数值；无schema/Excel变化。已验证切月、当前替代、无资格事实及人工基准，真实页面尚未取得证据。",
+    "rootCause": "普通重点投影只保留计数而丢弃已知承担日期，UI展开区未消费日期；现有末班表已有明细样式，复用即可，无需第二套统计判断。",
+    "earlyDetection": "补统计明细前先核对最终人员与基准、月份和同日当前覆盖合同；写summary真实点击及换月失败测试，独立按最终HTML核对条数而不复用统计实现。"
+  },
+  "automaticVerification": {
+    "level": "L4 required pre-commit verify",
+    "focusedFiles": 9,
+    "focusedTests": 97,
+    "boundaryFiles": 3,
+    "boundaryTests": 20,
+    "typecheckExit": 0,
+    "buildExit": 0,
+    "fullTest": "Passed in complete verify.",
+    "performance": "Passed in complete verify with unchanged thresholds.",
+    "verify": "Complete npm.cmd run verify exited zero before commit.",
+    "functionalFiles": 224,
+    "functionalTests": 2196,
+    "performanceFiles": 7,
+    "performanceTests": 19,
+    "verifyExit": 0
+  },
+  "externalActions": {
+    "commit": false,
+    "push": false,
+    "deployment": false,
+    "browserAcceptance": false
+  },
+  "commitValidation": {
+    "authorization": "Owner明确要求commit，仅本地提交本轮普通重点日期改动，排除PROJECT_MAP.md。",
+    "verifyExit": 0,
+    "evidence": {
+      "path": "docs/acceptance/evidence/2026-11-17-ordinary-dates-verify.txt",
+      "sha256": "0d4fd8a6b016993a2fc791c2cb972fb71caaca3ce47ec06ae29fd978ea7342e8",
+      "summary": "Complete npm.cmd run verify exited zero: 224 functional files / 2196 tests; 7 performance files / 19 tests; typecheck and production build. Single worker; original thresholds."
+    },
+    "push": false,
+    "deployment": false,
+    "actualBrowserAcceptance": false
+  }
+}

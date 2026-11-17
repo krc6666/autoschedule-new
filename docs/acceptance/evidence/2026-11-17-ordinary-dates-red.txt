@@ -1,0 +1,55 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+stderr | tests/ui/ordinary-priority-dates.test.ts
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+
+ ❯ tests/ui/ordinary-priority-dates.test.ts (2 tests | 2 failed) 197ms
+     × expands dates only using the late-priority detail style, preserving correction commands and month selection 128ms
+     × uses current final staff instead of the same-date archive and retains actual dates without today's qualification 68ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/ui/ordinary-priority-dates.test.ts > ordinary priority count dates > expands dates only using the late-priority detail style, preserving correction commands and month selection
+AssertionError: expected undefined to be '11-02、11-06' // Object.is equality
+
+- Expected:
+"11-02、11-06"
+
++ Received:
+undefined
+
+ ❯ tests/ui/ordinary-priority-dates.test.ts:37:38
+     35|     await settleLit();
+     36|     expect(detail.open).toBe(true);
+     37|     expect(datesFor(page, first.id)).toBe("11-02、11-06");
+       |                                      ^
+     38|     expect(detail.querySelector("summary")!.textContent!.trim()).toBe(…
+     39|     expect(detail.textContent!.replace(/\s+/g, " ")).toContain("实际 3 ·…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/ui/ordinary-priority-dates.test.ts > ordinary priority count dates > uses current final staff instead of the same-date archive and retains actual dates without today's qualification
+AssertionError: expected undefined to be '11-18' // Object.is equality
+
+- Expected:
+"11-18"
+
++ Received:
+undefined
+
+ ❯ tests/ui/ordinary-priority-dates.test.ts:69:48
+     67|     const page = await mountElement<Page>("autoschedule-statistics-pag…
+     68|     expect(datesFor(page, state.staff[0]!.id)).toBeUndefined();
+     69|     expect(datesFor(page, state.staff[1]!.id)).toBe("11-18");
+       |                                                ^
+     70|     const next = structuredClone(state);
+     71|     next.assignments[0]!.staffId = null;
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed (2)
+   Start at  13:54:14
+   Duration  1.22s (transform 345ms, setup 0ms, import 421ms, tests 197ms, environment 373ms)

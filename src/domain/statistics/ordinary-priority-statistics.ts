@@ -18,6 +18,7 @@ export interface OrdinaryPriorityStatisticsRow {
   actualCount: number;
   manualCorrection: number;
   effectiveCount: number;
+  dates: string[];
   qualificationOverrideCount: number;
   qualificationUnrecordedCount: number;
 }
@@ -87,6 +88,7 @@ export function buildOrdinaryPriorityStatistics(
         actualCount: actual,
         manualCorrection,
         effectiveCount: Math.max(0, actual + manualCorrection),
+        dates: finalRecords.map((record) => record.date),
         qualificationOverrideCount: finalRecords.filter(
           hasQualificationOverride
         ).length,

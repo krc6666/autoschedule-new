@@ -524,6 +524,13 @@ export class StatisticsPageElement extends LightDomElement {
             >实际 ${row.actualCount} · 修正
             ${row.manualCorrection >= 0 ? "+" : ""}${row.manualCorrection}</small
           >
+          ${
+            row.dates.length
+              ? html`<small class="late-priority-detail-list"
+                  >${row.dates.map((date) => date.slice(5)).join("、")}</small
+                >`
+              : ""
+          }
         </div>
       </div>
     </details>`;
