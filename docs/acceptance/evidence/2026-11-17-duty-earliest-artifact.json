@@ -1,0 +1,513 @@
+{
+  "date": "2026-11-17",
+  "input": {
+    "flightSeasonOverrides": {},
+    "staff": [
+      {
+        "id": "p0",
+        "name": "员工0",
+        "staffType": "常规",
+        "teamLeader": false,
+        "cxPreflightQualified": true,
+        "dutyQualified": true,
+        "standbyQualified": true,
+        "nightShift": true,
+        "status": "正常",
+        "remark": ""
+      },
+      {
+        "id": "p1",
+        "name": "员工1",
+        "staffType": "常规",
+        "teamLeader": false,
+        "cxPreflightQualified": true,
+        "dutyQualified": true,
+        "standbyQualified": true,
+        "nightShift": true,
+        "status": "正常",
+        "remark": ""
+      },
+      {
+        "id": "p2",
+        "name": "员工2",
+        "staffType": "常规",
+        "teamLeader": false,
+        "cxPreflightQualified": true,
+        "dutyQualified": true,
+        "standbyQualified": true,
+        "nightShift": true,
+        "status": "正常",
+        "remark": ""
+      }
+    ],
+    "flights": [
+      {
+        "id": "early",
+        "flightNo": "AA101",
+        "startTime": "07:00",
+        "endTime": "10:00",
+        "bookedPassengers": 100,
+        "positions": [],
+        "remark": "到岗08:05"
+      },
+      {
+        "id": "later",
+        "flightNo": "BB102",
+        "startTime": "08:00",
+        "endTime": "11:00",
+        "bookedPassengers": 100,
+        "positions": [],
+        "remark": "到岗08:05"
+      },
+      {
+        "id": "late",
+        "flightNo": "ZZ900",
+        "startTime": "21:00",
+        "endTime": "22:00",
+        "bookedPassengers": 100,
+        "positions": [],
+        "remark": "到岗08:05"
+      }
+    ],
+    "templates": [
+      {
+        "flightNo": "CX937",
+        "startTime": "08:30",
+        "endTime": "10:30",
+        "positions": [
+          "督导",
+          "G20",
+          "G19",
+          "G18",
+          "G17",
+          "G16",
+          "G15",
+          "G14",
+          "G13",
+          "G12"
+        ],
+        "remark": "到岗08:05",
+        "id": "template-flight-cx937"
+      },
+      {
+        "flightNo": "FD573",
+        "startTime": "15:25",
+        "endTime": "17:25",
+        "positions": ["督导/引导", "G10", "G09", "G08", "G07"],
+        "remark": "到岗15:05",
+        "id": "template-flight-fd573"
+      },
+      {
+        "flightNo": "CX931",
+        "startTime": "17:50",
+        "endTime": "19:50",
+        "positions": [
+          "督导",
+          "G20",
+          "G19",
+          "G18",
+          "G17",
+          "G16",
+          "G15",
+          "G14",
+          "G13",
+          "G12"
+        ],
+        "remark": "到岗17:25",
+        "id": "template-flight-cx931"
+      },
+      {
+        "flightNo": "TR121",
+        "startTime": "21:55",
+        "endTime": "23:55",
+        "positions": [
+          "督导",
+          "收费/引导",
+          "H02",
+          "H03",
+          "H04",
+          "H05",
+          "H06",
+          "H07",
+          "H08",
+          "H09"
+        ],
+        "remark": "到岗21:35",
+        "id": "template-flight-tr121"
+      }
+    ],
+    "positionRules": [
+      {
+        "id": "r-early",
+        "flightNo": "AA101",
+        "name": "G01",
+        "category": "常规",
+        "remark": "",
+        "qualifiedStaffIds": ["p0", "p1", "p2"],
+        "manual": false,
+        "fatiguePoints": 1,
+        "minPassengers": 0,
+        "earlyReleaseMinutes": 0
+      },
+      {
+        "id": "r-later",
+        "flightNo": "BB102",
+        "name": "G01",
+        "category": "常规",
+        "remark": "",
+        "qualifiedStaffIds": ["p0", "p1", "p2"],
+        "manual": false,
+        "fatiguePoints": 1,
+        "minPassengers": 0,
+        "earlyReleaseMinutes": 0
+      },
+      {
+        "id": "r-late",
+        "flightNo": "ZZ900",
+        "name": "G01",
+        "category": "常规",
+        "remark": "",
+        "qualifiedStaffIds": ["p0", "p1", "p2"],
+        "manual": false,
+        "fatiguePoints": 1,
+        "minPassengers": 0,
+        "earlyReleaseMinutes": 0
+      }
+    ],
+    "history": [],
+    "dutyRosterOverrides": [
+      {
+        "date": "2026-11-17",
+        "dutyStaffId": "p0",
+        "cxPreflightStaffId": "p1",
+        "standbyStaffIds": ["p1", "p2"]
+      }
+    ],
+    "latePriorityFrequencyAdjustments": [],
+    "ordinaryPriorityFrequencyAdjustments": [],
+    "assignments": [],
+    "settings": {
+      "maxDailyHours": 12,
+      "historyWindowDays": 7,
+      "nightStart": "22:00",
+      "nightEnd": "06:00",
+      "consecutiveDayPenalty": 5,
+      "highLoadProtectionEnabled": false,
+      "highLoadFatigueThreshold": 4,
+      "highLoadRecoveryMinutes": 360,
+      "remarkedPositionHighLoad": true,
+      "minimumRegularTransitionMinutes": 0,
+      "rollingLoadProtectionEnabled": false,
+      "rollingLoadWindowMinutes": 360,
+      "rollingLoadMaxFatigue": 8,
+      "positionRotationEnabled": true,
+      "sameDayCrossFlightPriorityEnabled": true,
+      "dailyPrimaryPositionUniqueEnabled": false,
+      "tr121H02CooldownWorkdays": 3,
+      "lateShiftRecoveryEnabled": false,
+      "nextWorkdayRecoveryMode": "prefer",
+      "lateShiftEndTime": "23:00",
+      "teamLeaderConcurrentSupervisionMaxOverlapMinutes": 30,
+      "dutyFatiguePoints": 12,
+      "earlyDepartureCutoffTime": "12:00",
+      "earlyDepartureBalanceEnabled": true,
+      "earlyDepartureMaxDifference": 1,
+      "afternoonRestBalanceEnabled": true,
+      "afternoonRestMaxDifference": 1,
+      "afternoonRestStartTime": "12:00",
+      "afternoonRestEndTime": "18:00",
+      "morningStatsStartTime": "06:00",
+      "morningStatsEndTime": "12:00",
+      "eveningStatsStartTime": "18:00",
+      "eveningStatsEndTime": "06:00",
+      "workloadBalanceEnabled": false,
+      "dailyFlightCountBalanceExemptHalfRest": true,
+      "dailyFlightCountBalanceExemptTeamLeaders": true,
+      "maxWorkHoursDifference": 2,
+      "maxTodayFatigueDifference": 4,
+      "adminSupportEnabled": false,
+      "latePriorityFlightNumbers": ["CX937", "FD573", "CX931", "TR121"],
+      "ordinaryPriorityPositions": [],
+      "airlineMixPolicies": [
+        {
+          "id": "airline-mix-fd-ak",
+          "enabled": true,
+          "airlineCodes": ["FD", "AK"]
+        }
+      ],
+      "sameFlightStaffExclusions": [],
+      "positionTransitionPolicies": [],
+      "dutyPositionPriorities": [
+        {
+          "id": "late",
+          "flightNo": "ZZ900",
+          "positionKeyword": "G01",
+          "enabled": true
+        }
+      ],
+      "nextWorkdayRecoveryTargets": [
+        {
+          "id": "recovery-target-cx937-one",
+          "flightNo": "CX937",
+          "positionKeyword": "一号",
+          "enabled": true
+        },
+        {
+          "id": "recovery-target-cx937-control",
+          "flightNo": "CX937",
+          "positionKeyword": "控制",
+          "enabled": true
+        },
+        {
+          "id": "recovery-target-ke166-one",
+          "flightNo": "KE166",
+          "positionKeyword": "一号",
+          "enabled": true
+        }
+      ],
+      "lateShiftRecoveryPositionRules": [
+        {
+          "id": "late-recovery-supervisor",
+          "enabled": true,
+          "flightNo": "",
+          "matchField": "position",
+          "keyword": "督导",
+          "nextWorkdayCutoffTime": ""
+        },
+        {
+          "id": "late-recovery-one",
+          "enabled": true,
+          "flightNo": "",
+          "matchField": "remark",
+          "keyword": "一号",
+          "nextWorkdayCutoffTime": ""
+        },
+        {
+          "id": "late-recovery-declaration",
+          "enabled": true,
+          "flightNo": "",
+          "matchField": "remark",
+          "keyword": "申报",
+          "nextWorkdayCutoffTime": ""
+        },
+        {
+          "id": "late-recovery-delivery",
+          "enabled": true,
+          "flightNo": "",
+          "matchField": "remark",
+          "keyword": "送资料",
+          "nextWorkdayCutoffTime": ""
+        }
+      ],
+      "mobileSupervisorCoverageRules": [
+        {
+          "id": "supervisor-forbid-one",
+          "enabled": true,
+          "flightNo": "",
+          "matchField": "remark",
+          "keyword": "一号",
+          "mode": "forbid"
+        },
+        {
+          "id": "supervisor-forbid-declare",
+          "enabled": true,
+          "flightNo": "",
+          "matchField": "remark",
+          "keyword": "申报",
+          "mode": "forbid"
+        },
+        {
+          "id": "supervisor-forbid-check",
+          "enabled": true,
+          "flightNo": "",
+          "matchField": "remark",
+          "keyword": "排查",
+          "mode": "forbid"
+        }
+      ],
+      "mobileSupervisorFillRules": [
+        {
+          "id": "ke166-h05-supervisor-fill",
+          "requiresConfirmation": true,
+          "enabled": true,
+          "sourceFlightNo": "KE166",
+          "sourcePositionKeyword": "督导",
+          "targetFlightNo": "KE166",
+          "targetPositionKeyword": "H05",
+          "allowAutomatic": true,
+          "allowManual": true
+        }
+      ],
+      "crossWorkdayQualificationReservations": [],
+      "crossFlightPriorityPolicies": [
+        {
+          "id": "later-first",
+          "flightNo": "BB102",
+          "staffIds": ["p0"],
+          "enabled": true
+        }
+      ],
+      "teamLeaderGapFillPositionPolicies": []
+    }
+  },
+  "result": {
+    "assignments": [
+      {
+        "id": "assignment-mwkca59l-625ge0",
+        "flightId": "early",
+        "flightNo": "AA101",
+        "positionRuleId": "r-early",
+        "position": "G01",
+        "staffId": "p0",
+        "staffName": "员工0",
+        "startTime": "07:00",
+        "endTime": "10:00",
+        "workHours": 3,
+        "fatiguePoints": 1,
+        "remark": "",
+        "manualRemark": "",
+        "status": "assigned",
+        "decisionTrace": [
+          {
+            "ruleId": "duty-position",
+            "stage": "reserved-assignment",
+            "outcome": "selected",
+            "message": "员工0在“值班岗位锁定与下午避排”判断中优先于员工1"
+          }
+        ],
+        "decisionEvidence": {
+          "scheduleRunId": "schedule-run-mwkca52l-thtsp4",
+          "ruleFingerprint": "rules-v3:f5ccb6f9aadb4fa4"
+        }
+      },
+      {
+        "id": "assignment-mwkca59l-c3jfpj",
+        "flightId": "later",
+        "flightNo": "BB102",
+        "positionRuleId": "r-later",
+        "position": "G01",
+        "staffId": "p2",
+        "staffName": "员工2",
+        "startTime": "08:00",
+        "endTime": "11:00",
+        "workHours": 3,
+        "fatiguePoints": 1,
+        "remark": "",
+        "manualRemark": "",
+        "status": "assigned"
+      },
+      {
+        "id": "assignment-mwkca59l-ginife",
+        "flightId": "late",
+        "flightNo": "ZZ900",
+        "positionRuleId": "r-late",
+        "position": "G01",
+        "staffId": "p0",
+        "staffName": "员工0",
+        "startTime": "21:00",
+        "endTime": "22:00",
+        "workHours": 1,
+        "fatiguePoints": 1,
+        "remark": "",
+        "manualRemark": "",
+        "status": "assigned",
+        "decisionTrace": [
+          {
+            "ruleId": "duty-position",
+            "stage": "reserved-assignment",
+            "outcome": "selected",
+            "message": "员工0在“值班岗位锁定与下午避排”判断中优先于员工1"
+          }
+        ],
+        "decisionEvidence": {
+          "scheduleRunId": "schedule-run-mwkca52l-thtsp4",
+          "ruleFingerprint": "rules-v3:f5ccb6f9aadb4fa4"
+        }
+      }
+    ],
+    "unfilledCount": 0,
+    "warnings": [],
+    "safetyCredential": {
+      "kind": "schedule-safety-credential",
+      "phase": "final",
+      "date": "2026-11-17",
+      "assignmentsFingerprint": "credential-v1:aa6579507e02fd6e",
+      "contextFingerprint": "credential-v1:f99ee27900bdc15e",
+      "integrityFingerprint": "credential-v1:50609ea6d3fc4d72"
+    }
+  },
+  "restoredAssignments": [
+    {
+      "id": "assignment-mwkca59l-625ge0",
+      "flightId": "early",
+      "flightNo": "AA101",
+      "positionRuleId": "r-early",
+      "position": "G01",
+      "staffId": "p0",
+      "staffName": "员工0",
+      "startTime": "07:00",
+      "endTime": "10:00",
+      "workHours": 3,
+      "fatiguePoints": 1,
+      "remark": "",
+      "manualRemark": "",
+      "status": "assigned",
+      "decisionTrace": [
+        {
+          "ruleId": "duty-position",
+          "stage": "reserved-assignment",
+          "outcome": "selected",
+          "message": "员工0在“值班岗位锁定与下午避排”判断中优先于员工1"
+        }
+      ],
+      "decisionEvidence": {
+        "scheduleRunId": "schedule-run-mwkca52l-thtsp4",
+        "ruleFingerprint": "rules-v3:f5ccb6f9aadb4fa4"
+      }
+    },
+    {
+      "id": "assignment-mwkca59l-c3jfpj",
+      "flightId": "later",
+      "flightNo": "BB102",
+      "positionRuleId": "r-later",
+      "position": "G01",
+      "staffId": "p2",
+      "staffName": "员工2",
+      "startTime": "08:00",
+      "endTime": "11:00",
+      "workHours": 3,
+      "fatiguePoints": 1,
+      "remark": "",
+      "manualRemark": "",
+      "status": "assigned"
+    },
+    {
+      "id": "assignment-mwkca59l-ginife",
+      "flightId": "late",
+      "flightNo": "ZZ900",
+      "positionRuleId": "r-late",
+      "position": "G01",
+      "staffId": "p0",
+      "staffName": "员工0",
+      "startTime": "21:00",
+      "endTime": "22:00",
+      "workHours": 1,
+      "fatiguePoints": 1,
+      "remark": "",
+      "manualRemark": "",
+      "status": "assigned",
+      "decisionTrace": [
+        {
+          "ruleId": "duty-position",
+          "stage": "reserved-assignment",
+          "outcome": "selected",
+          "message": "员工0在“值班岗位锁定与下午避排”判断中优先于员工1"
+        }
+      ],
+      "decisionEvidence": {
+        "scheduleRunId": "schedule-run-mwkca52l-thtsp4",
+        "ruleFingerprint": "rules-v3:f5ccb6f9aadb4fa4"
+      }
+    }
+  ]
+}

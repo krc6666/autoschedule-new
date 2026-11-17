@@ -1,5 +1,5 @@
 import type { Assignment } from "../../model";
-import { hasDutyMorningAssignment } from "../assignments/duty-assignment";
+import { dutyMorningRegressionReason } from "../assignments/duty-assignment";
 import { applyConfiguredEarlyReleases } from "../assignments/assignment-timing";
 import { diversionTransferCount } from "../assignments/diversion-release-usage";
 import {
@@ -401,12 +401,14 @@ function plannedAssignmentSafetyReasons(
       if (!hasOtherWork) reasons.push("重排会使原人员当日无实际岗位");
     }
   }
-  if (
-    policy.protectDutyMorning &&
-    facts?.currentDutyStaffId &&
-    !hasDutyMorningAssignment(plannedState, planned, facts.currentDutyStaffId)
-  ) {
-    reasons.push("交换后值班人员没有12点前开始的航班");
+  if (policy.protectDutyMorning && facts?.currentDutyStaffId) {
+    const morningReason = dutyMorningRegressionReason(
+      state,
+      assignments,
+      planned,
+      facts.currentDutyStaffId
+    );
+    if (morningReason) reasons.push(morningReason);
   }
   const dutyStaffId = facts?.currentDutyStaffId;
   const afternoonChange = dutyStaffId

@@ -210,8 +210,8 @@ export function orderDailyObjectiveBuckets(
       (objective) => objective.id !== "duty:preferred-morning"
     ),
     ...(coverageBeforeKe166 ? buckets.coverage.slice(2) : buckets.coverage),
-    // A preferred morning counter must not manufacture a vacancy when the
-    // duty worker can keep morning work on another safe counter.
+    // Earliest feasible morning work follows coverage; it never reserves a
+    // particular counter or sacrifices another position just to arrive early.
     ...buckets.duty.filter(
       (objective) => objective.id === "duty:preferred-morning"
     ),

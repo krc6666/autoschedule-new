@@ -6617,7 +6617,7 @@ describe("scheduler domain", { timeout: 15_000 }, () => {
         name: "G17",
         remark: "申报",
         category: "常规",
-        qualifiedStaffIds,
+        qualifiedStaffIds: [otherWorker!.id],
       },
       {
         ...base,

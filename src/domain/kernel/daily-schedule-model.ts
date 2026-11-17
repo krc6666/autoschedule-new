@@ -39,6 +39,7 @@ import type {
 import { durationHours } from "../shared/time";
 import type { SchedulePreparation } from "./schedule-preparation";
 import { buildDutyFlightCountModel } from "./daily-duty-flight-count-model";
+import { buildDutyMorningModel } from "../assignments/duty-morning-model";
 import {
   workloadBalanceLoadSnapshots,
   recentFatigueBalanceApplicable,
@@ -81,7 +82,6 @@ import {
   excludeCandidateForHalfRest,
   halfRestRestrictedStaffIds,
   halfRestPeriodViolation,
-  isHalfRestMorningStart,
   isStrictRecoveryHalfRestBackfill,
 } from "../rules/half-rest";
 
@@ -618,6 +618,7 @@ function staffChoicesForTasks(
 }
 
 function dutyModel(
+  state: ScheduleGenerationFacts,
   preparation: SchedulePreparation,
   staffChoices: readonly DailyScheduleStaffChoice[]
 ): {
@@ -648,14 +649,16 @@ function dutyModel(
         choice.task.key === taskKey && choice.person.id === dutyStaffId
     );
   const constraints: LinearConstraint[] = [];
-  const morningChoices = staffChoices.filter(
-    (choice) =>
-      choice.person.id === dutyStaffId &&
-      isHalfRestMorningStart(choice.task.flight.startTime)
+  const morning = buildDutyMorningModel(
+    state,
+    staffChoices
+      .filter((choice) => choice.person.id === dutyStaffId)
+      .map((choice) => ({
+        id: choice.id,
+        startTime: choice.task.flight.startTime,
+        workHours: choice.workHours,
+      }))
   );
-  const preferredMorningChoice = preparation.preferredDutyMorningTaskKey
-    ? choiceForTask(preparation.preferredDutyMorningTaskKey)
-    : undefined;
   const lateChoices = preparation.preferredDutyLateTaskCandidates.flatMap(
     (task) => {
       const choice = choiceForTask(task.key);
@@ -678,37 +681,12 @@ function dutyModel(
       !dutyTargetTaskKeys.has(choice.task.key)
   );
   return {
-    variables: morningChoices.length
-      ? [{ id: "duty:morning-worked", type: "binary" }]
-      : [],
-    constraints: [
-      ...constraints,
-      ...(morningChoices.length
-        ? [
-            {
-              id: "duty:morning",
-              terms: [
-                { variableId: "duty:morning-worked", coefficient: 1 },
-                ...morningChoices.map((choice) => ({
-                  variableId: choice.id,
-                  coefficient: -1,
-                })),
-              ],
-              upperBound: 0,
-            },
-          ]
-        : []),
-    ],
+    variables: morning.variables,
+    constraints: [...constraints, ...morning.constraints],
     objectives: [
-      ...(morningChoices.length
-        ? [
-            {
-              id: "duty:morning",
-              direction: "maximize" as const,
-              terms: [{ variableId: "duty:morning-worked", coefficient: 1 }],
-            },
-          ]
-        : []),
+      ...morning.objectives.filter(
+        (objective) => objective.id === "duty:morning"
+      ),
       ...(lateChoices.length
         ? [
             {
@@ -721,17 +699,9 @@ function dutyModel(
             },
           ]
         : []),
-      ...(preferredMorningChoice
-        ? [
-            {
-              id: "duty:preferred-morning",
-              direction: "maximize" as const,
-              terms: [
-                { variableId: preferredMorningChoice.id, coefficient: 1 },
-              ],
-            },
-          ]
-        : []),
+      ...morning.objectives.filter(
+        (objective) => objective.id === "duty:preferred-morning"
+      ),
     ],
     reliefObjectives: [
       {
@@ -1713,7 +1683,7 @@ export function buildDailyScheduleModel({
     staffChoices,
     new Set(dailyModelCandidateObjectives.map((objective) => objective.id))
   );
-  const duty = dutyModel(preparation, staffChoices);
+  const duty = dutyModel(state, preparation, staffChoices);
   const halfRest = buildHalfRestOptimizationModel(
     preparation.runFacts.halfRest,
     staffChoices.map((choice) => ({

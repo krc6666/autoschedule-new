@@ -120,7 +120,6 @@ export function buildDutyFlightCountModel(
   // Freeze the minimum extra morning work required by higher-priority coverage.
   // Catch-up may use work outside the configured afternoon, never extra morning
   // work merely to count. Higher-priority coverage can still require duty work.
-  const morningKey = preparation.preferredDutyMorningTaskKey;
   return {
     variables,
     constraints,
@@ -131,10 +130,7 @@ export function buildDutyFlightCountModel(
         direction: "minimize",
         terms: choices
           .filter(
-            (c) =>
-              c.person.id === dutyStaffId &&
-              isPreNoonFlight(c.task.flight) &&
-              c.task.key !== morningKey
+            (c) => c.person.id === dutyStaffId && isPreNoonFlight(c.task.flight)
           )
           .map((c) => ({ variableId: c.id, coefficient: 1 })),
       },

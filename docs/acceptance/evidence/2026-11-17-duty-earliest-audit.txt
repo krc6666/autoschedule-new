@@ -1,0 +1,18 @@
+{
+  "source": "real Worker handler + WASM, Store install, persistence, XLSX export; anonymous fixture",
+  "date": "2026-11-17",
+  "positions": 3,
+  "assigned": 3,
+  "vacancies": 0,
+  "dutyEarliestMinutes": 420,
+  "independentlyOptimalMinutes": 420,
+  "lateDutyRetained": true,
+  "independentQualificationsHoursAndConflicts": "passed",
+  "jsonMatchesPersistence": true,
+  "xlsxMatchesFinalRows": true,
+  "artifactSha256": {
+    ".json": "bce5100faf15846cb5b7bd55ece289f43dd3fabdfa72a9e3c1a6a308b6dfd62c",
+    ".xlsx": "a1ebcd30cab72e07d119cc30ea8ac3fea3c8e94e396ac94923bb32fba354deb5"
+  },
+  "ownerPageAcceptance": "pending; automatic evidence does not replace real page acceptance"
+}

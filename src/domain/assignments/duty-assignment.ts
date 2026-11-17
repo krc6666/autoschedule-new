@@ -14,6 +14,7 @@ import {
   type ScheduleFrequencyFacts,
 } from "../statistics/schedule-frequency";
 import { tr121H02CooldownProfile } from "../rules/tr121-h02-cooldown";
+import { improvesAutomaticRegularCoverage } from "../coverage/automatic-regular-coverage";
 
 function repeatsPriorityPosition(
   state: ScheduleGenerationFacts,
@@ -82,7 +83,7 @@ export const DUTY_MORNING_CUTOFF = "12:00";
 
 export function isDutyMorningFlight(
   target: Pick<Flight, "startTime">,
-  state: ScheduleGenerationFacts
+  state: Pick<ScheduleGenerationFacts, "settings">
 ): boolean {
   const start = timeToMinutes(target.startTime);
   const morningStart = timeToMinutes(state.settings.nightEnd);
@@ -99,13 +100,52 @@ export function hasDutyMorningAssignment(
   assignments: Assignment[],
   dutyStaffId: string
 ): boolean {
-  return assignments.some(
-    (assignment) =>
-      assignment.status === "assigned" &&
-      assignment.staffId === dutyStaffId &&
-      assignment.workHours > 0 &&
-      isDutyMorningFlight({ startTime: assignment.startTime }, state)
-  );
+  return dutyMorningStart(state, assignments, dutyStaffId) !== null;
+}
+
+/** Compare actual arrival times, allowing another counter in the same flight. */
+export function dutyMorningStart(
+  state: Pick<ScheduleGenerationFacts, "flights" | "settings">,
+  assignments: readonly Assignment[],
+  dutyStaffId: string
+): number | null {
+  const starts = assignments.flatMap((assignment) => {
+    if (
+      assignment.status !== "assigned" ||
+      assignment.staffId !== dutyStaffId ||
+      assignment.workHours <= 0
+    )
+      return [];
+    const flight = state.flights.find(
+      (item) => item.id === assignment.flightId
+    );
+    const target = flight ?? assignment;
+    return isDutyMorningFlight(target, state)
+      ? [timeToMinutes(target.startTime)]
+      : [];
+  });
+  return starts.length ? Math.min(...starts) : null;
+}
+
+export const DUTY_MORNING_DELAY_REASON =
+  "调整会推迟值班人员已落实的上午上岗时间";
+
+/** Coverage may improve, but ordinary soft reviews cannot postpone duty work. */
+export function dutyMorningRegressionReason(
+  state: ScheduleGenerationFacts,
+  original: readonly Assignment[],
+  planned: readonly Assignment[],
+  dutyStaffId: string | null
+): string | null {
+  if (!dutyStaffId) return null;
+  const before = dutyMorningStart(state, original, dutyStaffId);
+  if (before === null) return null;
+  const after = dutyMorningStart(state, planned, dutyStaffId);
+  if (after !== null && after <= before) return null;
+  if (improvesAutomaticRegularCoverage(state, original, planned)) return null;
+  return after === null
+    ? "交换后值班人员没有12点前开始的航班"
+    : DUTY_MORNING_DELAY_REASON;
 }
 
 function operationalStartMinutes(
@@ -269,10 +309,10 @@ export function preferredDutyMorningTask(
     )
     .sort(
       (left, right) =>
+        timeToMinutes(left.flight.startTime) -
+          timeToMinutes(right.flight.startTime) ||
         Number(repeatsPriorityPosition(state, left, dutyStaffId, date)) -
           Number(repeatsPriorityPosition(state, right, dutyStaffId, date)) ||
-        timeToMinutes(right.flight.startTime) -
-          timeToMinutes(left.flight.startTime) ||
         left.rule.fatiguePoints - right.rule.fatiguePoints
     )[0];
 }

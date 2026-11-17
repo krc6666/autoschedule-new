@@ -1,0 +1,32 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/domain/duty-earliest-morning.test.ts (7 tests | 1 failed) 488ms
+     × does not let an ordinary review postpone established morning work 12ms
+npm.cmd :
+所在位置 行:2 字符: 1
++ npm.cmd exec vitest -- run tests/domain/duty-earliest-morning.test.ts ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/domain/duty-earliest-morning.test.ts > duty earliest feasible morning > does not let an ordinary review po
+stpone established morning work
+AssertionError: expected [] to include '调整会推迟值班人员已落实的上午上岗时间'
+ ❯ tests/domain/duty-earliest-morning.test.ts:63:21
+     61|       changes: [{ assignmentId: assignments[0]!.id, staffId: "p1" }, {…
+     62|     });
+     63|     expect(reasons).toContain("调整会推迟值班人员已落实的上午上岗时间");
+       |                     ^
+     64|   });
+     65|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 7 passed (8)
+   Start at  14:39:01
+   Duration  2.04s (transform 2.17s, setup 0ms, import 2.58s, tests 721ms, environment 0ms)

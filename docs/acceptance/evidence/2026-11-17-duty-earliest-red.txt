@@ -1,0 +1,86 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/domain/duty-earliest-morning.test.ts (7 tests | 4 failed) 546ms
+     × selects the earliest morning while retaining late duty 247ms
+     × lets a later cross-flight preference yield to earliest duty 106ms
+     × does not let an ordinary review postpone established morning work 6ms
+     × rolls back a real pipeline mutation that moves the duty worker from 07:00 to 08:00 7ms
+npm.cmd :
+所在位置 行:2 字符: 1
++ npm.cmd exec vitest -- run tests/domain/duty-earliest-morning.test.ts ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/domain/duty-earliest-morning.test.ts > duty earliest feasible morning > selects the earliest morning while
+ retaining late duty
+AssertionError: expected 'p2' to be 'p0' // Object.is equality
+
+Expected: "p0"
+Received: "p2"
+
+ ❯ tests/domain/duty-earliest-morning.test.ts:15:77
+     13|     const result = await generateSchedule(state, date);
+     14|     expect(result.unfilledCount).toBe(0);
+     15|     expect(result.assignments.find((a) => a.flightId === "early")?.sta…
+       |                                                                             ^
+     16|     expect(result.assignments.find((a) => a.flightId === "late")?.staf…
+     17|     expect(result.safetyCredential).toBeDefined();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  tests/domain/duty-earliest-morning.test.ts > duty earliest feasible morning > lets a later cross-flight preferen
+ce yield to earliest duty
+AssertionError: expected 'p2' to be 'p0' // Object.is equality
+
+Expected: "p0"
+Received: "p2"
+
+ ❯ tests/domain/duty-earliest-morning.test.ts:25:77
+     23|     const result = await generateSchedule(state, date);
+     24|     expect(result.unfilledCount).toBe(0);
+     25|     expect(result.assignments.find((a) => a.flightId === "early")?.sta…
+       |                                                                             ^
+     26|   });
+     27|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  tests/domain/duty-earliest-morning.test.ts > duty earliest feasible morning > does not let an ordinary review po
+stpone established morning work
+AssertionError: expected [] to include '调整会推迟值班人员已落实的上午上岗时间'
+ ❯ tests/domain/duty-earliest-morning.test.ts:63:21
+     61|       changes: [{ assignmentId: assignments[0]!.id, staffId: "p1" }, {…
+     62|     });
+     63|     expect(reasons).toContain("调整会推迟值班人员已落实的上午上岗时间");
+       |                     ^
+     64|   });
+     65|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  tests/domain/duty-earliest-morning.test.ts > duty earliest feasible morning > rolls back a real pipeline mutatio
+n that moves the duty worker from 07:00 to 08:00
+AssertionError: expected 'p1' to be 'p0' // Object.is equality
+
+Expected: "p0"
+Received: "p1"
+
+ ❯ tests/domain/duty-earliest-morning.test.ts:87:43
+     85|       } },
+     86|     }]);
+     87|     expect(ledger.snapshot()[0]!.staffId).toBe("p0");
+       |                                           ^
+     88|     expect(warnings.join(" ")).toContain("推迟值班人员");
+     89|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed | 3 passed (7)
+   Start at  14:35:36
+   Duration  2.18s (transform 1.24s, setup 0ms, import 1.42s, tests 546ms, environment 0ms)

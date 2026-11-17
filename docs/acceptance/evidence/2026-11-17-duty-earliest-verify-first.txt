@@ -1,0 +1,81 @@
+
+> autoschedule@1.0.0 verify
+> npm run typecheck && npm test && npm run test:performance && npm run build
+
+
+> autoschedule@1.0.0 typecheck
+> tsc -b --pretty false
+
+
+> autoschedule@1.0.0 test
+> vitest run --exclude tests/performance/**
+
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/domain/scheduling-kernel.test.ts (135 tests | 1 failed) 66763ms
+     × allows the duty morning assignment to use a flight starting after 08:30 and before noon 65ms
+npm.cmd : stderr | tests/ui/schedule-policy-view.test.ts
+所在位置 行:2 字符: 32
++ ... KERS = '1'; npm.cmd run verify *> docs/acceptance/evidence/2026-11-17 ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (stderr | tests/...cy-view.test.ts:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+
+ ❯ tests/ui/schedule-policy-view.test.ts (24 tests | 1 failed) 1765ms
+     × shows duty afternoon relief and finds it by its rule name 116ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/domain/scheduling-kernel.test.ts > scheduler domain > allows the duty morning assignment to use a flight s
+tarting after 08:30 and before noon
+AssertionError: expected '2' to be '1' // Object.is equality
+
+Expected: "1"
+Received: "2"
+
+ ❯ tests/domain/scheduling-kernel.test.ts:6647:7
+    6645|     expect(
+    6646|       assignments.find((item) => item.positionRuleId === "ke-counter")…
+    6647|     ).toBe(dutyWorker!.id);
+       |       ^
+    6648|     expect(
+    6649|       assignments.find((item) => item.positionRuleId === "cx-counter")…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/ui/schedule-policy-view.test.ts > rules page > shows duty afternoon relief and finds it by its rule name
+AssertionError: expected '\n                  8\n              …' to contain '按航班开始时间联动下午起止设置'
+
+- Expected
++ Received
+
+- 按航班开始时间联动下午起止设置
++
++                   8
++
++                     优先安排先落实 KE166 督导和值班等指定任务
++
++                   值班岗位锁定与下午避排
++                   始终执行
++                   值班人员优先安排最早可合法排全的上午航班，跨航班优先、普通轮岗和疲劳偏好让路；同班可换柜台，无资格或会造成缺岗时尝试下一班。后续普通调整不能推迟已落实的早班，只有净补空且不产生新空缺时允许让步。保留
+原晚撤任务，只锁定实际晚撤岗位；按航班开始时间联动下午避排，缺员才用值班兜底。比普通参与人员最高航班数少超过1班时，尽量补非下午航班，不为凑数增加上午或下午任务。
++
+
+ ❯ tests/ui/schedule-policy-view.test.ts:125:36
+    123|     ).toBe(false);
+    124|     expect(ruleRow()).toBeDefined();
+    125|     expect(ruleRow()?.textContent).toContain("按航班开始时间联动下午起止设置");
+       |                                    ^
+    126|     expect(ruleRow()?.textContent).toContain("最早可合法排全");
+    127|     expect(ruleRow()?.textContent).toContain("不能推迟已落实的早班");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed | 224 passed (226)
+      Tests  2 failed | 2211 passed (2213)
+   Start at  14:50:08
+   Duration  318.79s (transform 8.11s, setup 0ms, import 47.45s, tests 209.88s, environment 15.56s)

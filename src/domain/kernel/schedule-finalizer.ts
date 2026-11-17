@@ -52,6 +52,10 @@ import { ScheduleGuardError } from "./schedule-guard";
 import type { SchedulePipelineContext } from "./schedule-pipeline";
 import { guardExplanation } from "../shared/schedule-issue-explanation";
 import {
+  dutyMorningRegressionReason,
+  hasDutyMorningAssignment,
+} from "../assignments/duty-assignment";
+import {
   refreshVacancyDiagnostics,
   type VacancyDiagnosticFacts,
 } from "../reviews/vacancy-diagnostics";
@@ -253,7 +257,20 @@ export async function finalizeSchedule({
       ],
     });
   }
+  let dutyMorningBaseline: readonly Assignment[] | null = null;
   const assertFinalSafety = (current: readonly Assignment[]): void => {
+    const morningReason =
+      dutyMorningBaseline &&
+      dutyMorningRegressionReason(
+        state,
+        dutyMorningBaseline,
+        current,
+        runFacts.currentDutyStaffId
+      );
+    if (morningReason)
+      throw new ScheduleGuardError([
+        { ruleId: "duty-position", message: morningReason },
+      ]);
     safetySession.assertAssignmentsSafe(current);
     assertDailyScheduleSafety({
       state,
@@ -289,6 +306,9 @@ export async function finalizeSchedule({
       });
     assertFinalSafety(assignments);
   });
+  // Hard-safety recovery can remove an invalid row. Protect the safe result,
+  // rather than forcing that invalid morning assignment to survive recovery.
+  dutyMorningBaseline = structuredClone(assignments);
   const validateFinalRegularProposal = (proposed: Assignment[]): boolean => {
     if (
       proposed.some(
@@ -337,17 +357,34 @@ export async function finalizeSchedule({
     if (!hook.enabled) continue;
     for (const executor of hook.execute) {
       if (executor.kind !== "final-review") continue;
-      const balancedAssignments = await executor.execute({
-        state,
-        date,
-        assignments,
-        lockedAssignmentIds,
-        halfRestStaffIds: runFacts.halfRest.activeStaffIds,
-        assertSafe: assertFinalSafety,
-        solver,
-        facts: runFacts,
-      });
-      assignments.splice(0, assignments.length, ...balancedAssignments);
+      const before = structuredClone(assignments);
+      const locksBefore = new Set(lockedAssignmentIds);
+      try {
+        const balancedAssignments = await executor.execute({
+          state,
+          date,
+          assignments,
+          lockedAssignmentIds,
+          halfRestStaffIds: runFacts.halfRest.activeStaffIds,
+          assertSafe: assertFinalSafety,
+          solver,
+          facts: runFacts,
+        });
+        assertFinalSafety(balancedAssignments);
+        assignments.splice(0, assignments.length, ...balancedAssignments);
+        dutyMorningBaseline = structuredClone(assignments);
+      } catch (error) {
+        if (!(error instanceof ScheduleGuardError)) throw error;
+        assignments.splice(0, assignments.length, ...before);
+        lockedAssignmentIds.clear();
+        locksBefore.forEach((id) => lockedAssignmentIds.add(id));
+        postReviewWarnings.push(
+          ...error.violations.map(
+            (violation) =>
+              `这一轮调整未采用：${guardExplanation(violation)}已保留调整前的班表。`
+          )
+        );
+      }
     }
   }
   await restoreIndependentMobileSupervisors({
@@ -378,12 +415,7 @@ export async function finalizeSchedule({
   );
   if (
     runFacts.currentDutyStaffId &&
-    !assignments.some(
-      (row) =>
-        row.status === "assigned" &&
-        row.staffId === runFacts.currentDutyStaffId &&
-        isPreNoonFlight(row)
-    )
+    !hasDutyMorningAssignment(state, assignments, runFacts.currentDutyStaffId)
   ) {
     const name =
       state.staff.find((person) => person.id === runFacts.currentDutyStaffId)

@@ -123,6 +123,8 @@ describe("rules page", () => {
     ).toBe(false);
     expect(ruleRow()).toBeDefined();
     expect(ruleRow()?.textContent).toContain("按航班开始时间联动下午起止设置");
+    expect(ruleRow()?.textContent).toContain("最早可合法排全");
+    expect(ruleRow()?.textContent).toContain("不能推迟已落实的早班");
     expect(ruleRow()?.textContent).toContain("缺员才用值班兜底");
     expect(ruleRow()?.textContent).toContain("尽量补非下午航班");
     expect(ruleRow()?.textContent).toContain("不为凑数增加下午任务");

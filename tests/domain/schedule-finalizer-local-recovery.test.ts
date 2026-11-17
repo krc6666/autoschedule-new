@@ -166,6 +166,24 @@ it("adopts a new final schedule with only the now-unqualified row vacant", async
   expect(result.warnings.join("；")).toContain("合格人员名单");
 });
 
+it("allows hard-safety recovery to clear an invalid duty morning row without rejecting the whole schedule", async () => {
+  const { result } = await runFinalizer(({ state }) => {
+    state.staff[0]!.dutyQualified = true;
+    state.dutyRosterOverrides = [
+      {
+        date: "2026-10-14",
+        dutyStaffId: "worker-0",
+        cxPreflightStaffId: null,
+        standbyStaffIds: [null, null],
+      },
+    ];
+    state.positionRules[0]!.qualifiedStaffIds = [];
+  });
+  expect(result.assignments[0]!.status).toBe("unfilled");
+  expect(result.assignments[1]!.staffId).toBe("worker-1");
+  expect(result.warnings.join(" ")).toContain("没有落实12点前");
+});
+
 it("retains the exact rejected supervisor-stage reason on the final vacant row", async () => {
   probe.rejectSupervisor = true;
   try {

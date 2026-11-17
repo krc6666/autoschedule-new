@@ -1,0 +1,157 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-17-duty-earliest-morning",
+  "title": "值班人员优先最早可行上午航班",
+  "startedFrom": "006bb6e0ed81cf89178020c87f4aa189fb627ca4",
+  "expectation": {
+    "example": "同一值班人可合法上7点或9点航班且全部岗位排满时选7点；7点没资格或会抢走其他岗位唯一人选时尝试下一班。同一最早航班允许换柜台。",
+    "expected": "按航班保障开始时间，在nightEnd至12:00前优先选择最早可行上午航班；跨航班优先、普通轮岗、恢复和疲劳偏好让步，后置普通调整不能把已落实的早班改晚。",
+    "unchanged": "人员状态、资格、夜班、半休、时间冲突、最小衔接、工时硬限制，KE166专项、原值班晚撤、下午避排、数量补差与减负、人工权限及数据合同保持。",
+    "fallback": "无资格或导致缺岗时选下一可行上午班；无合法上午岗位允许无岗并提醒。净补原自动常规空岗且无新空缺时允许早班让步，硬安全清理优先；违规后置调整原子回退，不拒绝整表。"
+  },
+  "testedVersion": "7a11e09c508b837652d48f7c97cf416e2a94570b941120906400886091319f74",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "原偏晚初排及真实管线改晚有改前失败、改后通过证据；漏facts红灯已剔除归因。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-duty-earliest-red.txt",
+          "summary": "改前7项4失败3通过；review用例漏facts不作有效红灯，其余初排偏晚、跨航班偏晚、真实管线改晚3项有效复现。",
+          "sha256": "ead179934ed5b49c3e3ba191378758ccd818331b36d0cfab6dab16aba6068e50"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-duty-earliest-expanded.txt",
+          "summary": "7文件61项通过，包含最早/次早/稀缺柜台/覆盖、重复重点、7航班、时间边界、无合法上午、人工权限、真实管线及最终review回退、硬安全清理、重排requirement、Worker/WASM/快照、Store、存储与Excel字节。",
+          "sha256": "824547632d17620317a163794d2eecf02258a14164b3266aa18739182f82de1a"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "可合法完整选择时优先07:00，保留晚撤；普通跨航班优先、疲劳和普通重点轮岗让步。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-duty-earliest-expanded.txt",
+          "summary": "7文件61项通过，包含最早/次早/稀缺柜台/覆盖、重复重点、7航班、时间边界、无合法上午、人工权限、真实管线及最终review回退、硬安全清理、重排requirement、Worker/WASM/快照、Store、存储与Excel字节。",
+          "sha256": "824547632d17620317a163794d2eecf02258a14164b3266aa18739182f82de1a"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-duty-earliest-audit.txt",
+          "summary": "独立Python枚举匿名三航班合法安排，并用标准库解析真实XLSX：3岗全满、最早07:00、晚撤保留、存储与导出一致。",
+          "sha256": "e6f45f40f4934954d24f7655e358adc360084e9f421fdba1cf188fc01fe751c0"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-duty-earliest-verify.txt",
+          "summary": "Windows PowerShell，VITEST_MAX_WORKERS=1，npm.cmd run verify退出0：类型检查、228文件2216项功能（321.36秒）、7文件19项性能（550.49秒）及生产构建（Vite 7.45秒）通过；保留原node:module外部化及大块提示，不据单次结果宣称性能改善。",
+          "sha256": "0a22198bd10d72c8b614d29a648357fecfc272ed2a3a3b729eedbb7ec81b7e80"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "无资格选下一班、覆盖优先、同班换柜台、7航班、nightEnd/12:00边界、零工时、无合法上午与人工权限已验证。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-duty-earliest-expanded.txt",
+          "summary": "7文件61项通过，包含最早/次早/稀缺柜台/覆盖、重复重点、7航班、时间边界、无合法上午、人工权限、真实管线及最终review回退、硬安全清理、重排requirement、Worker/WASM/快照、Store、存储与Excel字节。",
+          "sha256": "824547632d17620317a163794d2eecf02258a14164b3266aa18739182f82de1a"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-duty-earliest-verify.txt",
+          "summary": "Windows PowerShell，VITEST_MAX_WORKERS=1，npm.cmd run verify退出0：类型检查、228文件2216项功能（321.36秒）、7文件19项性能（550.49秒）及生产构建（Vite 7.45秒）通过；保留原node:module外部化及大块提示，不据单次结果宣称性能改善。",
+          "sha256": "0a22198bd10d72c8b614d29a648357fecfc272ed2a3a3b729eedbb7ec81b7e80"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "真实管线与真实finalizer执行器被注入改晚方案时回退，净补空可让步，同刻或提前允许；更晚固定上午不能绕过最早requirement。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-duty-earliest-expanded.txt",
+          "summary": "7文件61项通过，包含最早/次早/稀缺柜台/覆盖、重复重点、7航班、时间边界、无合法上午、人工权限、真实管线及最终review回退、硬安全清理、重排requirement、Worker/WASM/快照、Store、存储与Excel字节。",
+          "sha256": "824547632d17620317a163794d2eecf02258a14164b3266aa18739182f82de1a"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-duty-earliest-verify.txt",
+          "summary": "Windows PowerShell，VITEST_MAX_WORKERS=1，npm.cmd run verify退出0：类型检查、228文件2216项功能（321.36秒）、7文件19项性能（550.49秒）及生产构建（Vite 7.45秒）通过；保留原node:module外部化及大块提示，不据单次结果宣称性能改善。",
+          "sha256": "0a22198bd10d72c8b614d29a648357fecfc272ed2a3a3b729eedbb7ec81b7e80"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "最终review返回改晚方案亦在提交前拒绝并恢复原表；硬安全清理无资格上午岗位仍可局部留空；真实最终凭证及安全快照通过Store安装。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-duty-earliest-expanded.txt",
+          "summary": "7文件61项通过，包含最早/次早/稀缺柜台/覆盖、重复重点、7航班、时间边界、无合法上午、人工权限、真实管线及最终review回退、硬安全清理、重排requirement、Worker/WASM/快照、Store、存储与Excel字节。",
+          "sha256": "824547632d17620317a163794d2eecf02258a14164b3266aa18739182f82de1a"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-duty-earliest-audit.txt",
+          "summary": "独立Python枚举匿名三航班合法安排，并用标准库解析真实XLSX：3岗全满、最早07:00、晚撤保留、存储与导出一致。",
+          "sha256": "e6f45f40f4934954d24f7655e358adc360084e9f421fdba1cf188fc01fe751c0"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-duty-earliest-verify.txt",
+          "summary": "Windows PowerShell，VITEST_MAX_WORKERS=1，npm.cmd run verify退出0：类型检查、228文件2216项功能（321.36秒）、7文件19项性能（550.49秒）及生产构建（Vite 7.45秒）通过；保留原node:module外部化及大块提示，不据单次结果宣称性能改善。",
+          "sha256": "0a22198bd10d72c8b614d29a648357fecfc272ed2a3a3b729eedbb7ec81b7e80"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "完整verify退出0；覆盖原KE166、值班晚撤/下午避排/数量补差/工时、硬安全、人工权限、三个app入口、Worker/WASM、架构边界、Excel与存储回归；仅原上午偏晚前提用例按新合同补正。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-duty-earliest-verify.txt",
+          "summary": "Windows PowerShell，VITEST_MAX_WORKERS=1，npm.cmd run verify退出0：类型检查、228文件2216项功能（321.36秒）、7文件19项性能（550.49秒）及生产构建（Vite 7.45秒）通过；保留原node:module外部化及大块提示，不据单次结果宣称性能改善。",
+          "sha256": "0a22198bd10d72c8b614d29a648357fecfc272ed2a3a3b729eedbb7ec81b7e80"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-duty-earliest-expanded.txt",
+          "summary": "7文件61项通过，包含最早/次早/稀缺柜台/覆盖、重复重点、7航班、时间边界、无合法上午、人工权限、真实管线及最终review回退、硬安全清理、重排requirement、Worker/WASM/快照、Store、存储与Excel字节。",
+          "sha256": "824547632d17620317a163794d2eecf02258a14164b3266aa18739182f82de1a"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "真实Worker/WASM后台入口匿名结果、实际XLSX及独立枚举核对已通过；owner真实页面与实际配置未验收。遵守人复现、机器查代码，不主动打开浏览器。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-duty-earliest-audit.txt",
+          "summary": "独立Python枚举匿名三航班合法安排，并用标准库解析真实XLSX：3岗全满、最早07:00、晚撤保留、存储与导出一致。",
+          "sha256": "e6f45f40f4934954d24f7655e358adc360084e9f421fdba1cf188fc01fe751c0"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-duty-earliest-expanded.txt",
+          "summary": "7文件61项通过，包含最早/次早/稀缺柜台/覆盖、重复重点、7航班、时间边界、无合法上午、人工权限、真实管线及最终review回退、硬安全清理、重排requirement、Worker/WASM/快照、Store、存储与Excel字节。",
+          "sha256": "824547632d17620317a163794d2eecf02258a14164b3266aa18739182f82de1a"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-duty-earliest-artifact.json",
+          "summary": "真实Worker/WASM匿名输入与最终结果，含最终安全凭证及Store保存恢复结果；不是owner现场数据。",
+          "sha256": "bce5100faf15846cb5b7bd55ece289f43dd3fabdfa72a9e3c1a6a308b6dfd62c"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-17-duty-earliest-artifact.xlsx",
+          "summary": "Store安装及保存恢复后生成的本次真实Excel字节，独立XML解析通过；不是owner现场导出。",
+          "sha256": "a1ebcd30cab72e07d119cc30ea8ac3fea3c8e94e396ac94923bb32fba354deb5"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "red.txt记录旧初排及跨航班偏晚、真实后置7点改8点；expanded.txt记录修复后通过。旧review漏facts用例不作为旧实现失败证据。",
+    "laterChanges": "恢复/重点公平/普通轮岗/督导/最终月度均衡/任务集中/航司搭配可能改晚；共享退步事实进入重排requirement、逐阶段事务及final-review提交前检查。expanded.txt包含真实后置改坏回退和硬安全清理。",
+    "finalArtifact": "artifact.json来自真实Worker+WASM最终结果，artifact.xlsx来自Store安装及存储恢复后的真实导出；audit.py独立枚举和XML解析，audit.txt证明匿名夹具07:00最早、3岗全满、晚撤保留。owner页面验收仍缺，不能报告现场验收完成。"
+  },
+  "review": {
+    "missedScope": "检查覆盖小/7航班、同班稀缺柜台、重排requirement、实际管线与最终review、硬安全清理、人工、反馈、Worker/WASM安全快照、Store、存储和Excel；真实页面和owner现场配置仍未验收。旧测试的两处偏晚前提及规则页原说明遗漏已补正。 完整功能与性能门禁现已通过；自动化不替代真实页面。构建原有node:module与大块提示保留，本次未扩展构建调整。",
+    "rootCause": "原上午启发式优先晚班，模型只偏好一个固定柜台，后置仅要求保留任一上午班；仅倒转排序仍会抢稀缺资质，必须比较所有合法岗位的最早开始时间并保护最终结果。",
+    "earlyDetection": "改前先读history快速索引并定位local-vacancy-recovery、flight-balance、值班全天冻结和cross-flight-vacancy-coverage案例；先用失败测试检查同班换柜台、覆盖优先、真实后置和最终产物，不仅改候选排序。"
+  }
+}

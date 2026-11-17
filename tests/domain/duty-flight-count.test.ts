@@ -84,8 +84,8 @@ describe("duty non-afternoon flight count floor", () => {
     const { state } = dutyFlightCountScenario();
     state.flights.find((f) => f.flightNo === "TEST1")!.startTime = "10:00";
     state.flights.find((f) => f.flightNo === "TEST1")!.endTime = "11:00";
-    // The preferred morning target moves to TEST1. TEST0 must be coverable
-    // by the three peers, otherwise coverage itself requires a second morning.
+    // TEST0 is the earliest duty target. Peers can cover TEST1, so catch-up
+    // must not add that second morning flight merely to increase the count.
     state.positionRules = state.positionRules.filter(
       (r) => r.id !== "flight-0-rule-0"
     );
@@ -100,7 +100,7 @@ describe("duty non-afternoon flight count floor", () => {
     expect(result.unfilledCount).toBe(0);
     expect(
       result.assignments.some(
-        (r) => r.staffId === "duty" && r.flightNo === "TEST0"
+        (r) => r.staffId === "duty" && r.flightNo === "TEST1"
       )
     ).toBe(false);
   });

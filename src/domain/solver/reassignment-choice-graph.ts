@@ -1,5 +1,5 @@
 import type { Assignment, Staff } from "../../model";
-import { isDutyMorningFlight } from "../assignments/duty-assignment";
+import { dutyMorningStart } from "../assignments/duty-assignment";
 import { applyConfiguredEarlyReleases } from "../assignments/assignment-timing";
 import {
   diagnoseBaseAssignmentEligibility,
@@ -552,26 +552,36 @@ export function reassignmentChoiceRequirements(
   }
 
   const dutyStaffId = options.facts?.currentDutyStaffId;
+  const morningStart = dutyStaffId
+    ? dutyMorningStart(options.state, options.assignments, dutyStaffId)
+    : null;
+  const fixedMorningStart = dutyStaffId
+    ? dutyMorningStart(options.state, fixed, dutyStaffId)
+    : null;
   if (
     policy.protectDutyMorning &&
     dutyStaffId &&
-    !fixed.some(
-      (assignment) =>
-        assignment.staffId === dutyStaffId &&
-        assignment.status === "assigned" &&
-        assignment.workHours > 0 &&
-        isDutyMorningFlight({ startTime: assignment.startTime }, options.state)
-    )
+    morningStart !== null &&
+    (fixedMorningStart === null || fixedMorningStart > morningStart)
   ) {
     requirements.push({
       id: `duty-morning:${dutyStaffId}`,
-      choiceIds: choices.flatMap(({ choice, assignment }) =>
-        choice.staffId === dutyStaffId &&
-        choice.workHours > 0 &&
-        isDutyMorningFlight({ startTime: assignment.startTime }, options.state)
-          ? [choice.id]
-          : []
-      ),
+      choiceIds: choices.flatMap(({ choice, assignment }) => {
+        if (choice.staffId !== dutyStaffId) return [];
+        const start = dutyMorningStart(
+          options.state,
+          [
+            {
+              ...assignment,
+              staffId: dutyStaffId,
+              workHours: choice.workHours,
+              status: "assigned",
+            },
+          ],
+          dutyStaffId
+        );
+        return start !== null && start <= morningStart ? [choice.id] : [];
+      }),
       minimum: 1,
     });
   }

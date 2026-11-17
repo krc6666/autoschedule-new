@@ -16,6 +16,7 @@ import {
   type ScheduleGuardViolation,
 } from "./schedule-guard";
 import { guardExplanation } from "../shared/schedule-issue-explanation";
+import { dutyMorningRegressionReason } from "../assignments/duty-assignment";
 
 export interface SchedulePipelineContext extends ScheduleMutationContext {
   onProgress?: (stage: ScheduleProgressStage, percent: number) => void;
@@ -82,6 +83,16 @@ export async function runScheduleMutationPlan(
     const locksBefore = new Set(context.lockedAssignmentIds);
     try {
       const proposal = await item.executor.execute(context);
+      const morningReason = dutyMorningRegressionReason(
+        context.state,
+        before,
+        proposal.assignments ?? context.ledger.snapshot(),
+        context.runFacts.currentDutyStaffId
+      );
+      if (morningReason)
+        throw new ScheduleGuardError([
+          { ruleId: "duty-position", message: morningReason },
+        ]);
       if (proposal.assignments) {
         context.ledger.commit({
           type: "replace",

@@ -15,7 +15,7 @@ import {
   dutyAfternoonFlightIds,
   isDutyAfternoonFlight,
 } from "../assignments/duty-afternoon-relief";
-import { durationHours } from "../shared/time";
+import { durationHours, timeToMinutes, normalizeTime } from "../shared/time";
 import type { ScheduleFeedbackOptions } from "./schedule-feedback";
 import { compileSchedulingPlan } from "../rules/scheduling-execution-plan";
 import { recentArchivedWorkdays } from "../statistics/fatigue";
@@ -27,7 +27,7 @@ import {
 import {
   configuredDutyPositionPriority,
   dutyLatePositionPriority,
-  isDutyMorningFlight,
+  dutyMorningStart,
 } from "../assignments/duty-assignment";
 import {
   isLateEndingWork,
@@ -742,11 +742,21 @@ function dutyRosterFeedback(
       assignment.status === "assigned" &&
       assignment.workHours > 0
   );
-  const morningDutyAssignment = dutyAssignments.find((assignment) =>
-    isDutyMorningFlight({ startTime: assignment.startTime }, state)
-  );
+  const morningStart = roster.dutyStaffId
+    ? dutyMorningStart(state, dutyAssignments, roster.dutyStaffId)
+    : null;
+  const morningDutyAssignment =
+    morningStart === null
+      ? undefined
+      : dutyAssignments.find(
+          (assignment) =>
+            timeToMinutes(
+              state.flights.find((flight) => flight.id === assignment.flightId)
+                ?.startTime ?? assignment.startTime
+            ) === morningStart
+        );
   const morningDutyEvidence = morningDutyAssignment
-    ? `${morningDutyText}已安排在 ${morningDutyAssignment.flightNo}/${morningDutyAssignment.position}`
+    ? `${morningDutyText}已安排在 ${morningDutyAssignment.flightNo}/${morningDutyAssignment.position}，实际最早上岗 ${normalizeTime(state.flights.find((flight) => flight.id === morningDutyAssignment.flightId)?.startTime ?? morningDutyAssignment.startTime)}`
     : `${morningDutyText}未安排，需要复核值班人员是否在开始时间严格早于 12:00 的航班上岗`;
   if (!state.flights.length || !dutyAssignments.length) {
     return feedbackItem(
