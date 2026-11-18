@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-19-relaxed-shift-conflicting-starts",
+  "title": "早走均衡忽略归档航班互相冲突的开始时间",
+  "startedFrom": "23dee8d3321571c8dab8f8c97ee2060d2468ebdb",
+  "expectation": {
+    "example": "甲乙各早走一次。甲的同日同航班有 09:00 和 11:00 两个开始时间，乙为 10:00。",
+    "expected": "甲的归档事件仍计一次，时间按未知处理，两条记录的顺序对早走安排没有影响。",
+    "unchanged": "可信的开始时间照常参与次数同样均衡时的比较，末班重点轮换继续优先。配置备份保留原始记录。",
+    "fallback": "不能用时间区分时按已有次数优先级比较，同等方案沿用原安排。"
+  },
+  "testedVersion": "82a2ad7303ac4470e3b0843de546b24a9dafb1ee685027affcfba31e613732f9",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "甲的 09:00 在前时触发交换，11:00 在前时留在分钟样本里。两条原样例的计数相同。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-19-relaxed-shift-conflicting-starts-red.txt",
+          "summary": "正序与逆序各一项预期失败。",
+          "sha256": "320f0e978645d6b859a76fe22597157ec734f45ed994eee088433b401bd12101"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "甲乙各有一个历史及一个当日早走事件。甲冲突的历史时间不进分钟样本，乙可靠的 10:00 仍被读取。两种记录顺序的自动复核结果相同。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-19-relaxed-shift-conflicting-starts-targeted.txt",
+          "summary": "两个归档次序的原班表、计数和分钟样本断言通过。",
+          "sha256": "e766f83cf47836c27c33f2d70d756b584ec55333c1c56a4408bf682c9d28e480"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "两种次序的历史重新归档及历史班表 XLSX 字节回读均将甲的冲突字段留空，并保留乙的可靠时间。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-19-relaxed-shift-conflicting-starts-targeted.txt",
+          "summary": "历史保存与导出双路径通过，原无值与可靠值回归通过。",
+          "sha256": "e766f83cf47836c27c33f2d70d756b584ec55333c1c56a4408bf682c9d28e480"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "最后的自动换人消费同一统计投影。逆序归档不能触发原先由冲突时间引起的换人，原可靠开始时间的交换与反向保护回归通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-19-relaxed-shift-conflicting-starts-targeted.txt",
+          "summary": "两种记录顺序分别跑实际月度复核，最终人员一致。",
+          "sha256": "e766f83cf47836c27c33f2d70d756b584ec55333c1c56a4408bf682c9d28e480"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "原安全拒绝、完整生成零空岗及最终凭证、末班轮换 Worker 回归一同通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-19-relaxed-shift-conflicting-starts-targeted.txt",
+          "summary": "安全拒绝、完整自动排班与 Worker/WASM 定向回归通过。",
+          "sha256": "e766f83cf47836c27c33f2d70d756b584ec55333c1c56a4408bf682c9d28e480"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "可信时点仍用于打平比较，缺值仍计次；原早走、下午空和末班重点轮换测试通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-19-relaxed-shift-conflicting-starts-targeted.txt",
+          "summary": "本次定向验证通过 4 文件 38 项。",
+          "sha256": "e766f83cf47836c27c33f2d70d756b584ec55333c1c56a4408bf682c9d28e480"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-19-relaxed-shift-conflicting-starts-verify.txt",
+          "summary": "两处修复在同一独立副本中通过 npm.cmd run verify，退出码 0。2296 项功能、19 项性能、类型检查及生产构建通过。",
+          "sha256": "45a8685fbe1f46897a802ad690b74327e1737fe03d4ca545c543c5c9e16aa08a"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "已用匿名数据核对实际复核结果和 XLSX 字节，真实排班页面待 Owner 验收。",
+      "evidence": []
+    }
+  },
+  "answers": {
+    "originalFailure": "红测将同一航班的冲突记录调换顺序，捕获多算的分钟样本及因此发生的换人。",
+    "laterChanges": "实际月度复核和历史导出都消费归档，正反顺序分别核对计数、最终分配和导出内容。",
+    "finalArtifact": "定向报告覆盖匿名最终分配和历史 XLSX 回读，真实排班页面证据待验。"
+  },
+  "review": {
+    "missedScope": "历史记录可能多于一个岗位，先去重会遮掉冲突证据。真实班表仍待核对。",
+    "rootCause": "旧月度统计直接使用去重后首条岗位的航班开始时间，历史编辑和导出另走已有的冲突裁决。",
+    "earlyDetection": "修改归档字段或统计投影前，构造同日同航班两条不同开始时间，正序与逆序分别检查计数、后置换人和 Excel 回读。"
+  }
+}

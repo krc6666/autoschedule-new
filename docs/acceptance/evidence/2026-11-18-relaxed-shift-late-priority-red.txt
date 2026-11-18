@@ -1,0 +1,46 @@
+﻿
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/domain/relaxed-shift-balance.test.ts (22 tests | 2 failed | 18 skipped) 257ms
+     × keeps the late supervisor rotation even when swapping would balance early departure counts 19ms
+     × retains the fair late supervisor in the final generated schedule 229ms
+System.Management.Automation.RemoteException
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+System.Management.Automation.RemoteException
+ FAIL  tests/domain/relaxed-shift-balance.test.ts > monthly relaxed shift balance > keeps the late supervisor rotation even when swapping would balance early departure counts
+AssertionError: expected '甲' to be '乙' // Object.is equality
+System.Management.Automation.RemoteException
+Expected: "乙"
+Received: "甲"
+System.Management.Automation.RemoteException
+ ❯ tests/domain/relaxed-shift-balance.test.ts:217:71
+    215|       assertSafe: () => {},
+    216|     });
+    217|     expect(result.find((row) => row.id === supervisor.id)?.staffName).…
+       |                                                                       ^
+    218|     expect(result).toEqual(state.assignments);
+    219|   });
+System.Management.Automation.RemoteException
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+System.Management.Automation.RemoteException
+ FAIL  tests/domain/relaxed-shift-balance.test.ts > monthly relaxed shift balance > retains the fair late supervisor in the final generated schedule
+AssertionError: expected '甲' to be '乙' // Object.is equality
+System.Management.Automation.RemoteException
+Expected: "乙"
+Received: "甲"
+System.Management.Automation.RemoteException
+ ❯ tests/domain/relaxed-shift-balance.test.ts:248:7
+    246|       result.assignments.find((row) => row.positionRuleId === supervis…
+    247|         ?.staffName
+    248|     ).toBe("乙");
+       |       ^
+    249|     expect(result.unfilledCount).toBe(0);
+    250|     expect(result.safetyCredential).toBeDefined();
+System.Management.Automation.RemoteException
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+System.Management.Automation.RemoteException
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 2 passed | 18 skipped (22)
+   Start at  23:29:27
+   Duration  2.70s (transform 1.84s, setup 0ms, import 2.22s, tests 257ms, environment 0ms)

@@ -140,7 +140,121 @@ function balanceFixture(
   });
 }
 
+function latePriorityFixture() {
+  const state = fixture();
+  const earlier = state.assignments[0]!;
+  const lateFlight = state.flights[1]!;
+  Object.assign(lateFlight, {
+    flightNo: "KE160",
+    startTime: "21:55",
+    endTime: "23:55",
+  });
+  const supervisor: Assignment = {
+    ...state.assignments[2]!,
+    flightNo: lateFlight.flightNo,
+    startTime: lateFlight.startTime,
+    endTime: lateFlight.endTime,
+    workHours: 2,
+    position: "督导",
+  };
+  state.staff.forEach((person) => {
+    person.nightShift = true;
+  });
+  state.assignments = [earlier, supervisor];
+  state.positionRules = state.assignments.map((assignment) => ({
+    id: assignment.positionRuleId!,
+    flightNo: assignment.flightNo,
+    name: assignment.position,
+    category: "常规",
+    remark: "",
+    qualifiedStaffIds: state.staff.map((person) => person.id),
+    manual: false,
+    fatiguePoints: assignment.fatiguePoints,
+    minPassengers: 0,
+    earlyReleaseMinutes: 0,
+  }));
+  Object.assign(state.settings, {
+    earlyDepartureBalanceEnabled: true,
+    earlyDepartureCutoffTime: "16:00",
+    earlyDepartureMaxDifference: 0,
+    afternoonRestBalanceEnabled: false,
+    lateShiftEndTime: "23:00",
+    latePriorityFlightNumbers: [lateFlight.flightNo],
+    ordinaryPriorityPositions: [],
+    dailyPrimaryPositionUniqueEnabled: false,
+    lateShiftRecoveryEnabled: false,
+    highLoadProtectionEnabled: false,
+    rollingLoadProtectionEnabled: false,
+    workloadBalanceEnabled: false,
+  });
+  const history = (assignment: Assignment, date: string): HistoryRecord => ({
+    ...assignment,
+    id: `${date}-${assignment.id}`,
+    date,
+    staffId: earlier.staffId!,
+    staffName: earlier.staffName,
+    flightCutoffTime: assignment.endTime,
+  });
+  state.history = [
+    history(earlier, "2026-11-02"),
+    history(earlier, "2026-11-03"),
+    history(supervisor, "2026-11-04"),
+    history(supervisor, "2026-11-05"),
+  ];
+  return { state, date: state.activeScheduleDate!, supervisor };
+}
+
 describe("monthly relaxed shift balance", () => {
+  it("keeps the late supervisor rotation even when swapping would balance early departure counts", () => {
+    const { state, date, supervisor } = latePriorityFixture();
+    const result = balanceRelaxedShifts({
+      state,
+      date,
+      assignments: state.assignments,
+      lockedAssignmentIds: new Set(),
+      assertSafe: () => {},
+    });
+    expect(result.find((row) => row.id === supervisor.id)?.staffName).toBe(
+      "乙"
+    );
+    expect(result).toEqual(state.assignments);
+  });
+
+  it.each(["outside the late scope", "equal late rotation"])(
+    "still improves early departure fairness with %s",
+    (scenario) => {
+      const { state, date, supervisor } = latePriorityFixture();
+      if (scenario === "outside the late scope")
+        state.settings.latePriorityFlightNumbers = [];
+      else
+        state.history = state.history.filter(
+          (row) => row.flightNo !== supervisor.flightNo
+        );
+      const result = balanceRelaxedShifts({
+        state,
+        date,
+        assignments: state.assignments,
+        lockedAssignmentIds: new Set(),
+        assertSafe: () => {},
+      });
+      expect(result.find((row) => row.id === supervisor.id)?.staffName).toBe(
+        "甲"
+      );
+    }
+  );
+
+  it("retains the fair late supervisor in the final generated schedule", async () => {
+    const { state, date, supervisor } = latePriorityFixture();
+    const result = await generateSchedule({ ...state, assignments: [] }, date);
+    expect(
+      result.assignments.find(
+        (row) => row.positionRuleId === supervisor.positionRuleId
+      )?.staffName
+    ).toBe("乙");
+    expect(result.unfilledCount).toBe(0);
+    expect(result.safetyCredential).toBeDefined();
+  });
+
   it("rotates the flight that begins earlier when monthly counts are tied", () => {
     const state = qualityFixture();
     state.settings.relaxedShiftFlightNumbers = [];
@@ -264,6 +378,52 @@ describe("monthly relaxed shift balance", () => {
     ).toEqual([2, 2]);
     expect(balanceFixture(state)).toEqual(state.assignments);
   });
+
+  it.each(["09:00", "11:00"])(
+    "keeps conflicting archived starts neutral when %s comes first",
+    (firstStart) => {
+      const state = qualityFixture();
+      const [earlier, other] = state.history;
+      state.history = [
+        { ...earlier!, flightStartTime: firstStart },
+        {
+          ...earlier!,
+          id: "duplicate",
+          flightStartTime: firstStart === "09:00" ? "11:00" : "09:00",
+        },
+        { ...other!, flightStartTime: "10:00" },
+      ];
+      const date = state.activeScheduleDate!;
+      const report = buildMonthlyRelaxedShiftStatistics(state, date);
+      expect(report.rows.map((row) => row.earlyDepartures.length)).toEqual([
+        2, 2,
+      ]);
+      expect(balanceFixture(state)).toEqual(state.assignments);
+      expect(report.rows.map((row) => row.earlyDepartureStartMinutes)).toEqual([
+        [540],
+        [600, 660],
+      ]);
+
+      const historicalDate = earlier!.date;
+      const history = currentScheduleHistory(state, historicalDate, {
+        preserveArchivedFlightStarts: true,
+      });
+      expect(history.map((row) => row.flightStartTime)).toEqual([
+        undefined,
+        "10:00",
+      ]);
+      const workbook = buildScheduleWorkbook(state, historicalDate, {
+        historicalEdit: true,
+      });
+      const bytes = XLSX.write(workbook, { type: "array", bookType: "xlsx" });
+      expect(
+        parseWorkbook(
+          XLSX.read(bytes, { type: "array" }),
+          state.staff
+        ).history!.map((row) => row.flightStartTime)
+      ).toEqual([undefined, "10:00"]);
+    }
+  );
 
   it("archives the flight start and carries it through Excel bytes and local storage", () => {
     const state = qualityFixture();

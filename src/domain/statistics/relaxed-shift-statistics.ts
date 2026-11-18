@@ -57,23 +57,32 @@ export interface MonthlyRelaxedShiftStatistics {
   }>;
 }
 
-export function archivedFlightStarts(
-  history: readonly HistoryRecord[],
-  date: string
-): ReadonlyMap<string, string> {
-  const starts = new Map<string, string>();
+function archivedFlightStartsByDate(history: readonly HistoryRecord[]) {
+  const startsByDate = new Map<string, Map<string, string>>();
   for (const record of history) {
-    if (record.date !== date || record.historyCoverage === "late-priority-only")
-      continue;
+    if (record.historyCoverage === "late-priority-only") continue;
     const start = normalizeTime(record.flightStartTime ?? "");
     if (!start) continue;
+    const starts = startsByDate.get(record.date) ?? new Map<string, string>();
     const previous = starts.get(record.flightNo);
     starts.set(
       record.flightNo,
       previous === undefined || previous === start ? start : ""
     );
+    startsByDate.set(record.date, starts);
   }
-  return starts;
+  return startsByDate;
+}
+
+export function archivedFlightStarts(
+  history: readonly HistoryRecord[],
+  date: string
+): ReadonlyMap<string, string> {
+  return (
+    archivedFlightStartsByDate(
+      history.filter((record) => record.date === date)
+    ).get(date) ?? new Map()
+  );
 }
 
 function fromAssignment(
@@ -120,7 +129,6 @@ function fromHistory(record: HistoryRecord): ActualTask | null {
     startTime: record.startTime,
     endTime: record.endTime,
     flightCutoffTime: record.flightCutoffTime || record.endTime,
-    flightStartTime: record.flightStartTime,
     attendanceIntervals: record.attendanceIntervals,
     countedForEarlyDeparture: true,
   };
@@ -176,10 +184,11 @@ export function buildMonthlyRelaxedShiftStatistics(
   const month = date.slice(0, 7);
   const activeDate =
     state.activeScheduleDate === date && state.assignments.length ? date : null;
-  const historyTasks = state.history
-    .filter(
-      (record) => record.date.startsWith(month) && record.date !== activeDate
-    )
+  const monthlyHistory = state.history.filter(
+    (record) => record.date.startsWith(month) && record.date !== activeDate
+  );
+  const archivedStarts = archivedFlightStartsByDate(monthlyHistory);
+  const historyTasks = monthlyHistory
     .map(fromHistory)
     .filter((task): task is ActualTask => Boolean(task));
   const activeTasks = activeDate
@@ -222,6 +231,7 @@ export function buildMonthlyRelaxedShiftStatistics(
 
   for (const taskDate of dates) {
     const dailyTasks = tasks.filter((task) => task.date === taskDate);
+    const archivedStartsForDate = archivedStarts.get(taskDate);
     const inAfternoon = (task: { startTime: string; endTime: string }) =>
       overlapsWindow(
         task,
@@ -330,7 +340,9 @@ export function buildMonthlyRelaxedShiftStatistics(
         });
         earlyByStaff.set(staffId, events);
         const flightStart = operationalInterval(
-          lastTask.flightStartTime ?? "",
+          (taskDate === activeDate
+            ? lastTask.flightStartTime
+            : archivedStartsForDate?.get(lastTask.flightNo)) ?? "",
           lastTask.flightCutoffTime,
           state.settings.nightEnd
         )?.[0];

@@ -1,0 +1,75 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/domain/relaxed-shift-balance.test.ts (24 tests | 2 failed | 22 skipped) 30ms
+     × keeps conflicting archived starts neutral when 09:00 comes first 23ms
+     × keeps conflicting archived starts neutral when 11:00 comes first 5ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  tests/domain/relaxed-shift-balance.test.ts > monthly relaxed shift balance > keeps conflicting archived starts neutral when 09:00 comes first
+AssertionError: expected [ { id: 'a0', …(13) }, …(1) ] to deeply equal [ { id: 'a0', …(13) }, …(1) ]
+- Expected
++ Received
+@@ -7,12 +7,12 @@
+      "id": "a0",
+      "manualRemark": "",
+      "position": "P1",
+      "positionRuleId": "a0",
+      "remark": "",
+-     "staffId": "p0",
+-     "staffName": "甲",
++     "staffId": "p1",
++     "staffName": "乙",
+      "startTime": "09:00",
+      "status": "assigned",
+      "workHours": 1,
+    },
+    {
+@@ -23,12 +23,12 @@
+      "id": "p1",
+      "manualRemark": "",
+      "position": "P1",
+      "positionRuleId": "p1",
+      "remark": "",
+-     "staffId": "p1",
+-     "staffName": "乙",
++     "staffId": "p0",
++     "staffName": "甲",
+      "startTime": "11:00",
+      "status": "assigned",
+      "workHours": 1,
+    },
+  ]
+ ❯ tests/domain/relaxed-shift-balance.test.ts:397:37
+    395|         2, 2,
+    396|       ]);
+    397|       expect(balanceFixture(state)).toEqual(state.assignments);
+       |                                     ^
+    398|       expect(report.rows.map((row) => row.earlyDepartureStartMinutes))…
+    399|         [[540], [600, 660]]
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+ FAIL  tests/domain/relaxed-shift-balance.test.ts > monthly relaxed shift balance > keeps conflicting archived starts neutral when 11:00 comes first
+AssertionError: expected [ [ 660, 540 ], [ 600, 660 ] ] to deeply equal [ [ 540 ], [ 600, 660 ] ]
+- Expected
++ Received
+@@ -1,7 +1,8 @@
+  [
+    [
++     660,
+      540,
+    ],
+    [
+      600,
+      660,
+ ❯ tests/domain/relaxed-shift-balance.test.ts:398:72
+    396|       ]);
+    397|       expect(balanceFixture(state)).toEqual(state.assignments);
+    398|       expect(report.rows.map((row) => row.earlyDepartureStartMinutes))…
+       |                                                                        ^
+    399|         [[540], [600, 660]]
+    400|       );
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 22 skipped (24)
+   Start at  00:05:11
+   Duration  2.08s (transform 1.47s, setup 0ms, import 1.83s, tests 30ms, environment 0ms)

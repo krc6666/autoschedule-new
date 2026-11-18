@@ -1,4 +1,5 @@
 import type { Assignment } from "../../model";
+import type { ScheduleRunFacts } from "../shared/schedule-run-facts";
 import type { ScheduleGenerationFacts } from "../shared/scheduling-facts";
 import { buildMonthlyRelaxedShiftStatistics } from "../statistics/relaxed-shift-statistics";
 import {
@@ -12,6 +13,7 @@ import { ScheduleGuardError } from "../kernel/schedule-guard";
 import { dutyAfternoonFlightIds } from "../assignments/duty-afternoon-relief";
 import type { MonthlyRelaxedShiftStatistics } from "../statistics/relaxed-shift-statistics";
 import { preservesWorkloadBalance } from "./workload-balance";
+import { latePriorityFrequencyRegressionReasons } from "./late-priority-frequency-balance";
 import { timeToMinutes } from "../shared/time";
 
 type RelaxedShiftScore = {
@@ -250,6 +252,7 @@ export function balanceRelaxedShifts(options: {
   lockedAssignmentIds: ReadonlySet<string>;
   assertSafe: (assignments: readonly Assignment[]) => void;
   halfRestStaffIds?: ReadonlySet<string>;
+  facts?: ScheduleRunFacts;
 }): Assignment[] {
   const { state, date, lockedAssignmentIds, assertSafe } = options;
   let current = structuredClone([...options.assignments]);
@@ -344,7 +347,14 @@ export function balanceRelaxedShifts(options: {
       !preservesWorkloadBalance(state, date, current, proposal, duty) ||
       (duty !== null &&
         dutyAfternoonFlightIds(state, proposal, duty).size >
-          dutyAfternoonFlightIds(state, current, duty).size)
+          dutyAfternoonFlightIds(state, current, duty).size) ||
+      latePriorityFrequencyRegressionReasons(
+        state,
+        current,
+        proposal,
+        date,
+        options.facts?.scheduleFrequency
+      ).length > 0
     )
       return false;
     try {

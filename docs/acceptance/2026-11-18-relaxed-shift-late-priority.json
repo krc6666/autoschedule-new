@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-18-relaxed-shift-late-priority",
+  "title": "轻松班次均衡保护末班重点岗位轮换",
+  "startedFrom": "23dee8d3321571c8dab8f8c97ee2060d2468ebdb",
+  "expectation": {
+    "example": "甲做过两次末班督导，乙零次。末班本已轮到乙，但乙早走次数更少。",
+    "expected": "跳过把末班换回甲的轻松班次调整，继续寻找兼顾末班轮换的方案。",
+    "unchanged": "沿用现行末班范围、合计与分类比较、轻松班次计次和岗位安全判断。人工调整沿用现行权限与守卫。",
+    "fallback": "没有同时满足两个目标的方案时保留原班表。"
+  },
+  "testedVersion": "555d69cb4842bcacf32fc535185e66583a7d4b0905a4e0f453d53624d378550b",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "修改前，月度复核与完整生成都把末班督导从乙换给了已经做过两次的甲。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-relaxed-shift-late-priority-red.txt",
+          "summary": "2 项预期失败，最终负责人均由乙退步为甲；2 项对照通过。",
+          "sha256": "912c0e791068c4418864aa515b79922026f9df1526fbbe02b7c291654f73f23d"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "末班已合理轮到乙的匿名班表经过月度复核后保持原分配。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-relaxed-shift-late-priority-targeted.txt",
+          "summary": "修后保住末班督导，定向 7 文件 74 项通过。",
+          "sha256": "0bb4373563f0626fd95f1e522e17824f16cba8013415e9ffe2ffe87160d18018"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "末班范围为空或两人末班轮换记录相同时，允许改善早走次数的交换。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-relaxed-shift-late-priority-targeted.txt",
+          "summary": "配置范围及同等轮换两项对照通过。",
+          "sha256": "0bb4373563f0626fd95f1e522e17824f16cba8013415e9ffe2ffe87160d18018"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "从末班已轮给乙的结果出发，实际运行月度均衡，能改善早走的反向交换被拒绝。整班交换与航班组转移经过同一接受点。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-relaxed-shift-late-priority-targeted.txt",
+          "summary": "定向反向候选、早晚集中及航司搭配回归通过。",
+          "sha256": "0bb4373563f0626fd95f1e522e17824f16cba8013415e9ffe2ffe87160d18018"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "匿名完整排班通过真实 HiGHS、后置阶段和最终守卫，最终末班仍为乙，空岗数为零，安全凭证存在。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-relaxed-shift-late-priority-targeted.txt",
+          "summary": "完整排班断言及末班 Worker 回归通过。",
+          "sha256": "0bb4373563f0626fd95f1e522e17824f16cba8013415e9ffe2ffe87160d18018"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "原早走次数、程度、下午空、末班统计及其配置范围通过定向回归。基于开始版本加本次产品与测试改动的独立副本，通过完整验证。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-relaxed-shift-late-priority-targeted.txt",
+          "summary": "原轻松班次和末班频率逻辑、Worker/WASM 与现有 Excel 字节测试通过。",
+          "sha256": "0bb4373563f0626fd95f1e522e17824f16cba8013415e9ffe2ffe87160d18018"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-relaxed-shift-late-priority-verify.txt",
+          "summary": "独立副本 npm.cmd run verify 退出 0。237 文件 2294 项功能、7 文件 19 项性能、类型检查及生产构建通过。",
+          "sha256": "fc472055b57d1ec89679b963a8dfebc0f4f871ab2f8cca28d4d8be914c8d7446"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "自动测试已核对最终匿名班表。真实排班页面待 Owner 验收。",
+      "evidence": []
+    }
+  },
+  "answers": {
+    "originalFailure": "红测中末班已安排给乙，经过月度均衡和完整生成后实际都变成甲。",
+    "laterChanges": "末班轮换后的月度均衡可能再次换人。直接复核和完整生成两层均验证乙保住末班。",
+    "finalArtifact": "自动证据为定向报告中实际生成的匿名最终班表，末班是乙、岗位填满并有凭证。真实页面产物仍待确认。"
+  },
+  "review": {
+    "missedScope": "真实页面仍待验。普通岗位连续轮换及历史航班时间冲突属于另行审查的事项。",
+    "rootCause": "月度轻松班次候选原先直接通过已有安全检查入选，漏用了已有末班轮换退步比较。",
+    "earlyDetection": "修改最后一轮换人之前，先构造末班合计次数、上一工作班承担和轻松班次次数相互冲突的匿名班表，同时验证这个后置阶段和实际完整生成。"
+  }
+}
