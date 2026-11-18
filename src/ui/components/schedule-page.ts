@@ -163,6 +163,7 @@ export class SchedulePageElement extends LightDomElement {
       <autoschedule-daily-staff-flight-statistics
         .model=${this.model}
         .date=${this.date}
+        .historyEdit=${Boolean(this.historyEditDate)}
       ></autoschedule-daily-staff-flight-statistics>
       <autoschedule-schedule-feedback
         .model=${this.model}

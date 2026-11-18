@@ -1,0 +1,97 @@
+{
+  "input": "anonymous overlapStaffingFixture through mountAutoscheduleApp, navigation and Store commands",
+  "checks": {
+    "initial": "重叠航班人手检查： 发现1个重叠时段存在缺岗或机动督导补位；有空闲人员，请展开核对。\n查看时段与空闲人员\n\n空闲仅表示该时段没有岗位；“直接检查通过”按整个目标岗位核对，仍需人工确认完整方案。同一人不能同时补多个岗位，未列出直接人选也不代表换人无解。\n\n09:00—10:00 · AA101、BB102\n\n该时段空闲：员工乙、员工丙、员工丁\n\nAA101/G01：缺岗；直接检查通过：员工乙、员工丙、员工丁",
+    "independent": {
+      "intersection": [540, 600],
+      "idle": ["员工乙", "员工丙", "员工丁"]
+    },
+    "order": true,
+    "mobile": {
+      "fits": true,
+      "visible": true
+    },
+    "afterFill": "重叠航班人手检查： 未发现重叠航班时段的缺岗或机动督导补位。",
+    "supervisorFill": "重叠航班人手检查： 发现1个重叠时段存在缺岗或机动督导补位；有空闲人员，请展开核对。\n查看时段与空闲人员\n\n空闲仅表示该时段没有岗位；“直接检查通过”按整个目标岗位核对，仍需人工确认完整方案。同一人不能同时补多个岗位，未列出直接人选也不代表换人无解。\n\n09:00—10:00 · AA101、BB102\n\n该时段空闲：员工丙、员工丁\n\nAA101/G01：机动督导补位；直接检查通过：员工丙、员工丁",
+    "finalState": {
+      "source": "p1",
+      "halfRest": []
+    },
+    "errors": []
+  },
+  "facts": {
+    "flights": [
+      {
+        "id": "a",
+        "flightNo": "AA101",
+        "startTime": "08:00",
+        "endTime": "10:00",
+        "bookedPassengers": 100,
+        "positions": ["G01"],
+        "remark": ""
+      },
+      {
+        "id": "b",
+        "flightNo": "BB102",
+        "startTime": "09:00",
+        "endTime": "11:00",
+        "bookedPassengers": 100,
+        "positions": ["H01"],
+        "remark": ""
+      }
+    ],
+    "work": [
+      {
+        "id": "t0",
+        "flightId": "a",
+        "flightNo": "AA101",
+        "positionRuleId": "r0",
+        "position": "G01",
+        "staffId": null,
+        "staffName": "",
+        "startTime": "08:00",
+        "endTime": "10:00",
+        "workHours": 2,
+        "fatiguePoints": 1,
+        "remark": "",
+        "manualRemark": "",
+        "status": "unfilled"
+      },
+      {
+        "id": "t1",
+        "flightId": "b",
+        "flightNo": "BB102",
+        "positionRuleId": "r1",
+        "position": "H01",
+        "staffId": "p0",
+        "staffName": "员工甲",
+        "startTime": "09:00",
+        "endTime": "11:00",
+        "workHours": 2,
+        "fatiguePoints": 1,
+        "remark": "",
+        "manualRemark": "",
+        "status": "assigned"
+      }
+    ],
+    "staff": [
+      {
+        "id": "p0",
+        "name": "员工甲"
+      },
+      {
+        "id": "p1",
+        "name": "员工乙"
+      },
+      {
+        "id": "p2",
+        "name": "员工丙"
+      },
+      {
+        "id": "p3",
+        "name": "员工丁"
+      }
+    ]
+  },
+  "status": "passed"
+}

@@ -1,0 +1,162 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-18-overlap-staffing-check",
+  "title": "重叠航班缺岗或督导补位时核对空闲人员",
+  "startedFrom": "bfa29425e64cc6cb488cb826032e42c74fcc1f25",
+  "expectation": {
+    "example": "A航班08:00—10:00、B航班09:00—11:00；A的G01缺岗或由机动督导补位，员工甲09:00—10:00没有其他任务。Owner授权独立按推荐完成并commit；先前三行名单已提交bfa2942。",
+    "expected": "三行名单下新增固定第四行重叠航班人手检查，按实际保障时段正时长重叠扫描，列时段/航班、缺岗或实际督导补位及该时段空闲正常常规人员。逐岗位复用中央硬资格和覆盖重排保护核对，区分空闲与直接检查通过，分队长标注需人工补差；无触发问题也显示结论，人工修改后重算。",
+    "unchanged": "只读，不修改assignments、不自动补岗、不改变规则或优先级；原三行开始时间12点口径、月度统计、半休选择、存储/Excel/Worker/云端不变。历史教训：supervisor-independent-first-2026-11-16、cross-flight-vacancy-coverage-2026-11-16、ke166-failure-details-2026-10-12；空闲不等于合格，检查最终事实不能使用旧诊断。",
+    "fallback": "历史未保存空岗及补位关联，明确无法完整检查，不猜历史；无当前结果或无效时段提示证据不足。低客流/被动人工空白不推断缺员，非重叠不报警；无直接人选不宣称多岗换人无解，保留全部原安排。"
+  },
+  "testedVersion": "13fc7f85235bb7049bc884a7dd252eaee105c41c59e08dd69fe95975bcf8efa7",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "旧提交bfa2942隔离重放最终测试，因缺少领域诊断及UI第四行失败；原UTF-16红灯日志整理损坏后重新录制，来源写入red.txt。当前11文件53项通过。私人班表具体漏排原因未复现，本任务增加核对功能。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-overlap-red.txt",
+          "summary": "旧提交bfa2942隔离重放最终测试：领域模块缺失及2项第四行断言失败；原UTF-16日志整理损坏后重新录制。",
+          "sha256": "4e4d1b434c8f47293d069eebeb953538476df465daf04d6124150dc2fe1eb34d"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-overlap-focused.txt",
+          "summary": "11文件53项领域/UI/架构定向回归通过，含真实Store人工补人后更新。",
+          "sha256": "5f098d4a1c5beda1ed8e37a5ac058f3e9369d7339277ceec6632915a12439cbc"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "两个航班09:00—10:00重叠且缺岗时列乙丙丁空闲；原始起止另按分钟独立核对。实际督导补位即使无空岗仍触发。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-overlap-focused.txt",
+          "summary": "11文件53项领域/UI/架构定向回归通过，含真实Store人工补人后更新。",
+          "sha256": "5f098d4a1c5beda1ed8e37a5ac058f3e9369d7339277ceec6632915a12439cbc"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-overlap-browser.json",
+          "summary": "隔离Chrome真实应用挂载、导航、人工补人、实际督导补位、独立分钟与空闲名单核对、390px和无页面异常均通过。",
+          "sha256": "1833d056cda95e57300ffabd18c399dec7c337161f7d39062cf68b18ad9212ac"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-overlap-desktop.png",
+          "summary": "真实浏览器桌面第四行展开，列重叠时段、缺岗与空闲人员。",
+          "sha256": "7812505bd9084f49261abb376f3688878d40137f7df5961757240346b8323bdb"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "覆盖首尾相接、跨午夜、三航班链、25航班密集名单、低客流/被动人工/引导、无空闲、半休/资格/工时/衔接/严格恢复、完整岗位前后冲突、分队长与历史编辑证据不足。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-overlap-focused.txt",
+          "summary": "11文件53项领域/UI/架构定向回归通过，含真实Store人工补人后更新。",
+          "sha256": "5f098d4a1c5beda1ed8e37a5ac058f3e9369d7339277ceec6632915a12439cbc"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-overlap-verify.txt",
+          "summary": "完整npm.cmd run verify退出0：234文件2260项功能、7文件19项性能、类型检查和生产构建通过；Windows单worker，未改变阈值或原提交钩子。",
+          "sha256": "8d1165b8eadb0a718122da58d53e7036e56a7df3fe4b10bb67ce7f9b015e33aa"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "真实Store人工assignStaff补好后提示立即消失，随后实际补位关联进入模型后提示重新出现；不缓存旧名单，不修改班表，UI长期回归走真实Store。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-overlap-focused.txt",
+          "summary": "11文件53项领域/UI/架构定向回归通过，含真实Store人工补人后更新。",
+          "sha256": "5f098d4a1c5beda1ed8e37a5ac058f3e9369d7339277ceec6632915a12439cbc"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-overlap-browser.json",
+          "summary": "隔离Chrome真实应用挂载、导航、人工补人、实际督导补位、独立分钟与空闲名单核对、390px和无页面异常均通过。",
+          "sha256": "1833d056cda95e57300ffabd18c399dec7c337161f7d39062cf68b18ad9212ac"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "诊断读取最终assignments且只读；直接候选按全目标时段消费中央硬约束及coverage保护，不宣称整表安全或一人可同时补齐多岗。历史/无效时段不冒充无问题。最终DOM与独立分钟核对一致。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-overlap-focused.txt",
+          "summary": "11文件53项领域/UI/架构定向回归通过，含真实Store人工补人后更新。",
+          "sha256": "5f098d4a1c5beda1ed8e37a5ac058f3e9369d7339277ceec6632915a12439cbc"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-overlap-browser.json",
+          "summary": "隔离Chrome真实应用挂载、导航、人工补人、实际督导补位、独立分钟与空闲名单核对、390px和无页面异常均通过。",
+          "sha256": "1833d056cda95e57300ffabd18c399dec7c337161f7d39062cf68b18ad9212ac"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-overlap-final.html",
+          "summary": "真实浏览器最终DOM：无缺岗但有实际机动督导补位仍提示空闲人员。",
+          "sha256": "16e6951df3a8f4e7c31f113777a5ff036402ad1db30839ff00164358a5861813"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "原三行开始时间12点口径、统计/排序/查询及中央规则回归通过；半休选择未变，不新增存储/Excel/Worker/云端字段。完整npm.cmd run verify退出0：234文件2260项功能、7文件19项性能、类型检查和生产构建通过；Windows单worker，未改变阈值或原提交钩子。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-overlap-focused.txt",
+          "summary": "11文件53项领域/UI/架构定向回归通过，含真实Store人工补人后更新。",
+          "sha256": "5f098d4a1c5beda1ed8e37a5ac058f3e9369d7339277ceec6632915a12439cbc"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-overlap-verify.txt",
+          "summary": "完整npm.cmd run verify退出0：234文件2260项功能、7文件19项性能、类型检查和生产构建通过；Windows单worker，未改变阈值或原提交钩子。",
+          "sha256": "8d1165b8eadb0a718122da58d53e7036e56a7df3fe4b10bb67ce7f9b015e33aa"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-overlap-browser.json",
+          "summary": "隔离Chrome真实应用挂载、导航、人工补人、实际督导补位、独立分钟与空闲名单核对、390px和无页面异常均通过。",
+          "sha256": "1833d056cda95e57300ffabd18c399dec7c337161f7d39062cf68b18ad9212ac"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "verified",
+      "reason": "Owner授权独自完成后的本机隔离Chrome匿名真实应用挂载/导航及Store命令输出；桌面/390px、缺岗→人工补好、补位分支均通过。未连接云端，不代表私人班表复现或公网部署。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-overlap-browser.json",
+          "summary": "隔离Chrome真实应用挂载、导航、人工补人、实际督导补位、独立分钟与空闲名单核对、390px和无页面异常均通过。",
+          "sha256": "1833d056cda95e57300ffabd18c399dec7c337161f7d39062cf68b18ad9212ac"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-overlap-desktop.png",
+          "summary": "真实浏览器桌面第四行展开，列重叠时段、缺岗与空闲人员。",
+          "sha256": "7812505bd9084f49261abb376f3688878d40137f7df5961757240346b8323bdb"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-overlap-mobile.png",
+          "summary": "390px窄屏第四行内容完整、无横向溢出。",
+          "sha256": "8641a55642e0c1701927ebc2e7999574f9a64eb478ef465673912d4e6142e40b"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-overlap-final.html",
+          "summary": "真实浏览器最终DOM：无缺岗但有实际机动督导补位仍提示空闲人员。",
+          "sha256": "16e6951df3a8f4e7c31f113777a5ff036402ad1db30839ff00164358a5861813"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "red.txt记录旧实现缺领域诊断和第四行；focused.txt及verify.txt记录改后通过，新功能能发现重叠时段缺岗或实际督导兼任时仍有空闲人员。",
+    "laterChanges": "人工补人、重新安装模型、查询日期和历史编辑可能使提示过期。focused.txt走真实Store并覆盖历史编辑，browser.json核对人工assignStaff后提示消失以及实际补位后重新出现；计算始终从最终事实派生。",
+    "finalArtifact": "browser.json记录实际本机应用及原始匿名输入的独立核对；desktop.png、mobile.png和final.html记录最终用户可见第四行。verify.txt为最终完整门禁证据。"
+  },
+  "review": {
+    "missedScope": "已查当前结果、实际补位、密集/跨午夜/链式重叠、人工更新、无空闲、历史编辑与390px；历史未保存完整关联，明确无法完整检查。直接检查不搜索多人换岗闭环，不代表无解。私人真实班表与公网未复现/部署；其他已有云端资料保留不纳入提交。",
+    "rootCause": "原整天/半天航班名单没有局部重叠人手诊断，无法识别局部闲置或督导兼任掩盖的人手缺口。本次不推断私人漏排算法根因，只增加最终事实核对。开发中夹具缺严格恢复截止和衔接文案断言已修，未放松规则。",
+    "earlyDetection": "改前用两个重叠航班分别构造缺岗、无缺岗但督导实际补位的失败场景；区分空闲与合格，增加全岗位冲突和零工时重新核算反例，最后用真实Store人工补人和独立分钟核对最终DOM。"
+  }
+}

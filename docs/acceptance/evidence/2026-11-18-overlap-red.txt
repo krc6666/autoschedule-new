@@ -1,0 +1,60 @@
+Red evidence replay on old source bfa29425e64cc6cb488cb826032e42c74fcc1f25, using final task tests.
+Original UTF-16 capture was damaged during encoding cleanup and replaced by this actual isolated rerun.
+Exit code: 1 (expected missing feature).
+
+
+ RUN  v4.1.10 C:/Users/19598/AppData/Local/Temp/autoschedule-overlap-red-replay-20261118
+
+stderr | tests/ui/overlap-staffing-check.test.ts
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+
+ ❯ tests/ui/overlap-staffing-check.test.ts (2 tests | 2 failed) 121ms
+     × does not claim that an installed history-edit reconstruction has complete shortage evidence 107ms
+     × adds a fourth row, shows evidence, and recomputes after a manual change 12ms
+ ❯ tests/domain/overlap-staffing-check.test.ts (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/domain/overlap-staffing-check.test.ts [ tests/domain/overlap-staffing-check.test.ts ]
+Error: Cannot find module '../../src/domain/feedback/overlap-staffing-check' imported from C:/Users/19598/AppData/Local/Temp/autoschedule-overlap-red-replay-20261118/tests/domain/overlap-staffing-check.test.ts
+ ❯ tests/domain/overlap-staffing-check.test.ts:2:1
+      1| import { describe, expect, it } from "vitest";
+      2| import { buildOverlapStaffingCheck } from "../../src/domain/feedback/o…
+       | ^
+      3| import { overlapStaffingFixture } from "../helpers/overlap-staffing-fi…
+      4|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/ui/overlap-staffing-check.test.ts > overlap staffing check row > does not claim that an installed history-edit reconstruction has complete shortage evidence
+AssertionError: the given combination of arguments (undefined and string) is invalid for this assertion. You can use an array, a map, an object, a set, a string, or a weakset instead of a string
+ ❯ tests/ui/overlap-staffing-check.test.ts:22:7
+     20|     expect(
+     21|       element.querySelector(".overlap-staffing-check")?.textContent
+     22|     ).toContain("历史未保存空岗和督导补位关联");
+       |       ^
+     23|   });
+     24|   it("adds a fourth row, shows evidence, and recomputes after a manual…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  tests/ui/overlap-staffing-check.test.ts > overlap staffing check row > adds a fourth row, shows evidence, and recomputes after a manual change
+AssertionError: the given combination of arguments (undefined and string) is invalid for this assertion. You can use an array, a map, an object, a set, a string, or a weakset instead of a string
+ ❯ tests/ui/overlap-staffing-check.test.ts:44:35
+     42|     });
+     43|     const fourth = () => element.querySelector(".overlap-staffing-chec…
+     44|     expect(fourth()?.textContent).toContain("重叠航班人手检查");
+       |                                   ^
+     45|     expect(
+     46|       element.querySelector(".daily-staff-flight-availability")
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  2 failed (2)
+   Start at  09:15:29
+   Duration  2.78s (transform 1.48s, setup 0ms, import 1.72s, tests 121ms, environment 389ms)

@@ -1,6 +1,8 @@
 import { html, type PropertyValues } from "lit";
 
 import { buildDailyStaffFlightStatistics } from "../../domain/statistics/daily-staff-flight-statistics";
+import { buildOverlapStaffingCheck } from "../../domain/feedback/overlap-staffing-check";
+import { renderOverlapStaffingCheck } from "./overlap-staffing-check";
 import type { AppState } from "../../model";
 import { LightDomElement } from "./light-dom-element";
 
@@ -10,9 +12,11 @@ export class DailyStaffFlightStatisticsElement extends LightDomElement {
   static override properties = {
     model: { attribute: false },
     date: { type: String },
+    historyEdit: { type: Boolean },
   };
   model!: AppState;
   date = "";
+  historyEdit = false;
   private queryDate = "";
   private sortMode: DailyStaffFlightSort = "desc";
 
@@ -92,6 +96,7 @@ export class DailyStaffFlightStatisticsElement extends LightDomElement {
           </div>`;
         })}
       </div>
+      ${renderOverlapStaffingCheck(buildOverlapStaffingCheck(this.model, statistics.date, this.historyEdit))}
       ${
         statistics.source === "current" || statistics.source === "history"
           ? html`<label class="daily-staff-flight-sort">

@@ -2869,6 +2869,26 @@ autoschedule-previous-schedule-comparison {
   border: 1px solid var(--as-border);
   background: var(--as-surface);
 }
+.overlap-staffing-check {
+  margin: 8px 0;
+  padding: 8px 10px;
+  border: 1px solid var(--as-border);
+  border-radius: 4px;
+  color: var(--as-ink);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.overlap-staffing-check > details {
+  margin-top: 6px;
+}
+.overlap-staffing-check p {
+  margin: 6px 0;
+}
+.overlap-staffing-window {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--as-border);
+}
 .daily-staff-flight-unassigned {
   color: #842029;
   border: 1px solid #f1aeb5;
