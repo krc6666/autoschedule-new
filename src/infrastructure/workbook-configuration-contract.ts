@@ -99,6 +99,10 @@ export function compileWorkbookConfigurationRestore(input: WorkbookImport): {
 } {
   const imported = { ...input, settings: { ...input.settings } };
   const restoreDefaults: string[] = [];
+  if (imported.settings.relaxedShiftFlightNumbers === undefined) {
+    imported.settings.relaxedShiftFlightNumbers = null;
+    restoreDefaults.push("轻松班次航班范围：文件未记录，默认选择可用MF/CX航班");
+  }
   if (imported.settings.airlineMixPolicies === undefined) {
     const definition = STRUCTURED_POLICY_DEFINITIONS.airlineMixPolicies;
     imported.settings.airlineMixPolicies = definition.createDefault();

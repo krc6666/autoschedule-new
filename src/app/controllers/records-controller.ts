@@ -27,6 +27,10 @@ export class RecordsController implements UiCommandController {
   async handle(command: UiCommand): Promise<boolean> {
     const records = this.context.store.getState().records;
     switch (command.type) {
+      case "set-relaxed-shift-flights":
+        if (records.setRelaxedShiftFlights(command.flightNumbers))
+          this.context.commit("轻松班次统计航班已保存");
+        return true;
       case "clear-history":
         if (
           this.context.model().history.length &&

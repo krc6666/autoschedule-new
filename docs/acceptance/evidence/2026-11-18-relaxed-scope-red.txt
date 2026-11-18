@@ -1,0 +1,125 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/infrastructure/relaxed-flight-scope.test.ts (6 tests | 6 failed) 139ms
+   × roundtrips display scope null through actual XLSX and storage 54ms
+   × roundtrips display scope undefined through actual XLSX and storage 19ms
+   × roundtrips display scope "MF8001" through actual XLSX and storage 21ms
+   × preserves missing ordinary import, defaults old complete restore and rejects malformed scopes 26ms
+   × saves from the real controller, isolates groups and keeps rule fingerprints unchanged 5ms
+   × provides the same explicit default in the shipped template and missing persisted fields 12ms
+
+ Test Files  1 failed (1)
+      Tests  6 failed (6)
+   Start at  13:13:43
+   Duration  2.47s (transform 1.73s, setup 0ms, import 2.13s, tests 139ms, environment 0ms)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/infrastructure/relaxed-flight-scope.test.ts > roundtrips display scope null through actual XLSX and storage
+AssertionError: expected undefined to deeply equal null
+
+- Expected:
+null
+
++ Received:
+undefined
+
+ ❯ tests/infrastructure/relaxed-flight-scope.test.ts:20:54
+     18|   source.settings.relaxedShiftFlightNumbers = value;
+     19|   const parsed = parseWorkbook(bytes(buildConfigWorkbook(source)), []);
+     20|   expect(parsed.settings?.relaxedShiftFlightNumbers).toEqual(value);
+       |                                                      ^
+     21|   const target = createDefaultState();
+     22|   applyWorkbookImport(target, parsed, "config");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  tests/infrastructure/relaxed-flight-scope.test.ts > roundtrips display scope undefined through actual XLSX and storage
+AssertionError: expected undefined to deeply equal []
+
+- Expected:
+[]
+
++ Received:
+undefined
+
+ ❯ tests/infrastructure/relaxed-flight-scope.test.ts:20:54
+     18|   source.settings.relaxedShiftFlightNumbers = value;
+     19|   const parsed = parseWorkbook(bytes(buildConfigWorkbook(source)), []);
+     20|   expect(parsed.settings?.relaxedShiftFlightNumbers).toEqual(value);
+       |                                                      ^
+     21|   const target = createDefaultState();
+     22|   applyWorkbookImport(target, parsed, "config");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+ FAIL  tests/infrastructure/relaxed-flight-scope.test.ts > roundtrips display scope "MF8001" through actual XLSX and storage
+AssertionError: expected undefined to deeply equal [ 'MF8001', 'CX937' ]
+
+- Expected:
+[
+  "MF8001",
+  "CX937",
+]
+
++ Received:
+undefined
+
+ ❯ tests/infrastructure/relaxed-flight-scope.test.ts:20:54
+     18|   source.settings.relaxedShiftFlightNumbers = value;
+     19|   const parsed = parseWorkbook(bytes(buildConfigWorkbook(source)), []);
+     20|   expect(parsed.settings?.relaxedShiftFlightNumbers).toEqual(value);
+       |                                                      ^
+     21|   const target = createDefaultState();
+     22|   applyWorkbookImport(target, parsed, "config");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯
+
+ FAIL  tests/infrastructure/relaxed-flight-scope.test.ts > preserves missing ordinary import, defaults old complete restore and rejects malformed scopes
+AssertionError: expected [ 'KEEP1' ] to be null
+
+- Expected:
+null
+
++ Received:
+[
+  "KEEP1",
+]
+
+ ❯ tests/infrastructure/relaxed-flight-scope.test.ts:39:53
+     37|   expect(target.settings.relaxedShiftFlightNumbers).toEqual(["KEEP1"]);
+     38|   applyWorkbookImport(target, imported, "config", { restoreFlightConfi…
+     39|   expect(target.settings.relaxedShiftFlightNumbers).toBeNull();
+       |                                                     ^
+     40|   XLSX.utils.book_append_sheet(book, XLSX.utils.aoa_to_sheet([["选择方式",…
+     41|   const invalid = parseWorkbook(bytes(book), []);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/6]⎯
+
+ FAIL  tests/infrastructure/relaxed-flight-scope.test.ts > saves from the real controller, isolates groups and keeps rule fingerprints unchanged
+TypeError: Cannot read properties of undefined (reading 'loadPreflightDrafts')
+ ❯ new ApplicationCoordinator src/app/application-coordinator.ts:154:45
+    152|   ) {
+    153|     this.preferences = options.preferences;
+    154|     this.preflightDrafts = this.preferences.loadPreflightDrafts?.() ??…
+       |                                             ^
+    155|     this.currentView = initialView(
+    156|       this.preferences,
+ ❯ createTestApplicationCoordinator tests/helpers/application.ts:104:23
+ ❯ tests/infrastructure/relaxed-flight-scope.test.ts:53:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/6]⎯
+
+ FAIL  tests/infrastructure/relaxed-flight-scope.test.ts > provides the same explicit default in the shipped template and missing persisted fields
+AssertionError: expected [ '人员信息', '航班计划', '航班配置', …(21) ] to include '轻松班次航班范围'
+ ❯ tests/infrastructure/relaxed-flight-scope.test.ts:70:31
+     68| it("provides the same explicit default in the shipped template and mis…
+     69|   const template = XLSX.read(readFileSync("public/template/排班工具配置模板.xl…
+     70|   expect(template.SheetNames).toContain(sheetName);
+       |                               ^
+     71|   expect(parseWorkbook(template, []).settings?.relaxedShiftFlightNumbe…
+     72|   const old = createDefaultState();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/6]⎯

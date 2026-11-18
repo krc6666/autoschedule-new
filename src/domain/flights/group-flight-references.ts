@@ -34,6 +34,22 @@ function ruleCollection<T>(
 function collections(settings: ScheduleSettings) {
   return [
     {
+      slots: (settings.relaxedShiftFlightNumbers ?? []).map((value, index) => ({
+        value,
+        write: (next: string) => {
+          settings.relaxedShiftFlightNumbers![index] = next;
+        },
+      })),
+      remove: (flightNo: string) => {
+        if (settings.relaxedShiftFlightNumbers === null) return false;
+        const before = settings.relaxedShiftFlightNumbers;
+        settings.relaxedShiftFlightNumbers = before.filter(
+          (no) => normalizeWeeklyFlightNo(no) !== flightNo
+        );
+        return before.length !== settings.relaxedShiftFlightNumbers.length;
+      },
+    },
+    {
       slots: settings.latePriorityFlightNumbers.map((value, index) => ({
         value,
         write: (next: string) => {

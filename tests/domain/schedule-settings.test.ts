@@ -55,6 +55,7 @@ describe("schedule settings module", () => {
       "sameFlightStaffExclusions",
       "airlineMixPolicies",
       "latePriorityFlightNumbers",
+      "relaxedShiftFlightNumbers",
       "ordinaryPriorityPositions",
     ]);
     const scalarKeys = Object.keys(createDefaultScheduleSettings())

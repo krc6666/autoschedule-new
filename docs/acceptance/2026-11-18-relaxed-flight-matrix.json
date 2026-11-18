@@ -1,0 +1,212 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-18-relaxed-flight-matrix",
+  "title": "轻松班次按可选航班分列，增加下午空与下午休及点击日期",
+  "startedFrom": "5c1cad575e7a9ae55b8ac779dbbecf56ee85f3a5",
+  "expectation": {
+    "example": "已确认：人员为行，MF/CX等完整航班号为可选列；甲最后CX937且满足原提前下班条件，该列计1；下午无实际任务但晚间有任务记下午空；没有开始晚于12点任务记下午休。",
+    "expected": "沿用末班统计表样式、稳定人员顺序、独立选月、数字点击展开MM-DD日期；范围按组持久保存并随配置Excel往返，默认选择可用MF/CX航班。",
+    "unchanged": "原提前下班/下午无航班计次及排班均衡、岗位和人员事实、末班与普通重点统计、人工权限和公开产物不变；展示范围不使班表失效。",
+    "fallback": "0次展开暂无日期；空选择仍展示两项下午统计；无完整历史不猜补；非法导入保留原范围并提示；旧文件缺范围普通导入保留、完整恢复回默认MF/CX。"
+  },
+  "testedVersion": "64d75debf2335bc8a8f0fa67f3d900f0e7feefd54fdc4f459cdcfadfbc44733f",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "有效改前红灯与本次最终全量通过相对应；不把夹具启动失败当业务失败。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-relaxed-matrix-red.txt",
+          "summary": "修改前5项新行为失败：缺航班分列、下午空/休、日期展开和独立月份。",
+          "sha256": "36481fcff4afbce0b76a5bd91841768dcae08b7be4c1e8027f5d516353d230d0"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-relaxed-scope-red.txt",
+          "summary": "Excel字节/旧完整恢复/内置模板缺字段失败；另1项是coordinator夹具漏preferences，不算产品红灯。",
+          "sha256": "72e6f10a2cf91f8566376ed8477583d498f4942340468c3b7d2fe60a201f0f4d"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-relaxed-l2.txt",
+          "summary": "最终类型检查、237文件2282项完整功能及生产构建退出0；单worker，未修改性能门槛。",
+          "sha256": "b590fc884b2045d6b184f43bb1b1f52dbd258509ed5174426e5a7ff07df47232"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-relaxed-commit-verify.txt",
+          "summary": "Owner授权本地提交后完整npm.cmd run verify退出0：237文件2282项功能、7文件19项性能、类型检查和生产构建；原断言/预算不变，单worker。",
+          "sha256": "b5f4bc37a55b620396c92c1c25b3b6d4eef68fee4e3e89140f64ef741a8e74a1"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "人员原顺序、航班×人员次数、下午两项、点击MM-DD日期、0次、默认MF/CX和选月均已验证。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-relaxed-browser.json",
+          "summary": "隔离Chrome真实app入口、Store/controller、浏览器存储、实际Excel上传预览确认；刷新前后每格数值日期、A/B/A、独立切月、人工换人清空后重算、390px与无脚本错误。",
+          "sha256": "4612dd97b9aeee51c132e69c6d92e84c3c722f24411223de39cda0df1a76f907"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-relaxed-independent.json",
+          "summary": "独立Python从匿名任务分钟重算70格数字及日期，直接解压XLSX核对8个范围值，全部一致。",
+          "sha256": "4d9ff9b0dafe364187a4591ff3c8fcea6f4368faa5959124404d6fb8f8f948d4"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-relaxed-l2.txt",
+          "summary": "最终类型检查、237文件2282项完整功能及生产构建退出0；单worker，未修改性能门槛。",
+          "sha256": "b590fc884b2045d6b184f43bb1b1f52dbd258509ed5174426e5a7ff07df47232"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-relaxed-commit-verify.txt",
+          "summary": "Owner授权本地提交后完整npm.cmd run verify退出0：237文件2282项功能、7文件19项性能、类型检查和生产构建；原断言/预算不变，单worker。",
+          "sha256": "b5f4bc37a55b620396c92c1c25b3b6d4eef68fee4e3e89140f64ef741a8e74a1"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "null/空数组/明确范围、旧状态、旧完整恢复、缺表保留、重复/空航班/坏表头、A/B、跨月、不完整历史、零工时出勤、12:00/12:01及18点边界、200人分支、航班改名删除有回归；实际字节与浏览器导入通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-relaxed-l2.txt",
+          "summary": "最终类型检查、237文件2282项完整功能及生产构建退出0；单worker，未修改性能门槛。",
+          "sha256": "b590fc884b2045d6b184f43bb1b1f52dbd258509ed5174426e5a7ff07df47232"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-relaxed-browser.json",
+          "summary": "隔离Chrome真实app入口、Store/controller、浏览器存储、实际Excel上传预览确认；刷新前后每格数值日期、A/B/A、独立切月、人工换人清空后重算、390px与无脚本错误。",
+          "sha256": "4612dd97b9aeee51c132e69c6d92e84c3c722f24411223de39cda0df1a76f907"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-relaxed-template.json",
+          "summary": "原模板24张表942个单元格值/类型/样式不变，仅追加新范围表。",
+          "sha256": "a6131d716ce3acbf2d456e2d5a048df15b4f00ca5d87934b6dad88ac5861c2b2"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-relaxed-commit-verify.txt",
+          "summary": "Owner授权本地提交后完整npm.cmd run verify退出0：237文件2282项功能、7文件19项性能、类型检查和生产构建；原断言/预算不变，单worker。",
+          "sha256": "b5f4bc37a55b620396c92c1c25b3b6d4eef68fee4e3e89140f64ef741a8e74a1"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "最终岗位人工改派及清空、同日当前替换归档后重新统计；刷新后逐格核对数字和日期，没有仅检查设置字段。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-relaxed-browser.json",
+          "summary": "隔离Chrome真实app入口、Store/controller、浏览器存储、实际Excel上传预览确认；刷新前后每格数值日期、A/B/A、独立切月、人工换人清空后重算、390px与无脚本错误。",
+          "sha256": "4612dd97b9aeee51c132e69c6d92e84c3c722f24411223de39cda0df1a76f907"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-relaxed-independent.json",
+          "summary": "独立Python从匿名任务分钟重算70格数字及日期，直接解压XLSX核对8个范围值，全部一致。",
+          "sha256": "4d9ff9b0dafe364187a4591ff3c8fcea6f4368faa5959124404d6fb8f8f948d4"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-relaxed-l2.txt",
+          "summary": "最终类型检查、237文件2282项完整功能及生产构建退出0；单worker，未修改性能门槛。",
+          "sha256": "b590fc884b2045d6b184f43bb1b1f52dbd258509ed5174426e5a7ff07df47232"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-relaxed-commit-verify.txt",
+          "summary": "Owner授权本地提交后完整npm.cmd run verify退出0：237文件2282项功能、7文件19项性能、类型检查和生产构建；原断言/预算不变，单worker。",
+          "sha256": "b5f4bc37a55b620396c92c1c25b3b6d4eef68fee4e3e89140f64ef741a8e74a1"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "不新增候选/求解/覆盖硬约束；最终数字日期由独立原始分钟核对，范围变更不改变规则指纹和安全凭证的长期回归通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-relaxed-l2.txt",
+          "summary": "最终类型检查、237文件2282项完整功能及生产构建退出0；单worker，未修改性能门槛。",
+          "sha256": "b590fc884b2045d6b184f43bb1b1f52dbd258509ed5174426e5a7ff07df47232"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-relaxed-independent.json",
+          "summary": "独立Python从匿名任务分钟重算70格数字及日期，直接解压XLSX核对8个范围值，全部一致。",
+          "sha256": "4d9ff9b0dafe364187a4591ff3c8fcea6f4368faa5959124404d6fb8f8f948d4"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-relaxed-browser.json",
+          "summary": "隔离Chrome真实app入口、Store/controller、浏览器存储、实际Excel上传预览确认；刷新前后每格数值日期、A/B/A、独立切月、人工换人清空后重算、390px与无脚本错误。",
+          "sha256": "4612dd97b9aeee51c132e69c6d92e84c3c722f24411223de39cda0df1a76f907"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-relaxed-commit-verify.txt",
+          "summary": "Owner授权本地提交后完整npm.cmd run verify退出0：237文件2282项功能、7文件19项性能、类型检查和生产构建；原断言/预算不变，单worker。",
+          "sha256": "b5f4bc37a55b620396c92c1c25b3b6d4eef68fee4e3e89140f64ef741a8e74a1"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "原提前下班和下午无航班/均衡、普通与末班重点、保存恢复和整体功能通过；配置导入继续原清空当前班表合同。模板942格不变。Owner授权提交后完整verify退出0，功能、性能、类型和生产构建通过；不推送或部署。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-relaxed-l2.txt",
+          "summary": "最终类型检查、237文件2282项完整功能及生产构建退出0；单worker，未修改性能门槛。",
+          "sha256": "b590fc884b2045d6b184f43bb1b1f52dbd258509ed5174426e5a7ff07df47232"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-relaxed-template.json",
+          "summary": "原模板24张表942个单元格值/类型/样式不变，仅追加新范围表。",
+          "sha256": "a6131d716ce3acbf2d456e2d5a048df15b4f00ca5d87934b6dad88ac5861c2b2"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-relaxed-browser.json",
+          "summary": "隔离Chrome真实app入口、Store/controller、浏览器存储、实际Excel上传预览确认；刷新前后每格数值日期、A/B/A、独立切月、人工换人清空后重算、390px与无脚本错误。",
+          "sha256": "4612dd97b9aeee51c132e69c6d92e84c3c722f24411223de39cda0df1a76f907"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-relaxed-commit-verify.txt",
+          "summary": "Owner授权本地提交后完整npm.cmd run verify退出0：237文件2282项功能、7文件19项性能、类型检查和生产构建；原断言/预算不变，单worker。",
+          "sha256": "b5f4bc37a55b620396c92c1c25b3b6d4eef68fee4e3e89140f64ef741a8e74a1"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "verified",
+      "reason": "Owner已授权全程自主完成；本地隔离Chrome实际mountAutoscheduleApp及原Store/controllers/浏览器保存验收，不替代Owner私人数据或远端现场。桌面/窄屏截图、实际导出XLSX和独立核对闭合本次新功能。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-relaxed-browser.json",
+          "summary": "隔离Chrome真实app入口、Store/controller、浏览器存储、实际Excel上传预览确认；刷新前后每格数值日期、A/B/A、独立切月、人工换人清空后重算、390px与无脚本错误。",
+          "sha256": "4612dd97b9aeee51c132e69c6d92e84c3c722f24411223de39cda0df1a76f907"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-relaxed-desktop.png",
+          "summary": "1440px本次轻松班次航班矩阵与展开日期。",
+          "sha256": "e023c4c7f4215b246bbf282d083c0e4a1496e1f59ddac164158ed3b9c168c258"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-relaxed-mobile.png",
+          "summary": "390px日期展开且页面无横向溢出，沿用末班表移动布局。",
+          "sha256": "10e4a78ec63bd9a536e5386b5cea4af0e205c945db6bee24cf79c46fbf924f5b"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-relaxed-config.xlsx",
+          "summary": "本次真实页面状态导出的匿名配置Excel，包含已选8个完整航班号。",
+          "sha256": "b01d041a70ed7259c8ee80bd2e55351230a1b35c09220f8e1b1c6867fba4f270"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-relaxed-independent.json",
+          "summary": "独立Python从匿名任务分钟重算70格数字及日期，直接解压XLSX核对8个范围值，全部一致。",
+          "sha256": "4d9ff9b0dafe364187a4591ff3c8fcea6f4368faa5959124404d6fb8f8f948d4"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "relaxed-matrix-red.txt保存5项缺新行为失败；scope-red.txt中Excel/默认恢复/模板缺字段为有效红灯（preferences夹具错误单列）；relaxed-l2.txt最终237文件2282项、类型和构建通过。",
+    "laterChanges": "可能改坏来源为人工换人/清空、保存恢复、同日归档覆盖、切月/切组、航班改名/删除、Excel导入。browser.json实际命令验证人工后置刷新与每格重启一致，完整功能含上述边界及凭证/指纹保持；没有更改自动排班后置执行器。",
+    "finalArtifact": "本次browser.json及1440/390截图显示人员×完整航班号、下午空/休和点击日期；config.xlsx为本次页面实际导出，independent.json按匿名原始分钟独立核对70格和8个导出范围。实际文件上传/预览/确认另保留原配置导入清空合同。"
+  },
+  "review": {
+    "missedScope": "已检查范围保存/刷新/A-B/Excel/模板/航班引用/指纹凭证、现有两表样式标识、实际人工后置与独立计数。未操作Owner私人班表、远端或另一台真实设备，不声称这些现场已验收；本地隔离入口是本次已授权新功能验收。",
+    "rootCause": "旧视图只有两类汇总，缺航班维度/可编辑范围/两个新下午含义；原下午无航班已参与排班，直接改口径会改变算法。使用原提前下班事件分列，原统计字段不变，新增只读日期及独立展示范围。",
+    "earlyDetection": "定义表格前先列当前统计消费者与展示/排班分界；增加字段时先对照默认/清洗/组保存/Excel/模板/指纹矩阵；先看12:00、12:01和18:00业务例子，验收时逐格比较刷新前后数字与日期并触发真实人工后置命令。"
+  }
+}

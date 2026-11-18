@@ -73,6 +73,7 @@ const FIELDS: Record<string, string> = {
   positionTransitionPolicies: "岗位衔接规则",
   dutyPositionPriorities: "值班岗位优先项",
   latePriorityFlightNumbers: "末班重点航班",
+  relaxedShiftFlightNumbers: "轻松班次统计航班",
   ordinaryPriorityPositions: "普通重点岗位",
   lateShiftRecoveryPositionRules: "晚班恢复岗位",
   nextWorkdayRecoveryTargets: "下一班恢复目标",

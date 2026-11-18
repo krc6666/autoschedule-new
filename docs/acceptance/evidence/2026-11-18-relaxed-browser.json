@@ -1,0 +1,1462 @@
+{
+  "entry": "isolated Chrome / mountAutoscheduleApp + original Store/controllers + browser persistence",
+  "facts": {
+    "date": "2026-11-18",
+    "staff": [
+      {
+        "id": "person-0",
+        "name": "甲"
+      },
+      {
+        "id": "person-1",
+        "name": "乙"
+      },
+      {
+        "id": "person-2",
+        "name": "丙"
+      },
+      {
+        "id": "person-3",
+        "name": "丁"
+      },
+      {
+        "id": "person-4",
+        "name": "戊"
+      }
+    ],
+    "assignments": [
+      {
+        "id": "task-0",
+        "flightId": "MF8001",
+        "flightNo": "MF8001",
+        "positionRuleId": "rule-MF8001",
+        "position": "柜台",
+        "staffId": "person-0",
+        "staffName": "甲",
+        "startTime": "08:00",
+        "endTime": "10:00",
+        "workHours": 2,
+        "fatiguePoints": 1,
+        "remark": "",
+        "manualRemark": "",
+        "status": "assigned"
+      },
+      {
+        "id": "task-1",
+        "flightId": "CX937",
+        "flightNo": "CX937",
+        "positionRuleId": "rule-CX937",
+        "position": "柜台",
+        "staffId": "person-1",
+        "staffName": "乙",
+        "startTime": "19:00",
+        "endTime": "21:00",
+        "workHours": 2,
+        "fatiguePoints": 1,
+        "remark": "",
+        "manualRemark": "",
+        "status": "assigned"
+      },
+      {
+        "id": "task-2",
+        "flightId": "PM1",
+        "flightNo": "PM1",
+        "positionRuleId": "rule-PM1",
+        "position": "柜台",
+        "staffId": "person-2",
+        "staffName": "丙",
+        "startTime": "14:00",
+        "endTime": "16:00",
+        "workHours": 2,
+        "fatiguePoints": 1,
+        "remark": "",
+        "manualRemark": "",
+        "status": "assigned"
+      },
+      {
+        "id": "task-3",
+        "flightId": "NOON",
+        "flightNo": "NOON",
+        "positionRuleId": "rule-NOON",
+        "position": "柜台",
+        "staffId": "person-3",
+        "staffName": "丁",
+        "startTime": "12:00",
+        "endTime": "13:00",
+        "workHours": 2,
+        "fatiguePoints": 1,
+        "remark": "",
+        "manualRemark": "",
+        "status": "assigned"
+      },
+      {
+        "id": "task-4",
+        "flightId": "CROSS",
+        "flightNo": "CROSS",
+        "positionRuleId": "rule-CROSS",
+        "position": "柜台",
+        "staffId": "person-4",
+        "staffName": "戊",
+        "startTime": "11:50",
+        "endTime": "13:00",
+        "workHours": 2,
+        "fatiguePoints": 1,
+        "remark": "",
+        "manualRemark": "",
+        "status": "assigned"
+      }
+    ],
+    "history": [
+      {
+        "id": "task-0-2026-11-16",
+        "flightId": "MF8001",
+        "flightNo": "MF8001",
+        "positionRuleId": "rule-MF8001",
+        "position": "柜台",
+        "staffId": "person-0",
+        "staffName": "甲",
+        "startTime": "08:00",
+        "endTime": "10:00",
+        "workHours": 2,
+        "fatiguePoints": 1,
+        "remark": "",
+        "manualRemark": "",
+        "status": "assigned",
+        "date": "2026-11-16",
+        "historyCoverage": "complete"
+      },
+      {
+        "id": "task-0-2026-10-20",
+        "flightId": "MF8001",
+        "flightNo": "MF8001",
+        "positionRuleId": "rule-MF8001",
+        "position": "柜台",
+        "staffId": "person-0",
+        "staffName": "甲",
+        "startTime": "08:00",
+        "endTime": "10:00",
+        "workHours": 2,
+        "fatiguePoints": 1,
+        "remark": "",
+        "manualRemark": "",
+        "status": "assigned",
+        "date": "2026-10-20",
+        "historyCoverage": "complete"
+      }
+    ],
+    "flights": [
+      {
+        "id": "MF8001",
+        "flightNo": "MF8001",
+        "startTime": "08:00",
+        "endTime": "10:00",
+        "positions": ["柜台"],
+        "bookedPassengers": 0,
+        "remark": ""
+      },
+      {
+        "id": "CX937",
+        "flightNo": "CX937",
+        "startTime": "19:00",
+        "endTime": "21:00",
+        "positions": ["柜台"],
+        "bookedPassengers": 0,
+        "remark": ""
+      },
+      {
+        "id": "PM1",
+        "flightNo": "PM1",
+        "startTime": "14:00",
+        "endTime": "16:00",
+        "positions": ["柜台"],
+        "bookedPassengers": 0,
+        "remark": ""
+      },
+      {
+        "id": "NOON",
+        "flightNo": "NOON",
+        "startTime": "12:00",
+        "endTime": "13:00",
+        "positions": ["柜台"],
+        "bookedPassengers": 0,
+        "remark": ""
+      },
+      {
+        "id": "CROSS",
+        "flightNo": "CROSS",
+        "startTime": "11:50",
+        "endTime": "13:00",
+        "positions": ["柜台"],
+        "bookedPassengers": 0,
+        "remark": ""
+      }
+    ],
+    "afternoonStart": "12:00",
+    "afternoonEnd": "18:00",
+    "earlyCutoff": "22:00"
+  },
+  "original": {
+    "headers": ["人员", "MF8001", "CX937", "下午空", "下午休"],
+    "rows": [
+      {
+        "name": "甲",
+        "cells": [
+          {
+            "column": "MF8001",
+            "count": 2,
+            "dates": "11-16、11-18"
+          },
+          {
+            "column": "CX937",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "下午空",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "下午休",
+            "count": 2,
+            "dates": "11-16、11-18"
+          }
+        ]
+      },
+      {
+        "name": "乙",
+        "cells": [
+          {
+            "column": "MF8001",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "CX937",
+            "count": 1,
+            "dates": "11-18"
+          },
+          {
+            "column": "下午空",
+            "count": 1,
+            "dates": "11-18"
+          },
+          {
+            "column": "下午休",
+            "count": 0,
+            "dates": "暂无日期"
+          }
+        ]
+      },
+      {
+        "name": "丙",
+        "cells": [
+          {
+            "column": "MF8001",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "CX937",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "下午空",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "下午休",
+            "count": 0,
+            "dates": "暂无日期"
+          }
+        ]
+      },
+      {
+        "name": "丁",
+        "cells": [
+          {
+            "column": "MF8001",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "CX937",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "下午空",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "下午休",
+            "count": 1,
+            "dates": "11-18"
+          }
+        ]
+      },
+      {
+        "name": "戊",
+        "cells": [
+          {
+            "column": "MF8001",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "CX937",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "下午空",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "下午休",
+            "count": 1,
+            "dates": "11-18"
+          }
+        ]
+      }
+    ]
+  },
+  "restored": {
+    "headers": ["人员", "MF8001", "下午空", "下午休"],
+    "rows": [
+      {
+        "name": "甲",
+        "cells": [
+          {
+            "column": "MF8001",
+            "count": 2,
+            "dates": "11-16、11-18"
+          },
+          {
+            "column": "下午空",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "下午休",
+            "count": 2,
+            "dates": "11-16、11-18"
+          }
+        ]
+      },
+      {
+        "name": "乙",
+        "cells": [
+          {
+            "column": "MF8001",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "下午空",
+            "count": 1,
+            "dates": "11-18"
+          },
+          {
+            "column": "下午休",
+            "count": 0,
+            "dates": "暂无日期"
+          }
+        ]
+      },
+      {
+        "name": "丙",
+        "cells": [
+          {
+            "column": "MF8001",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "下午空",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "下午休",
+            "count": 0,
+            "dates": "暂无日期"
+          }
+        ]
+      },
+      {
+        "name": "丁",
+        "cells": [
+          {
+            "column": "MF8001",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "下午空",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "下午休",
+            "count": 1,
+            "dates": "11-18"
+          }
+        ]
+      },
+      {
+        "name": "戊",
+        "cells": [
+          {
+            "column": "MF8001",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "下午空",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "下午休",
+            "count": 1,
+            "dates": "11-18"
+          }
+        ]
+      }
+    ]
+  },
+  "mobile": {
+    "width": 390,
+    "scrollWidth": 390,
+    "tableWidth": 344
+  },
+  "mobileOpen": {
+    "width": 390,
+    "scrollWidth": 390
+  },
+  "final": {
+    "headers": [
+      "人员",
+      "MF8001",
+      "CX937",
+      "PM1",
+      "NOON",
+      "CROSS",
+      "FD573",
+      "CX931",
+      "TR121",
+      "下午空",
+      "下午休"
+    ],
+    "rows": [
+      {
+        "name": "甲",
+        "cells": [
+          {
+            "column": "MF8001",
+            "count": 2,
+            "dates": "11-16、11-18"
+          },
+          {
+            "column": "CX937",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "PM1",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "NOON",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "CROSS",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "FD573",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "CX931",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "TR121",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "下午空",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "下午休",
+            "count": 2,
+            "dates": "11-16、11-18"
+          }
+        ]
+      },
+      {
+        "name": "乙",
+        "cells": [
+          {
+            "column": "MF8001",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "CX937",
+            "count": 1,
+            "dates": "11-18"
+          },
+          {
+            "column": "PM1",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "NOON",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "CROSS",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "FD573",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "CX931",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "TR121",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "下午空",
+            "count": 1,
+            "dates": "11-18"
+          },
+          {
+            "column": "下午休",
+            "count": 0,
+            "dates": "暂无日期"
+          }
+        ]
+      },
+      {
+        "name": "丙",
+        "cells": [
+          {
+            "column": "MF8001",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "CX937",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "PM1",
+            "count": 1,
+            "dates": "11-18"
+          },
+          {
+            "column": "NOON",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "CROSS",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "FD573",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "CX931",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "TR121",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "下午空",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "下午休",
+            "count": 0,
+            "dates": "暂无日期"
+          }
+        ]
+      },
+      {
+        "name": "丁",
+        "cells": [
+          {
+            "column": "MF8001",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "CX937",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "PM1",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "NOON",
+            "count": 1,
+            "dates": "11-18"
+          },
+          {
+            "column": "CROSS",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "FD573",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "CX931",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "TR121",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "下午空",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "下午休",
+            "count": 1,
+            "dates": "11-18"
+          }
+        ]
+      },
+      {
+        "name": "戊",
+        "cells": [
+          {
+            "column": "MF8001",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "CX937",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "PM1",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "NOON",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "CROSS",
+            "count": 1,
+            "dates": "11-18"
+          },
+          {
+            "column": "FD573",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "CX931",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "TR121",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "下午空",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "下午休",
+            "count": 1,
+            "dates": "11-18"
+          }
+        ]
+      }
+    ]
+  },
+  "reassigned": {
+    "headers": [
+      "人员",
+      "MF8001",
+      "CX937",
+      "PM1",
+      "NOON",
+      "CROSS",
+      "FD573",
+      "CX931",
+      "TR121",
+      "下午空",
+      "下午休"
+    ],
+    "rows": [
+      {
+        "name": "甲",
+        "cells": [
+          {
+            "column": "MF8001",
+            "count": 1,
+            "dates": "11-16"
+          },
+          {
+            "column": "CX937",
+            "count": 1,
+            "dates": "11-18"
+          },
+          {
+            "column": "PM1",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "NOON",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "CROSS",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "FD573",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "CX931",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "TR121",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "下午空",
+            "count": 1,
+            "dates": "11-18"
+          },
+          {
+            "column": "下午休",
+            "count": 1,
+            "dates": "11-16"
+          }
+        ]
+      },
+      {
+        "name": "乙",
+        "cells": [
+          {
+            "column": "MF8001",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "CX937",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "PM1",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "NOON",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "CROSS",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "FD573",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "CX931",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "TR121",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "下午空",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "下午休",
+            "count": 0,
+            "dates": "暂无日期"
+          }
+        ]
+      },
+      {
+        "name": "丙",
+        "cells": [
+          {
+            "column": "MF8001",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "CX937",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "PM1",
+            "count": 1,
+            "dates": "11-18"
+          },
+          {
+            "column": "NOON",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "CROSS",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "FD573",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "CX931",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "TR121",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "下午空",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "下午休",
+            "count": 0,
+            "dates": "暂无日期"
+          }
+        ]
+      },
+      {
+        "name": "丁",
+        "cells": [
+          {
+            "column": "MF8001",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "CX937",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "PM1",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "NOON",
+            "count": 1,
+            "dates": "11-18"
+          },
+          {
+            "column": "CROSS",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "FD573",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "CX931",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "TR121",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "下午空",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "下午休",
+            "count": 1,
+            "dates": "11-18"
+          }
+        ]
+      },
+      {
+        "name": "戊",
+        "cells": [
+          {
+            "column": "MF8001",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "CX937",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "PM1",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "NOON",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "CROSS",
+            "count": 1,
+            "dates": "11-18"
+          },
+          {
+            "column": "FD573",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "CX931",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "TR121",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "下午空",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "下午休",
+            "count": 1,
+            "dates": "11-18"
+          }
+        ]
+      }
+    ]
+  },
+  "cleared": {
+    "headers": [
+      "人员",
+      "MF8001",
+      "CX937",
+      "PM1",
+      "NOON",
+      "CROSS",
+      "FD573",
+      "CX931",
+      "TR121",
+      "下午空",
+      "下午休"
+    ],
+    "rows": [
+      {
+        "name": "甲",
+        "cells": [
+          {
+            "column": "MF8001",
+            "count": 2,
+            "dates": "11-16、11-18"
+          },
+          {
+            "column": "CX937",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "PM1",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "NOON",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "CROSS",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "FD573",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "CX931",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "TR121",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "下午空",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "下午休",
+            "count": 2,
+            "dates": "11-16、11-18"
+          }
+        ]
+      },
+      {
+        "name": "乙",
+        "cells": [
+          {
+            "column": "MF8001",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "CX937",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "PM1",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "NOON",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "CROSS",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "FD573",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "CX931",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "TR121",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "下午空",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "下午休",
+            "count": 0,
+            "dates": "暂无日期"
+          }
+        ]
+      },
+      {
+        "name": "丙",
+        "cells": [
+          {
+            "column": "MF8001",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "CX937",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "PM1",
+            "count": 1,
+            "dates": "11-18"
+          },
+          {
+            "column": "NOON",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "CROSS",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "FD573",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "CX931",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "TR121",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "下午空",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "下午休",
+            "count": 0,
+            "dates": "暂无日期"
+          }
+        ]
+      },
+      {
+        "name": "丁",
+        "cells": [
+          {
+            "column": "MF8001",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "CX937",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "PM1",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "NOON",
+            "count": 1,
+            "dates": "11-18"
+          },
+          {
+            "column": "CROSS",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "FD573",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "CX931",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "TR121",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "下午空",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "下午休",
+            "count": 1,
+            "dates": "11-18"
+          }
+        ]
+      },
+      {
+        "name": "戊",
+        "cells": [
+          {
+            "column": "MF8001",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "CX937",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "PM1",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "NOON",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "CROSS",
+            "count": 1,
+            "dates": "11-18"
+          },
+          {
+            "column": "FD573",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "CX931",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "TR121",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "下午空",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "下午休",
+            "count": 1,
+            "dates": "11-18"
+          }
+        ]
+      }
+    ]
+  },
+  "imported": {
+    "headers": ["人员", "MF8001", "CX937", "下午空", "下午休"],
+    "rows": [
+      {
+        "name": "甲",
+        "cells": [
+          {
+            "column": "MF8001",
+            "count": 1,
+            "dates": "11-16"
+          },
+          {
+            "column": "CX937",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "下午空",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "下午休",
+            "count": 1,
+            "dates": "11-16"
+          }
+        ]
+      },
+      {
+        "name": "乙",
+        "cells": [
+          {
+            "column": "MF8001",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "CX937",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "下午空",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "下午休",
+            "count": 0,
+            "dates": "暂无日期"
+          }
+        ]
+      },
+      {
+        "name": "丙",
+        "cells": [
+          {
+            "column": "MF8001",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "CX937",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "下午空",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "下午休",
+            "count": 0,
+            "dates": "暂无日期"
+          }
+        ]
+      },
+      {
+        "name": "丁",
+        "cells": [
+          {
+            "column": "MF8001",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "CX937",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "下午空",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "下午休",
+            "count": 0,
+            "dates": "暂无日期"
+          }
+        ]
+      },
+      {
+        "name": "戊",
+        "cells": [
+          {
+            "column": "MF8001",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "CX937",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "下午空",
+            "count": 0,
+            "dates": "暂无日期"
+          },
+          {
+            "column": "下午休",
+            "count": 0,
+            "dates": "暂无日期"
+          }
+        ]
+      }
+    ]
+  },
+  "actions": [
+    "click count",
+    "uncheck and persist",
+    "reload and restore all counts/dates",
+    "independent month",
+    "390px with open dates",
+    "clear",
+    "select all",
+    "A/B/A",
+    "real assign-staff command",
+    "real clear-assignee command",
+    "actual XLSX file upload/preview/confirm (original configuration import clears current schedule)"
+  ],
+  "pageErrors": []
+}

@@ -44,6 +44,8 @@ export function fnv64Fingerprint(value: unknown, version: string): string {
 }
 
 export function scheduleRuleFingerprint(state: FingerprintState): string {
+  const { relaxedShiftFlightNumbers: _displayScope, ...ruleSettings } =
+    state.settings;
   return fnv64Fingerprint(
     {
       version: SCHEDULE_RULE_FINGERPRINT_VERSION,
@@ -88,7 +90,7 @@ export function scheduleRuleFingerprint(state: FingerprintState): string {
           `${right.month}|${right.staffId}|${right.airlineCode}|${right.position}`
         )
       ),
-      settings: state.settings,
+      settings: ruleSettings,
     },
     SCHEDULE_RULE_FINGERPRINT_VERSION
   );

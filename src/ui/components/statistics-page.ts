@@ -10,6 +10,7 @@ import {
   type MonthlyLatePriorityStatisticsRow,
 } from "../../domain/statistics/monthly-late-priority-statistics";
 import { buildMonthlyRelaxedShiftStatistics } from "../../domain/statistics/relaxed-shift-statistics";
+import { relaxedShiftFlightScope } from "../../domain/statistics/relaxed-shift-flight-scope";
 import type { AppState } from "../../model";
 import { LightDomElement } from "./light-dom-element";
 import "./duty-roster-details";
@@ -34,6 +35,8 @@ export class StatisticsPageElement extends LightDomElement {
     "全部" | LatePriorityStatisticsCategory = "全部";
   private selectedOrdinaryPriorityStatisticsMonth = "";
   private selectedOrdinaryPriorityKey = "全部";
+  private selectedRelaxedShiftMonth = "";
+  private readonly expandedRelaxedCells = new Set<string>();
 
   protected override render() {
     return html`
@@ -51,70 +54,149 @@ export class StatisticsPageElement extends LightDomElement {
   }
 
   private relaxedShiftStatistics() {
+    const month = this.selectedRelaxedShiftMonth || this.date.slice(0, 7);
+    const referenceDate = this.model.activeScheduleDate?.startsWith(month)
+      ? this.model.activeScheduleDate
+      : this.date.startsWith(month)
+        ? this.date
+        : `${month}-01`;
     const statistics = buildMonthlyRelaxedShiftStatistics(
       this.model,
-      this.date
+      referenceDate
     );
-    const rows = [...statistics.rows].sort(
-      (left, right) =>
-        right.earlyDepartures.length - left.earlyDepartures.length ||
-        right.afternoonRestDates.length - left.afternoonRestDates.length ||
-        left.staff.name.localeCompare(right.staff.name, "zh-CN")
-    );
+    const rows = statistics.rows;
+    const todayStatistics =
+      referenceDate === this.date
+        ? statistics
+        : buildMonthlyRelaxedShiftStatistics(this.model, this.date);
+    const scope = relaxedShiftFlightScope(this.model);
+    const setFlights = (flightNumbers: string[]) =>
+      dispatchUiCommand(this, {
+        type: "set-relaxed-shift-flights",
+        flightNumbers,
+      });
     return html`<section class="workspace-section relaxed-shift-statistics">
       <div class="section-heading">
         <div>
           <h3>月度轻松班次统计</h3>
-          <span>${statistics.month} · 仅统计实际参加排班的常规人员</span>
+          <span
+            >${statistics.month} ·
+            航班列沿用提前下班口径，每人每天最多一次；点击次数查看日期</span
+          >
+        </div>
+        <div class="late-priority-toolbar">
+          <label class="d-inline-flex align-items-center gap-2 mb-0">
+            <span class="small text-body-secondary">统计月份</span>
+            <input
+              class="form-control form-control-sm"
+              type="month"
+              aria-label="轻松班次统计月份"
+              .value=${month}
+              @change=${(event: Event) => {
+                const value = (event.currentTarget as HTMLInputElement).value;
+                if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(value)) return;
+                this.selectedRelaxedShiftMonth = value;
+                this.expandedRelaxedCells.clear();
+                this.requestUpdate();
+              }}
+            />
+          </label>
         </div>
       </div>
-      <div class="relaxed-shift-today">
-        <div>
-          <strong>今日提前下班</strong
-          ><small
-            >任一航班截载晚于 23:00 不计；否则最后航班截载严格早于
-            ${this.model.settings.earlyDepartureCutoffTime}，排除当日值班</small
+      <details class="relaxed-shift-flight-scope">
+        <summary>调整统计航班（已选 ${scope.selected.length} 个）</summary>
+        <div
+          class="d-flex flex-wrap gap-2 p-3"
+          role="group"
+          aria-label="轻松班次统计航班"
+        >
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-secondary"
+            @click=${() => setFlights(scope.candidates)}
           >
-          <div>
-            ${statistics.currentEarlyDepartures.length ? statistics.currentEarlyDepartures.map((item) => html`<span><strong>${item.staffName}</strong> ${item.flightNo} / ${item.cutoffTime} <em>本月 ${item.monthlyCount} 次</em></span>`) : html`<span class="is-empty">今日没有符合节点的提前下班人员</span>`}
-          </div>
-        </div>
-        <div>
-          <strong>今日下午无航班</strong
-          ><small
-            >${this.model.settings.afternoonRestStartTime}-${this.model.settings.afternoonRestEndTime}
-            当天该时段有航班，个人无已排岗位重叠才计次；值班和备勤照常计入</small
+            全选
+          </button>
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-secondary"
+            @click=${() => setFlights([])}
           >
-          <div>
-            ${statistics.currentAfternoonRest.length ? statistics.currentAfternoonRest.map((item) => html`<span><strong>${item.staffName}</strong> <em>本月 ${item.monthlyCount} 次</em></span>`) : html`<span class="is-empty">今日没有下午无航班人员</span>`}
-          </div>
+            清空
+          </button>
+          ${scope.candidates.map(
+            (flightNo) =>
+              html`<label class="d-inline-flex align-items-center gap-1">
+                <input
+                  type="checkbox"
+                  class="form-check-input m-0"
+                  aria-label=${`轻松班次统计航班：${flightNo}`}
+                  .checked=${scope.selected.includes(flightNo)}
+                  @change=${(event: Event) =>
+                    setFlights(
+                      (event.currentTarget as HTMLInputElement).checked
+                        ? [...scope.selected, flightNo]
+                        : scope.selected.filter((no) => no !== flightNo)
+                    )}
+                />${flightNo}
+              </label>`
+          )}
         </div>
-      </div>
+      </details>
+      <p class="small text-body-secondary px-3 mb-2">
+        下午空：${this.model.settings.afternoonRestStartTime}—${this.model.settings.afternoonRestEndTime}
+        无岗位重叠，之后仍有航班；下午休：没有开始时间晚于 12:00
+        的航班。仅统计当天实际参加排班的常规人员。
+      </p>
+      ${
+        month === this.date.slice(0, 7)
+          ? html`<div class="relaxed-shift-today">
+              <div>
+                <strong>今日提前下班</strong
+                ><small
+                  >任一航班截载晚于 23:00 不计；否则最后航班截载严格早于
+                  ${this.model.settings.earlyDepartureCutoffTime}，排除当日值班</small
+                >
+                <div>
+                  ${todayStatistics.currentEarlyDepartures.length ? todayStatistics.currentEarlyDepartures.map((item) => html`<span><strong>${item.staffName}</strong> ${item.flightNo} / ${item.cutoffTime} <em>本月 ${item.monthlyCount} 次</em></span>`) : html`<span class="is-empty">今日没有符合节点的提前下班人员</span>`}
+                </div>
+              </div>
+              <div>
+                <strong>今日下午无航班</strong
+                ><small
+                  >${this.model.settings.afternoonRestStartTime}-${this.model.settings.afternoonRestEndTime}
+                  当天该时段有航班，个人无已排岗位重叠才计次；值班和备勤照常计入</small
+                >
+                <div>
+                  ${todayStatistics.currentAfternoonRest.length ? todayStatistics.currentAfternoonRest.map((item) => html`<span><strong>${item.staffName}</strong> <em>本月 ${item.monthlyCount} 次</em></span>`) : html`<span class="is-empty">今日没有下午无航班人员</span>`}
+                </div>
+              </div>
+            </div>`
+          : ""
+      }
       <div class="table-responsive">
         <table
           class="table table-sm align-middle data-table relaxed-shift-table"
         >
           <thead>
             <tr>
-              <th>常规人员</th>
-              <th>提前下班次数</th>
-              <th>提前下班日期 / 最后航班 / 截载</th>
-              <th>下午无航班次数</th>
-              <th>下午无航班日期</th>
+              <th>人员</th>
+              ${scope.selected.map((flightNo) => html`<th>${flightNo}</th>`)}
+              <th>下午空</th>
+              <th>下午休</th>
             </tr>
           </thead>
           <tbody>
             ${rows.map(
               (row) =>
                 html`<tr>
-                  <td><strong>${row.staff.name}</strong></td>
-                  <td>${row.earlyDepartures.length}</td>
-                  <td>
-                    ${row.earlyDepartures.map((event) => `${event.date.slice(5)} ${event.flightNo} ${event.cutoffTime}`).join("、") || "-"}
+                  <td data-label="人员"><strong>${row.staff.name}</strong></td>
+                  ${scope.selected.map((flightNo) => html`<td data-label=${flightNo}>${this.relaxedShiftDateCell(row.staff.id, month, flightNo, row.earlyDepartureDatesByFlight[flightNo] ?? [])}</td>`)}
+                  <td data-label="下午空">
+                    ${this.relaxedShiftDateCell(row.staff.id, month, "下午空", row.afternoonFreeDates)}
                   </td>
-                  <td>${row.afternoonRestDates.length}</td>
-                  <td>
-                    ${row.afternoonRestDates.map((eventDate) => eventDate.slice(5)).join("、") || "-"}
+                  <td data-label="下午休">
+                    ${this.relaxedShiftDateCell(row.staff.id, month, "下午休", row.afternoonOffDates)}
                   </td>
                 </tr>`
             )}
@@ -122,6 +204,36 @@ export class StatisticsPageElement extends LightDomElement {
         </table>
       </div>
     </section>`;
+  }
+
+  private relaxedShiftDateCell(
+    staffId: string,
+    month: string,
+    column: string,
+    dates: readonly string[]
+  ) {
+    const key = `${month}\u0000${staffId}\u0000${column}`;
+    return html`<details
+      class="late-priority-count-detail relaxed-shift-count-detail"
+      .open=${this.expandedRelaxedCells.has(key)}
+      @toggle=${(event: Event) => {
+        if ((event.currentTarget as HTMLDetailsElement).open)
+          this.expandedRelaxedCells.add(key);
+        else this.expandedRelaxedCells.delete(key);
+      }}
+    >
+      <summary
+        title=${`展开${column}日期`}
+        aria-label=${`${column}：${dates.length}次，展开日期`}
+      >
+        ${dates.length}
+      </summary>
+      <div>
+        <small class="late-priority-detail-list"
+          >${dates.length ? dates.map((date) => date.slice(5)).join("、") : "暂无日期"}</small
+        >
+      </div>
+    </details>`;
   }
 
   private latePriorityStatistics() {

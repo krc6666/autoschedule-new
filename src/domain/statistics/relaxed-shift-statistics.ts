@@ -3,6 +3,7 @@ import { operationalInterval, timeToMinutes } from "../shared/time";
 import type { Assignment, HistoryRecord, Staff } from "../../model";
 import type { SchedulingFacts } from "../shared/scheduling-facts";
 import { isCountedWorkloadAssignment } from "../shared/workload-accounting";
+import { normalizeWeeklyFlightNo } from "../flights/weekly-flight-plan";
 
 interface ActualTask {
   date: string;
@@ -26,6 +27,9 @@ export interface MonthlyRelaxedShiftRow {
   staff: Staff;
   earlyDepartures: EarlyDepartureEvent[];
   afternoonRestDates: string[];
+  earlyDepartureDatesByFlight: Record<string, string[]>;
+  afternoonFreeDates: string[];
+  afternoonOffDates: string[];
 }
 
 export interface MonthlyRelaxedShiftStatistics {
@@ -182,6 +186,8 @@ export function buildMonthlyRelaxedShiftStatistics(
   const dates = [...new Set(tasks.map((task) => task.date))].sort();
   const earlyByStaff = new Map<string, EarlyDepartureEvent[]>();
   const afternoonByStaff = new Map<string, string[]>();
+  const afternoonFreeByStaff = new Map<string, string[]>();
+  const afternoonOffByStaff = new Map<string, string[]>();
   const earlyCutoff = timeToMinutes(state.settings.earlyDepartureCutoffTime);
   const lateFlightCutoff = timeToMinutes("23:00");
 
@@ -217,6 +223,37 @@ export function buildMonthlyRelaxedShiftStatistics(
     );
     for (const staffId of participatingStaffIds) {
       const staffTasks = dailyTasks.filter((task) => task.staffId === staffId);
+      const attendance = staffTasks.flatMap((task) => [
+        task,
+        ...(task.attendanceIntervals ?? []),
+      ]);
+      const afternoonOff = !attendance.some(
+        (task) => timeToMinutes(task.startTime) > timeToMinutes("12:00")
+      );
+      const afternoonWindow = operationalInterval(
+        state.settings.afternoonRestStartTime,
+        state.settings.afternoonRestEndTime,
+        state.settings.nightEnd
+      );
+      const afternoonFree =
+        !afternoonOff &&
+        !attendance.some(inAfternoon) &&
+        afternoonWindow !== null &&
+        attendance.some((task) => {
+          const interval = operationalInterval(
+            task.startTime,
+            task.endTime,
+            state.settings.nightEnd
+          );
+          return interval !== null && interval[0] >= afternoonWindow[1];
+        });
+      for (const [matches, target] of [
+        [afternoonOff, afternoonOffByStaff],
+        [afternoonFree, afternoonFreeByStaff],
+      ] as const) {
+        if (matches)
+          target.set(staffId, [...(target.get(staffId) ?? []), taskDate]);
+      }
       const earlyTasks = staffTasks.filter(
         (task) => task.countedForEarlyDeparture
       );
@@ -285,6 +322,24 @@ export function buildMonthlyRelaxedShiftStatistics(
       staff,
       earlyDepartures: earlyByStaff.get(staff.id) ?? [],
       afternoonRestDates: afternoonByStaff.get(staff.id) ?? [],
+      earlyDepartureDatesByFlight: Object.fromEntries(
+        [
+          ...new Set(
+            (earlyByStaff.get(staff.id) ?? []).map((event) =>
+              normalizeWeeklyFlightNo(event.flightNo)
+            )
+          ),
+        ].map((flightNo) => [
+          flightNo,
+          (earlyByStaff.get(staff.id) ?? [])
+            .filter(
+              (event) => normalizeWeeklyFlightNo(event.flightNo) === flightNo
+            )
+            .map((event) => event.date),
+        ])
+      ),
+      afternoonFreeDates: afternoonFreeByStaff.get(staff.id) ?? [],
+      afternoonOffDates: afternoonOffByStaff.get(staff.id) ?? [],
     }));
   return {
     month,

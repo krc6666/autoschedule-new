@@ -204,6 +204,8 @@ export interface ScheduleSettings {
   ordinaryPriorityPositions: OrdinaryPriorityPosition[];
   tr121H02CooldownWorkdays: number;
   latePriorityFlightNumbers: string[];
+  /** Display scope only; null selects available MF/CX flights, [] clears it. */
+  relaxedShiftFlightNumbers: string[] | null;
   lateShiftRecoveryEnabled: boolean;
   nextWorkdayRecoveryMode: "prefer" | "forbid";
   lateShiftEndTime: string;

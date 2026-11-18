@@ -4,6 +4,7 @@ import {
   normalizeStructuredPolicies,
 } from "./structured-policy-settings";
 import { normalizeLatePriorityFlightNumbers } from "../statistics/late-priority-flight-scope";
+import { normalizeRelaxedShiftFlights } from "../statistics/relaxed-shift-flight-scope";
 
 export type ScalarScheduleSettingKey = Exclude<
   keyof ScheduleSettings,
@@ -18,6 +19,7 @@ export type ScalarScheduleSettingKey = Exclude<
   | "crossWorkdayQualificationReservations"
   | "crossFlightPriorityPolicies"
   | "latePriorityFlightNumbers"
+  | "relaxedShiftFlightNumbers"
   | "ordinaryPriorityPositions"
   | "sameFlightStaffExclusions"
   | "teamLeaderGapFillPositionPolicies"
@@ -369,6 +371,7 @@ function scalarDefaults(): Omit<
   | "crossWorkdayQualificationReservations"
   | "crossFlightPriorityPolicies"
   | "latePriorityFlightNumbers"
+  | "relaxedShiftFlightNumbers"
   | "ordinaryPriorityPositions"
   | "sameFlightStaffExclusions"
   | "teamLeaderGapFillPositionPolicies"
@@ -386,6 +389,7 @@ export function createDefaultScheduleSettings(): ScheduleSettings {
     ...scalarDefaults(),
     adminSupportEnabled: false,
     latePriorityFlightNumbers: [],
+    relaxedShiftFlightNumbers: null,
     ordinaryPriorityPositions: [],
     ...createDefaultStructuredPolicies(),
   });
@@ -441,6 +445,12 @@ export function normalizeScheduleSettings(
       ? input.latePriorityFlightNumbers
       : fallback.latePriorityFlightNumbers
   );
+  result.relaxedShiftFlightNumbers =
+    input.relaxedShiftFlightNumbers === null
+      ? null
+      : Array.isArray(input.relaxedShiftFlightNumbers)
+        ? normalizeRelaxedShiftFlights(input.relaxedShiftFlightNumbers)
+        : structuredClone(fallback.relaxedShiftFlightNumbers);
   result.ordinaryPriorityPositions = Array.isArray(
     input.ordinaryPriorityPositions
   )

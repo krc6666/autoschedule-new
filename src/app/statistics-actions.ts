@@ -14,6 +14,21 @@ import { mergeOrdinaryPriorityFrequencyAdjustments } from "../domain/statistics/
 import { ordinaryPriorityConfigurationKey } from "../domain/reviews/position-rotation-policy";
 import type { LatePriorityCountsImportPreview } from "../infrastructure/late-priority-counts-excel";
 import { buildOrdinaryPriorityStatistics } from "../domain/statistics/ordinary-priority-statistics";
+import { normalizeRelaxedShiftFlights } from "../domain/statistics/relaxed-shift-flight-scope";
+
+export function setRelaxedShiftFlights(
+  state: AppState,
+  flightNumbers: string[]
+): boolean {
+  const selected = normalizeRelaxedShiftFlights(flightNumbers);
+  if (
+    JSON.stringify(selected) ===
+    JSON.stringify(state.settings.relaxedShiftFlightNumbers)
+  )
+    return false;
+  state.settings.relaxedShiftFlightNumbers = selected;
+  return true;
+}
 
 function normalizedFlightNo(flightNo: string): string {
   return flightNo.trim().toUpperCase().replaceAll(/\s+/g, "");

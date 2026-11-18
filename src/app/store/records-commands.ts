@@ -21,6 +21,7 @@ import type { WorkbookImportMode } from "../workbook-import-controller";
 import type { StateCommand } from "./store-command";
 import {
   applyLatePriorityCountsImport,
+  setRelaxedShiftFlights,
   resetMonthlyLatePriorityFrequencyCounts,
   updateLatePriorityFrequencyAdjustment,
   updateOrdinaryPriorityFrequencyAdjustment,
@@ -29,6 +30,8 @@ import type { LatePriorityCountsImportPreview } from "../../infrastructure/late-
 
 export function createRecordsCommands(command: StateCommand) {
   return {
+    setRelaxedShiftFlights: (flightNumbers: string[]) =>
+      command((state) => setRelaxedShiftFlights(state, flightNumbers)),
     clearHistory: () => command(clearHistory),
     deleteHistory: (id: string) => command((state) => deleteHistory(state, id)),
     replaceHistory: (date: string, records: HistoryRecord[]) =>

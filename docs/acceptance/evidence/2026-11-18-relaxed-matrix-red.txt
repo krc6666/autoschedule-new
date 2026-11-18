@@ -1,0 +1,204 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/domain/relaxed-flight-matrix.test.ts (3 tests | 3 failed) 26ms
+   × adds mutually exclusive afternoon free/off dates without changing the original rest statistic 17ms
+   × uses complete saved facts, keeps current-over-history replacement and does not invent missing attendance 5ms
+   × counts one event per person/day and preserves duty, strict cutoff and 23:00 exclusions 2ms
+ ❯ tests/ui/relaxed-flight-matrix.test.ts (2 tests | 2 failed) 194ms
+   × renders personnel × selectable flights and opens date-only details using the existing late table style 126ms
+   × switches months independently, keeps 0 clickable and recomputes after final assignments change 66ms
+
+ Test Files  2 failed (2)
+      Tests  5 failed (5)
+   Start at  13:03:34
+   Duration  1.30s (transform 494ms, setup 0ms, import 612ms, tests 219ms, environment 530ms)
+
+stderr | tests/ui/relaxed-flight-matrix.test.ts
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/domain/relaxed-flight-matrix.test.ts > adds mutually exclusive afternoon free/off dates without changing the original rest statistic
+AssertionError: expected { …(3) } to match object { afternoonFreeDates: [], …(2) }
+(13 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "afternoonFreeDates": [],
+-   "afternoonOffDates": [
++   "afternoonRestDates": [
+      "2026-11-18",
+    ],
+-   "earlyDepartureDatesByFlight": {
+-     "MF8001": [
+-       "2026-11-18",
++   "earlyDepartures": [
++     {
++       "cutoffTime": "10:00",
++       "date": "2026-11-18",
++       "flightNo": "MF8001",
++     },
+    ],
++   "staff": {
++     "cxPreflightQualified": false,
++     "dutyQualified": false,
++     "id": "person-0",
++     "name": "甲",
++     "nightShift": true,
++     "remark": "",
++     "staffType": "常规",
++     "standbyQualified": true,
++     "status": "正常",
++     "teamLeader": true,
+    },
+  }
+
+ ❯ tests/domain/relaxed-flight-matrix.test.ts:11:26
+      9|     ["2026-11-18"], ["2026-11-18"], [], [], [],
+     10|   ]);
+     11|   expect(report.rows[0]).toMatchObject({ afternoonFreeDates: [], after…
+       |                          ^
+     12|   expect(report.rows[1]).toMatchObject({ afternoonFreeDates: ["2026-11…
+     13|   expect(report.rows[2]).toMatchObject({ afternoonFreeDates: [], after…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  tests/domain/relaxed-flight-matrix.test.ts > uses complete saved facts, keeps current-over-history replacement and does not invent missing attendance
+AssertionError: expected { …(3) } to match object { …(2) }
+(13 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "afternoonFreeDates": [
+-     "2026-11-12",
++   "afternoonRestDates": [
++     "2026-11-18",
+    ],
+-   "afternoonOffDates": [
+-     "2026-11-18",
++   "earlyDepartures": [
++     {
++       "cutoffTime": "10:00",
++       "date": "2026-11-12",
++       "flightNo": "MF8001",
++     },
++     {
++       "cutoffTime": "10:00",
++       "date": "2026-11-18",
++       "flightNo": "MF8001",
++     },
+    ],
++   "staff": {
++     "cxPreflightQualified": false,
++     "dutyQualified": false,
++     "id": "person-0",
++     "name": "甲",
++     "nightShift": true,
++     "remark": "",
++     "staffType": "常规",
++     "standbyQualified": true,
++     "status": "正常",
++     "teamLeader": true,
++   },
+  }
+
+ ❯ tests/domain/relaxed-flight-matrix.test.ts:27:26
+     25|   ];
+     26|   const report = buildMonthlyRelaxedShiftStatistics(state, "2026-11-18…
+     27|   expect(report.rows[0]).toMatchObject({ afternoonOffDates: ["2026-11-…
+       |                          ^
+     28|   expect(report.rows[1]).toMatchObject({ afternoonFreeDates: ["2026-11…
+     29|   // A same-day manual reassignment must replace both dates and flight…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  tests/domain/relaxed-flight-matrix.test.ts > counts one event per person/day and preserves duty, strict cutoff and 23:00 exclusions
+AssertionError: expected { …(3) } to match object { …(1) }
+(13 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "earlyDepartureDatesByFlight": {
+-     "MF8001": [
++   "afternoonRestDates": [
+      "2026-11-18",
++   ],
++   "earlyDepartures": [
++     {
++       "cutoffTime": "10:00",
++       "date": "2026-11-18",
++       "flightNo": "MF8001",
++     },
+    ],
++   "staff": {
++     "cxPreflightQualified": false,
++     "dutyQualified": false,
++     "id": "person-0",
++     "name": "甲",
++     "nightShift": true,
++     "remark": "",
++     "staffType": "常规",
++     "standbyQualified": true,
++     "status": "正常",
++     "teamLeader": true,
+    },
+  }
+
+ ❯ tests/domain/relaxed-flight-matrix.test.ts:38:75
+     36|   const state = relaxedMatrixFixture();
+     37|   state.assignments.push({ ...state.assignments[0]!, id: "guide", posi…
+     38|   expect(buildMonthlyRelaxedShiftStatistics(state, "2026-11-18").rows[…
+       |                                                                           ^
+     39|   state.flights[0]!.endTime = "23:01";
+     40|   expect(buildMonthlyRelaxedShiftStatistics(state, "2026-11-18").rows[…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL  tests/ui/relaxed-flight-matrix.test.ts > renders personnel × selectable flights and opens date-only details using the existing late table style
+AssertionError: expected [ '常规人员', '提前下班次数', …(3) ] to deeply equal [ Array(5) ]
+
+- Expected
++ Received
+
+  [
+-   "人员",
+-   "MF8001",
+-   "CX937",
+-   "下午空",
+-   "下午休",
++   "常规人员",
++   "提前下班次数",
++   "提前下班日期 / 最后航班 / 截载",
++   "下午无航班次数",
++   "下午无航班日期",
+  ]
+
+ ❯ tests/ui/relaxed-flight-matrix.test.ts:12:77
+     10|   const page = await mountElement<LitTestElement>("autoschedule-statis…
+     11|   const table = page.querySelector(".relaxed-shift-table")!;
+     12|   expect([...table.querySelectorAll("th")].map(c => c.textContent?.tri…
+       |                                                                             ^
+     13|   expect([...table.querySelectorAll("tbody tr td:first-child")].map(c …
+     14|   const detail = table.querySelector<HTMLDetailsElement>('tr:first-chi…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+ FAIL  tests/ui/relaxed-flight-matrix.test.ts > switches months independently, keeps 0 clickable and recomputes after final assignments change
+AssertionError: expected null not to be null
+ ❯ tests/ui/relaxed-flight-matrix.test.ts:34:21
+     32|   const page = await mountElement<LitTestElement>("autoschedule-statis…
+     33|   const month = page.querySelector<HTMLInputElement>('input[aria-label…
+     34|   expect(month).not.toBeNull();
+       |                     ^
+     35|   month.value = "2026-10";
+     36|   month.dispatchEvent(new Event("change", { bubbles: true }));
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯

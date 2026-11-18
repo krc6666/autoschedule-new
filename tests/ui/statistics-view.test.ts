@@ -99,6 +99,7 @@ describe("statistics page", () => {
     state.staff = [person];
     state.activeScheduleDate = "2026-10-01";
     state.settings.earlyDepartureCutoffTime = "23:30";
+    state.settings.relaxedShiftFlightNumbers = ["AK151"];
     state.flights = [
       {
         id: "flight-AK151",
@@ -143,8 +144,14 @@ describe("statistics page", () => {
       candidate.cells[0]?.textContent?.includes(person.name)
     );
 
-    expect(row?.cells[1]?.textContent?.trim()).toBe("0");
-    expect(row?.cells[2]?.textContent?.trim()).toBe("-");
+    for (const detail of row!.querySelectorAll(
+      'td[data-label="AK151"] details'
+    )) {
+      expect(detail.querySelector("summary")?.textContent?.trim()).toBe("0");
+      expect(
+        detail.querySelector(".late-priority-detail-list")?.textContent?.trim()
+      ).toBe("暂无日期");
+    }
   });
 
   it("summarizes ordinary priority positions by staff with expandable count cells", async () => {

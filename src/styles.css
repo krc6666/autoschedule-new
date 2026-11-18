@@ -1330,8 +1330,20 @@ select {
   border-style: dashed;
   color: var(--as-muted);
 }
-.relaxed-shift-table {
-  min-width: 760px;
+.relaxed-shift-flight-scope {
+  padding: 0 16px 12px;
+}
+.relaxed-shift-flight-scope > summary {
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+}
+.relaxed-shift-statistics .late-priority-toolbar label > span {
+  white-space: nowrap;
+}
+.relaxed-shift-count-detail > div {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .late-priority-flight-scope {
@@ -1467,12 +1479,15 @@ select {
   place-items: center;
 }
 .late-priority-summary-table,
+.relaxed-shift-table,
 .ordinary-priority-summary-table {
   min-width: max(640px, 100%);
   margin: 0;
 }
 .late-priority-summary-table th:first-child,
 .late-priority-summary-table td:first-child,
+.relaxed-shift-table th:first-child,
+.relaxed-shift-table td:first-child,
 .ordinary-priority-summary-table th:first-child,
 .ordinary-priority-summary-table td:first-child {
   min-width: 96px;
@@ -1480,6 +1495,8 @@ select {
 }
 .late-priority-summary-table th:not(:first-child),
 .late-priority-summary-table td:not(:first-child),
+.relaxed-shift-table th:not(:first-child),
+.relaxed-shift-table td:not(:first-child),
 .ordinary-priority-summary-table th:not(:first-child),
 .ordinary-priority-summary-table td:not(:first-child) {
   width: 112px;
@@ -3609,6 +3626,7 @@ autoschedule-previous-schedule-comparison {
     width: 100%;
   }
   .late-priority-statistics > .section-heading,
+  .relaxed-shift-statistics > .section-heading,
   .ordinary-priority-statistics > .section-heading {
     flex-direction: column;
   }
@@ -3618,10 +3636,12 @@ autoschedule-previous-schedule-comparison {
     justify-content: flex-start;
   }
   .late-priority-summary-table,
+  .relaxed-shift-table,
   .ordinary-priority-summary-table {
     min-width: 0;
   }
   .late-priority-summary-table thead,
+  .relaxed-shift-table thead,
   .ordinary-priority-summary-table thead {
     position: absolute;
     width: 1px;
@@ -3631,17 +3651,22 @@ autoschedule-previous-schedule-comparison {
   }
   .late-priority-summary-table tbody,
   .late-priority-summary-table tr,
+  .relaxed-shift-table tbody,
+  .relaxed-shift-table tr,
   .ordinary-priority-summary-table tbody,
   .ordinary-priority-summary-table tr {
     display: grid;
   }
   .late-priority-summary-table tr,
+  .relaxed-shift-table tr,
   .ordinary-priority-summary-table tr {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     border-bottom: 1px solid var(--as-border);
   }
   .late-priority-summary-table td,
   .late-priority-summary-table td:not(:first-child),
+  .relaxed-shift-table td,
+  .relaxed-shift-table td:not(:first-child),
   .ordinary-priority-summary-table td,
   .ordinary-priority-summary-table td:not(:first-child) {
     display: grid;
@@ -3653,6 +3678,7 @@ autoschedule-previous-schedule-comparison {
     text-align: right;
   }
   .late-priority-summary-table td::before,
+  .relaxed-shift-table td::before,
   .ordinary-priority-summary-table td::before {
     content: attr(data-label);
     color: var(--as-muted);
@@ -3663,6 +3689,9 @@ autoschedule-previous-schedule-comparison {
   .late-priority-count-detail > div,
   .ordinary-priority-count-detail > div {
     min-width: min(250px, calc(100vw - 3rem));
+  }
+  .relaxed-shift-count-detail > div {
+    min-width: 0;
   }
   .late-priority-flight-scope legend {
     align-items: flex-start;

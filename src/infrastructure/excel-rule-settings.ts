@@ -1,4 +1,8 @@
 import type * as XLSX from "xlsx-js-style";
+import {
+  appendRelaxedShiftScope,
+  parseRelaxedShiftScope,
+} from "./excel-relaxed-shift-scope";
 
 import {
   SCHEDULE_SETTING_DEFINITIONS,
@@ -710,6 +714,7 @@ export function parseScheduleRuleSettings(
   const supervisorFill = parseSupervisorFillRules(workbook);
   const crossWorkdayReservations = parseCrossWorkdayReservations(workbook);
   const latePriorityFlightScope = parseLatePriorityFlightScope(workbook);
+  const relaxedShiftScope = parseRelaxedShiftScope(workbook);
   const crossFlightPriority = parseCrossFlightPriorityPolicies(workbook, staff);
   const sameFlightStaffExclusions = parseSameFlightStaffExclusions(
     workbook,
@@ -728,6 +733,7 @@ export function parseScheduleRuleSettings(
     supervisorFill.present ||
     crossWorkdayReservations.present ||
     latePriorityFlightScope.present ||
+    relaxedShiftScope.present ||
     crossFlightPriority.present ||
     sameFlightStaffExclusions.present ||
     teamLeaderGapFillPositionPolicies.present;
@@ -742,6 +748,7 @@ export function parseScheduleRuleSettings(
     supervisorFill.value !== undefined ||
     crossWorkdayReservations.value !== undefined ||
     latePriorityFlightScope.value !== undefined ||
+    relaxedShiftScope.value !== undefined ||
     crossFlightPriority.value !== undefined ||
     sameFlightStaffExclusions.value !== undefined ||
     teamLeaderGapFillPositionPolicies.value !== undefined;
@@ -777,6 +784,8 @@ export function parseScheduleRuleSettings(
       crossWorkdayReservations.value;
   if (settings && latePriorityFlightScope.value !== undefined)
     settings.latePriorityFlightNumbers = latePriorityFlightScope.value;
+  if (settings && relaxedShiftScope.value !== undefined)
+    settings.relaxedShiftFlightNumbers = relaxedShiftScope.value;
   if (settings && crossFlightPriority.value !== undefined)
     settings.crossFlightPriorityPolicies = crossFlightPriority.value;
   if (settings && sameFlightStaffExclusions.value !== undefined)
@@ -798,6 +807,7 @@ export function parseScheduleRuleSettings(
       ...supervisorFill.warnings,
       ...crossWorkdayReservations.warnings,
       ...latePriorityFlightScope.warnings,
+      ...relaxedShiftScope.warnings,
       ...crossFlightPriority.warnings,
       ...sameFlightStaffExclusions.warnings,
       ...teamLeaderGapFillPositionPolicies.warnings,
@@ -1006,6 +1016,7 @@ export function appendScheduleRuleSheets(
     ],
     [20]
   );
+  appendRelaxedShiftScope(workbook, state.settings.relaxedShiftFlightNumbers);
   append(
     workbook,
     structuredPolicySheet("crossFlightPriorityPolicies"),
