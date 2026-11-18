@@ -1,0 +1,76 @@
+
+ RUN  v4.1.10 C:/Users/19598/AppData/Local/Temp/autoschedule-relaxed-quality-ebf3986f
+
+ ✓ tests/app/application-coordinator.test.ts > application persistence feedback > clears the export warning only after configuration export succeeds 142ms
+ ✓ tests/app/application-coordinator.test.ts > application persistence feedback > keeps the export warning when configuration export fails 5ms
+ ✓ tests/app/application-coordinator.test.ts > application persistence feedback > 切换组前提示保存未保存改动，确认后只显示目标组数据 7ms
+ ✓ tests/app/application-coordinator.test.ts > application persistence feedback > 取消切组确认时保留当前组 3ms
+ ✓ tests/app/application-coordinator.test.ts > application persistence feedback > applies a validated late-priority count preview through the records controller 18ms
+ ✓ tests/app/application-coordinator.test.ts > application persistence feedback > confirms monthly late-priority reset before committing the zero baseline 10ms
+ ✓ tests/app/application-coordinator.test.ts > application persistence feedback > shows an important warning when saved data approaches browser capacity 4ms
+ ✓ tests/app/application-coordinator.test.ts > application persistence feedback > keeps in-memory data and reports a failed quota write 4ms
+ ✓ tests/app/application-coordinator.test.ts > historical schedule editing > 历史编辑红叉清空所有人员且保留岗位、备注；取消编辑恢复原表 37ms
+ ✓ tests/app/application-coordinator.test.ts > historical schedule editing > 历史红叉取消不改草稿；拒绝保存确认时原历史不变 14ms
+ ✓ tests/app/application-coordinator.test.ts > historical schedule editing > 历史红叉保存仅清空目标日期人员，持久化后可重开补人并保留基准 34ms
+ ✓ tests/app/application-coordinator.test.ts > historical schedule editing > 历史清空后日期、组、配置、自动排班和归档仍被拦截 23ms
+ ✓ tests/app/application-coordinator.test.ts > historical schedule editing > 历史红叉不会绕过记录未匹配时的禁止覆盖保护 7ms
+ ✓ tests/app/application-coordinator.test.ts > historical schedule editing > opens the archived date as an isolated draft and cancels back to the current schedule 8ms
+ ✓ tests/app/application-coordinator.test.ts > historical schedule editing > saves only the target history date and restores the current schedule 12ms
+ ✓ tests/app/application-coordinator.test.ts > historical schedule editing > keeps the draft and history unchanged when overwrite confirmation is declined 5ms
+ ✓ tests/app/application-coordinator.test.ts > historical schedule editing > exports the target historical draft while keeping mutating commands blocked 6ms
+ ✓ tests/app/application-coordinator.test.ts > application scheduling exclusivity > keeps the pre-run schedule when calculation is stopped without a result 6ms
+ ✓ tests/app/application-coordinator.test.ts > application scheduling exclusivity > installs only the complete safe result selected by stop-and-adopt 21ms
+ ✓ tests/app/application-coordinator.test.ts > application scheduling exclusivity > reserves a schedule run before asynchronous command routing 59ms
+ ✓ tests/app/application-coordinator.test.ts > application scheduling exclusivity > blocks data-changing commands while a schedule calculation is running 3ms
+ ✓ tests/app/application-coordinator.test.ts > manual swap analysis workflow > rechecks a proposed swap before applying it 18ms
+ ✓ tests/app/application-coordinator.test.ts > team leader gap fill workflow > previews a local chain and applies it only after confirmation 64ms
+ ✓ tests/app/application-coordinator.test.ts > next workday flight picker workflow > explains 'calculation-timeout' in plain language for 'generate' without adopting the failed draft 9ms
+ ✓ tests/app/application-coordinator.test.ts > next workday flight picker workflow > explains 'program-error' in plain language for 'generate' without adopting the failed draft 7ms
+ ✓ tests/app/application-coordinator.test.ts > next workday flight picker workflow > explains 'no-safe-schedule' in plain language for 'generate' without adopting the failed draft 7ms
+ ✓ tests/app/application-coordinator.test.ts > next workday flight picker workflow > explains 'schedule-check' in plain language for 'generate' without adopting the failed draft 7ms
+ ✓ tests/app/application-coordinator.test.ts > next workday flight picker workflow > explains 'schedule-check' in plain language for 'generate' without adopting the failed draft 7ms
+ ✓ tests/app/application-coordinator.test.ts > next workday flight picker workflow > explains 'calculation-timeout' in plain language for 'reschedule' without adopting the failed draft 6ms
+ ✓ tests/app/application-coordinator.test.ts > next workday flight picker workflow > explains 'program-error' in plain language for 'reschedule' without adopting the failed draft 6ms
+ ✓ tests/app/application-coordinator.test.ts > next workday flight picker workflow > explains 'no-safe-schedule' in plain language for 'reschedule' without adopting the failed draft 7ms
+ ✓ tests/app/application-coordinator.test.ts > next workday flight picker workflow > explains 'schedule-check' in plain language for 'reschedule' without adopting the failed draft 7ms
+ ✓ tests/app/application-coordinator.test.ts > next workday flight picker workflow > explains 'schedule-check' in plain language for 'reschedule' without adopting the failed draft 6ms
+ ✓ tests/app/application-coordinator.test.ts > next workday flight picker workflow > explains 'calculation-timeout' in plain language for 'next' without adopting the failed draft 12ms
+ ✓ tests/app/application-coordinator.test.ts > next workday flight picker workflow > explains 'program-error' in plain language for 'next' without adopting the failed draft 7ms
+ ✓ tests/app/application-coordinator.test.ts > next workday flight picker workflow > explains 'no-safe-schedule' in plain language for 'next' without adopting the failed draft 7ms
+ ✓ tests/app/application-coordinator.test.ts > next workday flight picker workflow > explains 'schedule-check' in plain language for 'next' without adopting the failed draft 6ms
+ ✓ tests/app/application-coordinator.test.ts > next workday flight picker workflow > explains 'schedule-check' in plain language for 'next' without adopting the failed draft 7ms
+ ✓ tests/app/application-coordinator.test.ts > next workday flight picker workflow > shows KE166 failure details and preserves the model for generate 8ms
+ ✓ tests/app/application-coordinator.test.ts > next workday flight picker workflow > shows KE166 failure details and preserves the model for reschedule 9ms
+ ✓ tests/app/application-coordinator.test.ts > next workday flight picker workflow > shows KE166 failure details and preserves the model for next 9ms
+ ✓ tests/app/application-coordinator.test.ts > next workday flight picker workflow > keeps manual late-priority balance through repeated archive-and-next-workday runs 297ms
+ ✓ tests/app/application-coordinator.test.ts > next workday flight picker workflow > opens local flight selection before changing history or starting calculation 5ms
+ ✓ tests/app/application-coordinator.test.ts > next workday flight picker workflow > keeps the original model when the selected next schedule fails 8ms
+ ✓ tests/app/application-coordinator.test.ts > next workday flight picker workflow > keeps the original model when a stopped result has no safety credential 7ms
+ ✓ tests/app/application-coordinator.test.ts > next workday flight picker workflow > commits archive, selected flights, date, and result only after success 18ms
+ ✓ tests/app/application-coordinator.test.ts > current schedule flight picker workflow > opens every local flight and defaults to the current day's selection without mutating state 7ms
+ ✓ tests/app/application-coordinator.test.ts > current schedule flight picker workflow > commits selected flights, passenger counts, and the new schedule only after success 20ms
+ ✓ tests/app/application-coordinator.test.ts > current schedule flight picker workflow > keeps the original flights and schedule when recalculation fails 7ms
+ ✓ tests/app/application-coordinator.test.ts > current schedule flight picker workflow > atomically adopts selected flights and a safe result when stop-and-adopt is requested 18ms
+ ✓ tests/domain/relaxed-shift-balance.test.ts > monthly relaxed shift balance > rotates the flight that begins earlier when monthly counts are tied 16ms
+ ✓ tests/domain/relaxed-shift-balance.test.ts > monthly relaxed shift balance > prefers fewer early departures even when that person had the earliest flight 4ms
+ ✓ tests/domain/relaxed-shift-balance.test.ts > monthly relaxed shift balance > does not balance tied counts by making today's only early departure later 3ms
+ ✓ tests/domain/relaxed-shift-balance.test.ts > monthly relaxed shift balance > does not compare unequal samples when an unknown start changes hands 3ms
+ ✓ tests/domain/relaxed-shift-balance.test.ts > monthly relaxed shift balance > keeps legacy dates counted without guessing their original flight start 2ms
+ ✓ tests/domain/relaxed-shift-balance.test.ts > monthly relaxed shift balance > archives the flight start and carries it through Excel bytes and local storage 61ms
+ ✓ tests/domain/relaxed-shift-balance.test.ts > monthly relaxed shift balance > keeps the earlier rotation through Worker/WASM and exported XLSX 273ms
+ ✓ tests/domain/relaxed-shift-balance.test.ts > monthly relaxed shift balance > balances the afternoon-free column even when old afternoon-rest counts are tied 5ms
+ ✓ tests/domain/relaxed-shift-balance.test.ts > monthly relaxed shift balance > shares recent fatigue protection instead of undoing it to balance monthly rest 11ms
+ ✓ tests/domain/relaxed-shift-balance.test.ts > monthly relaxed shift balance > does not give duty an afternoon flight to balance monthly rest counts 6ms
+ ✓ tests/domain/relaxed-shift-balance.test.ts > monthly relaxed shift balance > does not hide the recipient from the comparison by swapping in an originally idle person 15ms
+ ✓ tests/domain/relaxed-shift-balance.test.ts > monthly relaxed shift balance > catches up across archived workdays without losing daily rest opportunities 312ms
+ ✓ tests/domain/relaxed-shift-balance.test.ts > monthly relaxed shift balance > registers the final review and exposes independent switches in the actual rule ledger 2ms
+ ✓ tests/domain/relaxed-shift-balance.test.ts > monthly relaxed shift balance > keeps explicit switches and zero targets through Excel, empty import, restart and actual scheduling 83ms
+ ✓ tests/domain/relaxed-shift-balance.test.ts > monthly relaxed shift balance > runs the same balance after the complete automatic pipeline and final safety 50ms
+ ✓ tests/domain/relaxed-shift-balance.test.ts > monthly relaxed shift balance > preserves the original when disabled, locked or rejected by final safety 9ms
+ ✓ tests/domain/relaxed-shift-balance.test.ts > monthly relaxed shift balance > ignores target/future/other-month and partial history; keeps each setting independent 8ms
+ ✓ tests/domain/relaxed-shift-balance.test.ts > monthly relaxed shift balance > gives the next rest opportunity to the person at zero rather than two 9ms
+
+ Test Files  2 passed (2)
+      Tests  68 passed (68)
+   Start at  20:16:41
+   Duration  4.91s (transform 2.04s, setup 0ms, import 2.59s, tests 1.91s, environment 0ms)

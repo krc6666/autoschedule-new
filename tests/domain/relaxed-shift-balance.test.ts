@@ -1,13 +1,18 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { createDefaultState } from "../../src/defaults";
 import type { Assignment, HistoryRecord } from "../../src/model";
-import { balanceRelaxedShifts } from "../../src/domain/reviews/relaxed-shift-balance";
+import {
+  balanceRelaxedShifts,
+  preservesRelaxedShiftBalance,
+} from "../../src/domain/reviews/relaxed-shift-balance";
+import { currentScheduleHistory } from "../../src/app/history-actions";
 import { buildMonthlyRelaxedShiftStatistics } from "../../src/domain/statistics/relaxed-shift-statistics";
 import { ScheduleGuardError } from "../../src/domain/kernel/schedule-guard";
 import { generateSchedule } from "../helpers/generate-schedule";
 import * as XLSX from "xlsx-js-style";
 import {
   buildConfigWorkbook,
+  buildScheduleWorkbook,
   parseWorkbook,
 } from "../../src/infrastructure/excel";
 import { applyWorkbookImport } from "../../src/app/workbook-actions";
@@ -17,6 +22,11 @@ import {
   builtInRulePreferences,
 } from "../../src/domain/rules/built-in-rule-registry";
 import { USER_SCHEDULING_RULES } from "../../src/ui/projections/policy-rule-presentation";
+import { createScheduleGenerationFacts } from "../../src/domain/shared/scheduling-facts";
+import type {
+  ScheduleWorkerRequest,
+  ScheduleWorkerResponse,
+} from "../../src/infrastructure/schedule-worker-protocol";
 
 function fixture() {
   const state = createDefaultState();
@@ -88,7 +98,336 @@ function fixture() {
   return state;
 }
 
+function qualityFixture() {
+  const state = fixture();
+  state.settings.afternoonRestBalanceEnabled = false;
+  state.settings.workloadBalanceEnabled = false;
+  const earlier = state.flights[0]!;
+  state.flights[1] = {
+    ...state.flights[1]!,
+    startTime: "11:00",
+    endTime: "11:50",
+  };
+  const later = state.flights[1];
+  state.assignments = [
+    state.assignments[0]!,
+    {
+      ...state.assignments[2]!,
+      startTime: later.startTime,
+      endTime: later.endTime,
+    },
+  ];
+  state.history = state.assignments.map((assignment, index) => ({
+    ...assignment,
+    staffId: assignment.staffId!,
+    date: "2026-11-02",
+    startTime: "08:30",
+    flightStartTime: index === 0 ? earlier.startTime : later.startTime,
+  }));
+  return state;
+}
+
+function balanceFixture(
+  state: ReturnType<typeof fixture>,
+  assertSafe = () => undefined
+) {
+  return balanceRelaxedShifts({
+    state,
+    date: state.activeScheduleDate!,
+    assignments: state.assignments,
+    lockedAssignmentIds: new Set(),
+    assertSafe,
+  });
+}
+
 describe("monthly relaxed shift balance", () => {
+  it("rotates the flight that begins earlier when monthly counts are tied", () => {
+    const state = qualityFixture();
+    state.settings.relaxedShiftFlightNumbers = [];
+    const result = balanceFixture(state);
+    expect(result[0]!.staffId).toBe("p1");
+    expect(result[1]!.staffId).toBe("p0");
+    expect(
+      preservesRelaxedShiftBalance(
+        state,
+        state.activeScheduleDate!,
+        result,
+        state.assignments
+      )
+    ).toBe(false);
+    expect(
+      balanceFixture(state, () => {
+        throw new ScheduleGuardError([
+          { ruleId: "staff-unavailable", message: "unsafe swap" },
+        ]);
+      })
+    ).toEqual(state.assignments);
+  });
+
+  it("prefers fewer early departures even when that person had the earliest flight", () => {
+    const state = qualityFixture();
+    const afternoon = {
+      ...state.flights[1]!,
+      startTime: "14:00",
+      endTime: "15:00",
+    };
+    state.flights[1] = afternoon;
+    state.assignments[1] = {
+      ...state.assignments[1]!,
+      startTime: afternoon.startTime,
+      endTime: afternoon.endTime,
+    };
+    state.history.push({ ...state.history[1]!, date: "2026-11-04" });
+    expect(balanceFixture(state)[0]!.staffId).toBe("p0");
+  });
+
+  it("does not balance tied counts by making today's only early departure later", () => {
+    const state = qualityFixture();
+    const lateFlight = {
+      ...state.flights[1]!,
+      id: "late",
+      flightNo: "PM200",
+      startTime: "14:00",
+      endTime: "15:00",
+    };
+    state.flights.push(lateFlight);
+    const extra = {
+      ...state.assignments[1]!,
+      id: "late-post",
+      flightId: lateFlight.id,
+      flightNo: lateFlight.flightNo,
+      startTime: lateFlight.startTime,
+      endTime: lateFlight.endTime,
+    };
+    const before = [...state.assignments, extra];
+    const after = [
+      ...state.assignments,
+      { ...extra, staffId: "p0", staffName: "甲" },
+    ];
+    const date = state.activeScheduleDate!;
+    for (const [assignments, expected] of [
+      [before, [540]],
+      [after, [660]],
+    ] as const) {
+      expect(
+        buildMonthlyRelaxedShiftStatistics(
+          { ...state, assignments: [...assignments] },
+          date
+        ).currentEarlyDepartureStartMinutes
+      ).toEqual(expected);
+    }
+    expect(preservesRelaxedShiftBalance(state, date, before, after)).toBe(
+      false
+    );
+  });
+
+  it("does not compare unequal samples when an unknown start changes hands", () => {
+    const state = qualityFixture();
+    const third = { ...state.staff[0]!, id: "p2", name: "丙" };
+    state.staff.push(third);
+    state.history.push({
+      ...state.history[0]!,
+      id: "third-history",
+      staffId: third.id,
+      staffName: third.name,
+    });
+    state.flights[1]!.startTime = "";
+    const [first, second] = state.assignments;
+    const thirdAssignment = {
+      ...first!,
+      id: "third-post",
+      staffId: third.id,
+      staffName: third.name,
+    };
+    const before = [first!, second!, thirdAssignment];
+    const after = [
+      { ...first!, staffId: second!.staffId, staffName: second!.staffName },
+      { ...second!, staffId: first!.staffId, staffName: first!.staffName },
+      thirdAssignment,
+    ];
+    const date = state.activeScheduleDate!;
+    expect(preservesRelaxedShiftBalance(state, date, before, after)).toBe(true);
+    expect(preservesRelaxedShiftBalance(state, date, after, before)).toBe(true);
+  });
+
+  it("keeps legacy dates counted without guessing their original flight start", () => {
+    const state = qualityFixture();
+    state.history = state.history.map((row) => ({
+      ...row,
+      flightStartTime: undefined,
+    }));
+    expect(
+      buildMonthlyRelaxedShiftStatistics(
+        state,
+        state.activeScheduleDate!
+      ).rows.map((row) => row.earlyDepartures.length)
+    ).toEqual([2, 2]);
+    expect(balanceFixture(state)).toEqual(state.assignments);
+  });
+
+  it("archives the flight start and carries it through Excel bytes and local storage", () => {
+    const state = qualityFixture();
+    state.assignments[0]!.startTime = "08:30";
+    state.history = currentScheduleHistory(state, "2026-11-02");
+    const expectStarts = (history: HistoryRecord[]) =>
+      expect(
+        history.map(({ startTime, flightStartTime }) => [
+          startTime,
+          flightStartTime,
+        ])
+      ).toEqual([
+        ["08:30", "09:00"],
+        ["11:00", "11:00"],
+      ]);
+    expectStarts(state.history);
+    const bytes = XLSX.write(buildConfigWorkbook(state), {
+      type: "array",
+      bookType: "xlsx",
+    });
+    expectStarts(
+      parseWorkbook(XLSX.read(bytes, { type: "array" }), state.staff).history!
+    );
+    const memory = new Map<string, string>();
+    saveState(state, { setItem: memory.set.bind(memory) });
+    expectStarts(
+      loadState({ getItem: (key) => memory.get(key) ?? null }).history
+    );
+    const [first, second] = state.history;
+    state.history = [first!, { ...second!, flightStartTime: undefined }];
+    const date = "2026-11-02";
+    state.flights[0]!.startTime = "07:00";
+    for (const history of [
+      currentScheduleHistory(state, date, {
+        preserveArchivedFlightStarts: true,
+      }),
+      parseWorkbook(
+        buildScheduleWorkbook(state, date, { historicalEdit: true }),
+        state.staff
+      ).history!,
+    ])
+      expect(history.map((row) => row.flightStartTime)).toEqual([
+        "09:00",
+        undefined,
+      ]);
+  });
+
+  it("keeps the earlier rotation through Worker/WASM and exported XLSX", async () => {
+    const state = qualityFixture();
+    state.settings.minimumRegularTransitionMinutes = 0;
+    state.positionRules = state.assignments.map((assignment) => ({
+      id: assignment.positionRuleId!,
+      flightNo: assignment.flightNo,
+      name: assignment.position,
+      category: "常规",
+      remark: "",
+      qualifiedStaffIds: ["p0", "p1"],
+      manual: false,
+      fatiguePoints: 1,
+      minPassengers: 0,
+      earlyReleaseMinutes: 0,
+    }));
+    const date = state.activeScheduleDate!;
+    const baseline = await generateSchedule(
+      {
+        ...state,
+        settings: { ...state.settings, earlyDepartureBalanceEnabled: false },
+      },
+      date
+    );
+    expect(new Set(baseline.assignments.map((row) => row.staffId)).size).toBe(
+      2
+    );
+    const first = baseline.assignments.find(
+      (row) => row.flightId === "am"
+    )!.staffId!;
+    const second = baseline.assignments.find(
+      (row) => row.flightId === "pm"
+    )!.staffId!;
+    state.history[0]!.staffId = first;
+    state.history[0]!.staffName = state.staff.find(
+      (person) => person.id === first
+    )!.name;
+    state.history[1]!.staffId = second;
+    state.history[1]!.staffName = state.staff.find(
+      (person) => person.id === second
+    )!.name;
+    const replies: ScheduleWorkerResponse[] = [];
+    const host = {
+      onmessage: undefined as
+        | ((event: MessageEvent<ScheduleWorkerRequest>) => Promise<void>)
+        | undefined,
+      postMessage: (reply: ScheduleWorkerResponse) => replies.push(reply),
+    };
+    vi.stubGlobal("self", host);
+    try {
+      await import("../../src/schedule.worker");
+      await host.onmessage!(
+        new MessageEvent<ScheduleWorkerRequest>("message", {
+          data: {
+            state: createScheduleGenerationFacts(state),
+            date,
+            preferences: { halfRestStaffIds: [] },
+          },
+        })
+      );
+    } finally {
+      vi.unstubAllGlobals();
+    }
+    expect(replies.filter(({ type }) => type === "error")).toEqual([]);
+    const reply = replies.find((message) => message.type === "result");
+    if (reply?.type !== "result") throw new Error("no worker result");
+    const { result } = reply;
+    expect(result.unfilledCount).toBe(0);
+    expect(result.safetyCredential).toBeDefined();
+    const workbook = buildScheduleWorkbook(
+      { ...state, assignments: result.assignments },
+      date
+    );
+    const bytes = XLSX.write(workbook, { type: "array", bookType: "xlsx" });
+    const sheet = XLSX.read(bytes, { type: "array" }).Sheets["排班结果"]!;
+    const rows = XLSX.utils.sheet_to_json<Record<string, string>>(sheet);
+    expect(
+      rows.map((row) => [row["航班开始时间"], row["人员编号"]]).sort()
+    ).toEqual([
+      ["09:00", second],
+      ["11:00", first],
+    ]);
+  });
+
+  it("balances the afternoon-free column even when old afternoon-rest counts are tied", () => {
+    const state = fixture();
+    state.settings.earlyDepartureBalanceEnabled = false;
+    state.settings.workloadBalanceEnabled = false;
+    const flight = {
+      ...state.flights[1]!,
+      id: "evening",
+      flightNo: "EV100",
+      startTime: "19:00",
+      endTime: "20:00",
+    };
+    state.flights.push(flight);
+    const evening = {
+      ...state.assignments[2]!,
+      id: "late",
+      flightId: flight.id,
+      flightNo: flight.flightNo,
+      startTime: flight.startTime,
+      endTime: flight.endTime,
+      staffId: "p0",
+      staffName: "甲",
+    };
+    state.assignments.push(evening);
+    state.history = [{ ...evening, date: "2026-11-02", staffId: "p0" }];
+    const result = balanceFixture(state);
+    const report = buildMonthlyRelaxedShiftStatistics(
+      { ...state, assignments: result },
+      state.activeScheduleDate!
+    );
+    expect(report.rows.map((row) => row.afternoonFreeDates)).toEqual([
+      ["2026-11-02"],
+      ["2026-11-06"],
+    ]);
+  });
   it("shares recent fatigue protection instead of undoing it to balance monthly rest", () => {
     const state = fixture();
     state.history.forEach((r) => {

@@ -99,6 +99,7 @@ const FIELDS: Record<string, string> = {
   teamLeaderGapFill: "分队长补差",
   historyCoverage: "历史完整性",
   flightCutoffTime: "航班截载时间",
+  flightStartTime: "航班开始时间",
   attendanceIntervals: "实际出勤时段",
   movable: "允许调动",
   minimumGapMinutes: "最少间隔分钟",

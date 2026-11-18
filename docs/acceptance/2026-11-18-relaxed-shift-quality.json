@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-18-relaxed-shift-quality",
+  "title": "月度轻松班次先均衡次数，再轮换开始更早的航班",
+  "startedFrom": "e2fc4c52233a6d1c787405c056b5f6626f0404c3",
+  "expectation": {
+    "example": "甲乙都早走过一次，最后一班分别09:00、11:00开始；今天双方都能承担这两个班时，优先乙09:00。若甲只有1次、乙已有2次，先补甲的次数。",
+    "expected": "在既有次数目标与安全保护下，用归档的原航班开始时间均衡机会；下午空单独按次数比较，统计页航班勾选不参与排班。",
+    "unchanged": "同组同自然月只读取目标日前的完整归档；现有提前下班、下午无航班、下午休定义及开关、覆盖、锁定、资质、跨日恢复、值班、人员保护和人工权限不变。",
+    "fallback": "旧档缺可信航班开始时间仍计次数，不从现航班表推算；没有安全改善时保留原安排。"
+  },
+  "testedVersion": "ed1dfccb47f8db38d5731d8364b9344804d66ecc5b6c7493a453b983cddba34b",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "修改前匿名用例失败：09:00 机会未轮换、归档未保留原航班开始时间、下午空次数不均衡；补测另捕获换人后错误比较两批不同的人员。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-relaxed-shift-quality-red.txt",
+          "summary": "初始红测：3 失败，12 通过。",
+          "sha256": "f8c8b7c4389fa445b90b1f2ed1603a3b44f6165458334d1137b415b52171e650"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-relaxed-shift-quality-sample-red.txt",
+          "summary": "缺时间的机会调给另一人导致可比集合变化；新增用例修复前失败。",
+          "sha256": "3003b480a8146e26322b84177ae17d5e97729b23fee84fd55ab7a6651649f747"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "先按次数，次数同样均衡再轮换早开始航班。Node 宿主实际排班 Worker 加载 HiGHS WASM，生成有安全凭证且无空岗的结果；用 XLSX 字节重新读出实际航班时间与员工编号，核对 09:00 和 11:00 各轮给另一人。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-relaxed-shift-quality-targeted.txt",
+          "summary": "排班及控制器定向测试通过：2 文件 68 项。",
+          "sha256": "223048859bf780e2b63be42ed32a646f8bcfc7fb4e2ce1f963c6286f04bdbe52"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "下午空独立计次；旧档缺值仍计原次数，不用岗位开始时间猜；完整归档时间经配置 Excel 字节和 localStorage 往返，历史改派、临时草稿导出仍保留旧值或缺值。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-relaxed-shift-quality-targeted.txt",
+          "summary": "缺值、下午空、归档、历史导出和状态恢复专项通过。",
+          "sha256": "223048859bf780e2b63be42ed32a646f8bcfc7fb4e2ce1f963c6286f04bdbe52"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "早晚集中、航司搭配消费同一保持检查。先得到更公平班表，再把开始更早的机会换回已占优者，保持检查拒绝；不接受靠 09:00 换成 11:00 缩小差距或靠更换人员样本制造差距。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-relaxed-shift-quality-targeted.txt",
+          "summary": "保持检查反向场景及完整 Worker 结果通过。",
+          "sha256": "223048859bf780e2b63be42ed32a646f8bcfc7fb4e2ce1f963c6286f04bdbe52"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "仍消费原最终安全守卫；锁定或守卫否决后保留原结果，试排不能破坏当天机会人数、岗位覆盖、值班与近期疲劳保护。高优先级独立督导恢复继续走原守卫。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-relaxed-shift-quality-targeted.txt",
+          "summary": "锁定、安全否决、值班、疲劳及最终凭证回归通过。",
+          "sha256": "223048859bf780e2b63be42ed32a646f8bcfc7fb4e2ce1f963c6286f04bdbe52"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "原均衡开关关闭、零目标、月份、历史完整性、占岗参与人范围、历史编辑权限与已有保存合同均有定向回归。统计航班勾选不进入排班决策。最终源文件在隔离副本逐字节匹配后，单 worker 完整验证退出 0；原性能阈值未修改。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-relaxed-shift-quality-targeted.txt",
+          "summary": "原边界与新行为合跑 68 项通过。",
+          "sha256": "223048859bf780e2b63be42ed32a646f8bcfc7fb4e2ce1f963c6286f04bdbe52"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-relaxed-shift-quality-verify.txt",
+          "summary": "npm.cmd run verify 退出 0：240 文件 2319 项功能、7 文件 19 项性能、类型检查及生产构建通过；保留原 Vite 构建提示。",
+          "sha256": "f0fa8cb2c8a2bc56186a0a9b2d44261201126c85572202aaee3a96a1d80b285d"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "已在 Node 宿主核对实际 Worker/WASM、最终班表与 XLSX；本任务未获明确授权自行操作浏览器，未在真实页面或生产资料完成现场验收。自动证据不代替现场。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-relaxed-shift-quality-targeted.txt",
+          "summary": "匿名最终产物自动核对，仅作开发证据。",
+          "sha256": "223048859bf780e2b63be42ed32a646f8bcfc7fb4e2ce1f963c6286f04bdbe52"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "red.txt 中初始三项失败，sample-red.txt 捕获样本变动误判；targeted.txt 记录修复后原业务场景与新增边界全部通过。",
+    "laterChanges": "早晚集中和航司搭配经相同保持比较；targeted.txt 中已公平结果被逆向换人、整体换晚、缺值换人、安全守卫拒绝及 Worker 最终输出均有验证。高优先级独立督导恢复沿用既有安全合同。",
+    "finalArtifact": "targeted.txt 的 Worker/WASM → XLSX 字节测试以实际表格的员工编号和航班开始时间核对 09:00/11:00 轮换。真实页面最终产物未取得，不标现场通过。"
+  },
+  "review": {
+    "missedScope": "可能漏历史编辑的导出入口、缺值人员样本变化、以及后置为了公平把当天机会换晚。全量首轮发现导出 mock 未声明历史编辑选项；定向用例单独覆盖接口、字节及反向候选。真实页面不在本轮证据内。",
+    "rootCause": "原复核只比较提前下班与原下午无航班的次数，且持久化历史缺原航班开始时间；所以无法区分 09:00 与 11:00 的早走机会，也未消费新下午空分类。仅把开始时间分数加进去还可能因缺值换人而比较不同样本。",
+    "earlyDetection": "在改归档字段或排班比较前，先做时间不同而次数相同、次数冲突、缺值从两人之间转移以及原岗位时间与航班时间不同的匿名红测；同步列出历史保存和两类 Excel 的消费者，最后独立回读生成的文件。"
+  }
+}

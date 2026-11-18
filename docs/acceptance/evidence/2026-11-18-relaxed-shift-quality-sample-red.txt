@@ -1,0 +1,38 @@
+
+ RUN  v4.1.10 C:/Users/19598/AppData/Local/Temp/autoschedule-relaxed-quality-ebf3986f
+
+···x··············
+npm.cmd :
+所在位置 行:2 字符: 267
++ ... ORKERS='1'; npm.cmd exec vitest -- run tests/domain/relaxed-shift-bal ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/domain/relaxed-shift-balance.test.ts > monthly relaxed shift balance > does not compare unequal samples wh
+en an unknown start changes hands
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/domain/relaxed-shift-balance.test.ts:242:70
+    240|     ];
+    241|     const date = state.activeScheduleDate!;
+    242|     expect(preservesRelaxedShiftBalance(state, date, before, after)).t…
+       |                                                                      ^
+    243|     expect(preservesRelaxedShiftBalance(state, date, after, before)).t…
+    244|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 17 passed (18)
+   Start at  20:12:41
+   Duration  3.22s (transform 1.68s, setup 0ms, import 2.02s, tests 975ms, environment 0ms)

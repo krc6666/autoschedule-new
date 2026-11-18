@@ -449,6 +449,10 @@ function restoreHistory(value: unknown[]): HistoryRecord[] {
       typeof item.flightCutoffTime === "string"
         ? normalizeTime(item.flightCutoffTime)
         : "";
+    const flightStartTime =
+      typeof item.flightStartTime === "string"
+        ? normalizeTime(item.flightStartTime)
+        : "";
     const attendanceIntervals = normalizeAttendanceIntervals(
       item.attendanceIntervals
     );
@@ -463,6 +467,7 @@ function restoreHistory(value: unknown[]): HistoryRecord[] {
         startTime: item.startTime,
         endTime: item.endTime,
         ...(flightCutoffTime ? { flightCutoffTime } : {}),
+        ...(flightStartTime ? { flightStartTime } : {}),
         ...(attendanceIntervals ? { attendanceIntervals } : {}),
         workHours: item.workHours,
         fatiguePoints: item.fatiguePoints,

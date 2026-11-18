@@ -48,6 +48,7 @@ import {
 } from "../utils";
 import { durationHours, normalizeTime } from "../domain/shared/time";
 import { mergeLatePriorityFrequencyAdjustments } from "../domain/statistics/late-priority-frequency-adjustment";
+import { archivedFlightStarts } from "../domain/statistics/relaxed-shift-statistics";
 import { mergeOrdinaryPriorityFrequencyAdjustments } from "../domain/statistics/ordinary-priority-frequency-adjustment";
 import { normalizeOrdinaryPriorityPositions } from "../domain/reviews/position-rotation-policy";
 import { sameAirlinePriorityWarningsByAssignment } from "../domain/rules/airline-rotation";
@@ -831,6 +832,7 @@ function parseHistory(
   const startIndex = headerIndex(header, ["开始时间"], -1);
   const endIndex = headerIndex(header, ["结束时间"], -1);
   const flightCutoffIndex = headerIndex(header, ["航班截载时间"], -1);
+  const flightStartIndex = headerIndex(header, ["航班开始时间"], -1);
   const hoursIndex = headerIndex(header, ["工作时长"], 3);
   const fatigueIndex = headerIndex(header, ["疲劳点"], -1);
   const remarkIndex = headerIndex(header, ["备注"], 4);
@@ -870,6 +872,10 @@ function parseHistory(
       flightCutoffIndex >= 0
         ? normalizeTime(normalizeText(row[flightCutoffIndex]))
         : "";
+    const flightStartTime =
+      flightStartIndex >= 0
+        ? normalizeTime(normalizeText(row[flightStartIndex]))
+        : "";
     const rawHours = row[hoursIndex];
     const parsedHours = Number(rawHours);
     const hours =
@@ -906,6 +912,7 @@ function parseHistory(
         startTime,
         endTime,
         ...(flightCutoffTime ? { flightCutoffTime } : {}),
+        ...(flightStartTime ? { flightStartTime } : {}),
         ...(attendanceIntervals ? { attendanceIntervals } : {}),
         workHours: hours,
         fatiguePoints:
@@ -1327,6 +1334,7 @@ export function buildConfigWorkbook(state: AppState): XLSX.WorkBook {
         "人工调整证据",
         "出勤时段",
         "引导安排",
+        "航班开始时间",
       ],
       ...state.history.map((record) => [
         record.id,
@@ -1348,9 +1356,10 @@ export function buildConfigWorkbook(state: AppState): XLSX.WorkBook {
           ? JSON.stringify(record.attendanceIntervals)
           : "",
         record.guideMode === "independent" ? "独立" : "",
+        record.flightStartTime ?? "",
       ]),
     ],
-    [18, 12, 12, 18, 16, 14, 12, 12, 16, 12, 32, 20, 14, 12, 36]
+    [18, 12, 12, 18, 16, 14, 12, 12, 16, 12, 32, 20, 14, 12, 36, 15, 12, 16]
   );
   appendLeaveTypes(workbook, state.leaveTypes);
   appendHalfRestSelections(workbook, state.halfRestSelections ?? []);
@@ -1361,10 +1370,14 @@ export function buildConfigWorkbook(state: AppState): XLSX.WorkBook {
 
 export function buildScheduleWorkbook(
   state: AppState,
-  date: string
+  date: string,
+  options: { historicalEdit?: boolean } = {}
 ): XLSX.WorkBook {
   const workbook = XLSX.utils.book_new();
   const assignments = state.assignments;
+  const originalStarts = options.historicalEdit
+    ? archivedFlightStarts(state.history, date)
+    : undefined;
   const attendance = additionalAttendanceByAssignment(assignments);
   const sameDayWarningsByAssignment =
     state.settings.sameDayCrossFlightPriorityEnabled === false
@@ -1399,6 +1412,7 @@ export function buildScheduleWorkbook(
         "人工调整证据",
         "出勤时段",
         "引导安排",
+        "航班开始时间",
       ],
       ...assignments.map((item) => [
         date,
@@ -1431,9 +1445,13 @@ export function buildScheduleWorkbook(
         }),
         attendance.has(item.id) ? JSON.stringify(attendance.get(item.id)) : "",
         item.guideMode === "independent" ? "独立" : "",
+        (originalStarts
+          ? originalStarts.get(item.flightNo)
+          : state.flights.find((flight) => flight.id === item.flightId)
+              ?.startTime) ?? "",
       ]),
     ],
-    [12, 12, 16, 14, 12, 12, 16, 12, 24, 12, 12, 60, 16, 36]
+    [12, 12, 16, 14, 12, 12, 16, 12, 24, 12, 12, 60, 16, 36, 15, 12, 16]
   );
   const people = new Map<string, Assignment[]>();
   assignments

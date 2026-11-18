@@ -734,7 +734,8 @@ describe("historical schedule editing", () => {
 
     expect(historicalExportMocks.buildScheduleWorkbook).toHaveBeenCalledWith(
       historicalDraft,
-      "2026-08-20"
+      "2026-08-20",
+      { historicalEdit: true }
     );
     expect(historicalExportMocks.writeWorkbook).toHaveBeenCalledWith(
       expect.anything(),

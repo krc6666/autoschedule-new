@@ -114,7 +114,7 @@ const USER_RULE_DESCRIPTIONS: Readonly<Record<SchedulingRuleId, string>> = {
   "historical-fatigue": "前面条件相同时，优先选择历史疲劳较低的人。",
   "position-rotation": "最后按重点、高疲劳普通、低疲劳普通的顺序检查连续轮岗。",
   "relaxed-shift-balance":
-    "最终补缺后，提前下班、下午无航班分别按开关和目标差距尽量均衡本月次数；保留休息人数与已覆盖岗位，通过最终安全检查才换人。",
+    "先均衡本月提前下班和下午无航班次数；次数同样均衡时，尽量轮换最后一班开始更早的航班，并单独均衡下午空次数。保留休息机会和已覆盖岗位，通过安全检查才换人。",
 };
 
 export const USER_RULE_FLOW = SCHEDULING_STAGE_ORDER.map(

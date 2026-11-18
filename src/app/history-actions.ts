@@ -11,6 +11,7 @@ import type { Assignment } from "../model";
 import { isClearedCountRecord } from "../domain/statistics/manual-count-evidence";
 import { additionalAttendanceByAssignment } from "../domain/statistics/attendance-intervals";
 import { operationalInterval, timeToMinutes } from "../domain/shared/time";
+import { archivedFlightStarts } from "../domain/statistics/relaxed-shift-statistics";
 
 export interface HistoricalScheduleDraft {
   flights: AppState["flights"];
@@ -161,9 +162,16 @@ export function buildHistoricalScheduleDraft(
 export function currentScheduleHistory(
   state: AppState,
   date: string,
-  options: { includeUnavailableStaff?: boolean } = {}
+  options: {
+    includeUnavailableStaff?: boolean;
+    preserveArchivedFlightStarts?: boolean;
+  } = {}
 ): HistoryRecord[] {
   const attendance = additionalAttendanceByAssignment(state.assignments);
+  const flights = new Map(state.flights.map((flight) => [flight.id, flight]));
+  const archivedStarts = options.preserveArchivedFlightStarts
+    ? archivedFlightStarts(state.history, date)
+    : undefined;
   const records: HistoryRecord[] = state.assignments
     .filter(
       (item) =>
@@ -176,45 +184,50 @@ export function currentScheduleHistory(
         !assignmentUsesUnavailableStaff(state, item)
     )
     .filter((item) => isCountedWorkloadAssignment(state, item))
-    .map((item) => ({
-      id: createId("history"),
-      date,
-      flightNo: item.flightNo,
-      position: item.position,
-      staffId: item.staffId ?? "",
-      staffName: item.staffName,
-      startTime: item.startTime,
-      endTime: item.endTime,
-      ...(attendance.has(item.id)
-        ? { attendanceIntervals: attendance.get(item.id) }
-        : {}),
-      flightCutoffTime:
-        state.flights.find((flight) => flight.id === item.flightId)?.endTime ??
-        item.endTime,
-      workHours: item.staffId ? item.workHours : 0,
-      fatiguePoints: item.staffId ? item.fatiguePoints : 0,
-      remark: assignmentWarningRemark(
-        item.remark,
-        item.manualRemark,
-        item.manualOverrideWarnings
-      ),
-      ...(item.teamLeaderGapFill ? { teamLeaderGapFill: true as const } : {}),
-      ...(item.guideMode ? { guideMode: item.guideMode } : {}),
-      ...(item.countBaseline
-        ? { countBaseline: structuredClone(item.countBaseline) }
-        : {}),
-      ...(item.manualOverrideWarnings
-        ? {
-            manualOverrideWarnings: structuredClone(
-              item.manualOverrideWarnings
-            ),
-          }
-        : {}),
-      assignmentRemarks: {
-        remark: item.remark,
-        manualRemark: item.manualRemark,
-      },
-    }));
+    .map((item) => {
+      const flight = flights.get(item.flightId);
+      const flightStartTime = archivedStarts
+        ? archivedStarts.get(item.flightNo)
+        : flight?.startTime;
+      return {
+        id: createId("history"),
+        date,
+        flightNo: item.flightNo,
+        position: item.position,
+        staffId: item.staffId ?? "",
+        staffName: item.staffName,
+        startTime: item.startTime,
+        endTime: item.endTime,
+        ...(attendance.has(item.id)
+          ? { attendanceIntervals: attendance.get(item.id) }
+          : {}),
+        flightCutoffTime: flight?.endTime ?? item.endTime,
+        ...(flightStartTime ? { flightStartTime } : {}),
+        workHours: item.staffId ? item.workHours : 0,
+        fatiguePoints: item.staffId ? item.fatiguePoints : 0,
+        remark: assignmentWarningRemark(
+          item.remark,
+          item.manualRemark,
+          item.manualOverrideWarnings
+        ),
+        ...(item.teamLeaderGapFill ? { teamLeaderGapFill: true as const } : {}),
+        ...(item.guideMode ? { guideMode: item.guideMode } : {}),
+        ...(item.countBaseline
+          ? { countBaseline: structuredClone(item.countBaseline) }
+          : {}),
+        ...(item.manualOverrideWarnings
+          ? {
+              manualOverrideWarnings: structuredClone(
+                item.manualOverrideWarnings
+              ),
+            }
+          : {}),
+        assignmentRemarks: {
+          remark: item.remark,
+          manualRemark: item.manualRemark,
+        },
+      };
+    });
   const roster = getDutyRosterForDate(state, date);
   const dutyPerson = roster.dutyStaffId
     ? state.staff.find((person) => person.id === roster.dutyStaffId)

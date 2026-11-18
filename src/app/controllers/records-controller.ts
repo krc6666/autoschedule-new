@@ -100,6 +100,7 @@ export class RecordsController implements UiCommandController {
           return true;
         const replacement = currentScheduleHistory(this.context.model(), date, {
           includeUnavailableStaff: true,
+          preserveArchivedFlightStarts: true,
         }).filter((item) => item.flightNo !== "轮值");
         replacement.push(
           ...this.context

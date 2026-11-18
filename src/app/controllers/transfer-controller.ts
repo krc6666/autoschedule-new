@@ -93,9 +93,12 @@ export class TransferController implements UiCommandController {
       case "export-schedule": {
         const { buildScheduleWorkbook, writeWorkbook } =
           await import("../../infrastructure/excel");
+        const { date, historyEditDate } = this.context.view();
         writeWorkbook(
-          buildScheduleWorkbook(this.context.model(), this.context.view().date),
-          `保障明细_${this.context.view().date}.xlsx`
+          buildScheduleWorkbook(this.context.model(), date, {
+            historicalEdit: historyEditDate === date,
+          }),
+          `保障明细_${date}.xlsx`
         );
         return true;
       }

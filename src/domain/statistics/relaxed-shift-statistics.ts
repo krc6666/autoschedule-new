@@ -1,6 +1,10 @@
 import { getDutyRosterForDate } from "../duty-roster/roster";
-import { operationalInterval, timeToMinutes } from "../shared/time";
-import type { Assignment, HistoryRecord, Staff } from "../../model";
+import {
+  normalizeTime,
+  operationalInterval,
+  timeToMinutes,
+} from "../shared/time";
+import type { Assignment, Flight, HistoryRecord, Staff } from "../../model";
 import type { SchedulingFacts } from "../shared/scheduling-facts";
 import { isCountedWorkloadAssignment } from "../shared/workload-accounting";
 import { normalizeWeeklyFlightNo } from "../flights/weekly-flight-plan";
@@ -13,6 +17,7 @@ interface ActualTask {
   startTime: string;
   endTime: string;
   flightCutoffTime: string;
+  flightStartTime?: string;
   attendanceIntervals?: HistoryRecord["attendanceIntervals"];
   countedForEarlyDeparture: boolean;
 }
@@ -26,6 +31,7 @@ export interface EarlyDepartureEvent {
 export interface MonthlyRelaxedShiftRow {
   staff: Staff;
   earlyDepartures: EarlyDepartureEvent[];
+  earlyDepartureStartMinutes: number[];
   afternoonRestDates: string[];
   earlyDepartureDatesByFlight: Record<string, string[]>;
   afternoonFreeDates: string[];
@@ -42,6 +48,7 @@ export interface MonthlyRelaxedShiftStatistics {
       monthlyCount: number;
     }
   >;
+  currentEarlyDepartureStartMinutes: number[];
   currentAfternoonRest: Array<{
     date: string;
     staffId: string;
@@ -50,10 +57,29 @@ export interface MonthlyRelaxedShiftStatistics {
   }>;
 }
 
+export function archivedFlightStarts(
+  history: readonly HistoryRecord[],
+  date: string
+): ReadonlyMap<string, string> {
+  const starts = new Map<string, string>();
+  for (const record of history) {
+    if (record.date !== date || record.historyCoverage === "late-priority-only")
+      continue;
+    const start = normalizeTime(record.flightStartTime ?? "");
+    if (!start) continue;
+    const previous = starts.get(record.flightNo);
+    starts.set(
+      record.flightNo,
+      previous === undefined || previous === start ? start : ""
+    );
+  }
+  return starts;
+}
+
 function fromAssignment(
   date: string,
   assignment: Assignment,
-  flightCutoffTime: string,
+  flight: Flight | undefined,
   countedForEarlyDeparture: boolean
 ): ActualTask | null {
   if (
@@ -70,7 +96,8 @@ function fromAssignment(
     staffName: assignment.staffName,
     startTime: assignment.startTime,
     endTime: assignment.endTime,
-    flightCutoffTime,
+    flightCutoffTime: flight?.endTime ?? assignment.endTime,
+    flightStartTime: flight?.startTime,
     countedForEarlyDeparture,
   };
 }
@@ -93,6 +120,7 @@ function fromHistory(record: HistoryRecord): ActualTask | null {
     startTime: record.startTime,
     endTime: record.endTime,
     flightCutoffTime: record.flightCutoffTime || record.endTime,
+    flightStartTime: record.flightStartTime,
     attendanceIntervals: record.attendanceIntervals,
     countedForEarlyDeparture: true,
   };
@@ -160,8 +188,7 @@ export function buildMonthlyRelaxedShiftStatistics(
           fromAssignment(
             activeDate,
             assignment,
-            state.flights.find((flight) => flight.id === assignment.flightId)
-              ?.endTime ?? assignment.endTime,
+            state.flights.find((flight) => flight.id === assignment.flightId),
             isCountedWorkloadAssignment(state, assignment)
           )
         )
@@ -185,6 +212,8 @@ export function buildMonthlyRelaxedShiftStatistics(
   );
   const dates = [...new Set(tasks.map((task) => task.date))].sort();
   const earlyByStaff = new Map<string, EarlyDepartureEvent[]>();
+  const earlyStartsByStaff = new Map<string, number[]>();
+  const currentEarlyDepartureStartMinutes: number[] = [];
   const afternoonByStaff = new Map<string, string[]>();
   const afternoonFreeByStaff = new Map<string, string[]>();
   const afternoonOffByStaff = new Map<string, string[]>();
@@ -300,6 +329,18 @@ export function buildMonthlyRelaxedShiftStatistics(
           cutoffTime: lastTask.endTime,
         });
         earlyByStaff.set(staffId, events);
+        const flightStart = operationalInterval(
+          lastTask.flightStartTime ?? "",
+          lastTask.flightCutoffTime,
+          state.settings.nightEnd
+        )?.[0];
+        if (flightStart !== undefined) {
+          const starts = earlyStartsByStaff.get(staffId) ?? [];
+          starts.push(flightStart);
+          earlyStartsByStaff.set(staffId, starts);
+          if (taskDate === activeDate)
+            currentEarlyDepartureStartMinutes.push(flightStart);
+        }
       }
       if (
         hasAfternoonFlight &&
@@ -321,6 +362,7 @@ export function buildMonthlyRelaxedShiftStatistics(
     .map((staff) => ({
       staff,
       earlyDepartures: earlyByStaff.get(staff.id) ?? [],
+      earlyDepartureStartMinutes: earlyStartsByStaff.get(staff.id) ?? [],
       afternoonRestDates: afternoonByStaff.get(staff.id) ?? [],
       earlyDepartureDatesByFlight: Object.fromEntries(
         [
@@ -344,6 +386,7 @@ export function buildMonthlyRelaxedShiftStatistics(
   return {
     month,
     rows,
+    currentEarlyDepartureStartMinutes,
     currentEarlyDepartures: rows.flatMap((row) =>
       row.earlyDepartures
         .filter((event) => event.date === date)

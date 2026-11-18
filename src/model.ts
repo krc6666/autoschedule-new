@@ -103,6 +103,7 @@ export interface HistoryRecord
   endTime: string;
   /** Original scheduled end of the source flight, before an early release. */
   flightCutoffTime?: string;
+  flightStartTime?: string;
   /** Actual presence from reused roles, without adding workload history. */
   attendanceIntervals?: Array<{ startTime: string; endTime: string }>;
   workHours: number;

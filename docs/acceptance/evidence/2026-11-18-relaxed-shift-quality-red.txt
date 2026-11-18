@@ -1,0 +1,100 @@
+
+> autoschedule@1.0.0 test
+> vitest run --exclude tests/performance/** tests/domain/relaxed-shift-balance.test.ts --maxWorkers=1
+
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/domain/relaxed-shift-balance.test.ts (15 tests | 3 failed) 697ms
+     × rotates the flight that begins earlier when monthly counts are tied 15ms
+     × archives the flight start and carries it through Excel bytes and local storage 5ms
+     × balances the afternoon-free column even when old afternoon-rest counts are tied 4ms
+npm.cmd :
+所在位置 行:2 字符: 42
++ ... _COLOR='0'; npm.cmd test -- tests/domain/relaxed-shift-balance.test.t ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/domain/relaxed-shift-balance.test.ts > monthly relaxed shift balance > rotates the flight that begins earl
+ier when monthly counts are tied
+AssertionError: expected 'p0' to be 'p1' // Object.is equality
+
+Expected: "p1"
+Received: "p0"
+
+ ❯ tests/domain/relaxed-shift-balance.test.ts:128:32
+    126|     state.settings.relaxedShiftFlightNumbers = [];
+    127|     const result = balanceFixture(state);
+    128|     expect(result[0]!.staffId).toBe("p1");
+       |                                ^
+    129|     expect(result[1]!.staffId).toBe("p0");
+    130|     expect(preservesRelaxedShiftBalance(state, state.activeScheduleDat…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  tests/domain/relaxed-shift-balance.test.ts > monthly relaxed shift balance > archives the flight start and carri
+es it through Excel bytes and local storage
+AssertionError: expected [ [ '08:30', undefined ], …(1) ] to deeply equal [ [ '08:30', '09:00' ], …(1) ]
+
+- Expected
++ Received
+
+  [
+    [
+      "08:30",
+-     "09:00",
++     undefined,
+    ],
+    [
+-     "11:00",
+      "11:00",
++     undefined,
+    ],
+  ]
+
+ ❯ expectStarts tests/domain/relaxed-shift-balance.test.ts:155:93
+    153|     state.history = currentScheduleHistory(state, "2026-11-02");
+    154|     const expectStarts = (history: HistoryRecord[]) =>
+    155|       expect(history.map(({ startTime, flightStartTime }) => [startTim…
+       |                                                                                             ^
+    156|         ["08:30", "09:00"], ["11:00", "11:00"],
+    157|       ]);
+ ❯ tests/domain/relaxed-shift-balance.test.ts:158:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  tests/domain/relaxed-shift-balance.test.ts > monthly relaxed shift balance > balances the afternoon-free column
+even when old afternoon-rest counts are tied
+AssertionError: expected [ [ '2026-11-02', '2026-11-06' ], [] ] to deeply equal [ [ '2026-11-02' ], [ '2026-11-06' ] ]
+
+- Expected
++ Received
+
+  [
+    [
+      "2026-11-02",
+-   ],
+-   [
+      "2026-11-06",
+    ],
++   [],
+  ]
+
+ ❯ tests/domain/relaxed-shift-balance.test.ts:176:62
+    174|     const result = balanceFixture(state);
+    175|     const report = buildMonthlyRelaxedShiftStatistics({ ...state, assi…
+    176|     expect(report.rows.map((row) => row.afternoonFreeDates)).toEqual([…
+       |                                                              ^
+    177|   });
+    178|   it("shares recent fatigue protection instead of undoing it to balanc…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  3 failed | 12 passed (15)
+   Start at  20:00:48
+   Duration  2.83s (transform 1.57s, setup 0ms, import 1.88s, tests 697ms, environment 0ms)

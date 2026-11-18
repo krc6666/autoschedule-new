@@ -12,41 +12,158 @@ import { ScheduleGuardError } from "../kernel/schedule-guard";
 import { dutyAfternoonFlightIds } from "../assignments/duty-afternoon-relief";
 import type { MonthlyRelaxedShiftStatistics } from "../statistics/relaxed-shift-statistics";
 import { preservesWorkloadBalance } from "./workload-balance";
+import { timeToMinutes } from "../shared/time";
+
+type RelaxedShiftScore = {
+  countExcess: number;
+  countSquares: number;
+  earlyStartStaffIds: string[];
+  earlyStartSpread: number;
+  afternoonFreeExcess: number;
+  afternoonFreeSquares: number;
+};
+
+function relaxedRows(
+  value: MonthlyRelaxedShiftStatistics,
+  eligibleIds: ReadonlySet<string>,
+  excludedDuty?: string | null
+) {
+  return value.rows.filter(
+    ({ staff }) =>
+      staff.status === "正常" &&
+      staff.staffType === "常规" &&
+      !staff.teamLeader &&
+      eligibleIds.has(staff.id) &&
+      staff.id !== excludedDuty
+  );
+}
+
+function monthlyCountScore(values: number[], difference: number) {
+  let excess = 0;
+  let squares = 0;
+  for (const [index, value] of values.entries()) {
+    squares += value * value;
+    for (let other = index + 1; other < values.length; other++)
+      excess += Math.max(0, Math.abs(value - values[other]!) - difference);
+  }
+  return { excess, squares };
+}
+
+function earlyStartMinutes(
+  row: MonthlyRelaxedShiftStatistics["rows"][number],
+  cutoff: number
+): number | undefined {
+  if (row.earlyDepartureStartMinutes.length !== row.earlyDepartures.length)
+    return undefined;
+  return row.earlyDepartureStartMinutes.reduce(
+    (total, start) => total + Math.max(0, cutoff - start),
+    0
+  );
+}
 
 function relaxedShiftScore(
   state: ScheduleGenerationFacts,
   value: MonthlyRelaxedShiftStatistics,
   eligibleIds: ReadonlySet<string>,
   duty: string | null
-): [number, number] {
-  let excess = 0,
-    squares = 0;
-  for (const kind of ["earlyDeparture", "afternoonRest"] as const) {
-    if (!state.settings[`${kind}BalanceEnabled`]) continue;
-    const values = value.rows
-      .filter(
-        (row) =>
-          row.staff.status === "正常" &&
-          row.staff.staffType === "常规" &&
-          !row.staff.teamLeader &&
-          eligibleIds.has(row.staff.id) &&
-          (kind !== "earlyDeparture" || row.staff.id !== duty)
-      )
-      .map((row) =>
-        kind === "earlyDeparture"
-          ? row.earlyDepartures.length
-          : row.afternoonRestDates.length
-      );
-    for (let i = 0; i < values.length; i++) {
-      squares += values[i]! * values[i]!;
-      for (const second of values.slice(i + 1))
-        excess += Math.max(
-          0,
-          Math.abs(values[i]! - second) - state.settings[`${kind}MaxDifference`]
-        );
-    }
+): RelaxedShiftScore {
+  const { settings } = state;
+  const early = settings.earlyDepartureBalanceEnabled
+    ? relaxedRows(value, eligibleIds, duty)
+    : [];
+  const afternoon = settings.afternoonRestBalanceEnabled
+    ? relaxedRows(value, eligibleIds)
+    : [];
+  const earlyCount = monthlyCountScore(
+    early.map((row) => row.earlyDepartures.length),
+    settings.earlyDepartureMaxDifference
+  );
+  const restCount = monthlyCountScore(
+    afternoon.map((row) => row.afternoonRestDates.length),
+    settings.afternoonRestMaxDifference
+  );
+  const freeCount = monthlyCountScore(
+    afternoon.map((row) => row.afternoonFreeDates.length),
+    settings.afternoonRestMaxDifference
+  );
+  const cutoff = timeToMinutes(settings.earlyDepartureCutoffTime);
+  const earlyStartStaffIds: string[] = [];
+  let sum = 0;
+  let squares = 0;
+  for (const row of early) {
+    const minutes = earlyStartMinutes(row, cutoff);
+    if (minutes === undefined) continue;
+    earlyStartStaffIds.push(row.staff.id);
+    sum += minutes;
+    squares += minutes * minutes;
   }
-  return [excess, squares];
+  return {
+    countExcess: earlyCount.excess + restCount.excess,
+    countSquares: earlyCount.squares + restCount.squares,
+    earlyStartStaffIds,
+    earlyStartSpread: earlyStartStaffIds.length * squares - sum * sum,
+    afternoonFreeExcess: freeCount.excess,
+    afternoonFreeSquares: freeCount.squares,
+  };
+}
+
+function compareRelaxedScores(
+  first: RelaxedShiftScore,
+  second: RelaxedShiftScore
+): number {
+  const sameEarlyStartStaff =
+    first.earlyStartStaffIds.length === second.earlyStartStaffIds.length &&
+    first.earlyStartStaffIds.every(
+      (staffId, index) => staffId === second.earlyStartStaffIds[index]
+    );
+  return (
+    first.countExcess - second.countExcess ||
+    first.countSquares - second.countSquares ||
+    (sameEarlyStartStaff
+      ? first.earlyStartSpread - second.earlyStartSpread
+      : 0) ||
+    first.afternoonFreeExcess - second.afternoonFreeExcess ||
+    first.afternoonFreeSquares - second.afternoonFreeSquares
+  );
+}
+
+function opportunityCounts(
+  state: ScheduleGenerationFacts,
+  value: MonthlyRelaxedShiftStatistics,
+  date: string
+) {
+  return [
+    value.currentEarlyDepartures.length,
+    value.currentAfternoonRest.length,
+    state.settings.afternoonRestBalanceEnabled
+      ? value.rows.filter((row) => row.afternoonFreeDates.includes(date)).length
+      : 0,
+  ];
+}
+
+function compareRelaxedOutcomes(
+  state: ScheduleGenerationFacts,
+  before: MonthlyRelaxedShiftStatistics,
+  after: MonthlyRelaxedShiftStatistics,
+  beforeScore: RelaxedShiftScore,
+  afterScore: RelaxedShiftScore
+): number {
+  if (
+    state.settings.earlyDepartureBalanceEnabled &&
+    beforeScore.countExcess === afterScore.countExcess &&
+    beforeScore.countSquares === afterScore.countSquares
+  ) {
+    const earlier = before.currentEarlyDepartureStartMinutes;
+    const later = after.currentEarlyDepartureStartMinutes;
+    if (
+      earlier.length === before.currentEarlyDepartures.length &&
+      (later.length !== earlier.length ||
+        later.reduce((sum, minute) => sum + minute, 0) >
+          earlier.reduce((sum, minute) => sum + minute, 0))
+    )
+      return 1;
+  }
+  return compareRelaxedScores(afterScore, beforeScore);
 }
 
 /** Same fairness and rest budgets used by monthly balancing, for later reviews. */
@@ -97,24 +214,33 @@ export function preservesRelaxedShiftBalance(
   first.currentAfternoonRest = first.currentAfternoonRest.filter(
     (p) => !actualYieldIds.has(p.staffId)
   );
-  first.rows = first.rows.map((row) =>
-    actualYieldIds.has(row.staff.id)
-      ? {
-          ...row,
-          afternoonRestDates: row.afternoonRestDates.filter((d) => d !== date),
-        }
-      : row
+  const stillFreeIds = new Set(
+    second.rows
+      .filter((row) => row.afternoonFreeDates.includes(date))
+      .map((row) => row.staff.id)
   );
+  first.rows = first.rows.map((row) => ({
+    ...row,
+    afternoonRestDates: actualYieldIds.has(row.staff.id)
+      ? row.afternoonRestDates.filter((day) => day !== date)
+      : row.afternoonRestDates,
+    afternoonFreeDates:
+      afternoonRestYieldStaffIds.has(row.staff.id) &&
+      !stillFreeIds.has(row.staff.id)
+        ? row.afternoonFreeDates.filter((day) => day !== date)
+        : row.afternoonFreeDates,
+  }));
+  const afterCounts = opportunityCounts(state, second, date);
   if (
-    first.currentEarlyDepartures.length !==
-      second.currentEarlyDepartures.length ||
-    first.currentAfternoonRest.length !== second.currentAfternoonRest.length
+    opportunityCounts(state, first, date).some(
+      (count, index) => count !== afterCounts[index]
+    )
   )
     return false;
   const duty = getDutyRosterForDate(state, date).dutyStaffId;
   const a = relaxedShiftScore(state, first, eligibleIds, duty);
   const b = relaxedShiftScore(state, second, eligibleIds, duty);
-  return b[0] < a[0] || (b[0] === a[0] && b[1] <= a[1]);
+  return compareRelaxedOutcomes(state, first, second, a, b) <= 0;
 }
 
 export function balanceRelaxedShifts(options: {
@@ -127,10 +253,12 @@ export function balanceRelaxedShifts(options: {
 }): Assignment[] {
   const { state, date, lockedAssignmentIds, assertSafe } = options;
   let current = structuredClone([...options.assignments]);
-  const kinds = (["earlyDeparture", "afternoonRest"] as const).filter(
-    (kind) => state.settings[`${kind}BalanceEnabled`]
-  );
-  if (!kinds.length) return current;
+  const { settings } = state;
+  if (
+    !settings.earlyDepartureBalanceEnabled &&
+    !settings.afternoonRestBalanceEnabled
+  )
+    return current;
   const history = state.history.filter(
     (row) => row.date < date && row.date.slice(0, 7) === date.slice(0, 7)
   );
@@ -140,14 +268,7 @@ export function balanceRelaxedShifts(options: {
       date
     );
   const baseline = report(current);
-  const historyRows = report([]).rows;
-  const count = (
-    row: (typeof historyRows)[number],
-    kind: (typeof kinds)[number]
-  ) =>
-    kind === "earlyDeparture"
-      ? row.earlyDepartures.length
-      : row.afternoonRestDates.length;
+  const historical = report([]);
   const participants = state.staff.filter(
     (person) =>
       person.status === "正常" &&
@@ -161,30 +282,28 @@ export function balanceRelaxedShifts(options: {
       .map((a) => a.staffId!)
   );
   const duty = getDutyRosterForDate(state, date).dutyStaffId;
-  const score = (value: ReturnType<typeof report>): [number, number] => {
-    return relaxedShiftScore(state, value, eligibleIds, duty);
-  };
-  if (
-    !kinds.some(
-      (kind) =>
-        new Set(
-          historyRows
-            .filter(
-              (row) =>
-                eligibleIds.has(row.staff.id) &&
-                participantIds.has(row.staff.id) &&
-                (kind !== "earlyDeparture" || row.staff.id !== duty)
-            )
-            .map((row) => count(row, kind))
-        ).size > 1
-    )
-  )
-    return current;
-  const counts = (value: ReturnType<typeof report>) => [
-    value.currentEarlyDepartures.length,
-    value.currentAfternoonRest.length,
-  ];
+  const score = (value: MonthlyRelaxedShiftStatistics) =>
+    relaxedShiftScore(state, value, eligibleIds, duty);
+  const earlyHistory = relaxedRows(historical, eligibleIds, duty);
+  const afternoonHistory = relaxedRows(historical, eligibleIds);
+  const cutoff = timeToMinutes(settings.earlyDepartureCutoffTime);
+  const hasEarlyDifference =
+    settings.earlyDepartureBalanceEnabled &&
+    (new Set(earlyHistory.map((row) => row.earlyDepartures.length)).size > 1 ||
+      new Set(
+        earlyHistory.flatMap((row) => earlyStartMinutes(row, cutoff) ?? [])
+      ).size > 1);
+  const hasAfternoonDifference =
+    settings.afternoonRestBalanceEnabled &&
+    (new Set(afternoonHistory.map((row) => row.afternoonRestDates.length))
+      .size > 1 ||
+      new Set(afternoonHistory.map((row) => row.afternoonFreeDates.length))
+        .size > 1);
+  if (!hasEarlyDifference && !hasAfternoonDifference) return current;
+  const counts = (value: MonthlyRelaxedShiftStatistics) =>
+    opportunityCounts(state, value, date);
   const budget = counts(baseline);
+  let bestReport = baseline;
   const flightIds = dailyFlightCountParticipantIds(state, {
     dutyStaffId: duty,
     halfRestStaffIds: options.halfRestStaffIds,
@@ -215,14 +334,11 @@ export function balanceRelaxedShifts(options: {
     );
   let bestScore = score(baseline),
     probes = 0;
-  const improves = (next: [number, number]) =>
-    next[0] < bestScore[0] ||
-    (next[0] === bestScore[0] && next[1] < bestScore[1]);
   const accept = (proposal: Assignment[]) => {
     const result = report(proposal),
       next = score(result);
     if (
-      !improves(next) ||
+      compareRelaxedOutcomes(state, bestReport, result, bestScore, next) >= 0 ||
       counts(result).some((n, i) => n !== budget[i]) ||
       spread(proposal) > spreadBefore ||
       !preservesWorkloadBalance(state, date, current, proposal, duty) ||
@@ -238,6 +354,7 @@ export function balanceRelaxedShifts(options: {
       throw error;
     }
     current = proposal;
+    bestReport = result;
     bestScore = next;
     return true;
   };
