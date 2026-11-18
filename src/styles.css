@@ -2852,15 +2852,22 @@ autoschedule-previous-schedule-comparison {
   color: var(--as-muted);
   font-size: 11px;
 }
+.daily-staff-flight-availability-row,
 .daily-staff-flight-unassigned,
 .daily-staff-flight-complete {
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
   gap: 6px;
   margin: 8px 0;
   padding: 8px 10px;
   border-radius: 4px;
   font-size: 13px;
+}
+.daily-staff-flight-availability-row {
+  color: var(--as-ink);
+  border: 1px solid var(--as-border);
+  background: var(--as-surface);
 }
 .daily-staff-flight-unassigned {
   color: #842029;

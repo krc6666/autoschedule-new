@@ -1,0 +1,113 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/domain/daily-staff-flight-statistics.test.ts (12 tests | 3 failed) 56ms
+     × detects three exclusive no-flight lists using only start times from current 23ms
+     × detects three exclusive no-flight lists using only start times from history 3ms
+     × recomputes after reassignment and keeps unknown/partial days out of the lists 2ms
+ ❯ tests/ui/daily-no-flight-summary.test.ts (2 tests | 2 failed) 45ms
+     × always shows three lines, updates after manual reassignment, and keeps empty lines 32ms
+     × follows the query date and never calls missing or partial history no-flight 11ms
+npm.cmd : stderr | tests/ui/daily-no-flight-summary.test.ts
+所在位置 行:2 字符: 1
++ npm.cmd exec vitest -- run tests/domain/daily-staff-flight-statistics ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (stderr | tests/...summary.test.ts:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/domain/daily-staff-flight-statistics.test.ts > daily staff flight statistics > detects three exclusive no-
+flight lists using only start times from current
+ FAIL  tests/domain/daily-staff-flight-statistics.test.ts > daily staff flight statistics > detects three exclusive no-
+flight lists using only start times from history
+AssertionError: expected undefined to deeply equal [ '仅午后' ]
+
+- Expected:
+[
+  "仅午后",
+]
+
++ Received:
+undefined
+
+ ❯ tests/domain/daily-staff-flight-statistics.test.ts:94:50
+     92|
+     93|       expect(result.unassignedStaffNames).toEqual(["全天未排"]);
+     94|       expect(result.morningUnassignedStaffNames).toEqual(["仅午后"]);
+       |                                                  ^
+     95|       expect(result.afternoonUnassignedStaffNames).toEqual(["仅上午", "正午…
+     96|       expect(result.totalFlightCount).toBe(6);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  tests/domain/daily-staff-flight-statistics.test.ts > daily staff flight statistics > recomputes after reassignme
+nt and keeps unknown/partial days out of the lists
+AssertionError: expected undefined to deeply equal [ '员工乙' ]
+
+- Expected:
+[
+  "员工乙",
+]
+
++ Received:
+undefined
+
+ ❯ tests/domain/daily-staff-flight-statistics.test.ts:108:94
+    106|     state.activeScheduleDate = "2026-11-18";
+    107|     state.assignments = [assignment("one-am", "one", "员工甲", "AM1", "G0…
+    108|     expect(buildDailyStaffFlightStatistics(state, "2026-11-18").mornin…
+       |                                                                                              ^
+    109|     state.assignments[0] = { ...state.assignments[0]!, staffId: "two",…
+    110|     const changed = buildDailyStaffFlightStatistics(state, "2026-11-18…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  tests/ui/daily-no-flight-summary.test.ts > daily no-flight summary > always shows three lines, updates after man
+ual reassignment, and keeps empty lines
+AssertionError: expected [] to have a length of 3 but got +0
+
+- Expected
++ Received
+
+- 3
++ 0
+
+ ❯ tests/ui/daily-no-flight-summary.test.ts:33:21
+     31|     const element = await mountElement<LitTestElement & { model: typeo…
+     32|     const lines = () => [...element.querySelectorAll(".daily-staff-fli…
+     33|     expect(lines()).toHaveLength(3);
+       |                     ^
+     34|     expect(lines().map((line) => line.querySelector("strong")?.textCon…
+     35|     expect(lines().map((line) => line.querySelector("span")?.textConte…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL  tests/ui/daily-no-flight-summary.test.ts > daily no-flight summary > follows the query date and never calls miss
+ing or partial history no-flight
+AssertionError: expected [] to have a length of 3 but got +0
+
+- Expected
++ Received
+
+- 3
++ 0
+
+ ❯ tests/ui/daily-no-flight-summary.test.ts:60:21
+     58|       await settleLit();
+     59|       const lines = [...element.querySelectorAll(".daily-staff-flight-…
+     60|       expect(lines).toHaveLength(3);
+       |                     ^
+     61|       if (query === "2026-11-16") {
+     62|         expect(lines.map((line) => line.querySelector("span")?.textCon…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  5 failed | 9 passed (14)
+   Start at  08:10:34
+   Duration  1.79s (transform 470ms, setup 0ms, import 582ms, tests 100ms, environment 657ms)

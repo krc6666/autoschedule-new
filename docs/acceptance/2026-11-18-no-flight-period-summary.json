@@ -1,0 +1,172 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-18-no-flight-period-summary",
+  "title": "排班页固定三行无航班人员，按开始时间识别上午与午后",
+  "startedFrom": "0a3032e42d1b895a8fc5fe9c2f67130bc45298c3",
+  "expectation": {
+    "example": "甲11:50开始、13:00结束且无其他航班，乙只有12:10及晚间航班，丙全天无航班。Owner明确所有时段只按开始时间，严格晚于12点才算下午；12:00不算下午。",
+    "expected": "底部固定三行：全天无航班人员列丙，上午无航班人员列乙，中午以后无航班人员（半休）列甲；没有人显示无。只检查正常常规人员，全天无人仅列首行，人工改派和查询完整历史后自动更新。",
+    "unchanged": "保留人员表全部常规含病休、行政排除、航班去重、排序/查询及只读性。不改求解、半休选择/硬规则、右侧及月度下午无航班计次、AppState、存储、Excel和云端。历史教训：daily-flight-all-regular-2026-11-10与afternoon-attendance-2026-11-10，展示名单/漏排人员、出勤/负荷及统计口径不得混用。",
+    "fallback": "无完整班表或仅末班重点记录时三行注明无法判断，不把证据不足显示为无；保持原始班表，识别结果不写回排班。真实浏览器由Owner操作，未取得证据前页面验收保持未验证。"
+  },
+  "testedVersion": "f738d9c7b0925543e8bf39f757ef33e2c3a2ec57880699246b4812c8216f4a6f",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "旧实现5项新断言失败、9项原行为通过；修改后18文件129项通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-no-flight-red.txt",
+          "summary": "改前5项失败、9项通过，缺少上午/午后字段及固定三行。",
+          "sha256": "f19b5c12d2615054af4857c78b53774af03e1f5ab9a859b84244e66ad661a2d7"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-no-flight-related.txt",
+          "summary": "18个直接相关测试文件129项通过，含新行为、原统计/查询/排序与消费者回归。",
+          "sha256": "2bd2dd2697012ffc48ddbd5305b9094de85ef1f11428a3c10221ae9e70f7cf46"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "11:50开始13:00结束只算上午，12:01开始算午后，全天无人仅列首行，空名单显示无。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-no-flight-related.txt",
+          "summary": "18个直接相关测试文件129项通过，含新行为、原统计/查询/排序与消费者回归。",
+          "sha256": "2bd2dd2697012ffc48ddbd5305b9094de85ef1f11428a3c10221ae9e70f7cf46"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-no-flight-browser.json",
+          "summary": "隔离Chrome真实应用挂载与导航、Store人工改派/清空、历史查询、全空名单、独立重算及390px通过；无页面异常。",
+          "sha256": "64bd3255f5123ea2e390a392f92e5b858a585209dfc9255409971ff9a2763276"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-no-flight-desktop.png",
+          "summary": "桌面三行匿名名单。",
+          "sha256": "334ac31d0da184ea45d196f72119881ebf6542bd6c56fbcf1940bcd48d00baa8"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "覆盖12:00/12:01、晚间、跨午、零工时、轮值、病休/行政、完整历史/当前优先/部分历史/无记录及200人名单。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-no-flight-related.txt",
+          "summary": "18个直接相关测试文件129项通过，含新行为、原统计/查询/排序与消费者回归。",
+          "sha256": "2bd2dd2697012ffc48ddbd5305b9094de85ef1f11428a3c10221ae9e70f7cf46"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-no-flight-browser.json",
+          "summary": "隔离Chrome真实应用挂载与导航、Store人工改派/清空、历史查询、全空名单、独立重算及390px通过；无页面异常。",
+          "sha256": "64bd3255f5123ea2e390a392f92e5b858a585209dfc9255409971ff9a2763276"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "真实Store人工改派后名单更新，清空后全部进入首行且后两行无；查询历史自动切换，不持久化影子名单。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-no-flight-browser.json",
+          "summary": "隔离Chrome真实应用挂载与导航、Store人工改派/清空、历史查询、全空名单、独立重算及390px通过；无页面异常。",
+          "sha256": "64bd3255f5123ea2e390a392f92e5b858a585209dfc9255409971ff9a2763276"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-no-flight-related.txt",
+          "summary": "18个直接相关测试文件129项通过，含新行为、原统计/查询/排序与消费者回归。",
+          "sha256": "2bd2dd2697012ffc48ddbd5305b9094de85ef1f11428a3c10221ae9e70f7cf46"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "最终DOM固定三行；完整结果空名单为无，无完整证据为无法判断；匿名开始时间按分钟独立枚举与三行一致。无新增排班硬约束。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-no-flight-browser.json",
+          "summary": "隔离Chrome真实应用挂载与导航、Store人工改派/清空、历史查询、全空名单、独立重算及390px通过；无页面异常。",
+          "sha256": "64bd3255f5123ea2e390a392f92e5b858a585209dfc9255409971ff9a2763276"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-no-flight-final.html",
+          "summary": "真实浏览器最终三行全空仍固定显示无。",
+          "sha256": "b7055ec134ccbf9f89f86730fa63edab043fe58ebae33a14972fe9ccc3667e72"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "原航班去重/人数/病休/排序/查询及只读性回归通过；月度下午统计定向测试通过，未设置半休。未改求解、AppState、存储、Excel、云端。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-no-flight-related.txt",
+          "summary": "18个直接相关测试文件129项通过，含新行为、原统计/查询/排序与消费者回归。",
+          "sha256": "2bd2dd2697012ffc48ddbd5305b9094de85ef1f11428a3c10221ae9e70f7cf46"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-no-flight-focused.txt",
+          "summary": "4文件44项通过，包含原月度轻松班次统计与排班展示。",
+          "sha256": "5c8a06e3d38a1fb41cea309a9913a0db331061e96f2297bbc12c051569a82211"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-no-flight-typecheck.txt",
+          "summary": "npm.cmd run typecheck退出0。",
+          "sha256": "4b3f7cf1ed06cba39ee3b0608990fffcf42e1ff315949a5353a62ce478a2683c"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-no-flight-build.txt",
+          "summary": "npm.cmd run build退出0，Vite 7.18秒；原外部化和大块提示保留。",
+          "sha256": "d4fb646b8d59ade8e3625febfe78b2193f12e10fe7f6299d98d2de64ce506291"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-no-flight-browser.json",
+          "summary": "隔离Chrome真实应用挂载与导航、Store人工改派/清空、历史查询、全空名单、独立重算及390px通过；无页面异常。",
+          "sha256": "64bd3255f5123ea2e390a392f92e5b858a585209dfc9255409971ff9a2763276"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-no-flight-commit-verify.txt",
+          "summary": "提交前完整npm.cmd run verify退出0：232文件2240项功能、7文件19项性能、类型检查及构建通过。",
+          "sha256": "17650bd49030b08c571c38061dfa942e5394b0e7e91054ce1b7ebce8c2f47067"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "verified",
+      "reason": "Owner授权独自完成后，隔离Chrome使用真实mountAutoscheduleApp、导航、内存Store及现有人工命令完成匿名场景。桌面/390px、换人/清空/查询、三行全空均通过；仅为本地新功能验收，不代表私人班表复现或云端发布。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-no-flight-browser.json",
+          "summary": "隔离Chrome真实应用挂载与导航、Store人工改派/清空、历史查询、全空名单、独立重算及390px通过；无页面异常。",
+          "sha256": "64bd3255f5123ea2e390a392f92e5b858a585209dfc9255409971ff9a2763276"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-no-flight-desktop.png",
+          "summary": "桌面三行人员名单。",
+          "sha256": "334ac31d0da184ea45d196f72119881ebf6542bd6c56fbcf1940bcd48d00baa8"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-no-flight-mobile.png",
+          "summary": "390px窄屏三行文字完整。",
+          "sha256": "5e094f5d25844b5df9bb5b79d35884acb3c478337d39f84c5a6b8ef48ad9a68d"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-18-no-flight-final.html",
+          "summary": "最终三行空名单仍显示无。",
+          "sha256": "b7055ec134ccbf9f89f86730fa63edab043fe58ebae33a14972fe9ccc3667e72"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "red.txt保留5项失败，related.txt证明改后18文件129项通过；原缺少半天名单且空名单整行消失由领域与UI断言发现。",
+    "laterChanges": "人工改派、清空及查询历史会改变输入。browser.json记录真实Store命令后的名单，related.txt保留长期回归；新投影只读，不进入后置排班写入或月度计次。",
+    "finalArtifact": "browser.json、desktop.png、mobile.png及final.html为本次实际本地应用匿名输出，开始时间独立重算一致；build.txt证明生产构建通过。未连接云端，不推断私人班表漏排根因。"
+  },
+  "review": {
+    "missedScope": "当前/完整历史、人工更新、200人及窄屏已验证；Owner授权commit后已完成完整verify，原提交钩子保留。原区域固定三行，不扩展归档只读页；无完整记录明确无法判断。未复现私人班表，不push或发布；其他已有改动不纳入本提交。",
+    "rootCause": "原当日统计只有全天零航班名单。初始按出勤重叠理解与Owner的开始时间口径不一致，写实现前已按其纠正为严格晚于12:00；原月度下午出勤合同保留。",
+    "earlyDetection": "下次写代码前用11:50跨午、12:00、12:01锁定时间含义，先跑三行固定/空名单失败测试；修改后检查真实人工变更/查询后的最终DOM及独立名单，避免混用半休选择或月度计次。"
+  }
+}

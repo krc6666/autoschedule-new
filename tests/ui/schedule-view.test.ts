@@ -1264,7 +1264,10 @@ describe("schedule page", () => {
     expect(element.querySelector(".daily-staff-flight-unassigned")).toBeNull();
     expect(
       element.querySelector(".daily-staff-flight-complete")?.textContent
-    ).toContain("所有正常常规人员均已安排航班");
+    ).toContain("全天无航班人员：");
+    expect(
+      element.querySelector(".daily-staff-flight-complete span")?.textContent
+    ).toBe("无");
     expect(state).toEqual(before);
     expect(commands).toEqual([]);
   });

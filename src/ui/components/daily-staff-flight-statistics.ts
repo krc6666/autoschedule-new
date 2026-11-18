@@ -28,6 +28,19 @@ export class DailyStaffFlightStatisticsElement extends LightDomElement {
       this.model,
       this.queryDate || this.date
     );
+    const known =
+      statistics.source === "current" || statistics.source === "history";
+    const availability = [
+      { label: "全天无航班人员：", names: statistics.unassignedStaffNames },
+      {
+        label: "上午无航班人员：",
+        names: statistics.morningUnassignedStaffNames,
+      },
+      {
+        label: "中午以后无航班人员（半休）：",
+        names: statistics.afternoonUnassignedStaffNames,
+      },
+    ];
     return html`<section
       class="workspace-section daily-staff-flight-statistics"
       aria-label="人员当日航班"
@@ -61,20 +74,24 @@ export class DailyStaffFlightStatisticsElement extends LightDomElement {
             </div>`
           : null
       }
-      ${
-        statistics.unassignedStaffNames.length
-          ? html`<div class="daily-staff-flight-unassigned" role="alert">
-              <i class="bi bi-exclamation-triangle-fill"></i>
-              <strong>全天未安排航班：</strong>
-              <span>${statistics.unassignedStaffNames.join("、")}</span>
-            </div>`
-          : statistics.source === "current" || statistics.source === "history"
-            ? html`<div class="daily-staff-flight-complete" role="status">
-                <i class="bi bi-check-circle-fill"></i
-                >所有正常常规人员均已安排航班
-              </div>`
-            : null
-      }
+      <div
+        class="daily-staff-flight-availability"
+        aria-label="无航班人员自动识别"
+      >
+        ${availability.map(({ label, names }, index) => {
+          const warning = known && names.length > 0 && index === 0;
+          const complete = known && names.length === 0 && index === 0;
+          return html`<div
+            class="daily-staff-flight-availability-row ${warning ? "daily-staff-flight-unassigned" : complete ? "daily-staff-flight-complete" : ""}"
+            role=${warning ? "alert" : "status"}
+          >
+            <strong>${label}</strong>
+            <span
+              >${known ? names.join("、") || "无" : "无法判断（无完整班表）"}</span
+            >
+          </div>`;
+        })}
+      </div>
       ${
         statistics.source === "current" || statistics.source === "history"
           ? html`<label class="daily-staff-flight-sort">

@@ -55,6 +55,107 @@ function historyRecord(
 }
 
 describe("daily staff flight statistics", () => {
+  it.each(["current", "history"] as const)(
+    "detects three exclusive no-flight lists using only start times from %s",
+    (source) => {
+      const state = createDefaultState();
+      const regular = state.staff.find(
+        (person) => person.staffType === "常规"
+      )!;
+      state.staff = [
+        { ...regular, id: "morning", name: "仅上午" },
+        { ...regular, id: "afternoon", name: "仅午后" },
+        { ...regular, id: "noon", name: "正午" },
+        { ...regular, id: "both", name: "全天有班" },
+        { ...regular, id: "idle", name: "全天未排" },
+        { ...regular, id: "sick", name: "病休", status: "病假" },
+        { ...regular, id: "leave", name: "休假", status: "休假" },
+        { ...regular, id: "admin", name: "行政", staffType: "行政支援" },
+      ];
+      const entries = [
+        {
+          ...assignment("am", "morning", "仅上午", "AM1", "G01", "11:50"),
+          endTime: "13:00",
+        },
+        assignment("pm", "afternoon", "仅午后", "PM1", "G01", "12:01"),
+        assignment("night", "afternoon", "仅午后", "PM2", "G01", "23:00"),
+        assignment("noon", "noon", "正午", "NOON1", "G01", "12:00"),
+        assignment("both-am", "both", "全天有班", "AM2", "G01", "08:00"),
+        {
+          ...assignment("both-pm", "both", "全天有班", "PM3", "引导", "16:00"),
+          workHours: 0,
+        },
+        assignment("roster", "idle", "全天未排", "轮值", "值班人员", "14:00"),
+      ];
+      if (source === "current") {
+        state.activeScheduleDate = "2026-11-18";
+        state.assignments = entries;
+        // 同日旧历史不能覆盖当前安排。
+        state.history = [
+          historyRecord("stale", "2026-11-18", "morning", "仅上午", "STALE"),
+        ];
+      } else {
+        state.history = entries.map((entry) => ({
+          ...entry,
+          staffId: entry.staffId!,
+          date: "2026-11-18",
+          historyCoverage: "complete",
+        }));
+      }
+      const before = structuredClone(state);
+      const result = buildDailyStaffFlightStatistics(state, "2026-11-18");
+
+      expect(result.unassignedStaffNames).toEqual(["全天未排"]);
+      expect(result.morningUnassignedStaffNames).toEqual(["仅午后"]);
+      expect(result.afternoonUnassignedStaffNames).toEqual(["仅上午", "正午"]);
+      expect(result.totalFlightCount).toBe(6);
+      expect(result.allRows).toHaveLength(7);
+      expect(state).toEqual(before);
+    }
+  );
+
+  it("recomputes after reassignment and keeps unknown/partial days out of the lists", () => {
+    const state = createDefaultState();
+    const regular = state.staff.find((person) => person.staffType === "常规")!;
+    state.staff = [
+      { ...regular, id: "one", name: "员工甲" },
+      { ...regular, id: "two", name: "员工乙" },
+    ];
+    state.activeScheduleDate = "2026-11-18";
+    state.assignments = [
+      assignment("one-am", "one", "员工甲", "AM1", "G01"),
+      assignment("two-pm", "two", "员工乙", "PM1", "G01", "13:00"),
+    ];
+    expect(
+      buildDailyStaffFlightStatistics(state, "2026-11-18")
+        .morningUnassignedStaffNames
+    ).toEqual(["员工乙"]);
+    state.assignments[0] = {
+      ...state.assignments[0]!,
+      staffId: "two",
+      staffName: "员工乙",
+    };
+    const changed = buildDailyStaffFlightStatistics(state, "2026-11-18");
+    expect(changed.unassignedStaffNames).toEqual(["员工甲"]);
+    expect(changed.morningUnassignedStaffNames).toEqual([]);
+    expect(changed.afternoonUnassignedStaffNames).toEqual([]);
+    state.history = [
+      historyRecord(
+        "partial",
+        "2026-11-16",
+        "one",
+        "员工甲",
+        "AM1",
+        "late-priority-only"
+      ),
+    ];
+    for (const date of ["2026-11-16", "2026-11-14"]) {
+      const result = buildDailyStaffFlightStatistics(state, date);
+      expect(result.morningUnassignedStaffNames).toEqual([]);
+      expect(result.afternoonUnassignedStaffNames).toEqual([]);
+    }
+  });
+
   it("counts each flight once per regular person and excludes administrative support", () => {
     const state = createDefaultState();
     const regular = state.staff.find((person) => person.staffType === "常规")!;
@@ -356,6 +457,8 @@ describe("daily staff flight statistics", () => {
     expect(result.staffCount).toBe(3);
     expect(result.unassignedStaffCount).toBe(3);
     expect(result.unassignedStaffNames).toEqual([regular.name]);
+    expect(result.morningUnassignedStaffNames).toEqual([]);
+    expect(result.afternoonUnassignedStaffNames).toEqual([]);
     expect(result.assignedStaffCount).toBe(0);
     expect(result.totalFlightCount).toBe(0);
   });
@@ -368,5 +471,37 @@ describe("daily staff flight statistics", () => {
     expect(result.source).toBe("none");
     expect(result.allRows).toEqual([]);
     expect(result.unassignedStaffNames).toEqual([]);
+  });
+
+  it("keeps detection stable for a large roster without changing flight counts", () => {
+    const state = createDefaultState();
+    const regular = state.staff.find((person) => person.staffType === "常规")!;
+    state.staff = Array.from({ length: 200 }, (_, index) => ({
+      ...regular,
+      id: `staff-${index}`,
+      name: `员工${index}`,
+    }));
+    state.activeScheduleDate = "2026-11-18";
+    state.assignments = state.staff.map((person, index) =>
+      assignment(
+        `task-${index}`,
+        person.id,
+        person.name,
+        `TEST${index}`,
+        "G01",
+        index % 2 ? "12:01" : "11:50"
+      )
+    );
+    const result = buildDailyStaffFlightStatistics(state, "2026-11-18");
+    expect(result.unassignedStaffNames).toEqual([]);
+    expect(result.morningUnassignedStaffNames).toEqual(
+      state.staff.filter((_, index) => index % 2).map((person) => person.name)
+    );
+    expect(result.afternoonUnassignedStaffNames).toEqual(
+      state.staff
+        .filter((_, index) => index % 2 === 0)
+        .map((person) => person.name)
+    );
+    expect(result.totalFlightCount).toBe(200);
   });
 });
