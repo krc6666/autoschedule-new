@@ -1,11 +1,15 @@
 import { html, type PropertyValues } from "lit";
-import type { CloudSaveFeedback } from "../../app/cloud-contract";
+import type {
+  CloudSaveFeedback,
+  EditorLoginRequest,
+} from "../../app/cloud-contract";
 import { LightDomElement } from "./light-dom-element";
 
 export type CloudCommand =
   | { type: "login"; email: string; password: string }
   | { type: "restore"; file: File }
   | { type: "restore-version"; id: string }
+  | { type: "decide-login"; id: string; allow: boolean }
   | {
       type:
         | "save"
@@ -19,7 +23,7 @@ export type CloudCommand =
         | "versions"
         | "workspace";
     }
-  | { type: "takeover" };
+  | { type: "resume-session" };
 
 export interface CloudPanelState {
   phase: "loading" | "login" | "editor" | "error";
@@ -34,6 +38,9 @@ export interface CloudPanelState {
   cacheWarning: string;
   shareUrl: string;
   sessionActive?: boolean;
+  sessionPaused?: boolean;
+  incomingRequest?: EditorLoginRequest | null;
+  outgoingRequest?: EditorLoginRequest | null;
   auditOpen?: boolean;
   versionsOpen?: boolean;
 }
@@ -44,7 +51,7 @@ const FAILURE_LABELS = {
   conflict: "版本冲突",
   invalid: "数据校验未通过",
   unknown: "原因待确认",
-  session: "session active",
+  session: "编辑会话失效",
 } as const;
 
 export class CloudPanelElement extends LightDomElement {
@@ -193,7 +200,7 @@ export class CloudPanelElement extends LightDomElement {
             ? html` <button
                   class="btn btn-primary btn-sm cloud-save-button"
                   data-cloud-action="save"
-                  ?disabled=${s.busy || s.conflict}
+                  ?disabled=${s.busy || s.conflict || s.sessionPaused}
                   @click=${() => this.command({ type: "save" })}
                 >
                   保存到云端
@@ -226,7 +233,7 @@ export class CloudPanelElement extends LightDomElement {
                   >
                     <button
                       data-cloud-action="publish"
-                      ?disabled=${s.busy || s.conflict || s.dirty}
+                      ?disabled=${s.busy || s.conflict || s.dirty || s.sessionPaused}
                       @click=${() => this.command({ type: "publish" })}
                     >
                       发布当前组班表
@@ -271,6 +278,45 @@ export class CloudPanelElement extends LightDomElement {
             : null
         }
       </div>
+      ${
+        s.incomingRequest?.status === "pending"
+          ? html`<div
+              class="cloud-panel-notice"
+              role="alert"
+              data-login-request
+            >
+              另一台设备请求登录。拒绝后你可以继续操作；允许交接前会先保存到云端。
+              <button
+                class="btn btn-primary btn-sm"
+                ?disabled=${s.busy || s.sessionPaused}
+                @click=${() => this.command({ type: "decide-login", id: s.incomingRequest!.id, allow: false })}
+              >
+                拒绝登录
+              </button>
+              <button
+                class="btn btn-outline-secondary btn-sm"
+                ?disabled=${s.busy || s.sessionPaused}
+                @click=${() => this.command({ type: "decide-login", id: s.incomingRequest!.id, allow: true })}
+              >
+                保存并允许交接
+              </button>
+            </div>`
+          : null
+      }
+      ${
+        s.sessionPaused
+          ? html`<div class="cloud-panel-notice" role="alert">
+              编辑已暂停，当前页面和未保存输入保留。请检查网络后重新验证使用权。
+              <button
+                class="btn btn-outline-secondary btn-sm"
+                ?disabled=${s.busy}
+                @click=${() => this.command({ type: "resume-session" })}
+              >
+                重新验证使用权
+              </button>
+            </div>`
+          : null
+      }
       ${s.phase === "loading" ? html`<div class="cloud-panel-notice" role="status">正在连接云端...</div>` : null}
       ${
         s.phase === "login"
@@ -309,7 +355,7 @@ export class CloudPanelElement extends LightDomElement {
       }
       ${s.message && (s.phase === "error" || s.phase === "login" || s.notice) ? html`<div class="cloud-panel-notice" role=${s.notice === "error" || s.phase === "error" ? "alert" : "status"}>${s.message}</div>` : null}
       ${s.conflict ? html`<div class="cloud-panel-notice" role="alert">云端版本已变化，编辑已暂停。<button class="btn btn-link btn-sm" ?disabled=${s.busy} @click=${() => this.command({ type: "discard" })}>放弃本机未保存修改，使用云端内容</button></div>` : null}
-      ${s.phase === "error" ? html`<div class="d-flex gap-2 mt-2">${s.sessionActive ? html`<button class="btn btn-primary btn-sm" ?disabled=${s.busy} @click=${() => this.command({ type: "takeover" })}>接管此账号</button>` : html`<button class="btn btn-outline-secondary btn-sm" ?disabled=${s.busy} @click=${() => this.command({ type: "retry" })}>重新连接</button>`}<button class="btn btn-link btn-sm" ?disabled=${s.busy} @click=${() => this.command({ type: "logout" })}>退出当前登录</button></div>` : null}
+      ${s.phase === "error" ? html`<div class="d-flex gap-2 mt-2">${s.outgoingRequest?.status === "pending" ? html`<span role="status">等待原设备确认…</span>` : html`<button class="btn btn-outline-secondary btn-sm" ?disabled=${s.busy} @click=${() => this.command({ type: "retry" })}>${s.sessionActive ? "重新申请登录" : "重新连接"}</button>`}<button class="btn btn-link btn-sm" ?disabled=${s.busy} @click=${() => this.command({ type: "logout" })}>${s.outgoingRequest?.status === "pending" ? "取消登录申请" : "退出当前登录"}</button></div>` : null}
     </section>`;
   }
 

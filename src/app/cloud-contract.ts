@@ -25,6 +25,13 @@ export interface CloudPublication {
   snapshot: PublicSchedule;
 }
 
+/** Server state only; not part of AppState or exported workspaces. */
+export interface EditorLoginRequest {
+  id: string;
+  status: "pending" | "approved" | "rejected" | "expired" | "cancelled";
+  expiresAt: string;
+}
+
 /** Transient request feedback; never part of the saved scheduling model. */
 export type CloudSaveFeedback =
   | { phase: "idle" }
@@ -36,9 +43,23 @@ export interface CloudBackend {
   currentUser(): Promise<string | null>;
   signIn(email: string, password: string): Promise<void>;
   signOut(): Promise<void>;
-  acquireSession(sessionId: string, takeover?: boolean): Promise<void>;
+  acquireSession(sessionId: string): Promise<void>;
   touchSession(sessionId: string): Promise<void>;
   releaseSession(sessionId: string): Promise<void>;
+  requestSession(
+    sessionId: string,
+    requestId: string
+  ): Promise<EditorLoginRequest>;
+  pollSessionRequest(
+    sessionId: string,
+    requestId: string | null
+  ): Promise<EditorLoginRequest | null>;
+  decideSessionRequest(
+    sessionId: string,
+    requestId: string,
+    allow: boolean
+  ): Promise<void>;
+  cancelSessionRequest(sessionId: string, requestId: string): Promise<void>;
   onSignedOut(callback: () => void): () => void;
   load(): Promise<{ version: number; model: AppState | null }>;
   save(

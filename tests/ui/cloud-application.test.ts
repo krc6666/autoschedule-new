@@ -109,7 +109,7 @@ describe("cloud entry controls and public view", () => {
     expect(app.root.querySelector("time")).toBeNull();
   });
 
-  it("closes the editor when the lease heartbeat is rejected", async () => {
+  it("preserves the editor and its unsaved inputs when the heartbeat is rejected", async () => {
     vi.useFakeTimers();
     const fixture = cloudFixture();
     fixture.backend.touchSession.mockRejectedValueOnce(
@@ -120,16 +120,18 @@ describe("cloud entry controls and public view", () => {
     expect(app.mountEditor).toHaveBeenCalledOnce();
     await vi.advanceTimersByTimeAsync(30_000);
     await settle();
-    expect(app.mountEditor.mock.results[0]!.value.dispose).toHaveBeenCalled();
+    expect(
+      app.mountEditor.mock.results[0]!.value.dispose
+    ).not.toHaveBeenCalled();
     const panel = app.root.querySelector<CloudPanelElement>(
       "autoschedule-cloud-panel"
     )!;
-    expect(panel.state.phase).toBe("error");
-    expect(panel.state.sessionActive).toBe(true);
+    expect(panel.state.phase).toBe("editor");
+    expect(panel.state.sessionPaused).toBe(true);
     vi.useRealTimers();
   });
 
-  it("shows takeover after an active-session rejection and reconnects after takeover", async () => {
+  it("requests permission after an active-session rejection without mounting an editor", async () => {
     const fixture = cloudFixture();
     fixture.backend.acquireSession.mockRejectedValueOnce(
       new CloudError("session", "此账号已在别处使用")
@@ -141,12 +143,13 @@ describe("cloud entry controls and public view", () => {
     )!;
     expect(panel.state.phase).toBe("error");
     expect(panel.state.sessionActive).toBe(true);
-    await app.command({ type: "takeover" });
-    expect(fixture.backend.acquireSession).toHaveBeenLastCalledWith(
+    expect(fixture.backend.requestSession).toHaveBeenCalledWith(
       expect.any(String),
-      true
+      expect.any(String)
     );
-    expect(app.mountEditor).toHaveBeenCalledOnce();
+    expect(app.mountEditor).not.toHaveBeenCalled();
+    expect(app.root.textContent).toContain("等待原设备确认");
+    expect(app.root.textContent).not.toContain("接管此账号");
   });
 
   it("leaves no password after failed login and returns an empty password input after logout", async () => {

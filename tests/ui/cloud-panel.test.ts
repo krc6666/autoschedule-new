@@ -101,7 +101,7 @@ describe("minimal cloud toolbar", () => {
     ).toBe(true);
   });
 
-  it("offers takeover when another editor owns the account session", async () => {
+  it("offers a new permission request instead of forced takeover", async () => {
     const element = await panel({
       phase: "error",
       sessionActive: true,
@@ -109,13 +109,14 @@ describe("minimal cloud toolbar", () => {
     });
     const handler = vi.fn();
     element.addEventListener("cloud-command", handler);
-    const takeover = [...element.querySelectorAll("button")].find((button) =>
-      button.textContent?.includes("接管")
+    const request = [...element.querySelectorAll("button")].find((button) =>
+      button.textContent?.includes("重新申请")
     );
-    expect(takeover).toBeTruthy();
-    takeover!.click();
+    expect(request).toBeTruthy();
+    expect(element.textContent).not.toContain("接管此账号");
+    request!.click();
     expect((handler.mock.calls[0]![0] as CustomEvent).detail).toEqual({
-      type: "takeover",
+      type: "retry",
     });
   });
 

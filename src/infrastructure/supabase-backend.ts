@@ -15,6 +15,7 @@ import {
 import type { CloudConfiguration } from "./supabase-config";
 import { parseAuditDetails, parseAuditPage } from "./operation-audit-response";
 import { parseWorkspaceVersions } from "./workspace-version-response";
+import { parseEditorLoginRequest } from "./editor-session-response";
 
 function record(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -152,6 +153,14 @@ export function parsePublicSchedule(value: unknown): PublicSchedule {
 }
 
 function fail(error: { message: string; code?: string }): never {
+  if (error.message.includes("SESSION_REQUEST_")) {
+    throw new CloudError(
+      "invalid",
+      error.message.includes("SESSION_REQUEST_BUSY")
+        ? "已有另一台设备正在申请，请稍后重新申请。"
+        : "登录申请已结束或不再有效，未交接，请重新申请。"
+    );
+  }
   if (
     error.message.includes("SESSION_ACTIVE") ||
     error.message.includes("SESSION_EXPIRED") ||
@@ -161,8 +170,8 @@ function fail(error: { message: string; code?: string }): never {
     throw new CloudError(
       "session",
       error.message.includes("SESSION_ACTIVE")
-        ? "此账号已在别处使用。可以接管此账号，接管后另一处会停止编辑。"
-        : "编辑会话已失效，请重新获取或接管此账号。"
+        ? "此账号正在另一台设备使用，需要原设备同意才能进入。"
+        : "编辑会话已失效，当前输入保留，请重新验证使用权。"
     );
   }
   if (error.message.includes("VERSION_NOT_FOUND"))
@@ -240,10 +249,10 @@ export function createSupabaseBackend(
       const { error } = await client.auth.signOut({ scope: "local" });
       if (error) fail(error);
     },
-    async acquireSession(sessionId, takeover = false) {
+    async acquireSession(sessionId) {
       await rpc("cloud_acquire_editor_session", {
         p_session_id: sessionId,
-        p_takeover: takeover,
+        p_takeover: false,
       });
     },
     async touchSession(sessionId) {
@@ -251,6 +260,34 @@ export function createSupabaseBackend(
     },
     async releaseSession(sessionId) {
       await rpc("cloud_release_editor_session", { p_session_id: sessionId });
+    },
+    async requestSession(sessionId, requestId) {
+      return parseEditorLoginRequest(
+        await rpc("cloud_request_editor_session", {
+          p_session_id: sessionId,
+          p_request_id: requestId,
+        })
+      );
+    },
+    async pollSessionRequest(sessionId, requestId) {
+      const value = await rpc("cloud_poll_editor_request", {
+        p_session_id: sessionId,
+        p_request_id: requestId,
+      });
+      return value === null ? null : parseEditorLoginRequest(value);
+    },
+    async decideSessionRequest(sessionId, requestId, allow) {
+      await rpc("cloud_decide_editor_request", {
+        p_session_id: sessionId,
+        p_request_id: requestId,
+        p_allow: allow,
+      });
+    },
+    async cancelSessionRequest(sessionId, requestId) {
+      await rpc("cloud_cancel_editor_request", {
+        p_session_id: sessionId,
+        p_request_id: requestId,
+      });
     },
     onSignedOut(callback) {
       const { data } = client.auth.onAuthStateChange((event) => {

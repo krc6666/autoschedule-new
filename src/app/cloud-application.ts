@@ -19,6 +19,7 @@ import {
   type AuditPageCommand,
 } from "../ui/components/operation-audit-page";
 import { WorkspaceVersionsController } from "./workspace-versions-controller";
+import { EditorSessionPoller } from "./editor-session-poller";
 import {
   WorkspaceVersionsPageElement,
   type WorkspaceVersionsCommand,
@@ -131,7 +132,8 @@ export function mountCloudApplication(
         cacheWarning: workspace.cacheWarning,
         canImport: workspace.cloudVersion === 0,
       };
-    editorRoot.inert = state.busy || state.conflict;
+    editorRoot.inert =
+      state.busy || state.conflict || Boolean(state.sessionPaused);
     editorRoot.hidden =
       state.conflict || Boolean(state.auditOpen) || Boolean(state.versionsOpen);
     auditRoot.hidden = state.phase !== "editor" || !state.auditOpen;
@@ -145,6 +147,7 @@ export function mountCloudApplication(
     panel.state = state;
   };
   const closeEditor = () => {
+    sessionPoller.stop();
     window.clearInterval(heartbeatTimer);
     heartbeatTimer = undefined;
     if (sessionHeld) {
@@ -157,7 +160,13 @@ export function mountCloudApplication(
     audit?.dispose();
     audit = null;
     auditRoot.replaceChildren();
-    state = { ...state, auditOpen: false, versionsOpen: false };
+    state = {
+      ...state,
+      auditOpen: false,
+      versionsOpen: false,
+      incomingRequest: null,
+      sessionPaused: false,
+    };
     editor?.dispose();
     workspace?.dispose();
     editor = null;
@@ -173,10 +182,63 @@ export function mountCloudApplication(
       shouldWarnOnExit: () =>
         current.hasUnsavedChanges ||
         pendingCommand === "save" ||
+        pendingCommand === "decide-login" ||
         pendingCommand === "restore-version",
     });
   };
-  const connect = async (takeover = false) => {
+  const pauseSession = (error: unknown) => {
+    if (disposed || !workspace) return;
+    sessionPoller.stop();
+    render({
+      sessionPaused: true,
+      message:
+        error instanceof Error
+          ? error.message
+          : "暂时无法验证编辑使用权，当前输入保留。",
+      notice: "error",
+    });
+  };
+  const sessionPoller = new EditorSessionPoller(
+    backend,
+    sessionId,
+    (request) => {
+      if (disposed) return;
+      if (workspace) {
+        render({
+          incomingRequest: request?.status === "pending" ? request : null,
+        });
+        return;
+      }
+      if (!state.outgoingRequest || !request) return;
+      if (request.id !== state.outgoingRequest.id) return;
+      render({ outgoingRequest: request });
+      if (request.status === "pending") return;
+      sessionPoller.stop();
+      if (request.status === "approved") void connect();
+      else
+        render({
+          phase: "error",
+          busy: false,
+          sessionActive: true,
+          notice: "error",
+          message:
+            request.status === "rejected"
+              ? "原设备已拒绝，本次登录未获允许。"
+              : request.status === "cancelled"
+                ? "本次登录申请已取消。"
+                : "原设备未确认，登录申请已超时，请稍后重新申请。",
+        });
+    },
+    (error) => {
+      if (workspace) pauseSession(error);
+      else
+        render({
+          message: "暂时无法查询登录申请结果，尚未获准进入，请检查网络。",
+          notice: "error",
+        });
+    }
+  );
+  const connect = async () => {
     const request = ++epoch;
     closeEditor();
     render({
@@ -186,6 +248,7 @@ export function mountCloudApplication(
       shareUrl: "",
       notice: null,
       saveFeedback: { phase: "idle" },
+      outgoingRequest: null,
     });
     try {
       const userId = await backend.currentUser();
@@ -202,7 +265,11 @@ export function mountCloudApplication(
         });
         return;
       }
-      await backend.acquireSession(sessionId, takeover);
+      await backend.acquireSession(sessionId);
+      if (disposed || request !== epoch) {
+        void backend.releaseSession(sessionId).catch(() => {});
+        return;
+      }
       sessionHeld = true;
       const remote = await backend.load();
       if (disposed || request !== epoch) return;
@@ -220,26 +287,22 @@ export function mountCloudApplication(
       current.onChange = () => render();
       mountEditor(current);
       heartbeatTimer = window.setInterval(() => {
-        void backend.touchSession(sessionId).catch((error) => {
-          if (disposed || !sessionHeld) return;
-          try {
-            if (!current.recoveryConflict && editor?.canTransferWorkspace())
-              current.stash();
-          } catch {
-            /* Keep the existing recovery copy when the browser is full. */
-          }
-          closeEditor();
-          render({
-            phase: "error",
-            busy: false,
-            sessionActive: true,
-            message:
-              error instanceof Error
-                ? error.message
-                : "编辑会话已失效，请重新获取或接管此账号。",
-            notice: "error",
+        void backend
+          .touchSession(sessionId)
+          .then(() => {
+            if (!disposed && workspace === current && state.sessionPaused) {
+              render({
+                sessionPaused: false,
+                message: "使用权已恢复，可以继续操作。",
+                notice: "info",
+              });
+              sessionPoller.start(null);
+            }
+          })
+          .catch((error) => {
+            if (disposed || !sessionHeld) return;
+            if (workspace === current) pauseSession(error);
           });
-        });
       }, 30_000);
       render({
         phase: "editor",
@@ -247,10 +310,46 @@ export function mountCloudApplication(
         message: "",
         sessionActive: false,
       });
+      sessionPoller.start(null);
     } catch (error) {
       if (sessionHeld && !workspace) {
         sessionHeld = false;
         void backend.releaseSession(sessionId).catch(() => {});
+      }
+      if (
+        !disposed &&
+        request === epoch &&
+        error instanceof CloudError &&
+        error.kind === "session" &&
+        !workspace
+      ) {
+        const requestId = globalThis.crypto.randomUUID();
+        try {
+          const loginRequest = await backend.requestSession(
+            sessionId,
+            requestId
+          );
+          if (disposed || request !== epoch) {
+            void backend
+              .cancelSessionRequest(sessionId, requestId)
+              .then(() => backend.releaseSession(sessionId))
+              .catch(() => {});
+            return;
+          }
+          render({
+            phase: "error",
+            busy: false,
+            sessionActive: true,
+            outgoingRequest: loginRequest,
+            message: "已向原设备申请登录，等待原设备确认。",
+            notice: "info",
+          });
+          sessionPoller.start(requestId);
+          return;
+        } catch (requestError) {
+          if (disposed || request !== epoch) return;
+          error = requestError;
+        }
       }
       if (!disposed && request === epoch)
         render({
@@ -274,8 +373,101 @@ export function mountCloudApplication(
         new Blob([json], { type: "application/json" }),
         "排班云端恢复副本.json"
       ));
+  const cancelLoginRequest = async () => {
+    const request = state.outgoingRequest;
+    if (!request) return;
+    sessionPoller.stop();
+    await backend.cancelSessionRequest(sessionId, request.id);
+    // Approval and cancellation can cross on the network. Release only our id.
+    await backend.releaseSession(sessionId);
+    if (state.outgoingRequest?.id === request.id)
+      render({ outgoingRequest: null });
+  };
   const handle = async (command: CloudCommand) => {
     if (pendingCommand !== null || disposed) return;
+    if (command.type === "decide-login") {
+      const current = workspace;
+      if (
+        !current ||
+        state.sessionPaused ||
+        state.incomingRequest?.id !== command.id ||
+        state.incomingRequest.status !== "pending"
+      )
+        return;
+      if (
+        command.allow &&
+        (!editor?.canTransferWorkspace() || editor.hasUnsavedRules())
+      ) {
+        render({
+          message:
+            "请先结束排班计算、保存或取消历史编辑，并在规则页保存规则，再允许交接。当前修改保留。",
+          notice: "error",
+        });
+        return;
+      }
+      pendingCommand = command.type;
+      sessionPoller.stop();
+      render({ busy: true });
+      try {
+        if (command.allow && current.hasUnsavedChanges) {
+          render({ saveFeedback: { phase: "saving" } });
+          await current.save();
+          if (disposed || workspace !== current) return;
+          render({ saveFeedback: { phase: "saved", savedAt: now() } });
+        }
+        await backend.decideSessionRequest(
+          sessionId,
+          command.id,
+          command.allow
+        );
+        if (disposed || workspace !== current) return;
+        if (command.allow) {
+          ++epoch;
+          closeEditor();
+          render({
+            phase: "error",
+            busy: false,
+            sessionActive: false,
+            outgoingRequest: null,
+            dirty: false,
+            message: "已允许另一台设备登录，本设备已结束编辑。",
+            notice: "info",
+          });
+        } else
+          render({
+            incomingRequest: null,
+            message: "已拒绝另一台设备登录，你可以继续操作。",
+            notice: "info",
+          });
+      } catch (error) {
+        if (!disposed && workspace === current) {
+          if (state.saveFeedback.phase === "saving") {
+            const message =
+              error instanceof Error ? error.message : "云端保存未成功";
+            render({
+              saveFeedback: {
+                phase: "failed",
+                kind: error instanceof CloudError ? error.kind : "unknown",
+                message,
+              },
+            });
+            alert(`云端保存失败\n${message}\n\n未交接，当前修改保留，请重试。`);
+          }
+          render({
+            message: `${error instanceof Error ? error.message : "操作失败"}；未确认交接，当前修改保留。`,
+            notice: "error",
+          });
+          if (error instanceof CloudError && error.kind === "session")
+            pauseSession(error);
+        }
+      } finally {
+        pendingCommand = null;
+        render({ busy: false });
+        if (!disposed && workspace === current && !state.sessionPaused)
+          sessionPoller.start(null);
+      }
+      return;
+    }
     if (command.type === "versions") {
       if (!workspace || state.phase !== "editor") return;
       if (!state.versionsOpen && editor && !editor.confirmLeaveRules(confirm))
@@ -382,14 +574,31 @@ export function mountCloudApplication(
       if (command.type === "login") {
         await backend.signIn(command.email, command.password);
         await connect();
-      } else if (command.type === "takeover") {
-        await connect(true);
       } else if (command.type === "retry") {
         await connect();
       } else if (command.type === "logout" && !workspace) {
+        sessionPoller.stop();
+        await cancelLoginRequest();
         await backend.signOut();
         await connect();
       } else if (workspace) {
+        if (command.type === "resume-session") {
+          await backend.acquireSession(sessionId);
+          if (disposed || workspace !== actionWorkspace) return;
+          render({
+            sessionPaused: false,
+            message: "使用权已恢复，可以继续操作。",
+            notice: "info",
+          });
+          sessionPoller.start(null);
+          return;
+        }
+        if (
+          state.sessionPaused &&
+          command.type !== "download" &&
+          command.type !== "logout"
+        )
+          throw new Error("编辑已暂停，请先重新验证使用权。当前输入保留。");
         if (!editor?.canTransferWorkspace())
           throw new Error(
             "请先结束排班计算，或保存/取消历史编辑，再进行云端操作。"
@@ -530,19 +739,15 @@ export function mountCloudApplication(
         const message =
           error instanceof Error ? error.message : "操作未成功，请重试。";
         if (error instanceof CloudError && error.kind === "session") {
-          try {
-            if (workspace && !workspace.recoveryConflict) workspace.stash();
-          } catch {
-            /* Keep any previously committed recovery copy. */
+          if (command.type === "save") {
+            render({
+              saveFeedback: { phase: "failed", kind: "session", message },
+            });
+            alert(
+              `云端保存失败\n${message}\n\n当前修改保留，请重新验证使用权后重试。`
+            );
           }
-          closeEditor();
-          render({
-            phase: "error",
-            message,
-            notice: "error",
-            sessionActive: true,
-            dirty: false,
-          });
+          pauseSession(error);
           return;
         }
         render(
@@ -561,6 +766,8 @@ export function mountCloudApplication(
           alert(
             `云端保存失败\n${message}\n\n尚未确认保存到云端，请不要关闭页面，核对后重新点击“保存到云端”。`
           );
+        if (!workspace && state.outgoingRequest?.status === "pending")
+          sessionPoller.start(state.outgoingRequest.id);
       }
     } finally {
       pendingCommand = null;
@@ -576,6 +783,7 @@ export function mountCloudApplication(
     queueMicrotask(() => {
       if (disposed) return;
       ++epoch;
+      void cancelLoginRequest().catch(() => {});
       try {
         if (
           workspace &&
@@ -598,6 +806,7 @@ export function mountCloudApplication(
         message: "登录已结束，请重新登录。",
         notice: null,
         saveFeedback: { phase: "idle" },
+        outgoingRequest: null,
       });
     });
   });
@@ -617,6 +826,7 @@ export function mountCloudApplication(
         /* Exit warning also protects unsaved editor changes. */
       }
       disposed = true;
+      void cancelLoginRequest().catch(() => {});
       unsubscribeAuth();
       panel.removeEventListener("cloud-command", listener);
       closeEditor();

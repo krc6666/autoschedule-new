@@ -67,6 +67,68 @@ describe("official Supabase SDK adapter", () => {
     });
   });
 
+  it("exchanges only request identity, server status and the explicit holder decision", async () => {
+    const request = {
+      id: "request-from-device-b",
+      status: "pending",
+      expiresAt: "2026-11-18T12:00:00Z",
+    };
+    const { backend, fetcher } = adapter([
+      { data: request },
+      { data: request },
+      { data: null },
+      { data: null },
+    ]);
+    expect(await backend.requestSession("session-two", request.id)).toEqual(
+      request
+    );
+    expect(await backend.pollSessionRequest("session-one", null)).toEqual(
+      request
+    );
+    await backend.decideSessionRequest("session-one", request.id, false);
+    await backend.cancelSessionRequest("session-two", request.id);
+    expect(
+      fetcher.mock.calls.map((call) => String(call[0]).split("/rpc/")[1])
+    ).toEqual([
+      "cloud_request_editor_session",
+      "cloud_poll_editor_request",
+      "cloud_decide_editor_request",
+      "cloud_cancel_editor_request",
+    ]);
+    expect(JSON.parse(String(fetcher.mock.calls[2]![1]!.body))).toEqual({
+      p_session_id: "session-one",
+      p_request_id: request.id,
+      p_allow: false,
+    });
+  });
+
+  it.each([
+    { id: "request-from-device-b", status: "approved" },
+    {
+      id: "request-from-device-b",
+      status: "unknown",
+      expiresAt: "2026-11-18T12:00:00Z",
+    },
+    { id: "request-from-device-b", status: "approved", expiresAt: "bad date" },
+  ])("refuses a malformed approval response %#", async (response) => {
+    const { backend } = adapter([{ data: response }]);
+    await expect(
+      backend.pollSessionRequest("session-two", "request-from-device-b")
+    ).rejects.toMatchObject({ kind: "invalid" });
+  });
+
+  it("reports an ended request without treating it as permission", async () => {
+    const { backend } = adapter([
+      {
+        data: { code: "P0001", message: "SESSION_REQUEST_CLOSED" },
+        status: 400,
+      },
+    ]);
+    await expect(
+      backend.decideSessionRequest("session-one", "request-from-device-b", true)
+    ).rejects.toMatchObject({ kind: "invalid" });
+  });
+
   it("sends RPC arguments through the real SDK and preserves explicit empty workspace", async () => {
     const { backend, fetcher } = adapter([
       { data: { version: 0, model: null } },

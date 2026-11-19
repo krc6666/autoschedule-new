@@ -94,9 +94,25 @@ export function cloudFixture(model = cloudModel()) {
       user = null;
       signedOut();
     }),
-    acquireSession: vi.fn(async (_sessionId: string, _takeover = false) => {}),
+    acquireSession: vi.fn(async (_sessionId: string) => {}),
     touchSession: vi.fn(async (_sessionId: string) => {}),
     releaseSession: vi.fn(async (_sessionId: string) => {}),
+    requestSession: vi.fn<CloudBackend["requestSession"]>(
+      async (_sessionId, requestId) => ({
+        id: requestId,
+        status: "pending",
+        expiresAt: "2026-11-18T12:00:00Z",
+      })
+    ),
+    pollSessionRequest: vi.fn<CloudBackend["pollSessionRequest"]>(
+      async () => null
+    ),
+    decideSessionRequest: vi.fn<CloudBackend["decideSessionRequest"]>(
+      async () => {}
+    ),
+    cancelSessionRequest: vi.fn<CloudBackend["cancelSessionRequest"]>(
+      async () => {}
+    ),
     onSignedOut: vi.fn((callback: () => void) => {
       signedOut = callback;
       return () => {
