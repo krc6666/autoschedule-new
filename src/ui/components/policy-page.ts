@@ -14,10 +14,12 @@ export class PolicyPageElement extends LightDomElement {
     model: { attribute: false },
     query: { type: String },
     editing: { attribute: false },
+    section: { state: true },
   };
   model!: AppState;
   query = "";
   editing?: PolicyEditingView;
+  private section: "general" | "priority" = "general";
 
   protected override render() {
     return html`<section class="workspace-section policy-workspace">
@@ -69,23 +71,72 @@ export class PolicyPageElement extends LightDomElement {
           >保存后请重新排班。云端版还需点击顶部“保存到云端”上传。</small
         >
       </div>
-      <autoschedule-policy-settings
-        .model=${this.model}
-        .query=${this.query}
-      ></autoschedule-policy-settings>
-      <autoschedule-team-leader-gap-fill-protection-settings
-        .model=${this.model}
-        .query=${this.query}
-      ></autoschedule-team-leader-gap-fill-protection-settings>
-      <autoschedule-policy-structured-rules
-        .model=${this.model}
-        .query=${this.query}
-        .editing=${this.editing}
-      ></autoschedule-policy-structured-rules>
-      <autoschedule-policy-rule-ledger
-        .model=${this.model}
-        .query=${this.query}
-      ></autoschedule-policy-rule-ledger>
+      <nav class="nav nav-pills gap-2 mb-3" aria-label="规则分类">
+        ${(
+          [
+            ["general", "通用规则"],
+            ["priority", "重点岗位"],
+          ] as const
+        ).map(
+          ([section, label]) =>
+            html`<button
+              type="button"
+              class=${`nav-link ${this.section === section ? "active" : ""}`}
+              data-policy-section=${section}
+              aria-pressed=${this.section === section}
+              @click=${() => {
+                this.section = section;
+              }}
+            >
+              ${label}
+            </button>`
+        )}
+      </nav>
+      ${this.query.trim() ? html`<p class="small text-secondary">搜索结果包含通用规则和重点岗位；清空搜索后返回所选分类。</p>` : ""}
+      <div
+        data-policy-panel="general"
+        ?hidden=${!this.query.trim() && this.section !== "general"}
+      >
+        <autoschedule-policy-settings
+          .model=${this.model}
+          .query=${this.query}
+          .section=${"general"}
+        ></autoschedule-policy-settings>
+        <autoschedule-team-leader-gap-fill-protection-settings
+          .model=${this.model}
+          .query=${this.query}
+        ></autoschedule-team-leader-gap-fill-protection-settings>
+        <autoschedule-policy-structured-rules
+          .model=${this.model}
+          .query=${this.query}
+          .editing=${this.editing}
+          .section=${"general"}
+        ></autoschedule-policy-structured-rules>
+        <autoschedule-policy-rule-ledger
+          .model=${this.model}
+          .query=${this.query}
+        ></autoschedule-policy-rule-ledger>
+      </div>
+      <div
+        data-policy-panel="priority"
+        ?hidden=${!this.query.trim() && this.section !== "priority"}
+      >
+        <h4>重点岗位</h4>
+        <p class="text-secondary small">
+          普通重点岗位和末班重点岗位统一在此设置，修改后点击上方“保存规则”。
+        </p>
+        <autoschedule-policy-settings
+          .model=${this.model}
+          .query=${this.query}
+          .section=${"priority"}
+        ></autoschedule-policy-settings>
+        <autoschedule-policy-structured-rules
+          .model=${this.model}
+          .query=${this.query}
+          .editing=${this.editing}
+          .section=${"priority"}
+        ></autoschedule-policy-structured-rules>
+      </div>
     </section>`;
   }
 }

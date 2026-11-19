@@ -42,6 +42,68 @@ async function mountPolicyPage(state: AppState) {
 }
 
 describe("rules page", () => {
+  it("opens priority settings in a separate subpage and searches across both subpages", async () => {
+    const element = await mountPolicyPage(createDefaultState());
+    const general = element.querySelector<HTMLElement>(
+      '[data-policy-panel="general"]'
+    )!;
+    const priority = element.querySelector<HTMLElement>(
+      '[data-policy-panel="priority"]'
+    )!;
+    expect(general).not.toBeNull();
+    expect(priority).not.toBeNull();
+    expect(general.hidden).toBe(false);
+    expect(priority.hidden).toBe(true);
+    element
+      .querySelector<HTMLButtonElement>('[data-policy-section="priority"]')!
+      .click();
+    await settleLit();
+    expect(general.hidden).toBe(true);
+    expect(priority.hidden).toBe(false);
+    expect(priority.textContent).toContain("普通重点岗位集合");
+    expect(priority.textContent).toContain("末班重点岗位航班范围");
+    expect(
+      priority.querySelector("[data-policy-recovery-mode]")
+    ).not.toBeNull();
+    expect(
+      priority.querySelector('[data-policy-setting="maxDailyHours"]')
+    ).toBeNull();
+    expect(
+      general.querySelector(".ordinary-priority-position-scope")
+    ).toBeNull();
+    expect(general.querySelector(".late-priority-flight-scope")).toBeNull();
+    const fields = [
+      ...element.querySelectorAll<HTMLElement>("[data-policy-setting]"),
+    ].map((item) => item.dataset.policySetting);
+    expect(new Set(fields).size).toBe(fields.length);
+    expect(element.querySelectorAll(".policy-save-bar")).toHaveLength(1);
+    expect(element.editing?.dirty).toBe(false);
+    const search = element.querySelector<HTMLInputElement>(
+      'input[type="search"]'
+    )!;
+    search.value = "每日工时上限";
+    search.dispatchEvent(new Event("input", { bubbles: true }));
+    await settleLit();
+    expect(general.hidden).toBe(false);
+    expect(
+      general.querySelector('[data-policy-setting="maxDailyHours"]')
+    ).not.toBeNull();
+    expect(priority.querySelector("details")).toBeNull();
+    search.value = "普通重点岗位集合";
+    search.dispatchEvent(new Event("input", { bubbles: true }));
+    await settleLit();
+    expect(priority.hidden).toBe(false);
+    expect(
+      priority.querySelector(".ordinary-priority-position-scope")
+    ).not.toBeNull();
+    expect(priority.querySelector(".late-priority-flight-scope")).toBeNull();
+    search.value = "";
+    search.dispatchEvent(new Event("input", { bubbles: true }));
+    await settleLit();
+    expect(general.hidden).toBe(true);
+    expect(priority.hidden).toBe(false);
+  });
+
   it("starts with every rule disclosure collapsed and expands matching cards for search", async () => {
     const element = await mountPolicyPage(createDefaultState());
     const disclosures = [
@@ -343,6 +405,10 @@ describe("rules page", () => {
     const state = createDefaultState();
     state.settings.latePriorityFlightNumbers = ["MISSING"];
     const element = await mountPolicyPage(state);
+    element
+      .querySelector<HTMLButtonElement>('[data-policy-section="priority"]')!
+      .click();
+    await settleLit();
     const scope = element.querySelector<HTMLElement>(
       ".late-priority-flight-scope"
     )!;
@@ -672,6 +738,10 @@ describe("rules page", () => {
       { airlineCode: "MU", position: "送资料" },
     ];
     const element = await mountPolicyPage(state);
+    element
+      .querySelector<HTMLButtonElement>('[data-policy-section="priority"]')!
+      .click();
+    await settleLit();
     const collection = element.querySelector<HTMLDetailsElement>(
       ".ordinary-priority-position-scope"
     )!;
@@ -814,8 +884,12 @@ describe("rules page", () => {
   it("emits the selected recovery mode from the recovery module", async () => {
     const state = createDefaultState();
     const element = await mountPolicyPage(state);
+    element
+      .querySelector<HTMLButtonElement>('[data-policy-section="priority"]')!
+      .click();
+    await settleLit();
     const structuredRules = element.querySelector(
-      "autoschedule-policy-structured-rules"
+      '[data-policy-panel="priority"] autoschedule-policy-structured-rules'
     )!;
     const select = structuredRules.querySelector<HTMLSelectElement>(
       "[data-policy-recovery-mode] select"

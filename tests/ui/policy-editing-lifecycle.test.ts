@@ -51,6 +51,53 @@ async function mountLocal(model: AppState = createDefaultState()) {
 }
 
 describe("rules editing through the mounted entry", () => {
+  it("keeps one draft across priority and general subpages for save and discard", async () => {
+    vi.stubGlobal(
+      "confirm",
+      vi.fn(() => true)
+    );
+    const app = await mountLocal();
+    const before = structuredClone(app.store.getState().model.settings);
+    const switchTo = async (section: string) => {
+      app.root
+        .querySelector<HTMLButtonElement>(`[data-policy-section="${section}"]`)!
+        .click();
+      await settleLit();
+    };
+    await switchTo("priority");
+    const toggle = app.root.querySelector<HTMLInputElement>(
+      '[data-policy-setting="positionRotationEnabled"]'
+    )!;
+    toggle.checked = !before.positionRotationEnabled;
+    toggle.dispatchEvent(new Event("change", { bubbles: true }));
+    await settleLit();
+    await switchTo("general");
+    expect(app.mounted.hasUnsavedRules()).toBe(true);
+    expect(app.store.getState().model.settings).toEqual(before);
+    const hours = app.root.querySelector<HTMLInputElement>(
+      '[data-policy-setting="maxDailyHours"]'
+    )!;
+    hours.value = "15";
+    hours.dispatchEvent(new Event("input", { bubbles: true }));
+    await settleLit();
+    await switchTo("priority");
+    expect(toggle.checked).toBe(!before.positionRotationEnabled);
+    await app.command({ type: "save-policy" });
+    expect(app.store.getState().model.settings).toMatchObject({
+      positionRotationEnabled: !before.positionRotationEnabled,
+      maxDailyHours: 15,
+    });
+    expect(app.mounted.hasUnsavedRules()).toBe(false);
+    toggle.checked = before.positionRotationEnabled;
+    toggle.dispatchEvent(new Event("change", { bubbles: true }));
+    await settleLit();
+    await switchTo("general");
+    await app.command({ type: "discard-policy" });
+    await switchTo("priority");
+    expect(toggle.checked).toBe(!before.positionRotationEnabled);
+    expect(app.mounted.hasUnsavedRules()).toBe(false);
+  });
+
   it("captures unblurred scalar/text inputs, keeps raw list typing, and protects cancellation", async () => {
     const confirm = vi.fn(() => false);
     vi.stubGlobal("confirm", confirm);

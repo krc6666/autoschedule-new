@@ -31,18 +31,20 @@ export class PolicyStructuredRulesElement extends LightDomElement {
     model: { attribute: false },
     query: { type: String },
     editing: { attribute: false },
+    section: { type: String },
   };
   model!: AppState;
   query = "";
   editing?: PolicyEditingView;
+  section: "general" | "priority" = "general";
 
   protected override render() {
+    if (this.section === "priority") return this.recoveryRules();
     return html`
       ${this.airlineMixPolicies()} ${this.sameFlightStaffExclusions()}
       ${this.dutyPriorities()} ${this.crossFlightPriorities()}
-      ${this.crossWorkdayReservations()} ${this.recoveryRules()}
-      ${this.supervisorFillRules()} ${this.supervisorRules()}
-      ${this.transitionRules()}
+      ${this.crossWorkdayReservations()} ${this.supervisorFillRules()}
+      ${this.supervisorRules()} ${this.transitionRules()}
     `;
   }
 

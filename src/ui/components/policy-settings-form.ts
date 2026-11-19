@@ -32,21 +32,6 @@ const POLICY_SETTING_SEARCH_TEXT = [
   "限制短时间连续高疲劳",
   "滚动窗口（分钟）",
   "滚动疲劳上限",
-  "重点岗位频率与轮岗",
-  "重点岗位优先，普通岗位防止连续第三班",
-  "同日同航司控制/一号优先避免",
-  "有安全替代时优先分开，无替代时允许安排并报警",
-  "同一班表一号岗位单人限一次",
-  "每个人最多承担一次非督导首个岗位，无法安排时保留空岗",
-  "TR121/H02 冷却工作班数",
-  "0 表示关闭，默认避开随后 3 个已归档工作班",
-  "末班重点岗位航班范围",
-  "勾选后参与四类合计轮换、差值控制和统计",
-  "全选",
-  "清空",
-  "跨工作日恢复保护",
-  "全局开放链优先避免连续晚间重岗位",
-  "末班结束界线（晚于）",
   "分队长并行督导最大重叠",
   "工时与疲劳均衡",
   "压力不宽松时启用",
@@ -77,20 +62,22 @@ export class PolicySettingsFormElement extends LightDomElement {
   static override properties = {
     model: { attribute: false },
     query: { type: String },
+    section: { type: String },
   };
   model!: AppState;
   query = "";
+  section: "general" | "priority" = "general";
   private get draft(): SchedulePolicyInput {
     return this.model.settings;
   }
 
   protected override render() {
+    if (this.section === "priority") return this.prioritySettings();
     if (
       !matchesPolicySearch(
         this.query,
         POLICY_SETTING_SEARCH_TEXT,
-        Object.values(this.draft),
-        latePriorityFlightScopeCandidates(this.model.positionRules)
+        Object.values(this.draft)
       )
     ) {
       return nothing;
@@ -117,14 +104,6 @@ export class PolicySettingsFormElement extends LightDomElement {
             ${this.toggle("rollingLoadProtectionEnabled", "滚动负荷保护", "限制短时间连续高疲劳")}
             ${this.number("rollingLoadWindowMinutes", "滚动窗口（分钟）", 0, 1440, 30)}
             ${this.number("rollingLoadMaxFatigue", "滚动疲劳上限", 0.5, 100, 0.5)}
-            ${this.toggle("positionRotationEnabled", "重点岗位频率与轮岗", "重点岗位优先，普通岗位防止连续第三班")}
-            ${this.toggle("sameDayCrossFlightPriorityEnabled", "同日同航司控制/一号优先避免", "有安全替代时优先分开，无替代时允许安排并报警")}
-            ${this.toggle("dailyPrimaryPositionUniqueEnabled", "同一班表一号岗位单人限一次", "每个人最多承担一次非督导首个岗位，无法安排时保留空岗")}
-            ${this.number("tr121H02CooldownWorkdays", "TR121/H02 冷却工作班数", 0, 30, 1)}
-            ${this.latePriorityFlightScope()}
-            ${this.ordinaryPriorityPositionCollection()}
-            ${this.toggle("lateShiftRecoveryEnabled", "跨工作日恢复保护", "全局开放链优先避免连续晚间重岗位")}
-            ${this.time("lateShiftEndTime", "末班结束界线（晚于）")}
             ${this.toggle("workloadBalanceEnabled", "工时与疲劳均衡", "当日负荷均衡，并按历史统计天数补充平衡近期累计疲劳；近期调节也适用于宽松班")}
             ${this.toggle("dailyFlightCountBalanceExemptHalfRest", "半休人员豁免", "勾选后半休人员不参与航班数比较")}
             ${this.toggle("dailyFlightCountBalanceExemptTeamLeaders", "分队长豁免", "勾选后分队长不参与航班数比较")}
@@ -165,6 +144,85 @@ export class PolicySettingsFormElement extends LightDomElement {
         </div>
       </details>
     `;
+  }
+
+  private prioritySettings() {
+    const ordinaryMatches = matchesPolicySearch(
+      this.query,
+      "普通重点岗位集合",
+      "重点岗位频率与轮岗",
+      "重点岗位优先，普通岗位防止连续第三班",
+      "同日同航司控制/一号优先避免",
+      "有安全替代时优先分开，无替代时允许安排并报警",
+      "同一班表一号岗位单人限一次",
+      "每个人最多承担一次非督导首个岗位，无法安排时保留空岗",
+      "TR121/H02 冷却工作班数",
+      "0 表示关闭，默认避开随后 3 个已归档工作班",
+      this.model.settings.ordinaryPriorityPositions.map((item) => [
+        item.airlineCode,
+        item.position,
+      ]),
+      this.draft.tr121H02CooldownWorkdays
+    );
+    const lateMatches = matchesPolicySearch(
+      this.query,
+      "末班重点岗位航班范围",
+      "勾选后参与末班岗位轮换、统计及上一班末班人员晚班轻岗保护",
+      "全选",
+      "清空",
+      "跨工作日恢复保护",
+      "全局开放链优先避免连续晚间重岗位",
+      "末班结束界线（晚于）",
+      this.draft.lateShiftEndTime,
+      this.draft.latePriorityFlightNumbers,
+      latePriorityFlightScopeCandidates(this.model.positionRules)
+    );
+    return html` ${
+      ordinaryMatches
+        ? html`<details
+            class="policy-rule-card"
+            ?open=${Boolean(normalizePolicySearchQuery(this.query))}
+          >
+            <summary>
+              <span
+                ><strong>普通重点岗位</strong
+                ><small>岗位集合、频率与轮岗</small></span
+              ><i class="bi bi-chevron-down"></i>
+            </summary>
+            <div class="policy-rule-content">
+              ${this.ordinaryPriorityPositionCollection()}
+              <div class="schedule-policy-controls mt-3">
+                ${this.toggle("positionRotationEnabled", "重点岗位频率与轮岗", "重点岗位优先，普通岗位防止连续第三班")}
+                ${this.toggle("sameDayCrossFlightPriorityEnabled", "同日同航司控制/一号优先避免", "有安全替代时优先分开，无替代时允许安排并报警")}
+                ${this.toggle("dailyPrimaryPositionUniqueEnabled", "同一班表一号岗位单人限一次", "每个人最多承担一次非督导首个岗位，无法安排时保留空岗")}
+                ${this.number("tr121H02CooldownWorkdays", "TR121/H02 冷却工作班数", 0, 30, 1)}
+              </div>
+            </div>
+          </details>`
+        : nothing
+    }
+    ${
+      lateMatches
+        ? html`<details
+            class="policy-rule-card"
+            ?open=${Boolean(normalizePolicySearchQuery(this.query))}
+          >
+            <summary>
+              <span
+                ><strong>末班重点岗位</strong
+                ><small>航班范围与恢复保护</small></span
+              ><i class="bi bi-chevron-down"></i>
+            </summary>
+            <div class="policy-rule-content">
+              ${this.latePriorityFlightScope()}
+              <div class="schedule-policy-controls mt-3">
+                ${this.toggle("lateShiftRecoveryEnabled", "跨工作日恢复保护", "全局开放链优先避免连续晚间重岗位")}
+                ${this.time("lateShiftEndTime", "末班结束界线（晚于）")}
+              </div>
+            </div>
+          </details>`
+        : nothing
+    }`;
   }
 
   private updateDraft<K extends keyof SchedulePolicyInput>(
