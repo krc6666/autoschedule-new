@@ -13,6 +13,10 @@ import { isClearedCountRecord } from "../domain/statistics/manual-count-evidence
 import { additionalAttendanceByAssignment } from "../domain/statistics/attendance-intervals";
 import { operationalInterval, timeToMinutes } from "../domain/shared/time";
 import { archivedFlightStarts } from "../domain/statistics/relaxed-shift-statistics";
+import {
+  historicalTemporaryPosition,
+  temporaryPositionEvidence,
+} from "../domain/records/temporary-position-evidence";
 
 export interface HistoricalScheduleDraft {
   flights: AppState["flights"];
@@ -110,12 +114,41 @@ export function buildHistoricalScheduleDraft(
       (rule) => makeUnfilled(flight, rule.name, rule)
     )
   );
+  const temporaryRecords = new Map(
+    assignableRecords.flatMap((record) => {
+      const layout = historicalTemporaryPosition(
+        record,
+        state.positionRules.some(
+          (rule) =>
+            rule.flightNo === record.flightNo && rule.name === record.position
+        )
+      );
+      return layout ? [[record.id, layout] as const] : [];
+    })
+  );
+  const temporaryRecordByAssignment = new Map<string, HistoryRecord>();
+  for (const record of assignableRecords) {
+    const layout = temporaryRecords.get(record.id);
+    const flight = flights.find((item) => item.flightNo === record.flightNo);
+    if (!layout || !flight) continue;
+    const assignment = {
+      ...makeUnfilled(flight, record.position, undefined),
+      ...layout,
+      workHours: 0,
+      fatiguePoints: 0,
+      status: "manual" as const,
+    };
+    assignments.push(assignment);
+    temporaryRecordByAssignment.set(assignment.id, record);
+  }
   const unmatched = new Set(assignableRecords.map((record) => record.id));
   for (const assignment of assignments) {
     const record =
+      temporaryRecordByAssignment.get(assignment.id) ??
       records.find(
         (item) =>
           unmatched.has(item.id) &&
+          !temporaryRecords.has(item.id) &&
           item.flightNo === assignment.flightNo &&
           item.position === assignment.position &&
           (!item.startTime || item.startTime === assignment.startTime) &&
@@ -124,6 +157,7 @@ export function buildHistoricalScheduleDraft(
       records.find(
         (item) =>
           unmatched.has(item.id) &&
+          !temporaryRecords.has(item.id) &&
           item.flightNo === assignment.flightNo &&
           item.position === assignment.position
       );
@@ -187,7 +221,8 @@ export function currentScheduleHistory(
     .filter(
       (item) =>
         (item.status === "assigned" && item.staffName) ||
-        isClearedCountRecord({ ...item, staffId: item.staffId ?? "" })
+        isClearedCountRecord({ ...item, staffId: item.staffId ?? "" }) ||
+        Boolean(temporaryPositionEvidence(item).temporaryPosition)
     )
     .filter(
       (item) =>
@@ -237,6 +272,7 @@ export function currentScheduleHistory(
           remark: item.remark,
           manualRemark: item.manualRemark,
         },
+        ...temporaryPositionEvidence(item),
       };
     });
   const roster = getDutyRosterForDate(state, date);

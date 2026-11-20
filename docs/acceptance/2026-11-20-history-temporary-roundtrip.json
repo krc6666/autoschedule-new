@@ -1,0 +1,162 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-20-history-temporary-roundtrip",
+  "title": "历史编辑完整恢复临时岗位及同类归档往返遗漏",
+  "startedFrom": "e0199c9f3df32faf9103f5f86861f1739c1bc232",
+  "expectation": {
+    "example": "Owner提供2026-11-24网页截图及本地配置(10)。已只读复现FD571默认临时岗位未恢复，save-history-edit因未匹配记录阻止保存；随后授权修复并排查同一道理的遗漏。原文件只在本机读取，回归用匿名例子。",
+    "expected": "临时岗位的人员、名称、区域、顺序、实际时段、备注与人工基准经过归档、编辑、Excel导入导出及重启后保留。旧版默认临时岗位零工时零点数记录恢复；新记录显式保存来源，不猜任意未知岗位。核查空临时格、重名格、分队长补差标记。命中G03/G05/G06、D01/D02、V01/V02/V04。",
+    "unchanged": "自动规则、资格、人工权限、统计口径、A/B隔离、异日保存/取消恢复当前表、云端CAS保持；真正缺模板、未知正式岗位、重复正式记录和部分历史仍阻止覆盖。不写真实云库，不commit/push/部署，不操作浏览器。",
+    "fallback": "无法证明身份的旧自定义岗位仍逐项提示并拒绝覆盖，不静默改名或删除；取消和保存失败保留原历史。既有改动按11份候选文件及822份原证据备份，精确增量修改，测试自动重写的旧证据按原字节恢复。 Work resumed after explicit instruction in .tmp/hr-fix; integrate only unchanged shared-file hashes and back up the current shared files. Tests rewriting old evidence stay isolated."
+  },
+  "testedVersion": "fb197c3d464b163e586d794909166c4de23b4b25f552c6629a293390d71ca108",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "Nine regressions failed first; original workbook reproduced and now saves the screenshot date in memory.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-20-history-temporary-red.txt",
+          "summary": "Original nine failing regressions before implementation",
+          "sha256": "d8d951edc53a06ff4eff4c8e3e753b834efaf1a540588a7e293cf1c626663588"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-20-history-temporary-real-input.json",
+          "summary": "Original workbook unchanged; six temporary records checked, five restorable, screenshot date saves in memory",
+          "sha256": "27ddbdec7e1778e671d949d02d8d42b58bc5705714944729042de475a0794fa9"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "Temporary names, people, layout, zero workload and notes survive archive/edit/save/restart.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-20-history-temporary-targeted.txt",
+          "summary": "Nine files and 172 targeted tests passed",
+          "sha256": "87f8eddc7e65d09fd399274a0d1ff9e67fc42543b74a80d87afa9d81add4d081"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-20-history-temporary-functional.txt",
+          "summary": "252 files and 2381 functional tests passed",
+          "sha256": "b467baddb2b2f51bf065c92195211616213017d6970feadf170ab16f158aa656"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "Custom, blank, same-name primary/bottom slots and both Excel formats survive byte round trips.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-20-history-temporary-targeted.txt",
+          "summary": "Nine files and 172 targeted tests passed",
+          "sha256": "87f8eddc7e65d09fd399274a0d1ff9e67fc42543b74a80d87afa9d81add4d081"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-20-history-temporary-functional.txt",
+          "summary": "252 files and 2381 functional tests passed",
+          "sha256": "b467baddb2b2f51bf065c92195211616213017d6970feadf170ab16f158aa656"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "Imported into a clean history target, saved through real JSON restoration and edited again; gap-fill marker preserved.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-20-history-temporary-targeted.txt",
+          "summary": "Nine files and 172 targeted tests passed",
+          "sha256": "87f8eddc7e65d09fd399274a0d1ff9e67fc42543b74a80d87afa9d81add4d081"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-20-history-temporary-functional.txt",
+          "summary": "252 files and 2381 functional tests passed",
+          "sha256": "b467baddb2b2f51bf065c92195211616213017d6970feadf170ab16f158aa656"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "Unknown official jobs, missing flights, duplicate official records, malformed metadata and partial archives remain blocked.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-20-history-temporary-targeted.txt",
+          "summary": "Nine files and 172 targeted tests passed",
+          "sha256": "87f8eddc7e65d09fd399274a0d1ff9e67fc42543b74a80d87afa9d81add4d081"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-20-history-temporary-functional.txt",
+          "summary": "252 files and 2381 functional tests passed",
+          "sha256": "b467baddb2b2f51bf065c92195211616213017d6970feadf170ab16f158aa656"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "Original input hash unchanged; existing history/current sync, cancellation, manual permissions, storage and Excel regressions pass. Full commit verify passed without changing time limits. Default parallel run hit two solver timeout failures and was interrupted; single-worker rerun passed.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-20-history-temporary-targeted.txt",
+          "summary": "Nine files and 172 targeted tests passed",
+          "sha256": "87f8eddc7e65d09fd399274a0d1ff9e67fc42543b74a80d87afa9d81add4d081"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-20-history-temporary-functional.txt",
+          "summary": "252 files and 2381 functional tests passed",
+          "sha256": "b467baddb2b2f51bf065c92195211616213017d6970feadf170ab16f158aa656"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-20-history-temporary-integration.json",
+          "summary": "Conflict-checked integration with backup; unrelated shared files untouched; all source and test files compared to validated snapshot",
+          "sha256": "e7d0fe37c58754f49efc2028aaa9a74e22312f5d4fae2f34287f881e83ea23f0"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-20-history-temporary-commit-verify.txt",
+          "summary": "Commit gate: npm run verify passed with one worker; 2381 functional and 20 performance tests, typecheck and build",
+          "sha256": "a7aa15626b1f865994a1fe4d0fb4fb3af4c6c3ea6ff84920cc84710cf47fa719"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "Anonymous artifact, mounted UI and original-workbook memory replay passed, but the real browser/public website has not been operated or published; do not call it field acceptance.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-20-history-temporary-final.json",
+          "summary": "Anonymous final history and reopened draft",
+          "sha256": "081f1252b683be38c887444db6969e197fad5ca8f45296ca8c2e577b1ab85c68"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-20-history-temporary-independent.json",
+          "summary": "Ten independent assertions over final anonymous artifact",
+          "sha256": "65bf2d57506bb5ff0fae9b7f927b0cd54aad26d828247facf254e4a0c13ea507"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-20-history-temporary-real-input.json",
+          "summary": "Original workbook unchanged; six temporary records checked, five restorable, screenshot date saves in memory",
+          "sha256": "27ddbdec7e1778e671d949d02d8d42b58bc5705714944729042de475a0794fa9"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-20-history-temporary-build.txt",
+          "summary": "Production build passed",
+          "sha256": "c13e5feb24a4f95c8757aaf40ef4e7c87624a4fe380a147f45223e9e3947c1d0"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-20-history-temporary-typecheck.txt",
+          "summary": "Typecheck exit 0",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "Original nine failures and real workbook prove missing temporary origin/layout caused unmatched history and blocked save.",
+    "laterChanges": "Archive filtering, matching, import deduplication, JSON restore and editing are covered by negative and roundtrip regressions; no solver rules changed.",
+    "finalArtifact": "Anonymous final JSON independently matches two rows and 2h/3 fatigue; original file replay preserves temporary person/time/workload. Real webpage remains unverified."
+  },
+  "review": {
+    "missedScope": "Legacy custom names without source evidence cannot be inferred. One of six real temporary records lacks its original flight; old official jobs on other dates still mismatch and remain protected. No real cloud/browser operation.",
+    "rootCause": "Temporary source/layout was discarded by archive, then configured-only reconstruction rejected manual rows. Import filtering/keys and history JSON restore also omitted related row/marker facts.",
+    "earlyDetection": "Before delivery exercise create/archive/export/import/restart/edit/save/reopen; compare original row identities, placement, people and workload, and deliberately remove an official job to ensure overwrite remains blocked."
+  }
+}

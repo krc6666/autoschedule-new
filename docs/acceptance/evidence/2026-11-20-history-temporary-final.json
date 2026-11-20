@@ -1,0 +1,89 @@
+{
+  "date": "2026-11-18",
+  "history": [
+    {
+      "id": "history-mwp6ur0l-xku9ws",
+      "date": "2026-11-18",
+      "flightNo": "CX937",
+      "position": "督导",
+      "staffId": "1",
+      "staffName": "同步测试人员1",
+      "startTime": "08:30",
+      "endTime": "10:30",
+      "flightCutoffTime": "10:30",
+      "flightStartTime": "08:30",
+      "workHours": 2,
+      "fatiguePoints": 3,
+      "remark": "原备注",
+      "assignmentRemarks": {
+        "remark": "",
+        "manualRemark": "原备注"
+      }
+    },
+    {
+      "id": "history-mwp6ur0l-xpcjy8",
+      "date": "2026-11-18",
+      "flightNo": "CX937",
+      "position": "临时交接",
+      "staffId": "2",
+      "staffName": "同步测试人员2",
+      "startTime": "08:30",
+      "endTime": "10:30",
+      "flightCutoffTime": "10:30",
+      "flightStartTime": "08:30",
+      "workHours": 0,
+      "fatiguePoints": 0,
+      "remark": "保存后的临时说明",
+      "temporaryPosition": {
+        "layoutGroup": "bottom",
+        "layoutIndex": 3
+      },
+      "assignmentRemarks": {
+        "remark": "",
+        "manualRemark": "保存后的临时说明"
+      },
+      "countBaseline": {
+        "staffId": null,
+        "staffName": ""
+      }
+    }
+  ],
+  "draft": [
+    {
+      "flightNo": "CX937",
+      "positionRuleId": "position-cx937-%E7%9D%A3%E5%AF%BC",
+      "position": "督导",
+      "staffId": "1",
+      "staffName": "同步测试人员1",
+      "startTime": "08:30",
+      "endTime": "10:30",
+      "workHours": 2,
+      "fatiguePoints": 3,
+      "remark": "",
+      "manualRemark": "原备注",
+      "status": "assigned"
+    },
+    {
+      "flightNo": "CX937",
+      "positionRuleId": null,
+      "position": "临时交接",
+      "staffId": "2",
+      "staffName": "同步测试人员2",
+      "startTime": "08:30",
+      "endTime": "10:30",
+      "workHours": 0,
+      "fatiguePoints": 0,
+      "remark": "",
+      "manualRemark": "保存后的临时说明",
+      "status": "assigned",
+      "layoutGroup": "bottom",
+      "layoutIndex": 3,
+      "countBaseline": {
+        "staffId": null,
+        "staffName": ""
+      }
+    }
+  ],
+  "workHours": 2,
+  "fatiguePoints": 3
+}

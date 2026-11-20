@@ -79,6 +79,11 @@ export interface PositionRule {
 }
 
 export interface ManualCountEvidence {
+  /** Explicit origin and layout of an archived, manually added position. */
+  temporaryPosition?: {
+    layoutGroup: "primary" | "bottom";
+    layoutIndex?: number;
+  };
   /** First occupant before a successful manual edit; display only, never workload. */
   countBaseline?: { staffId: string | null; staffName: string };
   manualOverrideWarnings?: Array<{ code: string; message: string }>;

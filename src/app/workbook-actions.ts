@@ -68,7 +68,12 @@ export interface HistoryImportSummary {
 function historyKey(
   record: Pick<
     HistoryRecord,
-    "date" | "flightNo" | "position" | "staffId" | "staffName"
+    | "date"
+    | "flightNo"
+    | "position"
+    | "staffId"
+    | "staffName"
+    | "temporaryPosition"
   >
 ): string {
   return JSON.stringify([
@@ -77,6 +82,12 @@ function historyKey(
     record.position,
     record.staffId ? "id" : "name",
     record.staffId || record.staffName,
+    ...(record.temporaryPosition
+      ? [
+          record.temporaryPosition.layoutGroup,
+          record.temporaryPosition.layoutIndex ?? null,
+        ]
+      : []),
   ]);
 }
 

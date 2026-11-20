@@ -1,0 +1,8 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule/.tmp/hr-fix
+
+
+ Test Files  252 passed (252)
+      Tests  2381 passed (2381)
+   Start at  19:10:24
+   Duration  363.46s (transform 9.04s, setup 0ms, import 54.33s, tests 240.33s, environment 18.52s)

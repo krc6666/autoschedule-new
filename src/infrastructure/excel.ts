@@ -6,6 +6,7 @@ import {
   appendFlightIdentities,
   parseFlightIdentities,
 } from "./flight-identities-excel";
+import { temporaryPositionEvidence } from "../domain/records/temporary-position-evidence";
 import type { FlightIdentity } from "../model";
 import {
   appendFlightPlanConfirmations,
@@ -867,7 +868,13 @@ function parseHistory(
     const evidence = parseManualCountEvidence(
       evidenceIndex >= 0 ? normalizeText(row[evidenceIndex]) : ""
     );
-    if (!date || (!staffName && !evidence.countBaseline?.staffId) || !position)
+    if (
+      !date ||
+      (!staffName &&
+        !evidence.countBaseline?.staffId &&
+        !evidence.temporaryPosition) ||
+      !position
+    )
       return [];
     const importedStaffId =
       staffIdIndex >= 0 ? normalizeText(row[staffIdIndex]) : "";
@@ -1452,6 +1459,7 @@ export function buildScheduleWorkbook(
         item.staffId ?? "",
         serializeManualCountEvidence({
           ...item,
+          ...temporaryPositionEvidence(item),
           assignmentRemarks: {
             remark: item.remark,
             manualRemark: item.manualRemark,

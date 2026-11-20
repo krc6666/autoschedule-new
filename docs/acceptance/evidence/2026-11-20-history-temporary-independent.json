@@ -1,0 +1,10 @@
+{
+  "anonymousFinalArtifactChecks": 10,
+  "passed": true,
+  "expectedHistoryRows": 2,
+  "actualHistoryRows": 2,
+  "expectedHours": 2,
+  "actualHours": 2,
+  "expectedFatigue": 3,
+  "actualFatigue": 3
+}

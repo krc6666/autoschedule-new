@@ -1,0 +1,59 @@
+{
+  "inputSha256": "9f9565afa51183e93268993779ad2018fc3fa454a767c9004222a6c40b63f7ff",
+  "inputUnchanged": true,
+  "temporaryRecordsChecked": 6,
+  "days": [
+    {
+      "date": "2026-10-01",
+      "expectedTemporary": 1,
+      "blockedMissingFlight": 1,
+      "restoredTemporary": 0,
+      "previousWarnings": 20,
+      "remainingWarnings": 20
+    },
+    {
+      "date": "2026-10-19",
+      "expectedTemporary": 1,
+      "blockedMissingFlight": 0,
+      "restoredTemporary": 1,
+      "previousWarnings": 15,
+      "remainingWarnings": 14
+    },
+    {
+      "date": "2026-11-02",
+      "expectedTemporary": 1,
+      "blockedMissingFlight": 0,
+      "restoredTemporary": 1,
+      "previousWarnings": 15,
+      "remainingWarnings": 14
+    },
+    {
+      "date": "2026-11-16",
+      "expectedTemporary": 1,
+      "blockedMissingFlight": 0,
+      "restoredTemporary": 1,
+      "previousWarnings": 1,
+      "remainingWarnings": 0
+    },
+    {
+      "date": "2026-11-24",
+      "expectedTemporary": 1,
+      "blockedMissingFlight": 0,
+      "restoredTemporary": 1,
+      "previousWarnings": 1,
+      "remainingWarnings": 0
+    },
+    {
+      "date": "2026-11-26",
+      "expectedTemporary": 1,
+      "blockedMissingFlight": 0,
+      "restoredTemporary": 1,
+      "previousWarnings": 1,
+      "remainingWarnings": 0
+    }
+  ],
+  "screenshotDateEditSaveSucceededInMemory": true,
+  "screenshotDateHistoryUnchangedBeforeConfirmation": true,
+  "savedTemporaryPersonTimeAndWorkloadPreserved": true,
+  "originalEntryAndRealCloudNotOperated": true
+}

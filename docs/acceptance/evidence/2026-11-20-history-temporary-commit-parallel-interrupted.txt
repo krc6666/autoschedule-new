@@ -1,0 +1,18 @@
+
+> autoschedule@1.0.0 verify
+> npm run typecheck && npm test && npm run test:performance && npm run build
+
+
+> autoschedule@1.0.0 typecheck
+> tsc -b --pretty false
+
+
+> autoschedule@1.0.0 test
+> vitest run --exclude tests/performance/**
+
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule/.tmp/hr-commit
+
+ ❯ tests/domain/daily-schedule-optimizer.test.ts (63 tests | 2 failed) 13669ms
+     × retains the flight-count fallback instead of expanding the large-flight solver graph 5108ms
+     × keeps the final flight-count spread within one for large candidate sets 5393ms

@@ -7,6 +7,23 @@ export function restoreManualCountEvidence(
   if (!value || typeof value !== "object") return {};
   const source = value as Record<string, unknown>;
   const result: ManualCountEvidence = {};
+  const temporary = source.temporaryPosition;
+  if (temporary && typeof temporary === "object") {
+    const row = temporary as Record<string, unknown>;
+    if (
+      (row.layoutGroup === "primary" || row.layoutGroup === "bottom") &&
+      (row.layoutIndex === undefined ||
+        (typeof row.layoutIndex === "number" &&
+          Number.isInteger(row.layoutIndex) &&
+          row.layoutIndex >= 0))
+    )
+      result.temporaryPosition = {
+        layoutGroup: row.layoutGroup,
+        ...(row.layoutIndex !== undefined
+          ? { layoutIndex: row.layoutIndex as number }
+          : {}),
+      };
+  }
   const remarks = source.assignmentRemarks;
   if (remarks && typeof remarks === "object") {
     const row = remarks as Record<string, unknown>;
@@ -53,7 +70,8 @@ export function serializeManualCountEvidence(
   if (
     !value.countBaseline &&
     !value.manualOverrideWarnings &&
-    !value.assignmentRemarks
+    !value.assignmentRemarks &&
+    !value.temporaryPosition
   )
     return "";
   return JSON.stringify(restoreManualCountEvidence(value));

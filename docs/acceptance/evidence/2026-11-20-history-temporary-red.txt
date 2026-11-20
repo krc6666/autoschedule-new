@@ -1,0 +1,159 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/app/history-temporary-roundtrip.test.ts (9 tests | 9 failed) 170ms
+     × restores the known old default temporary record without weakening unknown-position protection 30ms
+     × keeps a custom temporary name, primary layout, remarks and person 8ms
+     × keeps a custom temporary name, bottom layout, remarks and person 4ms
+     × does not use a temporary record to occupy a same-name configured position 3ms
+     × keeps custom and blank temporary rows through config Excel bytes, import and restart 50ms
+     × keeps custom and blank temporary rows through schedule Excel bytes, import and restart 16ms
+     × keeps two same-name temporary slots for one person when importing the same workbook twice 33ms
+     × retains an archived gap-fill marker through actual JSON storage restoration 11ms
+     × can edit, save, restart and edit again while preserving original history until confirmation 15ms
+
+ Test Files  1 failed (1)
+      Tests  9 failed (9)
+   Start at  18:02:44
+   Duration  2.48s (transform 1.68s, setup 0ms, import 2.09s, tests 170ms, environment 0ms)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 9 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/app/history-temporary-roundtrip.test.ts > historical temporary positions through archive and reopen > restores the known old default temporary record without weakening unknown-position protection
+AssertionError: expected [ Array(1) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "CX937/临时岗位 未载入人员：历史岗位“临时岗位”与当前岗位不匹配；当前配置：“督导”（按岗位原文匹配）",
++ ]
+
+ ❯ tests/app/history-temporary-roundtrip.test.ts:31:28
+     29|     state.history.push({ ...state.history[0]!, id: "legacy-temp", posi…
+     30|     const draft = buildHistoricalScheduleDraft(state, syncDate);
+     31|     expect(draft.warnings).toEqual([]);
+       |                            ^
+     32|     expect(draft.assignments.find((a) => a.position === "临时岗位")).toMat…
+     33|       positionRuleId: null, layoutGroup: "primary", workHours: 0, fati…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/9]⎯
+
+ FAIL  tests/app/history-temporary-roundtrip.test.ts > historical temporary positions through archive and reopen > keeps a custom temporary name, primary layout, remarks and person
+ FAIL  tests/app/history-temporary-roundtrip.test.ts > historical temporary positions through archive and reopen > keeps a custom temporary name, bottom layout, remarks and person
+AssertionError: expected [ Array(1) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "CX937/临时资料交接 未载入人员：历史岗位“临时资料交接”与当前岗位不匹配；当前配置：“督导”（按岗位原文匹配）",
++ ]
+
+ ❯ tests/app/history-temporary-roundtrip.test.ts:47:28
+     45|     const before = structuredClone(state.history);
+     46|     const draft = buildHistoricalScheduleDraft(state, syncDate);
+     47|     expect(draft.warnings).toEqual([]);
+       |                            ^
+     48|     expect(draft.assignments.find((a) => a.position === "临时资料交接")).toM…
+     49|       positionRuleId: null, layoutGroup: group, layoutIndex: 3,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/9]⎯
+
+ FAIL  tests/app/history-temporary-roundtrip.test.ts > historical temporary positions through archive and reopen > does not use a temporary record to occupy a same-name configured position
+AssertionError: expected [ Array(1) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "CX937/督导 未载入人员：同一航班岗位的历史记录多于当前可载入岗位，存在重复记录",
++ ]
+
+ ❯ tests/app/history-temporary-roundtrip.test.ts:60:28
+     58|     state.history = currentScheduleHistory(state, syncDate);
+     59|     const draft = buildHistoricalScheduleDraft(state, syncDate);
+     60|     expect(draft.warnings).toEqual([]);
+       |                            ^
+     61|     expect(draft.assignments.filter((a) => a.position === state.positi…
+     62|     expect(draft.assignments.find((a) => a.positionRuleId !== null)?.s…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/9]⎯
+
+ FAIL  tests/app/history-temporary-roundtrip.test.ts > historical temporary positions through archive and reopen > keeps custom and blank temporary rows through config Excel bytes, import and restart
+ FAIL  tests/app/history-temporary-roundtrip.test.ts > historical temporary positions through archive and reopen > keeps custom and blank temporary rows through schedule Excel bytes, import and restart
+AssertionError: expected undefined to match object { staffId: '', staffName: '', …(1) }
+
+- Expected:
+{
+  "staffId": "",
+  "staffName": "",
+  "workHours": 0,
+}
+
++ Received:
+undefined
+
+ ❯ tests/app/history-temporary-roundtrip.test.ts:72:65
+     70|     const workbook = workbookBytes(kind === "config" ? buildConfigWork…
+     71|     const parsed = parseWorkbook(workbook, source.staff);
+     72|     expect(parsed.history?.find((r) => r.position === "待填资料岗")).toMatc…
+       |                                                                 ^
+     73|     const destination = historySyncState();
+     74|     destination.history = [];
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/9]⎯
+
+ FAIL  tests/app/history-temporary-roundtrip.test.ts > historical temporary positions through archive and reopen > keeps two same-name temporary slots for one person when importing the same workbook twice
+AssertionError: expected [ { …(16) } ] to have a length of 2 but got 1
+
+- Expected
++ Received
+
+- 2
++ 1
+
+ ❯ tests/app/history-temporary-roundtrip.test.ts:95:65
+     93|     applyWorkbookImport(target, imported, "history");
+     94|     applyWorkbookImport(target, imported, "history");
+     95|     expect(target.history.filter((r) => r.position === "临时交接")).toHave…
+       |                                                                 ^
+     96|     const draft = buildHistoricalScheduleDraft(target, syncDate);
+     97|     expect(draft.warnings).toEqual([]);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/9]⎯
+
+ FAIL  tests/app/history-temporary-roundtrip.test.ts > historical temporary positions through archive and reopen > retains an archived gap-fill marker through actual JSON storage restoration
+AssertionError: expected undefined to be true // Object.is equality
+
+- Expected:
+true
+
++ Received:
+undefined
+
+ ❯ tests/app/history-temporary-roundtrip.test.ts:107:92
+    105|     persistence.save(state);
+    106|     const restored = persistence.load();
+    107|     expect(restored.history.find((r) => r.id === state.history[0]!.id)…
+       |                                                                                            ^
+    108|     expect(buildHistoricalScheduleDraft(restored, syncDate).assignment…
+    109|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/9]⎯
+
+ FAIL  tests/app/history-temporary-roundtrip.test.ts > historical temporary positions through archive and reopen > can edit, save, restart and edit again while preserving original history until confirmation
+AssertionError: expected undefined to be defined
+ ❯ tests/app/history-temporary-roundtrip.test.ts:122:23
+    120|     expect(coordinator.model().history).toEqual(before);
+    121|     const temporary = coordinator.model().assignments.find((a) => a.po…
+    122|     expect(temporary).toBeDefined();
+       |                       ^
+    123|     await coordinator.handle({ type: "update-assignment", id: temporar…
+    124|     await coordinator.handle({ type: "save-history-edit" });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/9]⎯

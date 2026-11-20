@@ -1,0 +1,14 @@
+{
+  "integratedFiles": 22,
+  "sourceFiles": 13,
+  "evidenceFiles": 8,
+  "concurrentConflicts": [],
+  "unrelatedChangedDuringIntegration": [],
+  "isolatedToSharedMismatches": [],
+  "backup": "backups\\20261121-history-temporary-before-integration",
+  "committed": false,
+  "pushed": false,
+  "deployed": false,
+  "validatedSourceAndTestsCompared": 597,
+  "sharedAgainstValidatedSnapshotMismatches": []
+}

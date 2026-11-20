@@ -479,6 +479,9 @@ function restoreHistory(value: unknown[]): HistoryRecord[] {
         fatiguePoints: item.fatiguePoints,
         remark: item.remark,
         ...(historyCoverage ? { historyCoverage } : {}),
+        ...(item.teamLeaderGapFill === true
+          ? { teamLeaderGapFill: true as const }
+          : {}),
         ...(item.guideMode === "independent"
           ? { guideMode: "independent" as const }
           : {}),
