@@ -1,3 +1,4 @@
+import { flightRuleSettings } from "../flights/flight-rule-settings";
 import type { Assignment, Flight } from "../../model";
 import type { ScheduleGenerationFacts } from "../shared/scheduling-facts";
 import { isPriorityRotationPosition } from "../reviews/position-rotation-policy";
@@ -74,7 +75,7 @@ export function configuredDutyPositionPriority(
   state: ScheduleGenerationFacts,
   target: Pick<Assignment, "flightNo" | "position" | "remark">
 ): number {
-  return state.settings.dutyPositionPriorities.findIndex((item) =>
+  return flightRuleSettings(state).dutyPositionPriorities.findIndex((item) =>
     matchesDutyPositionPriority(item, target)
   );
 }
@@ -181,9 +182,9 @@ export function preferredDutyLateTasks(
       )
     );
   const ordered: AssignmentTask[] = [];
-  for (const priority of state.settings.dutyPositionPriorities.filter(
-    (item) => item.enabled
-  )) {
+  for (const priority of flightRuleSettings(
+    state
+  ).dutyPositionPriorities.filter((item) => item.enabled)) {
     const target = eligibleTasks.find((task) =>
       matchesDutyPositionPriority(priority, {
         flightNo: task.flight.flightNo,
@@ -262,12 +263,13 @@ export function configuredDutyTaskPriority(
   state: ScheduleGenerationFacts,
   task: AssignmentTask
 ): number {
-  return state.settings.dutyPositionPriorities.findIndex((priority) =>
-    matchesDutyPositionPriority(priority, {
-      flightNo: task.flight.flightNo,
-      position: task.rule.name,
-      remark: task.rule.remark,
-    })
+  return flightRuleSettings(state).dutyPositionPriorities.findIndex(
+    (priority) =>
+      matchesDutyPositionPriority(priority, {
+        flightNo: task.flight.flightNo,
+        position: task.rule.name,
+        remark: task.rule.remark,
+      })
   );
 }
 

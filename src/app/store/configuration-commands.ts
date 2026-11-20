@@ -35,9 +35,17 @@ import {
   deleteLeaveType,
 } from "../leave-type-actions";
 import type { LeaveType } from "../../model";
+import { applyFlightIdentityChange } from "../flight-identity-actions";
 
 export function createConfigurationCommands(command: StateCommand) {
   return {
+    saveFlightIdentities: (
+      identities: import("../../model").FlightIdentity[],
+      fingerprint: string
+    ) =>
+      command((state) =>
+        applyFlightIdentityChange(state, identities, fingerprint)
+      ),
     syncFlightSeason: (fingerprint: string) =>
       command((state) => applyFlightSeasonSync(state, fingerprint)),
     setFlightSeasonEnabled: (flightNo: string, enabled: boolean) =>

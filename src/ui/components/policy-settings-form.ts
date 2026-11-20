@@ -1,10 +1,14 @@
 import { html, nothing } from "lit";
+import {
+  flightIdentityKey,
+  flightIdentityLabel,
+} from "../../domain/flights/flight-identities";
 
 import type { SchedulePolicyInput } from "../../app/policy-actions";
 import type { AppState } from "../../model";
 import { dispatchUiCommand } from "../events/ui-command";
 import {
-  matchesPolicySearch,
+  matchesFlightPolicySearch,
   normalizePolicySearchQuery,
 } from "../projections/policy-search";
 import { LightDomElement } from "./light-dom-element";
@@ -74,7 +78,8 @@ export class PolicySettingsFormElement extends LightDomElement {
   protected override render() {
     if (this.section === "priority") return this.prioritySettings();
     if (
-      !matchesPolicySearch(
+      !matchesFlightPolicySearch(
+        this.model,
         this.query,
         POLICY_SETTING_SEARCH_TEXT,
         Object.values(this.draft)
@@ -147,7 +152,8 @@ export class PolicySettingsFormElement extends LightDomElement {
   }
 
   private prioritySettings() {
-    const ordinaryMatches = matchesPolicySearch(
+    const ordinaryMatches = matchesFlightPolicySearch(
+      this.model,
       this.query,
       "普通重点岗位集合",
       "重点岗位频率与轮岗",
@@ -164,7 +170,8 @@ export class PolicySettingsFormElement extends LightDomElement {
       ]),
       this.draft.tr121H02CooldownWorkdays
     );
-    const lateMatches = matchesPolicySearch(
+    const lateMatches = matchesFlightPolicySearch(
+      this.model,
       this.query,
       "末班重点岗位航班范围",
       "勾选后参与末班岗位轮换、统计及上一班末班人员晚班轻岗保护",
@@ -298,12 +305,18 @@ export class PolicySettingsFormElement extends LightDomElement {
 
   private latePriorityFlightScope() {
     const candidates = [
-      ...new Set([
-        ...latePriorityFlightScopeCandidates(this.model.positionRules),
-        ...this.draft.latePriorityFlightNumbers,
-      ]),
+      ...new Set(
+        [
+          ...latePriorityFlightScopeCandidates(this.model.positionRules),
+          ...this.draft.latePriorityFlightNumbers,
+        ].map((no) => flightIdentityKey(this.model, no))
+      ),
     ];
-    const selected = new Set(this.draft.latePriorityFlightNumbers);
+    const selected = new Set(
+      this.draft.latePriorityFlightNumbers.map((no) =>
+        flightIdentityKey(this.model, no)
+      )
+    );
     const setScope = (flightNumbers: string[]): void =>
       this.updateDraft("latePriorityFlightNumbers", flightNumbers);
     return html`<fieldset class="late-priority-flight-scope">
@@ -354,7 +367,9 @@ export class PolicySettingsFormElement extends LightDomElement {
                         );
                       }}
                     />
-                    <span class="form-check-label">${flightNo}</span>
+                    <span class="form-check-label"
+                      >${flightIdentityLabel(this.model, flightNo)}</span
+                    >
                   </label>`
               )
             : html`<small class="text-body-secondary"

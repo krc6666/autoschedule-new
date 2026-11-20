@@ -113,7 +113,7 @@ function appendProtectionFallbacks(
     runFacts,
   } = context;
   const { flight, rule } = task;
-  const ke166 = isKe166MobileSupervisor(flight, rule);
+  const ke166 = isKe166MobileSupervisor(flight, rule, state);
   if (
     selected.id === dutyStaffId &&
     isDutyTarget &&
@@ -241,7 +241,8 @@ function appendLateShiftPositionReliefDecision(
     ) ||
     !latePriorityFlightInScope(
       state.settings.latePriorityFlightNumbers,
-      task.flight.flightNo
+      task.flight.flightNo,
+      state
     ) ||
     !isLateEndingWork(task.flight, state)
   )
@@ -253,7 +254,9 @@ function appendLateShiftPositionReliefDecision(
           record.staffId === selected.id &&
           latePriorityFlightInScope(
             state.settings.latePriorityFlightNumbers,
-            record.flightNo
+            record.flightNo,
+            state,
+            record.date
           )
       )
       .map((record) => `${record.flightNo}/${record.position}`)
@@ -264,7 +267,8 @@ function appendLateShiftPositionReliefDecision(
         assignment.staffId === selected.id &&
         latePriorityFlightInScope(
           state.settings.latePriorityFlightNumbers,
-          assignment.flightNo
+          assignment.flightNo,
+          state
         ) &&
         isLateEndingWork(assignment, state)
     )

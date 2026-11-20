@@ -1,14 +1,17 @@
 import { html, nothing } from "lit";
+import { flightIdentityOptions } from "../projections/flight-identity-options";
+import {
+  flightRuleMatches,
+  flightIdentityKey,
+  flightIdentityLabel,
+} from "../../domain/flights/flight-identities";
 import type { AppState } from "../../model";
 import type { MobileSupervisorFillRule } from "../../domain/rules/structured-policy-contract";
-import {
-  isSameFlightSupervisorFillRule,
-  normalizeFillReference,
-} from "../../domain/coverage/supervisor-fill-configuration";
+import { isSameFlightSupervisorFillRule } from "../../domain/coverage/supervisor-fill-configuration";
 import { diagnoseSupervisorFillRuleConfiguration } from "../../domain/coverage/supervisor-fill-facts";
 import { dispatchUiCommand } from "../events/ui-command";
 import {
-  matchesPolicySearch,
+  matchesFlightPolicySearch,
   normalizePolicySearchQuery,
 } from "../projections/policy-search";
 import { LightDomElement } from "./light-dom-element";
@@ -28,7 +31,8 @@ export class SupervisorFillSettingsElement extends LightDomElement {
   protected override render() {
     const items = this.model.settings.mobileSupervisorFillRules;
     if (
-      !matchesPolicySearch(
+      !matchesFlightPolicySearch(
+        this.model,
         this.query,
         "督导补位关系",
         "人手不足",
@@ -84,7 +88,7 @@ export class SupervisorFillSettingsElement extends LightDomElement {
               data-supervisor-fill-id=${rule.id}
             >
               <div>
-                ${isSameFlightSupervisorFillRule(rule) ? `${rule.sourceFlightNo}：${rule.sourcePositionKeyword} → ${rule.targetPositionKeyword}` : `待处理：${rule.sourceFlightNo || "待选航班"} / ${rule.sourcePositionKeyword || "待选督导"} → ${rule.targetFlightNo} / ${rule.targetPositionKeyword}`}
+                ${isSameFlightSupervisorFillRule(rule) ? `${flightIdentityLabel(this.model, rule.sourceFlightNo)}：${rule.sourcePositionKeyword} → ${rule.targetPositionKeyword}` : `待处理：${rule.sourceFlightNo || "待选航班"} / ${rule.sourcePositionKeyword || "待选督导"} → ${flightIdentityLabel(this.model, rule.targetFlightNo)} / ${rule.targetPositionKeyword}`}
               </div>
               <small
                 >${rule.requiresConfirmation ? "待确认" : rule.enabled ? "启用" : "停用"}
@@ -121,19 +125,15 @@ export class SupervisorFillSettingsElement extends LightDomElement {
   }
 
   private flightSelector(draft: MobileSupervisorFillRule) {
-    const flights = [
-      ...new Set(
-        this.model.templates.map((template) =>
-          normalizeFillReference(template.flightNo)
-        )
-      ),
-    ];
+    const options = flightIdentityOptions(this.model);
+    const flights = options.map(([value]) => value);
+    const selected = flightIdentityKey(this.model, draft.sourceFlightNo);
     return html`<label class="col-md-4 form-label"
       >航班<select
         class="form-select form-select-sm"
         aria-label="航班"
-        ${dynamicSelectValue(draft.sourceFlightNo)}
-        .value=${draft.sourceFlightNo}
+        ${dynamicSelectValue(selected)}
+        .value=${selected}
         @change=${(event: Event) => {
           const flightNo = (event.currentTarget as HTMLSelectElement).value;
           dispatchUiCommand(this, {
@@ -148,8 +148,8 @@ export class SupervisorFillSettingsElement extends LightDomElement {
         }}
       >
         <option value="">请选择模板航班</option>
-        ${draft.sourceFlightNo && !flights.includes(draft.sourceFlightNo) ? html`<option value=${draft.sourceFlightNo} disabled>${draft.sourceFlightNo}（模板已不存在）</option>` : nothing}
-        ${flights.map((flightNo) => html`<option value=${flightNo}>${flightNo}</option>`)}
+        ${draft.sourceFlightNo && !flights.includes(selected) ? html`<option value=${draft.sourceFlightNo} disabled>${draft.sourceFlightNo}（模板已不存在）</option>` : nothing}
+        ${options.map(([flightNo, label]) => html`<option value=${flightNo}>${label}</option>`)}
       </select></label
     >`;
   }
@@ -167,8 +167,11 @@ export class SupervisorFillSettingsElement extends LightDomElement {
           const field = `${side}PositionKeyword` as const;
           const positions = this.model.positionRules.filter(
             (position) =>
-              normalizeFillReference(position.flightNo) ===
-                normalizeFillReference(draft.sourceFlightNo) &&
+              flightRuleMatches(
+                this.model,
+                draft.sourceFlightNo,
+                position.flightNo
+              ) &&
               position.category === (side === "source" ? "机动督导" : "常规")
           );
           return html`<label class="col-md-4 form-label"

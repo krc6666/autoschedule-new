@@ -25,6 +25,7 @@ import type { ApplicationPreferences } from "./application-preferences";
 import { isStorageQuotaExceeded } from "../infrastructure/storage";
 import { halfRestSelectionForDate } from "../domain/records/half-rest-selections";
 import { PolicyEditingSession } from "./policy-editing-session";
+import { FlightIdentityEditingSession } from "./flight-identity-editing-session";
 import {
   capturePreflightDraft,
   isPreflightDialog,
@@ -136,6 +137,7 @@ function initialView(
 
 export class ApplicationCoordinator implements ApplicationContext {
   readonly policyEditing = new PolicyEditingSession();
+  readonly flightIdentityEditing = new FlightIdentityEditingSession();
   readonly scheduleRunner: ScheduleRunner;
   readonly preferences: ApplicationPreferences;
   private currentView: ApplicationViewState;
@@ -223,6 +225,7 @@ export class ApplicationCoordinator implements ApplicationContext {
     return {
       ...this.currentView,
       policyEditing: this.policyEditing.view(this.model()),
+      flightIdentityEditing: this.flightIdentityEditing.view(this.model()),
       ...halfRestSelectionForDate(this.model(), this.currentView.date),
     };
   }
@@ -240,7 +243,10 @@ export class ApplicationCoordinator implements ApplicationContext {
   }
 
   hasUnsavedRules(): boolean {
-    return this.policyEditing.view(this.model()).dirty;
+    return (
+      this.policyEditing.view(this.model()).dirty ||
+      this.flightIdentityEditing.view(this.model()).dirty
+    );
   }
 
   confirmLeaveRules(
@@ -249,11 +255,12 @@ export class ApplicationCoordinator implements ApplicationContext {
     if (!this.hasUnsavedRules()) return true;
     if (
       !confirm(
-        "规则有未保存的修改。点“取消”返回继续编辑并点击“保存规则”；点“确定”将放弃这些修改并离开。"
+        "规则或航班档案有未保存的修改。点“取消”返回继续编辑并点击“保存规则”或“确认并保存航班档案”；点“确定”将放弃这些修改并离开。"
       )
     )
       return false;
     this.policyEditing.discard();
+    this.flightIdentityEditing.discard();
     this.updateView({});
     return true;
   }
@@ -375,7 +382,10 @@ export class ApplicationCoordinator implements ApplicationContext {
     )
       return;
     if (command.type === "export-config" && this.hasUnsavedRules()) {
-      this.toast("规则尚未保存，请先点击“保存规则”，再导出配置。", "warning");
+      this.toast(
+        "规则或航班档案尚未保存，请先点击“保存规则”或“确认并保存航班档案”，再导出配置。",
+        "warning"
+      );
       return;
     }
     const reservesSchedule = mayRunSchedule(command);
@@ -393,8 +403,35 @@ export class ApplicationCoordinator implements ApplicationContext {
 
   private handleViewCommand(command: UiCommand): boolean {
     switch (command.type) {
+      case "edit-flight-identities":
+        this.flightIdentityEditing.edit(this.model(), command.identities);
+        this.updateView({});
+        return true;
+      case "discard-flight-identities":
+        this.flightIdentityEditing.discard();
+        this.updateView({});
+        return true;
+      case "save-flight-identities":
+        try {
+          const result = this.store
+            .getState()
+            .saveFlightIdentities(command.identities, command.fingerprint);
+          this.flightIdentityEditing.discard();
+          this.toast(
+            result.nearCapacity
+              ? "航班档案已保存，但浏览器存储接近上限，请及时备份。"
+              : "航班档案已保存，两组规则自动共用；已有班表请重新排班。云端版请再点击顶部“保存到云端”。",
+            result.nearCapacity ? "warning" : "success"
+          );
+        } catch (error) {
+          this.toast(
+            `航班档案未保存，原数据和草稿均保留：${error instanceof Error ? error.message : "请重试"}`,
+            "danger"
+          );
+        }
+        return true;
       case "save-policy":
-        if (!this.hasUnsavedRules()) return true;
+        if (!this.policyEditing.view(this.model()).dirty) return true;
         try {
           const settings = this.policyEditing.prepareSave(this.model());
           const result = this.store.getState().savePolicySettings(settings);

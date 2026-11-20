@@ -1,4 +1,6 @@
 import "./supervisor-fill-settings";
+import { flightIdentityOptions } from "../projections/flight-identity-options";
+import { flightIdentityKey } from "../../domain/flights/flight-identities";
 import { html, nothing } from "lit";
 
 import {
@@ -12,7 +14,7 @@ import { diagnosePolicyConfiguration } from "../../domain/rules/policy-configura
 import { renderPolicyDiagnostics } from "./policy-diagnostic";
 import { dispatchUiCommand, inputValue } from "../events/ui-command";
 import {
-  matchesPolicySearch,
+  matchesFlightPolicySearch,
   normalizePolicySearchQuery,
 } from "../projections/policy-search";
 import { LightDomElement } from "./light-dom-element";
@@ -51,7 +53,8 @@ export class PolicyStructuredRulesElement extends LightDomElement {
   private airlineMixPolicies() {
     const items = this.model.settings.airlineMixPolicies;
     if (
-      !matchesPolicySearch(
+      !matchesFlightPolicySearch(
+        this.model,
         this.query,
         "航司搭配偏好",
         "软约束",
@@ -98,7 +101,8 @@ export class PolicyStructuredRulesElement extends LightDomElement {
   private sameFlightStaffExclusions() {
     const items = this.model.settings.sameFlightStaffExclusions;
     if (
-      !matchesPolicySearch(
+      !matchesFlightPolicySearch(
+        this.model,
         this.query,
         "同航班人员互斥",
         "同组人员在同一航班最多安排一人",
@@ -161,7 +165,8 @@ export class PolicyStructuredRulesElement extends LightDomElement {
   private crossFlightPriorities() {
     const items = this.model.settings.crossFlightPriorityPolicies;
     if (
-      !matchesPolicySearch(
+      !matchesFlightPolicySearch(
+        this.model,
         this.query,
         "跨航班重点人员优先",
         "优先航班",
@@ -218,7 +223,8 @@ export class PolicyStructuredRulesElement extends LightDomElement {
   private crossWorkdayReservations() {
     const items = this.model.settings.crossWorkdayQualificationReservations;
     if (
-      !matchesPolicySearch(
+      !matchesFlightPolicySearch(
+        this.model,
         this.query,
         "跨工作日资质预留",
         "从上到下依次保留",
@@ -291,7 +297,8 @@ export class PolicyStructuredRulesElement extends LightDomElement {
   private dutyPriorities() {
     const items = this.model.settings.dutyPositionPriorities;
     if (
-      !matchesPolicySearch(
+      !matchesFlightPolicySearch(
+        this.model,
         this.query,
         "值班任务规则",
         "按顺序逐项尝试",
@@ -343,7 +350,8 @@ export class PolicyStructuredRulesElement extends LightDomElement {
   private recoveryRules() {
     const settings = this.model.settings;
     if (
-      !matchesPolicySearch(
+      !matchesFlightPolicySearch(
+        this.model,
         this.query,
         "跨工作日恢复目标",
         "末班重点岗位",
@@ -465,7 +473,8 @@ export class PolicyStructuredRulesElement extends LightDomElement {
   private supervisorRules() {
     const items = this.model.settings.mobileSupervisorCoverageRules;
     if (
-      !matchesPolicySearch(
+      !matchesFlightPolicySearch(
+        this.model,
         this.query,
         "机动督导兼任范围",
         "自动排班与人工拖拽共用",
@@ -547,7 +556,8 @@ export class PolicyStructuredRulesElement extends LightDomElement {
   private transitionRules() {
     const items = this.model.settings.positionTransitionPolicies;
     if (
-      !matchesPolicySearch(
+      !matchesFlightPolicySearch(
+        this.model,
         this.query,
         "岗位衔接间隔规则",
         "新增衔接规则",
@@ -633,6 +643,23 @@ export class PolicyStructuredRulesElement extends LightDomElement {
     placeholder = "",
     type = "text"
   ) {
+    if (
+      this.model.shared.flightIdentities?.length &&
+      ["flightNo", "sourceFlightNo", "targetFlightNo"].includes(field)
+    ) {
+      const choices = flightIdentityOptions(
+        this.model,
+        value ? [String(value)] : []
+      );
+      return this.select(
+        entity,
+        id,
+        field,
+        flightIdentityKey(this.model, String(value)),
+        label,
+        [["", placeholder || "请选择航班"], ...choices]
+      );
+    }
     return html`<label class="form-label"
       >${label}<input
         class="form-control form-control-sm"
@@ -652,6 +679,8 @@ export class PolicyStructuredRulesElement extends LightDomElement {
     label: string,
     choices: readonly (readonly [string, string])[]
   ) {
+    if (["flightNo", "sourceFlightNo", "targetFlightNo"].includes(field))
+      value = flightIdentityKey(this.model, value);
     return html`<label class="form-label"
       >${label}<select
         ${dynamicSelectValue(value)}
@@ -687,7 +716,7 @@ export class PolicyStructuredRulesElement extends LightDomElement {
       "flightNo",
       value,
       label,
-      choices.map((flightNo) => [flightNo, flightNo] as const)
+      flightIdentityOptions(this.model, [...choices, value])
     );
   }
 
@@ -708,10 +737,7 @@ export class PolicyStructuredRulesElement extends LightDomElement {
       "flightNo",
       value,
       "适用航班",
-      [
-        ["", "全部航班"],
-        ...flightNumbers.map((flightNo) => [flightNo, flightNo] as const),
-      ]
+      [["", "全部航班"], ...flightIdentityOptions(this.model, flightNumbers)]
     );
   }
 

@@ -1,0 +1,8 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+
+ Test Files  7 passed (7)
+      Tests  73 passed (73)
+   Start at  17:45:05
+   Duration  7.31s (transform 14.78s, setup 0ms, import 18.10s, tests 11.04s, environment 2.11s)

@@ -1,4 +1,5 @@
 import type { Assignment } from "../../model";
+import { flightIdentities } from "../flights/flight-identities";
 import type { ScheduleGenerationFacts } from "../shared/scheduling-facts";
 import type { ScheduleRunFacts } from "../shared/schedule-run-facts";
 import {
@@ -41,6 +42,8 @@ export function createScheduleGuardContext({
   runFacts,
   warningSink,
 }: Omit<ScheduleSafetySessionOptions, "guards">): ScheduleGuardContext {
+  if (flightIdentities(state).length)
+    state = { ...state, flightIdentityDate: date };
   return {
     phase,
     sameFlightStaffExclusionFacts: { state },

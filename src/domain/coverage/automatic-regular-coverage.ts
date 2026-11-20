@@ -14,7 +14,7 @@ export function isAutomaticRegularAssignment(
     flight &&
     rule.category === "常规" &&
     !rule.manual &&
-    shouldAutoAssign(flight, rule, state.settings.adminSupportEnabled)
+    shouldAutoAssign(flight, rule, state.settings.adminSupportEnabled, state)
   );
 }
 

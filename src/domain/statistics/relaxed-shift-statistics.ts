@@ -7,7 +7,7 @@ import {
 import type { Assignment, Flight, HistoryRecord, Staff } from "../../model";
 import type { SchedulingFacts } from "../shared/scheduling-facts";
 import { isCountedWorkloadAssignment } from "../shared/workload-accounting";
-import { normalizeWeeklyFlightNo } from "../flights/weekly-flight-plan";
+import { flightIdentityKey } from "../flights/flight-identities";
 
 interface ActualTask {
   date: string;
@@ -380,14 +380,16 @@ export function buildMonthlyRelaxedShiftStatistics(
         [
           ...new Set(
             (earlyByStaff.get(staff.id) ?? []).map((event) =>
-              normalizeWeeklyFlightNo(event.flightNo)
+              flightIdentityKey(state, event.flightNo, event.date)
             )
           ),
         ].map((flightNo) => [
           flightNo,
           (earlyByStaff.get(staff.id) ?? [])
             .filter(
-              (event) => normalizeWeeklyFlightNo(event.flightNo) === flightNo
+              (event) =>
+                flightIdentityKey(state, event.flightNo, event.date) ===
+                flightNo
             )
             .map((event) => event.date),
         ])

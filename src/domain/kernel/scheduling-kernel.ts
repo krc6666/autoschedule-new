@@ -141,6 +141,7 @@ export async function generateSchedule(
   date: string,
   options: GenerateScheduleOptions
 ): Promise<ScheduleResult> {
+  state = { ...state, flightIdentityDate: date };
   const reportProgress = (
     stage: ScheduleProgressStage,
     percent: number

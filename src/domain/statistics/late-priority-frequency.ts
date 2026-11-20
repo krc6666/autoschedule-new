@@ -16,12 +16,21 @@ import {
   latePriorityFrequencyKinds,
   LATE_PRIORITY_FREQUENCY_ORDER,
   normalizeLatePriorityFlightNumber,
-  normalizeLatePriorityPositionReference,
   type LatePriorityFrequencyKind,
 } from "../reviews/late-priority-policy";
 import { assignmentRule } from "../flights/schedule-position-rules";
 import { latePriorityFlightInScope } from "./late-priority-flight-scope";
-import { latePriorityRecordSemantics } from "./late-priority-record-semantics";
+import {
+  latePriorityHistoryRule,
+  latePriorityRecordSemantics,
+} from "./late-priority-record-semantics";
+import {
+  flightHasSpecialRule,
+  flightIdentities,
+  flightRuleMatches,
+  type FlightIdentityFacts,
+} from "../flights/flight-identities";
+import { buildMonthlyLatePriorityStatistics } from "./monthly-late-priority-statistics";
 
 function manualAdjustmentCount(
   state: ScheduleGenerationFacts,
@@ -40,10 +49,11 @@ function manualAdjustmentCount(
         item.staffId === staffId &&
         item.kind === kind &&
         (normalizedFlight
-          ? itemFlight === normalizedFlight
+          ? flightRuleMatches(state, normalizedFlight, itemFlight)
           : latePriorityFlightInScope(
               state.settings.latePriorityFlightNumbers,
-              itemFlight
+              itemFlight,
+              state
             )) &&
         (state.positionRules.some(
           (rule) =>
@@ -122,13 +132,10 @@ function historyRule(
   state: ScheduleGenerationFacts,
   record: HistoryRecord
 ): PositionRule | undefined {
-  return state.positionRules.find(
-    (rule) =>
-      rule.category === "常规" &&
-      normalizeLatePriorityFlightNumber(rule.flightNo) ===
-        normalizeLatePriorityFlightNumber(record.flightNo) &&
-      normalizeLatePriorityPositionReference(rule.name) ===
-        normalizeLatePriorityPositionReference(record.position)
+  return latePriorityHistoryRule(
+    state,
+    state.positionRules.filter((rule) => rule.category === "常规"),
+    record
   );
 }
 
@@ -141,7 +148,9 @@ function scopedLatePriorityHistoryRecord(
   return rule &&
     latePriorityFlightInScope(
       state.settings.latePriorityFlightNumbers,
-      record.flightNo
+      record.flightNo,
+      state,
+      record.date
     ) &&
     isLatePriorityPosition(
       { ...rule, ...semantics },
@@ -251,6 +260,7 @@ function historyCache(
       rule.qualifiedStaffIds,
     ]),
     state.latePriorityFrequencyAdjustments,
+    flightIdentities(state),
   ]);
   const existing = historyCaches.get(facts);
   if (existing?.configuration === configuration) return existing;
@@ -278,13 +288,33 @@ function historicalStaffProfile(
     facts.recentEightWorkdayRecordIds.has(record.id)
   );
   const counts = emptyCounts();
+  const identityStatistics = flightIdentities(state).length
+    ? buildMonthlyLatePriorityStatistics(
+        {
+          ...state,
+          activeScheduleDate: null,
+          assignments: [],
+          history: state.history.filter((r) => r.date < date),
+        },
+        date
+      ).rows.find((r) => r.staff.id === staffId)
+    : undefined;
   for (const kind of LATE_PRIORITY_FREQUENCY_ORDER) {
     counts[kind] = {
-      currentMonthCount: Math.max(
-        0,
-        countForKind(monthly, kind) +
-          manualAdjustmentCount(state, staffId, month, undefined, kind)
-      ),
+      currentMonthCount: identityStatistics
+        ? identityStatistics.categories[
+            {
+              supervisor: "督导",
+              "number-one": "一号",
+              declaration: "申报",
+              delivery: "送资料",
+            }[kind] as "督导" | "一号" | "申报" | "送资料"
+          ].effectiveCount
+        : Math.max(
+            0,
+            countForKind(monthly, kind) +
+              manualAdjustmentCount(state, staffId, month, undefined, kind)
+          ),
       recentWorkdayCount: countForKind(recent, kind),
     };
   }
@@ -313,7 +343,8 @@ function supervisorQualifiedForScope(
       rule.category === "常规" &&
       latePriorityFlightInScope(
         state.settings.latePriorityFlightNumbers,
-        rule.flightNo
+        rule.flightNo,
+        state
       ) &&
       isSupervisorPosition(rule) &&
       rule.qualifiedStaffIds.includes(staffId)
@@ -333,7 +364,8 @@ function supervisorRotationDeficit(
       rule.category === "常规" &&
       latePriorityFlightInScope(
         state.settings.latePriorityFlightNumbers,
-        rule.flightNo
+        rule.flightNo,
+        state
       ) &&
       isSupervisorPosition(rule)
         ? rule.qualifiedStaffIds
@@ -401,7 +433,8 @@ export function latePriorityFrequencyProfileForRule(
     !state.settings.positionRotationEnabled ||
     !latePriorityFlightInScope(
       state.settings.latePriorityFlightNumbers,
-      rule.flightNo
+      rule.flightNo,
+      state
     ) ||
     !isLatePriorityPosition(rule, flight, state.settings.lateShiftEndTime)
   )
@@ -454,7 +487,8 @@ export function isLatePriorityAssignment(
     assignment.staffId &&
     latePriorityFlightInScope(
       state.settings.latePriorityFlightNumbers,
-      assignment.flightNo
+      assignment.flightNo,
+      state
     ) &&
     isLatePriorityPosition(rule, assignment, state.settings.lateShiftEndTime)
   );
@@ -611,10 +645,11 @@ export function latePriorityFrequencyComparisonValue(
 
 export function isTr121NumberOne(
   flightNo: string,
-  rule: Pick<PositionRule, "name" | "remark">
+  rule: Pick<PositionRule, "name" | "remark">,
+  context: FlightIdentityFacts = {}
 ): boolean {
   return (
-    normalizeLatePriorityFlightNumber(flightNo) === "TR121" &&
+    flightHasSpecialRule(context, flightNo, "TR121") &&
     latePriorityFrequencyKinds(rule).includes("number-one")
   );
 }
@@ -636,7 +671,12 @@ export function tr121NumberOneCurrentMonthCount(
           (record) =>
             record.date < date &&
             record.date.startsWith(month) &&
-            normalizeLatePriorityFlightNumber(record.flightNo) === "TR121" &&
+            flightHasSpecialRule(
+              state,
+              record.flightNo,
+              "TR121",
+              record.date
+            ) &&
             latePriorityFrequencyKinds({
               name: record.position,
               remark: record.remark,
@@ -658,7 +698,7 @@ export function exceedsTr121NumberOneAutomaticLimit(
   facts?: ScheduleFrequencyFacts
 ): boolean {
   return (
-    isTr121NumberOne(flightNo, rule) &&
+    isTr121NumberOne(flightNo, rule, state) &&
     tr121NumberOneCurrentMonthCount(state, staffId, date, facts) >=
       TR121_NUMBER_ONE_MONTHLY_AUTOMATIC_LIMIT
   );

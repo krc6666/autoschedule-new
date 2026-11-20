@@ -1,3 +1,4 @@
+import { flightRuleSettings } from "../flights/flight-rule-settings";
 import type { Assignment, Flight, PositionRule, Staff } from "../../model";
 import type {
   AssignmentEligibilityFacts,
@@ -96,7 +97,12 @@ function sameFlightMovableAutoCounters(
     );
     if (!rule || !flight || !isNumberedRegularPosition(rule) || rule.manual)
       return false;
-    return shouldAutoAssign(flight, rule, state.settings.adminSupportEnabled);
+    return shouldAutoAssign(
+      flight,
+      rule,
+      state.settings.adminSupportEnabled,
+      state
+    );
   });
 }
 
@@ -107,7 +113,7 @@ export function configuredFillTargets(
   sourceRule: PositionRule,
   mode: SupervisorFillMode
 ): Assignment[] {
-  const rules = state.settings.mobileSupervisorFillRules.filter(
+  const rules = flightRuleSettings(state).mobileSupervisorFillRules.filter(
     (rule) =>
       rule.enabled &&
       isSameFlightSupervisorFillRule(rule) &&

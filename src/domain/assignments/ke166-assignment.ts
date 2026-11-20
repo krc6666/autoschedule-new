@@ -92,7 +92,7 @@ export function assessKe166AssignmentSnapshot(
     const rule = state.positionRules.find(
       (item) => item.id === assignment.positionRuleId
     );
-    return flight && rule && isKe166MobileSupervisor(flight, rule)
+    return flight && rule && isKe166MobileSupervisor(flight, rule, state)
       ? [assignment.id]
       : [];
   });
@@ -130,7 +130,7 @@ export function assessKe166DistinctStaffCapacityFacts(
     if (
       !supervisorFlight ||
       !supervisorRule ||
-      !isKe166MobileSupervisor(supervisorFlight, supervisorRule)
+      !isKe166MobileSupervisor(supervisorFlight, supervisorRule, state)
     )
       continue;
     const counter = assignments.find(
@@ -245,7 +245,7 @@ function eligibleSupervisorOrder(
     state.settings.ordinaryPriorityPositions
   );
   const prioritizeKe166Rotation =
-    isKe166MobileSupervisor(flight, rule) || ordinaryPriority;
+    isKe166MobileSupervisor(flight, rule, state) || ordinaryPriority;
   return eligibleStaffForRule(state, flight, rule)
     .filter(
       (person) =>
@@ -449,7 +449,7 @@ export async function assignMobileSupervisorByCounterCoverage(
   ) => void
 ): Promise<Assignment | undefined> {
   if (!isMobileSupervisor(flight, rule)) return undefined;
-  const ke166 = isKe166MobileSupervisor(flight, rule);
+  const ke166 = isKe166MobileSupervisor(flight, rule, state);
   const ordinaryPriority = isOrdinaryPriorityPosition(
     rule,
     state.settings.ordinaryPriorityPositions

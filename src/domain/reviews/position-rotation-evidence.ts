@@ -34,7 +34,7 @@ export function refreshPositionRotationEvidence(
       rule &&
       flight &&
       !rule.manual &&
-      (isKe166MobileSupervisor(flight, rule) ||
+      (isKe166MobileSupervisor(flight, rule, state) ||
         (isMobileSupervisor(flight, rule) &&
           isOrdinaryPriorityPosition(
             rule,

@@ -1,3 +1,4 @@
+import { flightRuleSettings } from "../flights/flight-rule-settings";
 import type { MobileSupervisorCoverageRule } from "../rules/structured-policy-contract";
 import type { ScheduleSettingsFacts } from "../shared/scheduling-facts";
 
@@ -52,7 +53,9 @@ export function evaluateMobileSupervisorCoverage(
   state: ScheduleSettingsFacts,
   target: MobileSupervisorCoverageTarget
 ): MobileSupervisorCoverageEvaluation {
-  const applicable = state.settings.mobileSupervisorCoverageRules.filter(
+  const applicable = flightRuleSettings(
+    state
+  ).mobileSupervisorCoverageRules.filter(
     (rule) =>
       rule.enabled &&
       appliesToFlight(rule, target.flightNo) &&

@@ -1,10 +1,13 @@
 import { html } from "lit";
+import {
+  flightIdentityKey,
+  flightIdentityLabel,
+} from "../../domain/flights/flight-identities";
 
 import {
   buildMonthlyLatePriorityStatistics,
   canAdjustLatePriorityCategory,
   LATE_PRIORITY_STATISTICS_CATEGORIES,
-  latePriorityStatisticsFlightNumbers,
   type LatePriorityStatisticsCategory,
   type MonthlyLatePriorityFlightStatistics,
   type MonthlyLatePriorityStatisticsRow,
@@ -138,7 +141,7 @@ export class StatisticsPageElement extends LightDomElement {
                         ? [...scope.selected, flightNo]
                         : scope.selected.filter((no) => no !== flightNo)
                     )}
-                />${flightNo}
+                />${flightIdentityLabel(this.model, flightNo)}
               </label>`
           )}
         </div>
@@ -181,7 +184,7 @@ export class StatisticsPageElement extends LightDomElement {
           <thead>
             <tr>
               <th>人员</th>
-              ${scope.selected.map((flightNo) => html`<th>${flightNo}</th>`)}
+              ${scope.selected.map((flightNo) => html`<th>${flightIdentityLabel(this.model, flightNo)}</th>`)}
               <th>下午空</th>
               <th>下午休</th>
             </tr>
@@ -191,7 +194,7 @@ export class StatisticsPageElement extends LightDomElement {
               (row) =>
                 html`<tr>
                   <td data-label="人员"><strong>${row.staff.name}</strong></td>
-                  ${scope.selected.map((flightNo) => html`<td data-label=${flightNo}>${this.relaxedShiftDateCell(row.staff.id, month, flightNo, row.earlyDepartureDatesByFlight[flightNo] ?? [])}</td>`)}
+                  ${scope.selected.map((flightNo) => html`<td data-label=${flightIdentityLabel(this.model, flightNo)}>${this.relaxedShiftDateCell(row.staff.id, month, flightNo, row.earlyDepartureDatesByFlight[flightNo] ?? [], flightNo.startsWith("@") ? row.earlyDepartures.filter((event) => flightIdentityKey(this.model, event.flightNo, event.date) === flightNo) : [])}</td>`)}
                   <td data-label="下午空">
                     ${this.relaxedShiftDateCell(row.staff.id, month, "下午空", row.afternoonFreeDates)}
                   </td>
@@ -210,7 +213,8 @@ export class StatisticsPageElement extends LightDomElement {
     staffId: string,
     month: string,
     column: string,
-    dates: readonly string[]
+    dates: readonly string[],
+    originalEvents: readonly { date: string; flightNo: string }[] = []
   ) {
     const key = `${month}\u0000${staffId}\u0000${column}`;
     return html`<details
@@ -223,25 +227,25 @@ export class StatisticsPageElement extends LightDomElement {
       }}
     >
       <summary
-        title=${`展开${column}日期`}
-        aria-label=${`${column}：${dates.length}次，展开日期`}
+        title=${`展开${flightIdentityLabel(this.model, column)}日期`}
+        aria-label=${`${flightIdentityLabel(this.model, column)}：${dates.length}次，展开日期`}
       >
         ${dates.length}
       </summary>
       <div>
         <small class="late-priority-detail-list"
-          >${dates.length ? dates.map((date) => date.slice(5)).join("、") : "暂无日期"}</small
+          >${originalEvents.length ? originalEvents.map((event) => `${event.date.slice(5)} ${event.flightNo}`).join("、") : dates.length ? dates.map((date) => date.slice(5)).join("、") : "暂无日期"}</small
         >
       </div>
     </details>`;
   }
 
   private latePriorityStatistics() {
-    const flightNumbers = latePriorityStatisticsFlightNumbers(this.model);
     const statistics = buildMonthlyLatePriorityStatistics(
       this.model,
       this.latePriorityStatisticsDate()
     );
+    const flightNumbers = statistics.flightNumbers;
     const displayRows = this.latePriorityDisplayRows(statistics.rows);
     return html`<section
       class="workspace-section late-priority-statistics"
@@ -252,8 +256,8 @@ export class StatisticsPageElement extends LightDomElement {
           <h3>末班重点岗位统计</h3>
           <span
             >${statistics.month} ·
-            当前统计航班：${flightNumbers.join("、") || "尚未选择"} ·
-            实际结束晚于 ${this.model.settings.lateShiftEndTime}</span
+            当前统计航班：${flightNumbers.map((no) => flightIdentityLabel(this.model, no)).join("、") || "尚未选择"}
+            · 实际结束晚于 ${this.model.settings.lateShiftEndTime}</span
           >
         </div>
         <div class="late-priority-toolbar">
@@ -337,6 +341,7 @@ export class StatisticsPageElement extends LightDomElement {
           }
         </div>
       </div>
+      ${statistics.warnings?.length ? html`<div class="alert alert-warning" role="alert">${statistics.warnings.join("；")}</div>` : ""}
       ${
         flightNumbers.length
           ? displayRows.length
@@ -353,7 +358,7 @@ export class StatisticsPageElement extends LightDomElement {
                         >
                           ${this.latePriorityCategoryColumnLabel()}
                         </th>
-                        ${flightNumbers.map((flightNo) => html`<th>${flightNo}</th>`)}
+                        ${flightNumbers.map((flightNo) => html`<th>${flightIdentityLabel(this.model, flightNo)}</th>`)}
                       </tr>
                     </thead>
                     <tbody>
@@ -371,7 +376,9 @@ export class StatisticsPageElement extends LightDomElement {
                             </td>
                             ${flightNumbers.map(
                               (flightNo) =>
-                                html`<td data-label=${flightNo}>
+                                html`<td
+                                  data-label=${flightIdentityLabel(this.model, flightNo)}
+                                >
                                   ${this.latePriorityFlightCell(
                                     row.staff.id,
                                     statistics.month,
@@ -735,7 +742,8 @@ export class StatisticsPageElement extends LightDomElement {
                 ? html`<small class="late-priority-detail-list"
                     >${own.visibleDetails
                       .map(
-                        (detail) => `${detail.date.slice(5)} ${detail.position}`
+                        (detail) =>
+                          `${detail.date.slice(5)} ${flight.flightNo.startsWith("@") ? `${detail.flightNo} ` : ""}${detail.position}`
                       )
                       .join("、")}</small
                   >`

@@ -1,5 +1,9 @@
 import type { AppState } from "../model";
 import { markActiveScheduleStale } from "../domain/kernel/schedule-lifecycle";
+import {
+  flightIdentityKey,
+  flightRuleMatches,
+} from "../domain/flights/flight-identities";
 import { normalizeAirlineMixCodes } from "../domain/rules/airline-mix-policy";
 import {
   normalizeOrdinaryPriorityPositions,
@@ -27,7 +31,6 @@ import {
   splitPositionList,
 } from "../utils";
 import {
-  fillPositionMatches,
   isSameFlightSupervisorFillRule,
   normalizeFillReference,
 } from "../domain/coverage/supervisor-fill-configuration";
@@ -113,23 +116,28 @@ export function setTeamLeaderGapFillPositionsMovable(
   const selectedIds = new Set(positionRuleIds);
   const selectedRules = state.positionRules.filter(
     (rule) =>
-      selectedIds.has(rule.id) && !fixedTeamLeaderGapFillPositionReason(rule)
+      selectedIds.has(rule.id) &&
+      !fixedTeamLeaderGapFillPositionReason(rule, state)
   );
   if (!selectedRules.length) return false;
 
   const policies = new Map(
     state.settings.teamLeaderGapFillPositionPolicies.map((policy) => [
-      teamLeaderGapFillPositionKey(policy.flightNo, policy.position),
-      policy,
+      teamLeaderGapFillPositionKey(
+        flightIdentityKey(state, policy.flightNo),
+        policy.position
+      ),
+      { ...policy, flightNo: flightIdentityKey(state, policy.flightNo) },
     ])
   );
   let changed = false;
   for (const rule of selectedRules) {
-    const key = teamLeaderGapFillPositionKey(rule.flightNo, rule.name);
+    const reference = flightIdentityKey(state, rule.flightNo);
+    const key = teamLeaderGapFillPositionKey(reference, rule.name);
     const current = policies.get(key);
     if (current?.movable === movable) continue;
     policies.set(key, {
-      flightNo: rule.flightNo.trim().toUpperCase(),
+      flightNo: reference,
       position: rule.name.trim(),
       movable,
     });
@@ -699,33 +707,30 @@ export function saveSupervisorFillRule(
     };
   for (const flightNo of [rule.sourceFlightNo, rule.targetFlightNo]) {
     if (
-      !state.templates.some(
-        (template) => normalizeFillReference(template.flightNo) === flightNo
+      !state.templates.some((template) =>
+        flightRuleMatches(state, flightNo, template.flightNo)
       )
     )
       return { ok: false, error: "请选择航班模板中已有的航班" };
   }
   const sources = state.positionRules.filter(
     (position) =>
-      fillPositionMatches(
-        position,
-        rule.sourceFlightNo,
-        rule.sourcePositionKeyword
-      ) &&
+      flightRuleMatches(state, rule.sourceFlightNo, position.flightNo) &&
       position.name === rule.sourcePositionKeyword &&
       position.category === "机动督导"
   );
   const targets = state.positionRules.filter(
     (position) =>
-      fillPositionMatches(
-        position,
-        rule.targetFlightNo,
-        rule.targetPositionKeyword
-      ) &&
+      flightRuleMatches(state, rule.targetFlightNo, position.flightNo) &&
       position.name === rule.targetPositionKeyword &&
       position.category === "常规"
   );
-  if (sources.length !== 1 || targets.length !== 1)
+  if (
+    !sources.length ||
+    !targets.length ||
+    new Set(sources.map((r) => r.flightNo)).size !== sources.length ||
+    new Set(targets.map((r) => r.flightNo)).size !== targets.length
+  )
     return { ok: false, error: "请选择唯一的来源机动督导和目标常规岗位" };
   if (
     state.settings.mobileSupervisorFillRules.some(

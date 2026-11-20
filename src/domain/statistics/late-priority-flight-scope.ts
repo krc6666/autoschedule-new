@@ -1,5 +1,9 @@
 import type { PositionRule } from "../../model";
 import {
+  flightRuleMatches,
+  type FlightIdentityFacts,
+} from "../flights/flight-identities";
+import {
   latePriorityFrequencyKinds,
   normalizeLatePriorityFlightNumber,
 } from "../reviews/late-priority-policy";
@@ -30,10 +34,11 @@ export function latePriorityFlightScopeCandidates(
 
 export function latePriorityFlightInScope(
   flightNumbers: readonly string[],
-  flightNo: string
+  flightNo: string,
+  context: FlightIdentityFacts = {},
+  date?: string
 ): boolean {
-  const target = normalizeLatePriorityFlightNumber(flightNo);
-  return flightNumbers.some(
-    (value) => normalizeLatePriorityFlightNumber(value) === target
+  return flightNumbers.some((value) =>
+    flightRuleMatches(context, value, flightNo, date)
   );
 }

@@ -27,7 +27,7 @@ export function installGeneratedSchedule(
   date: string,
   result: ScheduleResult
 ): void {
-  assertScheduleSafetyCredential({ date, result });
+  assertScheduleSafetyCredential({ date, result, state });
   state.assignments = result.assignments;
   state.activeScheduleDate = date;
   state.schedulePolicyStale = false;

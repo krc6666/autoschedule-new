@@ -1,3 +1,4 @@
+import { flightRuleSettings } from "../flights/flight-rule-settings";
 import type { Assignment } from "../../model";
 import type {
   HistoryRuleFacts,
@@ -9,7 +10,7 @@ import { intervalsOverlap } from "../shared/time";
 import type { ScheduleFrequencyFacts } from "../statistics/schedule-frequency";
 
 export function enabledCrossFlightPriorityPolicies(state: HistoryRuleFacts) {
-  return state.settings.crossFlightPriorityPolicies.filter(
+  return flightRuleSettings(state).crossFlightPriorityPolicies.filter(
     (policy) =>
       policy.enabled && policy.flightNo.trim() && policy.staffIds.length
   );

@@ -2769,3 +2769,51 @@ Owner确认：上一班甲10点、乙6点，下一班条件允许时甲6点、�
 | 最终守卫、展示                      | 最终凭证仍随实际班表生成。统计页仍显示原计次数与日期。                                                                     |
 | 历史保存、Excel、localStorage、迁移 | 历史重新归档与历史班表导出沿用同一可信时间。当冲突时留空。配置备份及本地恢复保留原始值，数据结构沿用原字段。               |
 | 回归                                | 交换冲突行顺序、检查同次数的换人与早走计数、历史保存及实际 Excel 字节。                                                    |
+
+## 2026-11-20：航班长期身份与换季归并（实施与核对清单）
+
+- 类别：业务目标识别机制与持久化字段；既有规则本身的强度、优先级和时间条件保持。方案见`plan.md`本日条目。
+- Owner已确认：CX937早/晚与CX937归为同一航班；认定同一航班后，原有航班规则自动共用。A/B的规则、人员与账本仍分别管理。
+- 唯一owner：`flight-identities`拥有归属/日期/岗位来源，`flight-rule-settings`拥有规则执行投影，`flight-identity-change`拥有变更校验与指纹；岗位资格、航司和历史时段保留原owner。
+- 以下状态对应本机实现及隔离验证；不代表真实资料已归并、真实云库已迁移或网页已部署。证据汇总见`docs/acceptance/2026-11-20-flight-identities.json`。
+
+| 消费路径                   | 拟接入职责与检查点                                           | 主要现有位置/回归方向                                                | 状态                                                                                                                     |
+| -------------------------- | ------------------------------------------------------------ | -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| 输入/默认/唯一性           | 稳定编号、显式日期归属；未知关系保留原号，不自动建猜测档案   | model、defaults、flight-identities                                   | 已接入；flight-identities / maintenance测试                                                                              |
+| 维护入口/改号/换季         | 集中预览与原子保存；显式改号建立延续关系；失效预览拒绝       | configuration-actions、flight-plan-review-actions、Store             | 已接入；editing、maintenance、flight-season-review测试                                                                   |
+| 共用模板/周计划/本季       | 实际号码/时段与本季选择保留，目录独立于模板删除              | weekly/next-workday-flight-plan、configured-flight-positions         | 原事实保留；configuration-device-roundtrip及既有准备流程回归                                                             |
+| 岗位/资格/候选池           | 明确本组岗位来源，已有新号岗位优先；日期外不借岗位           | activeFlightRules、inheritFlightIdentityPositions                    | 已接入；integration、transfer、maintenance及Worker测试                                                                   |
+| 初排/模型/特殊锁定         | 编译航班规则；KE166、TR121专项使用集中解析，实际时间条件保持 | daily-schedule-model、schedule-tasks、KE166、TR121/H02               | 已接入；Worker/WASM与既有专项回归；不改变专项强度                                                                        |
+| 结构化规则及规则页         | 原规则自动共用，重复去重、相反规则拒绝，草稿统一             | flight-rule-settings、group-flight-references、policy session        | 已接入；maintenance、editing、options、unified-supervisor-fill测试                                                       |
+| 补缺/覆盖/补差             | 档案目标统一；督导关联仍限同班；补差开关按稳定引用更新       | coverage、supervisor-fill、team-leader-gap-fill                      | 已接入；integration同班反向、maintenance开关及既有覆盖回归                                                               |
+| 恢复/资质预留/轮岗公平     | 解析旧档案；原工作班窗口和航司＋岗位尺度保持                 | reviews、schedule-frequency、late-priority-frequency                 | 已接入；integration与既有恢复/频率回归                                                                                   |
+| 人工换人/交换/清空/重排    | 复用规则事实与最终守卫，不跨真实班次                         | assignment actions、manual-swap-analysis、最终人工告警               | 现有入口消费集中事实；Worker反向及原手调回归                                                                             |
+| 最终复核/安全守卫/凭证     | 目录进入规则/安全指纹；改目录使旧结果不能安装                | schedule-guard、schedule-rule-fingerprint、safety-credential/session | 已接入；flight-identity-worker合法后破坏及旧结果拒绝                                                                     |
+| Worker/求解输入            | 显式裁剪目录；主线程与Worker一致，不读取草稿                 | scheduling-facts、schedule-worker-protocol、schedule.worker          | 已接入；真实Worker handler/WASM、900条历史及8岗位无空缺                                                                  |
+| 轻松班次/早走均衡          | 表格归档案，早走每天一次；筛选只影响展示                     | relaxed-shift-statistics、flight-scope、原balance                    | 已接入；integration按事件独立断言；原balance计量不变                                                                     |
+| 末班/普通重点/冷却统计     | 原号事件再归并，同日早晚不吞；普通重点航司＋岗位不变         | monthly-late-priority、frequency、原ordinary统计                     | 已接入；integration表格与轮换对账、既有ordinary回归                                                                      |
+| 手工次数/清零/次数Excel    | 先原账本截断/清零，再归并，最后档案修正；编号列幂等          | statistics-actions、late-priority-counts-excel                       | 已接入；integration、maintenance、counts-excel测试                                                                       |
+| 归档/历史查看及编辑        | 历史原文保留，原号岗位优先，再明确来源，再身份兜底           | late-priorityHistoryRule、history-actions、manual-count-evidence     | 已接入；integration不同岗位备注及原历史编辑/时间回归                                                                     |
+| 统计/规则展示与搜索        | 统一名与旧号追溯，未知账本显式警示                           | statistics-page、policy-search、flight-identity-options              | 已接入；options/UI测试及隔离浏览器旧号搜索/统计                                                                          |
+| localStorage/切组/状态迁移 | 共享一份关系；两组悬空引用拒绝；保存失败不改正式Store        | storage、state-restoration、editing-session                          | 已接入；editing、transfer及浏览器重启                                                                                    |
+| 配置Excel读/写/完整恢复    | 真字节往返，缺/空表明确，A/B影响预览；部分导入亦承接本组岗位 | flight-identities-excel、workbook-actions/contract/dialog            | 已接入；transfer、configuration-device-roundtrip、浏览器XLSX/JSON                                                        |
+| 云端保存/版本恢复/审计     | 单一客户端合同，增量校验、旧客户端保护、旧版本显式恢复空关系 | supabase-backend、cloud-workspace、202611200001 SQL                  | 客户端及隔离PGlite已验；真实迁移/保存/多设备尚未执行                                                                     |
+| 结果导出/公开班表          | 实际号码与原岗位不改，公开输出不加入内部目录                 | Excel、print、离线HTML/PNG、PublicSchedule                           | 无新增公开字段；原导出/公开投影回归，Worker真实新号输出                                                                  |
+| 完整性/反向/往返/现场验收  | 字段清单、另一组号码、逐事件核对、后置拒绝、两种目标及重启   | domain/app/UI/infrastructure/architecture测试与隔离浏览器            | 独立TypeScript模型扫描核对全部结构化航班目标，新增目标漏注册即失败；本机验收见任务JSON，真实业务归属及线上验收未冒充完成 |
+
+本轮实现已替代最初“仅设计”范围；当前产品合同见spec同日末节，最终自动验证与页面证据以任务JSON为准。
+
+### 2026-11-20 航班长期身份续修（unattended委托）
+
+范围为持久化字段与规则目标解析机制。接手时已有未完成实现和13项定向测试；本轮按下表补失败证据并修复，完成核对状态见上表。唯一owner保持不变。
+
+| 路径                | 本轮核对与失败证据                                          | 验证要求                                                                       |
+| ------------------- | ----------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| 输入/恢复/云端      | 坏编号、空别名项会抛异常；空白包裹内部引用未拒绝            | 单一校验器无异常拒绝，旧无目录空关系明确可恢复，未知稳定引用拒绝               |
+| 岗位/候选/Worker    | 岗位来源未读取排班日期；执行投影保留重复规则                | 日期交界、真实班次不合并、唯一规则执行及Worker事实一致                         |
+| 预览/手调/最终保护  | 预览指纹漏当前assignments；安全凭证事实类型未闭合           | 人工改表后旧预览拒绝；归属变化旧安全凭证拒绝；禁止规则后置反向                 |
+| 规则/补位/恢复/轮岗 | 衔接相反规则未阻止合并；其余直接消费者沿上表逐项核对        | 明确相反配置拒绝，不借冲突回退放宽硬约束；规则编辑/搜索与统计名称一致          |
+| 改号/账本/统计      | 旧改号路径改写人工次数来源，截断后求和可能变化              | 来源账本不改写，历史实际早晚次数不吞；清零/修正/次数Excel重复导入对账          |
+| 模板/周计划/历史    | 显式改号延用旧同步；岗位版本和A/B资格独立                   | 全部显式改号入口、缺来源提示、删除模板不删关系；原历史名称/时间保持            |
+| 页面/存储/导入导出  | 已有档案组件未验草稿离开/保存失败；共享导入需原子检查另一组 | 保存成功才更新，失败保留草稿，切组/重启、配置XLSX与完整JSON往返实际使用        |
+| 交付                | 本地全量基线2340项中10失败，类型检查3错误，不能当完成       | 修复直接问题，完整功能/性能/构建及隔离入口验收；不自动推送、部署或迁移真实云库 |

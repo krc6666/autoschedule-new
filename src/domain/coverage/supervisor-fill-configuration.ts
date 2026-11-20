@@ -1,3 +1,8 @@
+import { flightRuleSettings } from "../flights/flight-rule-settings";
+import {
+  flightRuleMatches,
+  type FlightIdentityFacts,
+} from "../flights/flight-identities";
 import type { PositionRule } from "../../model";
 import type { MobileSupervisorFillRule } from "../rules/structured-policy-contract";
 
@@ -32,16 +37,17 @@ export function supervisorFillRelationsForTarget(
     settings: {
       mobileSupervisorFillRules: readonly MobileSupervisorFillRule[];
     };
-  },
+  } & FlightIdentityFacts,
   position: PositionRule | undefined
 ): MobileSupervisorFillRule[] {
   if (!position) return [];
-  return state.settings.mobileSupervisorFillRules.filter((rule) =>
-    fillPositionMatches(
-      position,
-      rule.targetFlightNo,
-      rule.targetPositionKeyword
-    )
+  return flightRuleSettings(state).mobileSupervisorFillRules.filter(
+    (rule) =>
+      flightRuleMatches(state, rule.targetFlightNo, position.flightNo) &&
+      Boolean(rule.targetPositionKeyword.trim()) &&
+      normalizeFillReference(position.name).includes(
+        normalizeFillReference(rule.targetPositionKeyword)
+      )
   );
 }
 

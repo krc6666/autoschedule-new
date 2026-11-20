@@ -114,6 +114,15 @@ export function compileWorkbookConfigurationRestore(input: WorkbookImport): {
     imported.flightSeasonOverrides = {};
     restoreDefaults.push("本季航班状态：文件未记录，按岗位配置确定本季航班");
   }
+  if (
+    imported.flightIdentities === undefined &&
+    !imported.flightIdentityErrors?.length
+  ) {
+    imported.flightIdentities = [];
+    restoreDefaults.push(
+      "航班长期档案：旧文件未记录，新旧名称分别计算，不沿用目标设备的关联"
+    );
+  }
   if (imported.flightPlanConfirmations === undefined) {
     imported.flightPlanConfirmations = [];
     restoreDefaults.push("航班换季确认：未确认，按实际差异重新核对");

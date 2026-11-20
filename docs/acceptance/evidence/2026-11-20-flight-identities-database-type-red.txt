@@ -1,0 +1,71 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/infrastructure/flight-identity-database.test.ts (2 tests | 2 failed) 2255ms
+     × 旧格式可首次迁移，归并后拒绝旧页面漏字段，原工作区/备份/审计原子保留 197ms
+     × 恢复旧备份明确升为独立名称，恢复新备份保留目录，并继续要求编辑会话 9ms
+npm.cmd :
+所在位置 行:2 字符: 1
++ npm.cmd exec vitest -- run tests/infrastructure/flight-identity-datab ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/infrastructure/flight-identity-database.test.ts > 航班档案云端旧页面保护、CAS与版本恢复 > 旧格式可首次迁移，归并后拒绝旧页面漏字段，原工作区/备份/审计原子
+保留
+AssertionError: promise resolved "{ rows: [ { version: 3 } ], …(4) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "affectedRows": 0,
++   "command": "SELECT",
++   "fields": [
++     {
++       "dataTypeID": 20,
++       "name": "version",
++     },
++   ],
++   "rowCount": 1,
++   "rows": [
++     {
++       "version": 3,
++     },
++   ],
+  }
+
+ ❯ tests/infrastructure/flight-identity-database.test.ts:108:36
+    106|       const invalid = structuredClone(model);
+    107|       change(invalid);
+    108|       await expect(save(2, invalid)).rejects.toThrow();
+       |                                    ^
+    109|       expect((await snapshot()).rows).toEqual(before.rows);
+    110|     }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/infrastructure/flight-identity-database.test.ts > 航班档案云端旧页面保护、CAS与版本恢复 > 恢复旧备份明确升为独立名称，恢复新备份保留目录，并继续要求编辑会话
+error: WORKSPACE_CONFLICT
+ ❯ pe.Oe node_modules/@electric-sql/pg-protocol/src/parser.ts:433:47
+ ❯ pe.tt node_modules/@electric-sql/pg-protocol/src/parser.ts:218:8
+ ❯ pe.parse node_modules/@electric-sql/pg-protocol/src/parser.ts:99:38
+ ❯ q.Ce node_modules/@electric-sql/pglite/src/pglite.ts:795:25
+ ❯ node_modules/@electric-sql/pglite/src/pglite.ts:746:15
+ ❯ null.<anonymous> wasm:/wasm/022a9842:1:5417191
+ ❯ null.<anonymous> wasm:/wasm/022a9842:1:2185286
+ ❯ null.<anonymous> wasm:/wasm/022a9842:1:2215102
+ ❯ null.<anonymous> wasm:/wasm/022a9842:1:2215667
+ ❯ null.<anonymous> wasm:/wasm/022a9842:1:5074842
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed (2)
+   Start at  18:20:24
+   Duration  2.93s (transform 302ms, setup 0ms, import 378ms, tests 2.26s, environment 0ms)

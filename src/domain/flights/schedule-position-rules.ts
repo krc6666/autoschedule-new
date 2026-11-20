@@ -1,4 +1,10 @@
 import type { Assignment, Flight, PositionRule, Staff } from "../../model";
+import {
+  flightIdentities,
+  flightPositionSource,
+  type FlightIdentityFacts,
+} from "./flight-identities";
+import { normalizeWeeklyFlightNo } from "./weekly-flight-plan";
 import { createId } from "../../utils";
 import { durationHours } from "../shared/time";
 import type {
@@ -184,12 +190,29 @@ export function makeUnfilled(
 }
 
 export function activeFlightRules(
-  state: Pick<FlightRuleFacts, "positionRules" | "settings">,
+  state: Pick<FlightRuleFacts, "positionRules" | "settings"> &
+    FlightIdentityFacts,
   flight: Flight
 ): PositionRule[] {
-  const flightRules = state.positionRules.filter(
+  // Exact jobs are the common path and keep their independent qualifications.
+  // Resolve/normalize directory sources only when this actual number has no jobs.
+  let flightRules = state.positionRules.filter(
     (rule) => rule.flightNo === flight.flightNo
   );
+  if (!flightRules.length && flightIdentities(state).length) {
+    const requested = normalizeWeeklyFlightNo(flight.flightNo);
+    flightRules = state.positionRules.filter(
+      (rule) => normalizeWeeklyFlightNo(rule.flightNo) === requested
+    );
+    if (!flightRules.length) {
+      const source = normalizeWeeklyFlightNo(
+        flightPositionSource(state, flight.flightNo)
+      );
+      flightRules = state.positionRules.filter(
+        (rule) => normalizeWeeklyFlightNo(rule.flightNo) === source
+      );
+    }
+  }
   const administrativePositions = new Set(
     flightRules
       .filter((rule) => rule.category === "行政支援")
@@ -252,7 +275,8 @@ export function administrativeSupportAutomaticRule(
 }
 
 export function activeFlightPositions(
-  state: Pick<FlightRuleFacts, "positionRules" | "settings">,
+  state: Pick<FlightRuleFacts, "positionRules" | "settings"> &
+    FlightIdentityFacts,
   flight: Flight
 ): string[] {
   return activeFlightRules(state, flight).map((rule) => rule.name);

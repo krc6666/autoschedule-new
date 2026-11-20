@@ -7,8 +7,12 @@ import "./position-rules-section";
 import "./staff-config-section";
 
 export class ConfigPageElement extends LightDomElement {
-  static override properties = { model: { attribute: false } };
+  static override properties = {
+    model: { attribute: false },
+    editing: { attribute: false },
+  };
   model!: AppState;
+  editing?: import("../../app/flight-identity-editing-session").FlightIdentityEditingView;
 
   protected override render() {
     return html`
@@ -20,6 +24,7 @@ export class ConfigPageElement extends LightDomElement {
       ></autoschedule-position-rules>
       <autoschedule-configuration-settings
         .model=${this.model}
+        .editing=${this.editing}
       ></autoschedule-configuration-settings>
     `;
   }

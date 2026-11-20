@@ -1,4 +1,8 @@
 import * as XLSX from "xlsx-js-style";
+import {
+  flightIdentityKey,
+  flightIdentityLabel,
+} from "../domain/flights/flight-identities";
 
 import {
   LATE_PRIORITY_STATISTICS_CATEGORIES,
@@ -41,21 +45,30 @@ export function buildLatePriorityCountsWorkbook(
     workbook,
     SHEET_NAME,
     [
-      ["月份", "人员编号", "人员姓名", "航班号", "岗位类别", "最终次数"],
+      [
+        "月份",
+        "人员编号",
+        "人员姓名",
+        "航班号",
+        "岗位类别",
+        "最终次数",
+        "航班档案编号",
+      ],
       ...statistics.rows.flatMap((row) =>
         statistics.flightNumbers.flatMap((flightNo) =>
           row.flights[flightNo]!.applicableCategories.map((category) => [
             statistics.month,
             row.staff.id,
             row.staff.name,
-            flightNo,
+            flightIdentityLabel(state, flightNo),
             category,
             row.flights[flightNo]!.categories[category].effectiveCount,
+            flightNo.startsWith("@") ? flightNo : "",
           ])
         )
       ),
     ],
-    [12, 14, 14, 14, 14, 12]
+    [12, 14, 14, 14, 14, 12, 28]
   );
   return workbook;
 }
@@ -85,6 +98,7 @@ export function parseLatePriorityCountsWorkbook(
   const flightIndex = headerIndex(header, ["航班号"], 3);
   const categoryIndex = headerIndex(header, ["岗位类别"], 4);
   const countIndex = headerIndex(header, ["最终次数"], 5);
+  const identityIndex = header.indexOf("航班档案编号");
   const staffById = new Map(state.staff.map((person) => [person.id, person]));
   const statistics = buildMonthlyLatePriorityStatistics(state, expectedDate);
   const rowByStaffId = new Map(
@@ -111,9 +125,19 @@ export function parseLatePriorityCountsWorkbook(
     const rowMonth = normalizeText(row[monthIndex]);
     const staffId = normalizeText(row[staffIdIndex]);
     const staffName = normalizeText(row[staffNameIndex]);
-    const flightNo = normalizeLatePriorityFlightNumber(
-      normalizeText(row[flightIndex])
+    const rawFlight = normalizeText(row[flightIndex]);
+    const namedIdentity = state.shared.flightIdentities?.find(
+      (i) =>
+        normalizeLatePriorityFlightNumber(i.displayName) ===
+        normalizeLatePriorityFlightNumber(rawFlight)
     );
+    const stableReference =
+      identityIndex >= 0 ? normalizeText(row[identityIndex]).toUpperCase() : "";
+    const flightNo =
+      stableReference ||
+      (namedIdentity
+        ? `@${namedIdentity.id.toUpperCase()}`
+        : flightIdentityKey(state, rawFlight));
     const category = normalizeText(row[categoryIndex]);
     const rawCount = normalizeText(row[countIndex]);
     const finalCount = Number(rawCount);

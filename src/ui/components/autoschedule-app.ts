@@ -107,7 +107,7 @@ export class AutoscheduleAppElement extends LightDomElement {
           </label>
           <span class="save-state small text-secondary d-none d-md-inline"
             ><i class="bi bi-check-circle me-1"></i
-            >${this.view.policyEditing?.dirty ? "规则未保存" : this.cloud ? "云端保存状态见上方" : "已保存"}</span
+            >${this.view.flightIdentityEditing?.dirty ? "航班档案未保存" : this.view.policyEditing?.dirty ? "规则未保存" : this.cloud ? "云端保存状态见上方" : "已保存"}</span
           >
         </div>
       </header>
@@ -197,6 +197,7 @@ export class AutoscheduleAppElement extends LightDomElement {
     if (section === "config")
       return html`<autoschedule-config-page
         .model=${this.model}
+        .editing=${this.view.flightIdentityEditing}
       ></autoschedule-config-page>`;
     if (section === "flights")
       return html`<autoschedule-flights-page

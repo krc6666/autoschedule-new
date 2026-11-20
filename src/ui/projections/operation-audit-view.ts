@@ -6,6 +6,8 @@ import { SCHEDULE_SETTING_DEFINITIONS } from "../../domain/rules/schedule-settin
 import { LATE_PRIORITY_KIND_DEFINITIONS } from "../../domain/reviews/late-priority-policy";
 
 const AREAS: Record<string, string> = {
+  flightIdentities: "航班长期档案",
+  flightIdentitySchemaVersion: "航班档案格式",
   staff: "人员",
   flights: "当天航班",
   templates: "航班模板",
@@ -24,6 +26,11 @@ const AREAS: Record<string, string> = {
   activeScheduleDate: "班表日期",
 };
 const FIELDS: Record<string, string> = {
+  displayName: "统计统一名称",
+  aliases: "新旧航班名称",
+  from: "生效日期",
+  until: "截至日期",
+  positionSourceFlightNo: "沿用岗位版本",
   ...Object.fromEntries(
     SCHEDULE_SETTING_DEFINITIONS.map((field) => [field.key, field.label])
   ),

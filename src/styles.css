@@ -3739,3 +3739,30 @@ autoschedule-previous-schedule-comparison {
     width: 116px;
   }
 }
+.flight-identities-section .section-heading {
+  flex-wrap: wrap;
+}
+.flight-identities-section .section-heading > div {
+  flex: 1 1 20rem;
+  min-width: 0;
+}
+.flight-identity-alias-table {
+  min-width: 850px;
+}
+.flight-identity-alias-table th {
+  white-space: nowrap;
+}
+.flight-identity-alias-table td:first-child {
+  min-width: 160px;
+}
+.flight-identity-alias-table td:nth-child(4) {
+  min-width: 220px;
+}
+@media (max-width: 576px) {
+  .position-copy-controls {
+    flex-wrap: wrap;
+  }
+  .position-copy-controls select {
+    max-width: 100%;
+  }
+}

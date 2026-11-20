@@ -1,3 +1,4 @@
+import { flightRuleSettings } from "../flights/flight-rule-settings";
 import type { Flight, HistoryRecord } from "../../model";
 import type { HistoryRuleFacts } from "../shared/scheduling-facts";
 import type { LateShiftRecoveryPositionRule } from "../rules/structured-policy-contract";
@@ -42,14 +43,16 @@ export function matchingLateShiftRecoveryPositionRules(
   target: Pick<Flight, "flightNo"> & { position: string; remark: string }
 ): LateShiftRecoveryPositionRule[] {
   const flightNo = normalized(target.flightNo);
-  return state.settings.lateShiftRecoveryPositionRules.filter((rule) => {
-    if (!rule.enabled || !rule.keyword.trim()) return false;
-    if (rule.flightNo.trim() && normalized(rule.flightNo) !== flightNo)
-      return false;
-    const value =
-      rule.matchField === "position" ? target.position : target.remark;
-    return normalized(value).includes(normalized(rule.keyword));
-  });
+  return flightRuleSettings(state).lateShiftRecoveryPositionRules.filter(
+    (rule) => {
+      if (!rule.enabled || !rule.keyword.trim()) return false;
+      if (rule.flightNo.trim() && normalized(rule.flightNo) !== flightNo)
+        return false;
+      const value =
+        rule.matchField === "position" ? target.position : target.remark;
+      return normalized(value).includes(normalized(rule.keyword));
+    }
+  );
 }
 
 export function previousWorkdayLateProtection(
@@ -67,7 +70,9 @@ export function previousWorkdayLateProtection(
   const scopedProtectedRecords = protectedRecords.filter((record) =>
     latePriorityFlightInScope(
       state.settings.latePriorityFlightNumbers,
-      record.flightNo
+      record.flightNo,
+      state,
+      record.date
     )
   );
   return {
@@ -134,7 +139,7 @@ export function matchesNextWorkdayRecoveryTarget(
 ): boolean {
   const flightNo = normalized(target.flightNo);
   const searchable = normalized(`${target.position} ${target.remark}`);
-  return state.settings.nextWorkdayRecoveryTargets.some(
+  return flightRuleSettings(state).nextWorkdayRecoveryTargets.some(
     (item) =>
       item.enabled &&
       normalized(item.flightNo) === flightNo &&

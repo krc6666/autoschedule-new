@@ -7,38 +7,55 @@ import {
 import { createLatePriorityPressureState } from "./fixtures/late-priority";
 
 describe("late priority complete review cost", () => {
-  it("reuses history for category and aggregate checks while projecting each schedule", () => {
-    const { state, assignments, date } = createLatePriorityPressureState();
-    const facts = createScheduleFrequencyFacts(state, date);
-    const started = performance.now();
-    for (let pass = 0; pass < 3; pass++) {
-      for (const target of assignments) {
-        expect(
-          assessLatePriorityFrequencyBalance(
-            state,
-            target,
-            assignments,
-            date,
-            facts
-          )
-        ).not.toBeNull();
-        expect(
-          assessLatePriorityAggregateBalance(
-            state,
-            target,
-            assignments,
-            date,
-            facts
-          )
-        ).not.toBeNull();
+  it.each([false, true])(
+    "reuses history for category and aggregate checks while projecting each schedule (directory=%s)",
+    (withDirectory) => {
+      const { state, assignments, date } = createLatePriorityPressureState();
+      if (withDirectory) {
+        state.shared.flightIdentities =
+          state.settings.latePriorityFlightNumbers.map((flightNo, index) => ({
+            id: `service-${index}`,
+            displayName: `长期航班${index}`,
+            aliases: [
+              { flightNo },
+              { flightNo: `NEW${index}`, positionSourceFlightNo: flightNo },
+            ],
+          }));
+        state.settings.latePriorityFlightNumbers =
+          state.shared.flightIdentities.map((i) => `@${i.id.toUpperCase()}`);
       }
-    }
-    const elapsed = performance.now() - started;
-    console.info(
-      "[performance] late category+aggregate 3 passes/900 history",
-      Math.round(elapsed),
-      "ms"
-    );
-    expect(elapsed).toBeLessThan(2_000);
-  }, 30_000);
+      const facts = createScheduleFrequencyFacts(state, date);
+      const started = performance.now();
+      for (let pass = 0; pass < 3; pass++) {
+        for (const target of assignments) {
+          expect(
+            assessLatePriorityFrequencyBalance(
+              state,
+              target,
+              assignments,
+              date,
+              facts
+            )
+          ).not.toBeNull();
+          expect(
+            assessLatePriorityAggregateBalance(
+              state,
+              target,
+              assignments,
+              date,
+              facts
+            )
+          ).not.toBeNull();
+        }
+      }
+      const elapsed = performance.now() - started;
+      console.info(
+        `[performance] late category+aggregate 3 passes/900 history directory=${withDirectory}`,
+        Math.round(elapsed),
+        "ms"
+      );
+      expect(elapsed).toBeLessThan(2_000);
+    },
+    30_000
+  );
 });

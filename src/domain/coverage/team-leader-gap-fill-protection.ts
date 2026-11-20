@@ -1,3 +1,4 @@
+import { flightRuleSettings } from "../flights/flight-rule-settings";
 import type { Assignment, PositionRule } from "../../model";
 import type { TeamLeaderGapFillPositionPolicy } from "../rules/structured-policy-contract";
 import type { ScheduleGenerationFacts } from "../shared/scheduling-facts";
@@ -6,6 +7,10 @@ import {
   isGapFillGuidePosition,
 } from "../flights/schedule-position-rules";
 import { isOrdinaryPriorityPosition } from "../reviews/position-rotation-policy";
+import {
+  flightHasSpecialRule,
+  type FlightIdentityFacts,
+} from "../flights/flight-identities";
 
 export interface TeamLeaderGapFillPositionDisposition {
   movable: boolean;
@@ -61,9 +66,10 @@ export function removeTeamLeaderGapFillPositionReference(
 }
 
 export function fixedTeamLeaderGapFillPositionReason(
-  rule: Pick<PositionRule, "flightNo" | "category" | "manual">
+  rule: Pick<PositionRule, "flightNo" | "category" | "manual">,
+  context: FlightIdentityFacts = {}
 ): string | null {
-  if (/^KE\s*166$/i.test(rule.flightNo.trim())) return "KE166岗位";
+  if (flightHasSpecialRule(context, rule.flightNo, "KE166")) return "KE166岗位";
   if (rule.manual) return "人工岗位";
   if (rule.category === "行政支援") return "行政支援岗位";
   return null;
@@ -71,7 +77,7 @@ export function fixedTeamLeaderGapFillPositionReason(
 
 /** Filling an empty target does not grant permission to move an occupied source. */
 export function isTeamLeaderGapFillVacancy(
-  state: Pick<ScheduleGenerationFacts, "positionRules">,
+  state: Pick<ScheduleGenerationFacts, "positionRules"> & FlightIdentityFacts,
   assignment: Assignment
 ): boolean {
   const rule = assignmentRule(state, assignment);
@@ -80,21 +86,26 @@ export function isTeamLeaderGapFillVacancy(
     !assignment.staffId &&
     rule &&
     (rule.category === "常规" || rule.category === "机动督导") &&
-    !fixedTeamLeaderGapFillPositionReason({
-      ...rule,
-      flightNo: assignment.flightNo,
-    })
+    !fixedTeamLeaderGapFillPositionReason(
+      {
+        ...rule,
+        flightNo: assignment.flightNo,
+      },
+      state
+    )
   );
 }
 
 export function teamLeaderGapFillPositionDisposition(
-  state: Pick<ScheduleGenerationFacts, "settings">,
+  state: Pick<ScheduleGenerationFacts, "settings"> & FlightIdentityFacts,
   rule: PositionRule
 ): TeamLeaderGapFillPositionDisposition {
-  const fixedReason = fixedTeamLeaderGapFillPositionReason(rule);
+  const fixedReason = fixedTeamLeaderGapFillPositionReason(rule, state);
   if (fixedReason) return { movable: false, fixed: true, reason: fixedReason };
 
-  const override = state.settings.teamLeaderGapFillPositionPolicies.find(
+  const override = flightRuleSettings(
+    state
+  ).teamLeaderGapFillPositionPolicies.find(
     (policy) =>
       teamLeaderGapFillPositionKey(policy.flightNo, policy.position) ===
       teamLeaderGapFillPositionKey(rule.flightNo, rule.name)
@@ -132,7 +143,8 @@ export function teamLeaderGapFillAssignmentProtectionReasons(
   if (assignment.status !== "assigned" || !assignment.staffId)
     reasons.push("不是有效已排岗位");
   if (!rule) reasons.push("岗位规则不存在");
-  if (/^KE\s*166$/i.test(assignment.flightNo.trim())) reasons.push("KE166岗位");
+  if (flightHasSpecialRule(state, assignment.flightNo, "KE166"))
+    reasons.push("KE166岗位");
   if (assignment.staffId === dutyStaffId) reasons.push("值班人员当前岗位");
   if (assignment.layoutGroup !== undefined) reasons.push("特殊布局岗位");
   if (assignment.supervisorSourceAssignmentId !== undefined)

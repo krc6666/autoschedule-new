@@ -1,4 +1,5 @@
 import type { Assignment } from "../../model";
+import { flightHasSpecialRule } from "../flights/flight-identities";
 import type { ScheduleGenerationFacts } from "../shared/scheduling-facts";
 import { schedulingDecision } from "../rules/schedule-rule-contract";
 import {
@@ -135,7 +136,7 @@ function applyRotationPlan(
       mobileAssignmentIds.has(assignment.id)
         ? [
             schedulingDecision(
-              assignment.flightNo.trim().toUpperCase() === "KE166"
+              flightHasSpecialRule(state, assignment.flightNo, "KE166")
                 ? "ke166-supervisor"
                 : "mobile-supervisor",
               "selected",
@@ -203,7 +204,11 @@ export async function reviewMobileSupervisorGroupRotation(
     const supervisorFlight = state.flights.find(
       (f) => f.id === supervisor.flightId
     )!;
-    const ke166 = isKe166MobileSupervisor(supervisorFlight, supervisorRule);
+    const ke166 = isKe166MobileSupervisor(
+      supervisorFlight,
+      supervisorRule,
+      state
+    );
     const priority = (assignment: Assignment) => {
       const rule = assignmentRule(state, assignment);
       return Boolean(

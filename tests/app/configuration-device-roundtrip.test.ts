@@ -5,6 +5,11 @@ import ts from "typescript";
 import * as XLSX from "xlsx-js-style";
 import { createDefaultState } from "../../src/defaults";
 import type { AppState } from "../../src/model";
+import {
+  flightPositionSource,
+  sameFlightIdentity,
+} from "../../src/domain/flights/flight-identities";
+import { restorePersistedState } from "../../src/infrastructure/state-restoration";
 import { applyWorkbookImport } from "../../src/app/workbook-actions";
 import {
   buildConfigWorkbook,
@@ -76,6 +81,30 @@ describe("complete configuration device transfer", () => {
         .sort();
     };
     const imported = parse(createDefaultState());
+    expect(fields("SharedScheduleData")).toEqual(
+      [
+        "flightIdentities",
+        "flightIdentitySchemaVersion",
+        "templates",
+        "weeklyFlightPlans",
+      ].sort()
+    );
+    expect(fields("FlightIdentity")).toEqual(
+      ["id", "displayName", "aliases"].sort()
+    );
+    const identity = source.statements.find(
+      (statement): statement is ts.InterfaceDeclaration =>
+        ts.isInterfaceDeclaration(statement) &&
+        statement.name.text === "FlightIdentity"
+    )!;
+    const aliases = identity.members.find(
+      (m) => m.name?.getText(source) === "aliases"
+    ) as ts.PropertySignature;
+    const aliasType = aliases.type as ts.TypeReferenceNode;
+    const members = aliasType.typeArguments![0] as ts.TypeLiteralNode;
+    expect(members.members.map((m) => m.name!.getText(source)).sort()).toEqual(
+      ["flightNo", "from", "until", "positionSourceFlightNo"].sort()
+    );
     expect(Object.keys(imported.settings!).sort()).toEqual(
       fields("ScheduleSettings").filter((key) => key !== "adminSupportEnabled")
     );
@@ -108,6 +137,50 @@ describe("complete configuration device transfer", () => {
         imported[field as keyof typeof imported],
         `Excel omitted group field ${field}`
       ).toBeDefined();
+  });
+
+  it("transfers every flight identity field through XLSX and restart with dated job-source effects", () => {
+    const source = createDefaultState();
+    source.shared.flightIdentities = [
+      {
+        id: "transfer",
+        displayName: "长期航班",
+        aliases: [
+          { flightNo: "OLD100" },
+          {
+            flightNo: "NEW200",
+            from: "2026-11-01",
+            until: "2027-03-01",
+            positionSourceFlightNo: "OLD100",
+          },
+        ],
+      },
+    ];
+    const target = createDefaultState();
+    target.shared.flightIdentities = [];
+    expect(
+      applyWorkbookImport(target, parse(source), "config", restore).errors
+    ).toBeUndefined();
+    const restarted = restorePersistedState(
+      JSON.parse(JSON.stringify(target)),
+      createDefaultState()
+    )!;
+    expect(restarted.shared.flightIdentities).toEqual(
+      source.shared.flightIdentities
+    );
+    expect(restarted.shared.flightIdentitySchemaVersion).toBe(1);
+    expect(
+      sameFlightIdentity(restarted, "OLD100", "NEW200", "2026-11-01")
+    ).toBe(true);
+    expect(
+      sameFlightIdentity(restarted, "OLD100", "NEW200", "2026-10-31")
+    ).toBe(false);
+    expect(flightPositionSource(restarted, "NEW200", "2027-03-01")).toBe(
+      "OLD100"
+    );
+    expect(flightPositionSource(restarted, "NEW200", "2027-03-02")).toBe(
+      "NEW200"
+    );
   });
 
   it("preserves compound rule positions, zero fatigue and manual qualifications through actual XLSX bytes", () => {
@@ -593,7 +666,19 @@ describe("complete configuration device transfer", () => {
     expect(store.getState().model.settings).toEqual(expected);
     expect(
       store.getState().model.latePriorityFrequencyAdjustments[0]!.flightNo
-    ).toBe("NEW100");
+    ).toBe(old);
+    expect(store.getState().model.latePriorityFrequencyAdjustments).toEqual(
+      before.latePriorityFrequencyAdjustments
+    );
+    expect(
+      store
+        .getState()
+        .model.shared.flightIdentities?.some(
+          (i) =>
+            i.aliases.some((a) => a.flightNo === old) &&
+            i.aliases.some((a) => a.flightNo === "NEW100")
+        )
+    ).toBe(true);
     expect(store.getState().model.groups.B).toEqual(before.groups.B);
     expect(store.getState().model.templates).toEqual(before.templates);
     expect(store.getState().model.history).toEqual(before.history);

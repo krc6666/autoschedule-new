@@ -1,4 +1,5 @@
 import { markActiveScheduleStale } from "../domain/kernel/schedule-lifecycle";
+import { flightIdentityKey } from "../domain/flights/flight-identities";
 import {
   latePriorityKindForLabel,
   latePriorityKindLabel,
@@ -86,7 +87,7 @@ export function applyLatePriorityCountsImport(
   const preserved = state.latePriorityFrequencyAdjustments.filter(
     (item) =>
       item.month !== preview.month ||
-      !importedFlights.has(normalizedFlightNo(item.flightNo))
+      !importedFlights.has(flightIdentityKey(state, item.flightNo))
   );
   const imported = preview.targets.flatMap((target) => {
     const actualCount =
@@ -210,7 +211,7 @@ export function resetMonthlyLatePriorityFrequencyCounts(
       for (const detail of categoryStatistics.details) {
         const key = [
           row.staff.id,
-          normalizedFlightNo(detail.flightNo),
+          flightIdentityKey(state, detail.flightNo, detail.date),
           kindByCategory[category],
         ].join("\u0000");
         counts.set(key, (counts.get(key) ?? 0) + 1);
@@ -220,7 +221,7 @@ export function resetMonthlyLatePriorityFrequencyCounts(
   const preserved = state.latePriorityFrequencyAdjustments.filter(
     (item) =>
       item.month !== month ||
-      !scopeFlights.has(normalizedFlightNo(item.flightNo))
+      !scopeFlights.has(flightIdentityKey(state, item.flightNo))
   );
   const resetAdjustments = [...counts].map(([key, count]) => {
     const [staffId, flightNo, kind] = key.split("\u0000") as [

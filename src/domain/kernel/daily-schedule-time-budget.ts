@@ -16,7 +16,8 @@ export function dailyScheduleTimeoutMs(
       adjustment.month === month &&
       latePriorityFlightInScope(
         state.settings.latePriorityFlightNumbers,
-        adjustment.flightNo
+        adjustment.flightNo,
+        state
       ) &&
       (adjustment.delta !== 0 || (adjustment.resetBaseline ?? 0) > 0)
   );

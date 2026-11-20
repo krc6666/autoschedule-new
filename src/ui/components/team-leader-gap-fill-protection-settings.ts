@@ -5,7 +5,7 @@ import { teamLeaderGapFillPositionDisposition } from "../../domain/coverage/team
 import { isOrdinaryPriorityPosition } from "../../domain/reviews/position-rotation-policy";
 import { dispatchUiCommand } from "../events/ui-command";
 import {
-  matchesPolicySearch,
+  matchesFlightPolicySearch,
   normalizePolicySearchQuery,
 } from "../projections/policy-search";
 import { LightDomElement } from "./light-dom-element";
@@ -43,7 +43,8 @@ export class TeamLeaderGapFillProtectionSettingsElement extends LightDomElement 
 
   protected override render() {
     if (
-      !matchesPolicySearch(
+      !matchesFlightPolicySearch(
+        this.model,
         this.query,
         SEARCH_TEXT,
         this.model.positionRules.flatMap((rule) => [

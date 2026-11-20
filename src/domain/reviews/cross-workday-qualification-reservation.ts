@@ -1,4 +1,9 @@
+import { flightRuleSettings } from "../flights/flight-rule-settings";
 import type { Assignment, Flight, PositionRule } from "../../model";
+import {
+  flightRuleMatches,
+  type FlightIdentityFacts,
+} from "../flights/flight-identities";
 import type { ScheduleGenerationFacts } from "../shared/scheduling-facts";
 import type { CrossWorkdayQualificationReservation } from "../rules/structured-policy-contract";
 import {
@@ -27,14 +32,15 @@ function normalized(value: string): string {
 }
 
 export function matchingPositionRules(
-  state: Pick<ScheduleGenerationFacts, "positionRules">,
+  state: Pick<ScheduleGenerationFacts, "positionRules"> & FlightIdentityFacts,
   reservation: CrossWorkdayQualificationReservation
 ): PositionRule[] {
   const flightNo = normalized(reservation.flightNo);
   const keyword = normalized(reservation.keyword);
   if (!flightNo || !keyword) return [];
   return state.positionRules.filter((rule) => {
-    if (normalized(rule.flightNo) !== flightNo) return false;
+    if (!flightRuleMatches(state, reservation.flightNo, rule.flightNo))
+      return false;
     const value =
       reservation.matchField === "position" ? rule.name : rule.remark;
     return normalized(value).includes(keyword);
@@ -72,8 +78,8 @@ export function crossWorkdayReservationTargets(
   const active = new Set(
     configuredFlightNumbers(state.positionRules, state.flightSeasonOverrides)
   );
-  return state.settings.crossWorkdayQualificationReservations
-    .filter(
+  return flightRuleSettings(state)
+    .crossWorkdayQualificationReservations.filter(
       (reservation) =>
         reservation.enabled && active.has(normalized(reservation.flightNo))
     )

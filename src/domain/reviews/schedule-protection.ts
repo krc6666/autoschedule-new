@@ -1,3 +1,4 @@
+import { flightRuleSettings } from "../flights/flight-rule-settings";
 import type { Assignment, Flight, Staff } from "../../model";
 import type {
   ScheduleGenerationFacts,
@@ -143,8 +144,8 @@ export function violatedPositionTransitionPolicies(
 ) {
   const targetFlight = normalizedPolicyValue(targetFlightNo);
   const targetRole = normalizedPolicyValue(targetPosition);
-  return state.settings.positionTransitionPolicies
-    .filter(
+  return flightRuleSettings(state)
+    .positionTransitionPolicies.filter(
       (policy) =>
         policy.enabled &&
         policy.mode === mode &&
@@ -197,8 +198,10 @@ export function violatedPositionTransitionPoliciesForInsertion(
   );
   const sourceFlight = normalizedPolicyValue(flightNo);
   const sourcePosition = normalizedPolicyValue(position);
-  const reverse = state.settings.positionTransitionPolicies
-    .filter((policy) => policy.enabled && policy.mode === mode)
+  const reverse = flightRuleSettings(state)
+    .positionTransitionPolicies.filter(
+      (policy) => policy.enabled && policy.mode === mode
+    )
     .filter(
       (policy) =>
         (!policy.sourceFlightNo.trim() ||

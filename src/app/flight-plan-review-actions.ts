@@ -1,4 +1,5 @@
 import type { AppState } from "../model";
+import { flightRenameIdentityPlan } from "./flight-identity-rename";
 import {
   flightPlanReview,
   type FlightPlanReviewChoice,
@@ -78,10 +79,15 @@ export function applyFlightPlanReview(
       return fail("新旧航班都有岗位配置或当天航班，不能自动合并，请先核对");
     const rename = (value: string) =>
       normalize(value) === previous ? template.flightNo : value;
+    const identityPlan = flightRenameIdentityPlan(
+      state,
+      previous,
+      template.flightNo
+    );
+    if (identityPlan.error) return fail(identityPlan.error);
+    state.shared.flightIdentities = identityPlan.identities;
     renameGroupFlightReferences(state.positionRules, state.settings, rename);
     renameFlightSeasonOverride(state, previous, template.flightNo);
-    for (const row of state.latePriorityFrequencyAdjustments)
-      row.flightNo = rename(row.flightNo);
     for (const flight of state.flights) {
       if (normalize(flight.flightNo) !== previous) continue;
       flight.flightNo = template.flightNo;

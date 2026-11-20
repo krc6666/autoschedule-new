@@ -137,6 +137,7 @@ export interface ScheduleProgressView {
 
 export interface ApplicationViewState {
   policyEditing?: PolicyEditingView;
+  flightIdentityEditing?: import("./flight-identity-editing-session").FlightIdentityEditingView;
   policyQuery?: string;
   section: AppSection;
   date: string;

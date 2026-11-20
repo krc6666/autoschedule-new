@@ -20,6 +20,48 @@ import {
 } from "../../src/infrastructure/late-priority-counts-excel";
 
 describe("late-priority counts workbook", () => {
+  it("uses the stable directory number after renaming its display label, preserving import idempotency", () => {
+    const state = createDefaultState();
+    state.shared.flightIdentities = [
+      {
+        id: "service",
+        displayName: "旧统一名",
+        aliases: [{ flightNo: "TR121" }, { flightNo: "AB999" }],
+      },
+    ];
+    state.settings.latePriorityFlightNumbers = ["@SERVICE"];
+    const workbook = XLSX.read(
+      XLSX.write(buildLatePriorityCountsWorkbook(state, "2026-08-20"), {
+        type: "array",
+        bookType: "xlsx",
+      }),
+      { type: "array" }
+    );
+    state.shared.flightIdentities[0]!.displayName = "新统一名";
+    const preview = parseLatePriorityCountsWorkbook(
+      workbook,
+      state,
+      "2026-08-20"
+    );
+    expect(preview.errors).toEqual([]);
+    expect(preview.canApply).toBe(true);
+    applyLatePriorityCountsImport(state, preview);
+    const once = structuredClone(state.latePriorityFrequencyAdjustments);
+    applyLatePriorityCountsImport(
+      state,
+      parseLatePriorityCountsWorkbook(workbook, state, "2026-08-20")
+    );
+    expect(state.latePriorityFrequencyAdjustments).toEqual(once);
+    const sheet = XLSX.utils.sheet_to_json<unknown[]>(
+      workbook.Sheets["末班重点岗位次数"]!,
+      { header: 1 }
+    );
+    sheet[1]![6] = "@MISSING";
+    workbook.Sheets["末班重点岗位次数"] = XLSX.utils.aoa_to_sheet(sheet);
+    expect(
+      parseLatePriorityCountsWorkbook(workbook, state, "2026-08-20").canApply
+    ).toBe(false);
+  });
   it("preserves non-regular statistics through config Excel and storage without rewriting facts", () => {
     const state = createDefaultState();
     const rule = state.positionRules.find(

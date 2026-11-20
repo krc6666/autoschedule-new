@@ -222,7 +222,7 @@ function ke166SupervisorAvailabilityModel(
   const capacityObjectives: LexicographicObjective[] = [];
   const availabilityObjectives: LexicographicObjective[] = [];
   for (const [taskIndex, task] of preparation.tasks.entries()) {
-    if (!isKe166MobileSupervisor(task.flight, task.rule)) continue;
+    if (!isKe166MobileSupervisor(task.flight, task.rule, state)) continue;
     const eligibleIds = preparation.eligibleStaffIds.get(task.key);
     const availableIds: string[] = [];
     const independentIds: string[] = [];
@@ -604,7 +604,8 @@ function staffChoicesForTasks(
           ) &&
           latePriorityFlightInScope(
             state.settings.latePriorityFlightNumbers,
-            task.flight.flightNo
+            task.flight.flightNo,
+            state
           ) &&
           isLateEndingWork(task.flight, state),
       });

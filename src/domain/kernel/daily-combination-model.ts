@@ -1,3 +1,4 @@
+import { flightRuleSettings } from "../flights/flight-rule-settings";
 import type { Assignment, Staff } from "../../model";
 import type { ScheduleGenerationFacts } from "../shared/scheduling-facts";
 import { createAssignedPosition } from "../assignments/assignment-factory";
@@ -436,7 +437,7 @@ function sameFlightStaffExclusionConstraints(
 ): LinearConstraint[] {
   const constraints: LinearConstraint[] = [];
   for (const [exclusionIndex, exclusion] of (
-    state.settings.sameFlightStaffExclusions ?? []
+    flightRuleSettings(state).sameFlightStaffExclusions ?? []
   )
     .flatMap((group) =>
       sameFlightStaffExclusionPairs(group).map(
@@ -505,12 +506,13 @@ function combinationTaskPairIndex(
     transitionModesByTargetTaskKey.set(
       target.task.key,
       new Set(
-        state.settings.positionTransitionPolicies.flatMap((policy) =>
-          policy.enabled &&
-          normalizedPolicyValue(policy.targetFlightNo) === targetFlight &&
-          normalizedPolicyValue(policy.targetPosition) === targetPosition
-            ? [policy.mode]
-            : []
+        flightRuleSettings(state).positionTransitionPolicies.flatMap(
+          (policy) =>
+            policy.enabled &&
+            normalizedPolicyValue(policy.targetFlightNo) === targetFlight &&
+            normalizedPolicyValue(policy.targetPosition) === targetPosition
+              ? [policy.mode]
+              : []
         )
       )
     );

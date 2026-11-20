@@ -2,6 +2,7 @@ import { html } from "lit";
 
 import type { ApplicationDialog } from "../../app/application-view-state";
 import type { AppState } from "../../model";
+import { previewFlightIdentityChange } from "../../domain/flights/flight-identity-change";
 import { weekdayLabel } from "../../domain/flights/weekly-flight-plan";
 import { dispatchUiCommand } from "../events/ui-command";
 import { LightDomElement } from "./light-dom-element";
@@ -34,6 +35,13 @@ export class WorkbookImportDialogElement extends LightDomElement {
       restoreFlightConfiguration || this.dialog.replaceSharedTemplates;
     const importsPositionRules =
       this.dialog.mode !== "history" && imported.positionRules !== undefined;
+    const identityPreview =
+      this.dialog.mode !== "history" && imported.flightIdentities !== undefined
+        ? previewFlightIdentityChange(
+            { ...this.model, settings },
+            imported.flightIdentities
+          )
+        : null;
     const importsWeeklyPlan =
       this.dialog.mode !== "history" &&
       imported.weeklyFlightPlans !== undefined;
@@ -78,6 +86,19 @@ export class WorkbookImportDialogElement extends LightDomElement {
         <div class="small text-secondary mb-3">
           配置目标：${this.model.activeGroupId} 组
         </div>
+        ${
+          identityPreview
+            ? html`<div class="alert alert-info" aria-label="航班档案导入影响">
+                <strong>航班长期档案影响 A、B 两组</strong>
+                <p>
+                  将使用文件中的 ${imported.flightIdentities!.length}
+                  个共用档案；两组规则按档案自动共用，已有班表需重新排班。人员、资质及规则内容仍各组独立。
+                </p>
+                ${identityPreview.groups.map((group) => html`<div>${group.groupId}组：${group.affectedRules}处规则关联、${group.historyRecords}条历史归属${group.needsReschedule ? "，已有班表需重排" : ""}</div>`)}
+                ${imported.flightIdentities!.map((identity) => html`<div>${identity.displayName}：${identity.aliases.map((alias) => alias.flightNo).join("、")}</div>`)}
+              </div>`
+            : ""
+        }
         ${
           this.dialog.weeklyPlanPreview
             ? html`<div class="border rounded p-3 mb-3">

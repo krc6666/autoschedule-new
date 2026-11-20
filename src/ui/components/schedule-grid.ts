@@ -174,7 +174,9 @@ export class ScheduleGridElement extends LightDomElement {
       assignment.systemNotes?.some(isHalfRestWarning);
     const ke166Unfilled =
       assignment.status === "unfilled" &&
-      Boolean(flight && rule && isKe166MobileSupervisor(flight, rule));
+      Boolean(
+        flight && rule && isKe166MobileSupervisor(flight, rule, this.model)
+      );
     const timeConflict = this.view.timeConflictAssignmentIds.has(assignment.id);
     const belowPassengerThreshold = Boolean(
       flight && rule && !meetsPassengerThreshold(flight, rule)

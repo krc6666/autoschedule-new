@@ -49,7 +49,12 @@ export function prepareSchedule(
   const tasks = flights.flatMap((flight) =>
     (displayRulesByFlight.get(flight.id) ?? [])
       .filter((rule) =>
-        shouldAutoAssign(flight, rule, state.settings.adminSupportEnabled)
+        shouldAutoAssign(
+          flight,
+          rule,
+          state.settings.adminSupportEnabled,
+          state
+        )
       )
       .map((rule) => ({ key: `${flight.id}:${rule.id}`, flight, rule }))
   );

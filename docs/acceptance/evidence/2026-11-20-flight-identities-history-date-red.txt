@@ -1,0 +1,56 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/domain/flight-identity-integration.test.ts (6 tests | 1 failed) 67ms
+     × history editing resolves inherited jobs at the archived date 17ms
+npm.cmd :
+所在位置 行:2 字符: 1
++ npm.cmd exec vitest -- run tests/domain/flight-identity-integration.t ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/domain/flight-identity-integration.test.ts > 换号后的完整计次与规则链 > history editing resolves inherited jobs at the
+ archived date
+AssertionError: expected [ { …(14) } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "endTime": "23:00",
++     "fatiguePoints": 3,
++     "flightId": "historical-2026-10-20-template-flight-cx937-CX999",
++     "flightNo": "CX999",
++     "id": "assignment-mwotccqr-rysbia",
++     "manualRemark": "",
++     "position": "H02",
++     "positionRuleId": "role",
++     "remark": "一号",
++     "staffId": "1",
++     "staffName": "测试人员",
++     "startTime": "20:00",
++     "status": "assigned",
++     "workHours": 3,
++   },
++ ]
+
+ ❯ tests/domain/flight-identity-integration.test.ts:64:75
+     62|     state.templates = [{ ...state.templates[0]!, flightNo: "CX999" }];
+     63|     state.history = [{ ...state.history[2]!, date: "2026-10-20" }];
+     64|     expect(buildHistoricalScheduleDraft(state, "2026-10-20").assignmen…
+       |                                                                           ^
+     65|     state.history[0]!.date = "2026-11-02";
+     66|     const restored = buildHistoricalScheduleDraft(state, "2026-11-02");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 5 passed (6)
+   Start at  18:05:16
+   Duration  1.61s (transform 1.12s, setup 0ms, import 1.30s, tests 67ms, environment 0ms)

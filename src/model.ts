@@ -251,7 +251,24 @@ export interface FlightPlanConfirmation {
 }
 
 /** Reusable flight planning facts shared by both groups. */
+export interface FlightIdentity {
+  /** Stable reference, independent of seasonal flight numbers. */
+  id: string;
+  displayName: string;
+  aliases: Array<{
+    flightNo: string;
+    from?: string;
+    until?: string;
+    /** Explicit position version to inherit when this number has no own jobs. */
+    positionSourceFlightNo?: string;
+  }>;
+}
+
 export interface SharedScheduleData {
+  /** Cloud write guard distinguishes a directory-aware client from old pages. */
+  flightIdentitySchemaVersion?: 1;
+  /** Missing in older workspaces; never infer relationships from similar names. */
+  flightIdentities?: FlightIdentity[];
   templates: FlightTemplate[];
   weeklyFlightPlans: WeeklyFlightPlanEntry[];
 }

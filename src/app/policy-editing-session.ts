@@ -1,4 +1,6 @@
 import { produce } from "immer";
+import { previewFlightIdentityChange } from "../domain/flights/flight-identity-change";
+import { flightRuleMatches } from "../domain/flights/flight-identities";
 import type { AppState, ScheduleSettings } from "../model";
 import type { MobileSupervisorFillRule } from "../domain/rules/structured-policy-contract";
 import {
@@ -6,10 +8,7 @@ import {
   STATISTICS_TIME_WINDOWS,
 } from "../domain/rules/schedule-settings";
 import { normalizeAirlineMixCodes } from "../domain/rules/airline-mix-policy";
-import {
-  fillPositionMatches,
-  isSameFlightSupervisorFillRule,
-} from "../domain/coverage/supervisor-fill-configuration";
+import { isSameFlightSupervisorFillRule } from "../domain/coverage/supervisor-fill-configuration";
 import { createPolicyCommands } from "./store/policy-commands";
 import type { PolicyValue, SchedulePolicyInput } from "./policy-actions";
 
@@ -166,14 +165,20 @@ export class PolicyEditingSession {
       for (const side of ["source", "target"] as const) {
         const matches = model.positionRules.filter(
           (position) =>
-            fillPositionMatches(
-              position,
+            flightRuleMatches(
+              model,
               rule[`${side}FlightNo`],
-              rule[`${side}PositionKeyword`]
-            ) && position.category === (side === "source" ? "机动督导" : "常规")
+              position.flightNo
+            ) &&
+            position.name
+              .toUpperCase()
+              .includes(rule[`${side}PositionKeyword`].toUpperCase()) &&
+            position.category === (side === "source" ? "机动督导" : "常规")
         );
         draft[`${side}PositionKeyword`] =
-          matches.length === 1 ? matches[0]!.name : "";
+          new Set(matches.map((m) => m.name)).size === 1
+            ? matches[0]!.name
+            : "";
       }
       if (!isSameFlightSupervisorFillRule(rule)) {
         draft.sourceFlightNo = draft.targetFlightNo = "";
@@ -234,6 +239,12 @@ export class PolicyEditingSession {
           "有规则项填写不完整或重复，请补全或删除该项后保存；所有草稿仍保留。"
         );
     }
+    const identityPreview = previewFlightIdentityChange(
+      { ...model, settings: normalized },
+      model.shared.flightIdentities ?? []
+    );
+    if (identityPreview.errors.length)
+      throw new Error(identityPreview.errors.join("；"));
     return normalized;
   }
 

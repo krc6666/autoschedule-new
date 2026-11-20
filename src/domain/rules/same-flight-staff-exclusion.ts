@@ -1,3 +1,4 @@
+import { flightRuleSettings } from "../flights/flight-rule-settings";
 import type { Assignment } from "../../model";
 import type { ScheduleGenerationFacts } from "../shared/scheduling-facts";
 import type { SameFlightStaffExclusion } from "./structured-policy-contract";
@@ -44,7 +45,7 @@ export function matchingSameFlightStaffExclusion(
 ): SameFlightStaffExclusion | undefined {
   if (!firstStaffId || !secondStaffId || firstStaffId === secondStaffId)
     return undefined;
-  return (state.settings.sameFlightStaffExclusions ?? []).find(
+  return (flightRuleSettings(state).sameFlightStaffExclusions ?? []).find(
     (exclusion) =>
       sameFlightStaffExclusionApplies(exclusion, flightNo) &&
       exclusion.staffIds.includes(firstStaffId) &&
@@ -66,7 +67,8 @@ export function sameFlightStaffExclusionViolations(
   const violations: SameFlightStaffExclusionViolation[] = [];
   for (const [flightId, flightAssignments] of assignedByFlight) {
     const flightNo = flightAssignments[0]?.flightNo ?? "";
-    for (const exclusion of state.settings.sameFlightStaffExclusions ?? []) {
+    for (const exclusion of flightRuleSettings(state)
+      .sameFlightStaffExclusions ?? []) {
       if (!sameFlightStaffExclusionApplies(exclusion, flightNo)) continue;
       for (const [firstStaffId, secondStaffId] of sameFlightStaffExclusionPairs(
         exclusion

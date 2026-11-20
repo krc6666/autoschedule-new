@@ -1,0 +1,23 @@
+{
+  "baseline": "resume-baseline/manifest.json",
+  "checked": 58,
+  "restored": [
+    {
+      "path": "docs/acceptance/evidence/2026-11-18-session-approval-rejected.html",
+      "sha256": "f152ec3fa141910127beb749efbe3d5f2e71ae8be89076555af26f87daf62ba7"
+    },
+    {
+      "path": "docs/acceptance/evidence/2026-11-17-history-time-final.json",
+      "sha256": "30cf168406972d6450def4983d30d59e545c62b891ebbf70a6eb153003b14ffb"
+    },
+    {
+      "path": "docs/acceptance/evidence/2026-11-17-latest-view.html",
+      "sha256": "ae7a9e9da27f9696fba333526ec89dc00a66c305acb4ac331eec17de44ce7bf9"
+    },
+    {
+      "path": "docs/acceptance/evidence/2026-11-17-ordinary-dates.html",
+      "sha256": "3b24814b53f869cda108351a378ce25c27df67dff65d9108d5c5d838506aa4f3"
+    }
+  ],
+  "allMatched": true
+}

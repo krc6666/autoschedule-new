@@ -27,7 +27,7 @@ export function placePassivePosition({
   rule,
   displayIndex,
 }: PassivePositionContext): boolean {
-  const ke166MobileSupervisor = isKe166MobileSupervisor(flight, rule);
+  const ke166MobileSupervisor = isKe166MobileSupervisor(flight, rule, state);
   if (
     rule.category === "行政支援" ||
     (!ke166MobileSupervisor &&

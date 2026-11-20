@@ -107,7 +107,7 @@ export function buildOverlapStaffingCheck(
     );
     const vacancy =
       !row.staffId &&
-      shouldAutoAssign(flight, rule, state.settings.adminSupportEnabled);
+      shouldAutoAssign(flight, rule, state.settings.adminSupportEnabled, state);
     return vacancy || filledBySupervisor
       ? [
           {

@@ -1,0 +1,1076 @@
+{
+  "syntheticOnly": true,
+  "productionBuild": true,
+  "origin": "http://127.0.0.1:55432",
+  "checks": [
+    "新建、规则归档案、本组岗位复制及历史原名保留",
+    "未保存离开取消保护、再次保存成功",
+    "按旧航班名搜索共用规则，显示统一名称",
+    "页面统一列显示3次，展开可逐项追溯同日早晚及新号",
+    "配置真实XLSX字节→不同旧值设备导入→完整JSON重启→规则/岗位/统计实际生效",
+    "浏览器持久化重启、桌面及390宽度页面无整页横溢"
+  ],
+  "statisticsText": "人员岗位疲劳\n当日：2026-11-02 · 2026-11累计截至 2026-11-02\n统计月份\n当日岗位疲劳\n月份累计岗位疲劳\n从高到低\n从低到高\n\n按班表记录的疲劳点数逐日累加，包含值班额外疲劳；各月分别计算，同日不重复，不加连续工作惩罚。\n\n人员\t状态\t当日岗位疲劳\t月份累计岗位疲劳\n测试人员\t正常\t3.0\t9.0\n测试同事\t正常\t0.0\t0.0\n月度轮值明细\n2026-11-02 · 值班对应工作班，备勤对应次日休息日\n轮值月份\n下载值班备勤模板\n导入值班备勤表\nCX航前轮换\n值班与备勤轮换\n月度轻松班次统计\n2026-11 · 航班列沿用提前下班口径，每人每天最多一次；点击次数查看日期\n统计月份\n调整统计航班（已选 1 个）\n\n下午空：12:00—18:00 无岗位重叠，之后仍有航班；下午休：没有开始时间晚于 12:00 的航班。仅统计当天实际参加排班的常规人员。\n\n今日提前下班\n任一航班截载晚于 23:00 不计；否则最后航班截载严格早于 12:00，排除当日值班\n今日没有符合节点的提前下班人员\n今日下午无航班\n12:00-18:00 当天该时段有航班，个人无已排岗位重叠才计次；值班和备勤照常计入\n今日没有下午无航班人员\n人员\t国泰统一统计\t下午空\t下午休\n测试人员\t\n0\n\t\n2\n\t\n0\n\n测试同事\t\n0\n\t\n0\n\t\n0\n普通重点岗位\n2026-11 · 只统计集合内岗位；次数进入一般同岗轮换\n统计月份\n全部\nCX / 督导\nCX / G17\nCX / G18\nCX / G20\nFD / 督导/引导\nFD / G07\nFD / G08\nTR / 督导\nTR / H02\nTR / H04\nTR / H05\n人员\t合计\tCX / 督导\tCX / G17\tCX / G18\tCX / G20\tFD / 督导/引导\tFD / G07\tFD / G08\tTR / 督导\tTR / H02\tTR / H04\tTR / H05\n末班重点岗位统计\n2026-11 · 当前统计航班：国泰统一统计 · 实际结束晚于 22:00\n统计月份\n全部\n督导\n一号\n申报\n送资料\n导入次数\n导出次数\n当月次数清零\n督导最高 / 最低\n0 / 0\n允许差值 1\n一号最高 / 最低\n3 / 3\n允许差值 1\n申报最高 / 最低\n0 / 0\n允许差值 2\n送资料最高 / 最低\n0 / 0\n允许差值 2\n人员\t四类合计\t国泰统一统计\n测试人员\t3\t\n3\n一号\n−\n3\n+\n实际 3 · 修正 +0\n11-01 CX937晚 H02、11-01 CX937早 H02、11-02 AB999 H02",
+  "roundtrip": {
+    "identities": [
+      {
+        "id": "flight-mwouys5x-3f5v4r",
+        "displayName": "国泰统一统计",
+        "aliases": [
+          {
+            "flightNo": "CX937早"
+          },
+          {
+            "flightNo": "CX937晚"
+          },
+          {
+            "flightNo": "AB999",
+            "positionSourceFlightNo": "CX937晚"
+          }
+        ]
+      }
+    ],
+    "rules": ["@FLIGHT-MWOUYS5X-3F5V4R"],
+    "columns": ["@FLIGHT-MWOUYS5X-3F5V4R"],
+    "actualNumberOneCount": 3,
+    "originalEvents": [
+      {
+        "date": "2026-11-01",
+        "flightNo": "CX937晚"
+      },
+      {
+        "date": "2026-11-01",
+        "flightNo": "CX937早"
+      },
+      {
+        "date": "2026-11-02",
+        "flightNo": "AB999"
+      }
+    ],
+    "role": [
+      {
+        "name": "H02",
+        "qualifiedStaffIds": ["test-person"]
+      }
+    ]
+  },
+  "pageErrors": [],
+  "finalState": {
+    "version": 12,
+    "shared": {
+      "flightIdentities": [
+        {
+          "id": "flight-mwouys5x-3f5v4r",
+          "displayName": "国泰统一统计",
+          "aliases": [
+            {
+              "flightNo": "CX937早"
+            },
+            {
+              "flightNo": "CX937晚"
+            },
+            {
+              "flightNo": "AB999",
+              "positionSourceFlightNo": "CX937晚"
+            }
+          ]
+        }
+      ],
+      "flightIdentitySchemaVersion": 1,
+      "templates": [
+        {
+          "id": "t0",
+          "flightNo": "CX937早",
+          "startTime": "20:00",
+          "endTime": "23:00",
+          "positions": ["H02"],
+          "remark": "到岗08:05"
+        },
+        {
+          "id": "t1",
+          "flightNo": "CX937晚",
+          "startTime": "20:00",
+          "endTime": "23:00",
+          "positions": ["H02"],
+          "remark": "到岗08:05"
+        },
+        {
+          "id": "t2",
+          "flightNo": "AB999",
+          "startTime": "20:00",
+          "endTime": "23:00",
+          "positions": ["H02"],
+          "remark": "到岗08:05"
+        }
+      ],
+      "weeklyFlightPlans": [
+        {
+          "weekday": 1,
+          "flightNos": []
+        },
+        {
+          "weekday": 2,
+          "flightNos": []
+        },
+        {
+          "weekday": 3,
+          "flightNos": []
+        },
+        {
+          "weekday": 4,
+          "flightNos": []
+        },
+        {
+          "weekday": 5,
+          "flightNos": []
+        },
+        {
+          "weekday": 6,
+          "flightNos": []
+        },
+        {
+          "weekday": 7,
+          "flightNos": []
+        }
+      ]
+    },
+    "groups": {
+      "A": {
+        "flightSeasonOverrides": {
+          "AB999": true
+        },
+        "flightPlanConfirmations": [],
+        "halfRestSelections": [],
+        "leaveTypes": [],
+        "flights": [],
+        "staff": [
+          {
+            "id": "test-person",
+            "name": "测试人员",
+            "staffType": "常规",
+            "teamLeader": true,
+            "cxPreflightQualified": false,
+            "dutyQualified": false,
+            "standbyQualified": true,
+            "nightShift": true,
+            "status": "正常",
+            "remark": ""
+          },
+          {
+            "id": "test-other",
+            "name": "测试同事",
+            "staffType": "常规",
+            "teamLeader": true,
+            "cxPreflightQualified": false,
+            "dutyQualified": false,
+            "standbyQualified": true,
+            "nightShift": true,
+            "status": "正常",
+            "remark": ""
+          }
+        ],
+        "positionRules": [
+          {
+            "id": "p0",
+            "flightNo": "CX937早",
+            "name": "H02",
+            "category": "常规",
+            "remark": "一号",
+            "qualifiedStaffIds": ["test-person"],
+            "manual": false,
+            "fatiguePoints": 4,
+            "minPassengers": 0,
+            "earlyReleaseMinutes": 0
+          },
+          {
+            "id": "p1",
+            "flightNo": "CX937晚",
+            "name": "H02",
+            "category": "常规",
+            "remark": "一号",
+            "qualifiedStaffIds": ["test-person"],
+            "manual": false,
+            "fatiguePoints": 4,
+            "minPassengers": 0,
+            "earlyReleaseMinutes": 0
+          },
+          {
+            "id": "position-mwouysco-my73ns",
+            "flightNo": "AB999",
+            "name": "H02",
+            "category": "常规",
+            "remark": "一号",
+            "qualifiedStaffIds": ["test-person"],
+            "manual": false,
+            "fatiguePoints": 4,
+            "minPassengers": 0,
+            "earlyReleaseMinutes": 0
+          }
+        ],
+        "settings": {
+          "maxDailyHours": 12,
+          "historyWindowDays": 7,
+          "nightStart": "22:00",
+          "nightEnd": "06:00",
+          "consecutiveDayPenalty": 5,
+          "highLoadProtectionEnabled": true,
+          "highLoadFatigueThreshold": 4,
+          "highLoadRecoveryMinutes": 360,
+          "remarkedPositionHighLoad": true,
+          "minimumRegularTransitionMinutes": 90,
+          "rollingLoadProtectionEnabled": true,
+          "rollingLoadWindowMinutes": 360,
+          "rollingLoadMaxFatigue": 8,
+          "positionRotationEnabled": true,
+          "sameDayCrossFlightPriorityEnabled": true,
+          "dailyPrimaryPositionUniqueEnabled": true,
+          "tr121H02CooldownWorkdays": 3,
+          "lateShiftRecoveryEnabled": true,
+          "nextWorkdayRecoveryMode": "prefer",
+          "lateShiftEndTime": "22:00",
+          "teamLeaderConcurrentSupervisionMaxOverlapMinutes": 30,
+          "dutyFatiguePoints": 12,
+          "earlyDepartureCutoffTime": "12:00",
+          "earlyDepartureBalanceEnabled": true,
+          "earlyDepartureMaxDifference": 1,
+          "afternoonRestBalanceEnabled": true,
+          "afternoonRestMaxDifference": 1,
+          "afternoonRestStartTime": "12:00",
+          "afternoonRestEndTime": "18:00",
+          "morningStatsStartTime": "06:00",
+          "morningStatsEndTime": "12:00",
+          "eveningStatsStartTime": "18:00",
+          "eveningStatsEndTime": "06:00",
+          "workloadBalanceEnabled": true,
+          "dailyFlightCountBalanceExemptHalfRest": true,
+          "dailyFlightCountBalanceExemptTeamLeaders": true,
+          "maxWorkHoursDifference": 2,
+          "maxTodayFatigueDifference": 4,
+          "adminSupportEnabled": false,
+          "latePriorityFlightNumbers": ["@FLIGHT-MWOUYS5X-3F5V4R"],
+          "relaxedShiftFlightNumbers": null,
+          "ordinaryPriorityPositions": [
+            {
+              "airlineCode": "CX",
+              "position": "督导"
+            },
+            {
+              "airlineCode": "CX",
+              "position": "G17"
+            },
+            {
+              "airlineCode": "CX",
+              "position": "G18"
+            },
+            {
+              "airlineCode": "CX",
+              "position": "G20"
+            },
+            {
+              "airlineCode": "FD",
+              "position": "督导/引导"
+            },
+            {
+              "airlineCode": "FD",
+              "position": "G07"
+            },
+            {
+              "airlineCode": "FD",
+              "position": "G08"
+            },
+            {
+              "airlineCode": "TR",
+              "position": "督导"
+            },
+            {
+              "airlineCode": "TR",
+              "position": "H02"
+            },
+            {
+              "airlineCode": "TR",
+              "position": "H04"
+            },
+            {
+              "airlineCode": "TR",
+              "position": "H05"
+            }
+          ],
+          "airlineMixPolicies": [
+            {
+              "id": "airline-mix-fd-ak",
+              "enabled": true,
+              "airlineCodes": ["FD", "AK"]
+            }
+          ],
+          "sameFlightStaffExclusions": [
+            {
+              "id": "pair",
+              "enabled": true,
+              "staffIds": ["test-other", "test-person"],
+              "flightNo": "@FLIGHT-MWOUYS5X-3F5V4R"
+            }
+          ],
+          "positionTransitionPolicies": [],
+          "dutyPositionPriorities": [],
+          "nextWorkdayRecoveryTargets": [
+            {
+              "id": "recovery-target-cx937-one",
+              "flightNo": "CX937",
+              "positionKeyword": "一号",
+              "enabled": true
+            },
+            {
+              "id": "recovery-target-cx937-control",
+              "flightNo": "CX937",
+              "positionKeyword": "控制",
+              "enabled": true
+            },
+            {
+              "id": "recovery-target-ke166-one",
+              "flightNo": "KE166",
+              "positionKeyword": "一号",
+              "enabled": true
+            }
+          ],
+          "lateShiftRecoveryPositionRules": [
+            {
+              "id": "late-recovery-supervisor",
+              "enabled": true,
+              "flightNo": "",
+              "matchField": "position",
+              "keyword": "督导",
+              "nextWorkdayCutoffTime": ""
+            },
+            {
+              "id": "late-recovery-one",
+              "enabled": true,
+              "flightNo": "",
+              "matchField": "remark",
+              "keyword": "一号",
+              "nextWorkdayCutoffTime": ""
+            },
+            {
+              "id": "late-recovery-declaration",
+              "enabled": true,
+              "flightNo": "",
+              "matchField": "remark",
+              "keyword": "申报",
+              "nextWorkdayCutoffTime": ""
+            },
+            {
+              "id": "late-recovery-delivery",
+              "enabled": true,
+              "flightNo": "",
+              "matchField": "remark",
+              "keyword": "送资料",
+              "nextWorkdayCutoffTime": ""
+            }
+          ],
+          "mobileSupervisorCoverageRules": [
+            {
+              "id": "supervisor-forbid-one",
+              "enabled": true,
+              "flightNo": "",
+              "matchField": "remark",
+              "keyword": "一号",
+              "mode": "forbid"
+            },
+            {
+              "id": "supervisor-forbid-declare",
+              "enabled": true,
+              "flightNo": "",
+              "matchField": "remark",
+              "keyword": "申报",
+              "mode": "forbid"
+            },
+            {
+              "id": "supervisor-forbid-check",
+              "enabled": true,
+              "flightNo": "",
+              "matchField": "remark",
+              "keyword": "排查",
+              "mode": "forbid"
+            }
+          ],
+          "mobileSupervisorFillRules": [
+            {
+              "id": "ke166-h05-supervisor-fill",
+              "enabled": true,
+              "sourceFlightNo": "KE166",
+              "sourcePositionKeyword": "督导",
+              "targetFlightNo": "KE166",
+              "targetPositionKeyword": "H05",
+              "allowAutomatic": true,
+              "allowManual": true,
+              "requiresConfirmation": true
+            }
+          ],
+          "crossWorkdayQualificationReservations": [],
+          "crossFlightPriorityPolicies": [],
+          "teamLeaderGapFillPositionPolicies": []
+        },
+        "history": [
+          {
+            "id": "h0",
+            "date": "2026-11-01",
+            "flightNo": "CX937早",
+            "position": "H02",
+            "staffId": "test-person",
+            "staffName": "测试人员",
+            "startTime": "20:00",
+            "endTime": "23:00",
+            "workHours": 3,
+            "fatiguePoints": 3,
+            "remark": "一号"
+          },
+          {
+            "id": "h1",
+            "date": "2026-11-01",
+            "flightNo": "CX937晚",
+            "position": "H02",
+            "staffId": "test-person",
+            "staffName": "测试人员",
+            "startTime": "20:00",
+            "endTime": "23:00",
+            "workHours": 3,
+            "fatiguePoints": 3,
+            "remark": "一号"
+          },
+          {
+            "id": "h2",
+            "date": "2026-11-02",
+            "flightNo": "AB999",
+            "position": "H02",
+            "staffId": "test-person",
+            "staffName": "测试人员",
+            "startTime": "20:00",
+            "endTime": "23:00",
+            "workHours": 3,
+            "fatiguePoints": 3,
+            "remark": "一号"
+          }
+        ],
+        "dutyRosterOverrides": [],
+        "latePriorityFrequencyAdjustments": [],
+        "ordinaryPriorityFrequencyAdjustments": [],
+        "assignments": [],
+        "activeScheduleDate": null,
+        "schedulePolicyStale": false
+      },
+      "B": {
+        "leaveTypes": [],
+        "flightSeasonOverrides": {},
+        "flightPlanConfirmations": [],
+        "halfRestSelections": [],
+        "flights": [],
+        "staff": [],
+        "positionRules": [],
+        "settings": {
+          "maxDailyHours": 12,
+          "historyWindowDays": 7,
+          "nightStart": "22:00",
+          "nightEnd": "06:00",
+          "consecutiveDayPenalty": 5,
+          "highLoadProtectionEnabled": true,
+          "highLoadFatigueThreshold": 4,
+          "highLoadRecoveryMinutes": 360,
+          "remarkedPositionHighLoad": true,
+          "minimumRegularTransitionMinutes": 90,
+          "rollingLoadProtectionEnabled": true,
+          "rollingLoadWindowMinutes": 360,
+          "rollingLoadMaxFatigue": 8,
+          "positionRotationEnabled": true,
+          "sameDayCrossFlightPriorityEnabled": true,
+          "dailyPrimaryPositionUniqueEnabled": true,
+          "tr121H02CooldownWorkdays": 3,
+          "lateShiftRecoveryEnabled": true,
+          "nextWorkdayRecoveryMode": "prefer",
+          "lateShiftEndTime": "23:00",
+          "teamLeaderConcurrentSupervisionMaxOverlapMinutes": 30,
+          "dutyFatiguePoints": 12,
+          "earlyDepartureCutoffTime": "12:00",
+          "earlyDepartureBalanceEnabled": true,
+          "earlyDepartureMaxDifference": 1,
+          "afternoonRestBalanceEnabled": true,
+          "afternoonRestMaxDifference": 1,
+          "afternoonRestStartTime": "12:00",
+          "afternoonRestEndTime": "18:00",
+          "morningStatsStartTime": "06:00",
+          "morningStatsEndTime": "12:00",
+          "eveningStatsStartTime": "18:00",
+          "eveningStatsEndTime": "06:00",
+          "workloadBalanceEnabled": true,
+          "dailyFlightCountBalanceExemptHalfRest": true,
+          "dailyFlightCountBalanceExemptTeamLeaders": true,
+          "maxWorkHoursDifference": 2,
+          "maxTodayFatigueDifference": 4,
+          "adminSupportEnabled": false,
+          "latePriorityFlightNumbers": ["CX937", "FD573", "CX931", "TR121"],
+          "relaxedShiftFlightNumbers": null,
+          "ordinaryPriorityPositions": [
+            {
+              "airlineCode": "CX",
+              "position": "督导"
+            },
+            {
+              "airlineCode": "CX",
+              "position": "G17"
+            },
+            {
+              "airlineCode": "CX",
+              "position": "G18"
+            },
+            {
+              "airlineCode": "CX",
+              "position": "G20"
+            },
+            {
+              "airlineCode": "FD",
+              "position": "督导/引导"
+            },
+            {
+              "airlineCode": "FD",
+              "position": "G07"
+            },
+            {
+              "airlineCode": "FD",
+              "position": "G08"
+            },
+            {
+              "airlineCode": "TR",
+              "position": "督导"
+            },
+            {
+              "airlineCode": "TR",
+              "position": "H02"
+            },
+            {
+              "airlineCode": "TR",
+              "position": "H04"
+            },
+            {
+              "airlineCode": "TR",
+              "position": "H05"
+            }
+          ],
+          "airlineMixPolicies": [
+            {
+              "id": "airline-mix-fd-ak",
+              "enabled": true,
+              "airlineCodes": ["FD", "AK"]
+            }
+          ],
+          "sameFlightStaffExclusions": [],
+          "positionTransitionPolicies": [
+            {
+              "id": "transition-cx931-tr121-h02",
+              "name": "TR121 H02 准备保护",
+              "enabled": true,
+              "sourceFlightNo": "CX931",
+              "sourcePositions": ["督导", "G20", "G19"],
+              "targetFlightNo": "TR121",
+              "targetPosition": "H02",
+              "minimumGapMinutes": 180,
+              "mode": "prefer"
+            }
+          ],
+          "dutyPositionPriorities": [
+            {
+              "id": "duty-priority-tr121-h02",
+              "flightNo": "TR121",
+              "positionKeyword": "H02",
+              "enabled": true
+            },
+            {
+              "id": "duty-priority-tw616-one",
+              "flightNo": "TW616",
+              "positionKeyword": "一号",
+              "enabled": true
+            }
+          ],
+          "nextWorkdayRecoveryTargets": [
+            {
+              "id": "recovery-target-cx937-one",
+              "flightNo": "CX937",
+              "positionKeyword": "一号",
+              "enabled": true
+            },
+            {
+              "id": "recovery-target-cx937-control",
+              "flightNo": "CX937",
+              "positionKeyword": "控制",
+              "enabled": true
+            },
+            {
+              "id": "recovery-target-ke166-one",
+              "flightNo": "KE166",
+              "positionKeyword": "一号",
+              "enabled": true
+            }
+          ],
+          "lateShiftRecoveryPositionRules": [
+            {
+              "id": "late-recovery-supervisor",
+              "enabled": true,
+              "flightNo": "",
+              "matchField": "position",
+              "keyword": "督导",
+              "nextWorkdayCutoffTime": ""
+            },
+            {
+              "id": "late-recovery-one",
+              "enabled": true,
+              "flightNo": "",
+              "matchField": "remark",
+              "keyword": "一号",
+              "nextWorkdayCutoffTime": ""
+            },
+            {
+              "id": "late-recovery-declaration",
+              "enabled": true,
+              "flightNo": "",
+              "matchField": "remark",
+              "keyword": "申报",
+              "nextWorkdayCutoffTime": ""
+            },
+            {
+              "id": "late-recovery-delivery",
+              "enabled": true,
+              "flightNo": "",
+              "matchField": "remark",
+              "keyword": "送资料",
+              "nextWorkdayCutoffTime": ""
+            }
+          ],
+          "mobileSupervisorCoverageRules": [
+            {
+              "id": "supervisor-forbid-one",
+              "enabled": true,
+              "flightNo": "",
+              "matchField": "remark",
+              "keyword": "一号",
+              "mode": "forbid"
+            },
+            {
+              "id": "supervisor-forbid-declare",
+              "enabled": true,
+              "flightNo": "",
+              "matchField": "remark",
+              "keyword": "申报",
+              "mode": "forbid"
+            },
+            {
+              "id": "supervisor-forbid-check",
+              "enabled": true,
+              "flightNo": "",
+              "matchField": "remark",
+              "keyword": "排查",
+              "mode": "forbid"
+            }
+          ],
+          "mobileSupervisorFillRules": [
+            {
+              "id": "ke166-h05-supervisor-fill",
+              "enabled": true,
+              "sourceFlightNo": "KE166",
+              "sourcePositionKeyword": "督导",
+              "targetFlightNo": "KE166",
+              "targetPositionKeyword": "H05",
+              "allowAutomatic": true,
+              "allowManual": true,
+              "requiresConfirmation": true
+            }
+          ],
+          "crossWorkdayQualificationReservations": [],
+          "crossFlightPriorityPolicies": [],
+          "teamLeaderGapFillPositionPolicies": []
+        },
+        "history": [],
+        "dutyRosterOverrides": [],
+        "latePriorityFrequencyAdjustments": [],
+        "ordinaryPriorityFrequencyAdjustments": [],
+        "assignments": [],
+        "activeScheduleDate": null,
+        "schedulePolicyStale": false
+      }
+    },
+    "activeGroupId": "A",
+    "leaveTypes": [],
+    "staff": [
+      {
+        "id": "test-person",
+        "name": "测试人员",
+        "staffType": "常规",
+        "teamLeader": true,
+        "cxPreflightQualified": false,
+        "dutyQualified": false,
+        "standbyQualified": true,
+        "nightShift": true,
+        "status": "正常",
+        "remark": ""
+      },
+      {
+        "id": "test-other",
+        "name": "测试同事",
+        "staffType": "常规",
+        "teamLeader": true,
+        "cxPreflightQualified": false,
+        "dutyQualified": false,
+        "standbyQualified": true,
+        "nightShift": true,
+        "status": "正常",
+        "remark": ""
+      }
+    ],
+    "flights": [],
+    "templates": [
+      {
+        "id": "t0",
+        "flightNo": "CX937早",
+        "startTime": "20:00",
+        "endTime": "23:00",
+        "positions": ["H02"],
+        "remark": "到岗08:05"
+      },
+      {
+        "id": "t1",
+        "flightNo": "CX937晚",
+        "startTime": "20:00",
+        "endTime": "23:00",
+        "positions": ["H02"],
+        "remark": "到岗08:05"
+      },
+      {
+        "id": "t2",
+        "flightNo": "AB999",
+        "startTime": "20:00",
+        "endTime": "23:00",
+        "positions": ["H02"],
+        "remark": "到岗08:05"
+      }
+    ],
+    "weeklyFlightPlans": [
+      {
+        "weekday": 1,
+        "flightNos": []
+      },
+      {
+        "weekday": 2,
+        "flightNos": []
+      },
+      {
+        "weekday": 3,
+        "flightNos": []
+      },
+      {
+        "weekday": 4,
+        "flightNos": []
+      },
+      {
+        "weekday": 5,
+        "flightNos": []
+      },
+      {
+        "weekday": 6,
+        "flightNos": []
+      },
+      {
+        "weekday": 7,
+        "flightNos": []
+      }
+    ],
+    "positionRules": [
+      {
+        "id": "p0",
+        "flightNo": "CX937早",
+        "name": "H02",
+        "category": "常规",
+        "remark": "一号",
+        "qualifiedStaffIds": ["test-person"],
+        "manual": false,
+        "fatiguePoints": 4,
+        "minPassengers": 0,
+        "earlyReleaseMinutes": 0
+      },
+      {
+        "id": "p1",
+        "flightNo": "CX937晚",
+        "name": "H02",
+        "category": "常规",
+        "remark": "一号",
+        "qualifiedStaffIds": ["test-person"],
+        "manual": false,
+        "fatiguePoints": 4,
+        "minPassengers": 0,
+        "earlyReleaseMinutes": 0
+      },
+      {
+        "id": "position-mwouysco-my73ns",
+        "flightNo": "AB999",
+        "name": "H02",
+        "category": "常规",
+        "remark": "一号",
+        "qualifiedStaffIds": ["test-person"],
+        "manual": false,
+        "fatiguePoints": 4,
+        "minPassengers": 0,
+        "earlyReleaseMinutes": 0
+      }
+    ],
+    "history": [
+      {
+        "id": "h0",
+        "date": "2026-11-01",
+        "flightNo": "CX937早",
+        "position": "H02",
+        "staffId": "test-person",
+        "staffName": "测试人员",
+        "startTime": "20:00",
+        "endTime": "23:00",
+        "workHours": 3,
+        "fatiguePoints": 3,
+        "remark": "一号"
+      },
+      {
+        "id": "h1",
+        "date": "2026-11-01",
+        "flightNo": "CX937晚",
+        "position": "H02",
+        "staffId": "test-person",
+        "staffName": "测试人员",
+        "startTime": "20:00",
+        "endTime": "23:00",
+        "workHours": 3,
+        "fatiguePoints": 3,
+        "remark": "一号"
+      },
+      {
+        "id": "h2",
+        "date": "2026-11-02",
+        "flightNo": "AB999",
+        "position": "H02",
+        "staffId": "test-person",
+        "staffName": "测试人员",
+        "startTime": "20:00",
+        "endTime": "23:00",
+        "workHours": 3,
+        "fatiguePoints": 3,
+        "remark": "一号"
+      }
+    ],
+    "dutyRosterOverrides": [],
+    "latePriorityFrequencyAdjustments": [],
+    "ordinaryPriorityFrequencyAdjustments": [],
+    "assignments": [],
+    "flightSeasonOverrides": {
+      "AB999": true
+    },
+    "flightPlanConfirmations": [],
+    "halfRestSelections": [],
+    "activeScheduleDate": null,
+    "schedulePolicyStale": false,
+    "settings": {
+      "maxDailyHours": 12,
+      "historyWindowDays": 7,
+      "nightStart": "22:00",
+      "nightEnd": "06:00",
+      "consecutiveDayPenalty": 5,
+      "highLoadProtectionEnabled": true,
+      "highLoadFatigueThreshold": 4,
+      "highLoadRecoveryMinutes": 360,
+      "remarkedPositionHighLoad": true,
+      "minimumRegularTransitionMinutes": 90,
+      "rollingLoadProtectionEnabled": true,
+      "rollingLoadWindowMinutes": 360,
+      "rollingLoadMaxFatigue": 8,
+      "positionRotationEnabled": true,
+      "sameDayCrossFlightPriorityEnabled": true,
+      "dailyPrimaryPositionUniqueEnabled": true,
+      "tr121H02CooldownWorkdays": 3,
+      "lateShiftRecoveryEnabled": true,
+      "nextWorkdayRecoveryMode": "prefer",
+      "lateShiftEndTime": "22:00",
+      "teamLeaderConcurrentSupervisionMaxOverlapMinutes": 30,
+      "dutyFatiguePoints": 12,
+      "earlyDepartureCutoffTime": "12:00",
+      "earlyDepartureBalanceEnabled": true,
+      "earlyDepartureMaxDifference": 1,
+      "afternoonRestBalanceEnabled": true,
+      "afternoonRestMaxDifference": 1,
+      "afternoonRestStartTime": "12:00",
+      "afternoonRestEndTime": "18:00",
+      "morningStatsStartTime": "06:00",
+      "morningStatsEndTime": "12:00",
+      "eveningStatsStartTime": "18:00",
+      "eveningStatsEndTime": "06:00",
+      "workloadBalanceEnabled": true,
+      "dailyFlightCountBalanceExemptHalfRest": true,
+      "dailyFlightCountBalanceExemptTeamLeaders": true,
+      "maxWorkHoursDifference": 2,
+      "maxTodayFatigueDifference": 4,
+      "adminSupportEnabled": false,
+      "latePriorityFlightNumbers": ["@FLIGHT-MWOUYS5X-3F5V4R"],
+      "relaxedShiftFlightNumbers": null,
+      "ordinaryPriorityPositions": [
+        {
+          "airlineCode": "CX",
+          "position": "督导"
+        },
+        {
+          "airlineCode": "CX",
+          "position": "G17"
+        },
+        {
+          "airlineCode": "CX",
+          "position": "G18"
+        },
+        {
+          "airlineCode": "CX",
+          "position": "G20"
+        },
+        {
+          "airlineCode": "FD",
+          "position": "督导/引导"
+        },
+        {
+          "airlineCode": "FD",
+          "position": "G07"
+        },
+        {
+          "airlineCode": "FD",
+          "position": "G08"
+        },
+        {
+          "airlineCode": "TR",
+          "position": "督导"
+        },
+        {
+          "airlineCode": "TR",
+          "position": "H02"
+        },
+        {
+          "airlineCode": "TR",
+          "position": "H04"
+        },
+        {
+          "airlineCode": "TR",
+          "position": "H05"
+        }
+      ],
+      "airlineMixPolicies": [
+        {
+          "id": "airline-mix-fd-ak",
+          "enabled": true,
+          "airlineCodes": ["FD", "AK"]
+        }
+      ],
+      "sameFlightStaffExclusions": [
+        {
+          "id": "pair",
+          "enabled": true,
+          "staffIds": ["test-other", "test-person"],
+          "flightNo": "@FLIGHT-MWOUYS5X-3F5V4R"
+        }
+      ],
+      "positionTransitionPolicies": [],
+      "dutyPositionPriorities": [],
+      "nextWorkdayRecoveryTargets": [
+        {
+          "id": "recovery-target-cx937-one",
+          "flightNo": "CX937",
+          "positionKeyword": "一号",
+          "enabled": true
+        },
+        {
+          "id": "recovery-target-cx937-control",
+          "flightNo": "CX937",
+          "positionKeyword": "控制",
+          "enabled": true
+        },
+        {
+          "id": "recovery-target-ke166-one",
+          "flightNo": "KE166",
+          "positionKeyword": "一号",
+          "enabled": true
+        }
+      ],
+      "lateShiftRecoveryPositionRules": [
+        {
+          "id": "late-recovery-supervisor",
+          "enabled": true,
+          "flightNo": "",
+          "matchField": "position",
+          "keyword": "督导",
+          "nextWorkdayCutoffTime": ""
+        },
+        {
+          "id": "late-recovery-one",
+          "enabled": true,
+          "flightNo": "",
+          "matchField": "remark",
+          "keyword": "一号",
+          "nextWorkdayCutoffTime": ""
+        },
+        {
+          "id": "late-recovery-declaration",
+          "enabled": true,
+          "flightNo": "",
+          "matchField": "remark",
+          "keyword": "申报",
+          "nextWorkdayCutoffTime": ""
+        },
+        {
+          "id": "late-recovery-delivery",
+          "enabled": true,
+          "flightNo": "",
+          "matchField": "remark",
+          "keyword": "送资料",
+          "nextWorkdayCutoffTime": ""
+        }
+      ],
+      "mobileSupervisorCoverageRules": [
+        {
+          "id": "supervisor-forbid-one",
+          "enabled": true,
+          "flightNo": "",
+          "matchField": "remark",
+          "keyword": "一号",
+          "mode": "forbid"
+        },
+        {
+          "id": "supervisor-forbid-declare",
+          "enabled": true,
+          "flightNo": "",
+          "matchField": "remark",
+          "keyword": "申报",
+          "mode": "forbid"
+        },
+        {
+          "id": "supervisor-forbid-check",
+          "enabled": true,
+          "flightNo": "",
+          "matchField": "remark",
+          "keyword": "排查",
+          "mode": "forbid"
+        }
+      ],
+      "mobileSupervisorFillRules": [
+        {
+          "id": "ke166-h05-supervisor-fill",
+          "enabled": true,
+          "sourceFlightNo": "KE166",
+          "sourcePositionKeyword": "督导",
+          "targetFlightNo": "KE166",
+          "targetPositionKeyword": "H05",
+          "allowAutomatic": true,
+          "allowManual": true,
+          "requiresConfirmation": true
+        }
+      ],
+      "crossWorkdayQualificationReservations": [],
+      "crossFlightPriorityPolicies": [],
+      "teamLeaderGapFillPositionPolicies": []
+    },
+    "updatedAt": "2026-11-20T10:50:44.747Z"
+  }
+}

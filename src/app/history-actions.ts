@@ -1,4 +1,5 @@
 import { getDutyRosterForDate } from "../domain/duty-roster/roster";
+import { flightPositionSource } from "../domain/flights/flight-identities";
 import { assignmentUsesUnavailableStaff } from "../domain/kernel/schedule-state";
 import { isCountedWorkloadAssignment } from "../domain/shared/workload-accounting";
 import type { AppState, HistoryRecord } from "../model";
@@ -51,9 +52,14 @@ export function buildHistoricalScheduleDraft(
   ];
   const unmatchedFlightNos = new Set<string>();
   const flights = flightNos.flatMap((flightNo) => {
+    const positionSource = flightPositionSource(state, flightNo, date);
     const source =
       state.templates.find((item) => item.flightNo === flightNo) ??
-      state.flights.find((item) => item.flightNo === flightNo);
+      state.flights.find((item) => item.flightNo === flightNo) ??
+      (positionSource !== flightNo
+        ? (state.templates.find((item) => item.flightNo === positionSource) ??
+          state.flights.find((item) => item.flightNo === positionSource))
+        : undefined);
     if (!source) {
       unmatchedFlightNos.add(flightNo);
       return [];
@@ -81,10 +87,15 @@ export function buildHistoricalScheduleDraft(
     const last = [...timedRecords].sort(
       (a, b) => b.interval[1] - a.interval[1]
     )[0];
+    if (positionSource !== flightNo && (!first || !last)) {
+      unmatchedFlightNos.add(flightNo);
+      return [];
+    }
     return [
       {
         ...source,
-        id: `historical-${date}-${source.id}`,
+        flightNo,
+        id: `historical-${date}-${source.id}-${flightNo}`,
         startTime: first?.startTime ?? source.startTime,
         endTime: last?.endTime ?? source.endTime,
         bookedPassengers:
@@ -95,8 +106,8 @@ export function buildHistoricalScheduleDraft(
     ];
   });
   const assignments = flights.flatMap((flight) =>
-    activeFlightRules(state, flight).map((rule) =>
-      makeUnfilled(flight, rule.name, rule)
+    activeFlightRules({ ...state, flightIdentityDate: date }, flight).map(
+      (rule) => makeUnfilled(flight, rule.name, rule)
     )
   );
   const unmatched = new Set(assignableRecords.map((record) => record.id));

@@ -53,14 +53,15 @@ export interface FinalizeMobileSupervisorsOptions {
 }
 
 function mobileSupervisorTasks(
+  state: ScheduleGenerationFacts,
   preparation: SchedulePreparation
 ): AssignmentTask[] {
   return preparation.tasks
     .filter((task) => isMobileSupervisor(task.flight, task.rule))
     .sort(
       (left, right) =>
-        Number(!isKe166MobileSupervisor(left.flight, left.rule)) -
-        Number(!isKe166MobileSupervisor(right.flight, right.rule))
+        Number(!isKe166MobileSupervisor(left.flight, left.rule, state)) -
+        Number(!isKe166MobileSupervisor(right.flight, right.rule, state))
     );
 }
 
@@ -72,7 +73,7 @@ export async function finalizeMobileSupervisors({
   preparation,
   lockedAssignmentIds,
 }: FinalizeMobileSupervisorsOptions): Promise<Assignment[]> {
-  const tasks = mobileSupervisorTasks(preparation);
+  const tasks = mobileSupervisorTasks(state, preparation);
   const processedTasks = new Set(
     preparation.tasks
       .filter((task) => !isMobileSupervisor(task.flight, task.rule))
@@ -126,7 +127,7 @@ export async function finalizeMobileSupervisors({
   };
 
   for (const task of tasks) {
-    const ke166 = isKe166MobileSupervisor(task.flight, task.rule);
+    const ke166 = isKe166MobileSupervisor(task.flight, task.rule, state);
     const searchFailureNotes: string[] = [];
     const recordSearchFailure: Parameters<
       typeof assignMobileSupervisorByCounterCoverage

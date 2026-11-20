@@ -402,7 +402,7 @@ export function buildCandidatePriority(
         futureTask.key !== taskKey &&
         !processedTasks.has(futureTask.key) &&
         futureTask.flight.id !== flight.id &&
-        isKe166MobileSupervisor(futureTask.flight, futureTask.rule) &&
+        isKe166MobileSupervisor(futureTask.flight, futureTask.rule, state) &&
         eligibleStaffIds.get(futureTask.key)?.has(person.id) &&
         eligibleCounts.get(futureTask.key) === 1 &&
         intervalsOverlap(

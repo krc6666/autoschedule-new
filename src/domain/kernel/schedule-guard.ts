@@ -1,6 +1,7 @@
 import { isSupervisorFillTarget } from "../coverage/supervisor-fill-configuration";
 import type { Assignment, PositionRule } from "../../model";
 import type { ScheduleGenerationFacts } from "../shared/scheduling-facts";
+import type { FlightIdentityFacts } from "../flights/flight-identities";
 import {
   minimumFlightTransitionMessage,
   minimumFlightTransitionViolationBetweenTasks,
@@ -97,7 +98,8 @@ export type MinimumFlightTransitionFacts = Pick<
 >;
 
 export type LateShiftCutoffFacts = {
-  state: Pick<ScheduleGenerationFacts, "history" | "settings">;
+  state: Pick<ScheduleGenerationFacts, "history" | "settings"> &
+    FlightIdentityFacts;
   date: string;
   crossDayRecovery?: CrossDayRecoveryFacts;
 };
@@ -126,7 +128,7 @@ export type PositionRotationFacts = {
 };
 
 export type PositionTransitionFacts = {
-  state: Pick<ScheduleGenerationFacts, "settings">;
+  state: Pick<ScheduleGenerationFacts, "settings"> & FlightIdentityFacts;
 };
 
 export type WorkloadBalanceFacts = {
@@ -161,7 +163,8 @@ export interface ScheduleGuardContext {
   scarceQualificationFacts?: SnapshotRuleFacts;
   dutyPositionFacts?: SnapshotRuleFacts;
   sameFlightStaffExclusionFacts?: {
-    state: Pick<ScheduleGenerationFacts, "settings" | "staff">;
+    state: Pick<ScheduleGenerationFacts, "settings" | "staff"> &
+      FlightIdentityFacts;
   };
   dailyPrimaryPositionFacts?: {
     state: Pick<

@@ -3,6 +3,11 @@ import {
   parseFlightSeasonOverrides,
 } from "./flight-season-excel";
 import {
+  appendFlightIdentities,
+  parseFlightIdentities,
+} from "./flight-identities-excel";
+import type { FlightIdentity } from "../model";
+import {
   appendFlightPlanConfirmations,
   parseFlightPlanConfirmations,
 } from "./flight-plan-confirmations-excel";
@@ -86,6 +91,8 @@ import {
 } from "../domain/staff-status";
 
 export interface WorkbookImport {
+  flightIdentities?: FlightIdentity[];
+  flightIdentityErrors?: string[];
   flightSeasonOverrides?: Record<string, boolean>;
   flightPlanConfirmations?: FlightPlanConfirmation[];
   halfRestSelections?: HalfRestSelection[];
@@ -977,6 +984,7 @@ export function parseWorkbook(
   const halfRest = parseHalfRestSelections(workbook);
   const flightPlanConfirmations = parseFlightPlanConfirmations(workbook);
   const flightSeasonOverrides = parseFlightSeasonOverrides(workbook);
+  const flightIdentities = parseFlightIdentities(workbook);
   if (ordinaryPriorityPositions.present) {
     parsedRules.settings = {
       ...(parsedRules.settings ?? {}),
@@ -984,6 +992,7 @@ export function parseWorkbook(
     };
   }
   const warnings = [
+    ...flightIdentities.errors,
     ...flightConfigurationErrors,
     ...halfRest.warnings,
     ...flightPlanConfirmations.warnings,
@@ -1016,6 +1025,7 @@ export function parseWorkbook(
   if (weeklyFlightPlanImport?.status === "invalid")
     warnings.push(weeklyFlightPlanImport.warning);
   const hasStandardSheet = Boolean(
+    workbook.Sheets["航班长期档案"] ||
     workbook.Sheets["航班换季确认"] ||
     workbook.Sheets["半休选择"] ||
     workbook.SheetNames.some((name) => name.includes("休假类别")) ||
@@ -1059,6 +1069,7 @@ export function parseWorkbook(
   if (positionRules?.length === 0 && sheetHasDataRows(workbook, ["岗位配置"]))
     warnings.push("岗位配置工作表没有有效数据");
   if (
+    !workbook.Sheets["航班长期档案"] &&
     !workbook.Sheets["航班换季确认"] &&
     !workbook.Sheets["本季航班状态"] &&
     !staff &&
@@ -1077,6 +1088,8 @@ export function parseWorkbook(
   )
     warnings.push("未识别到受支持的工作表");
   return {
+    flightIdentities: flightIdentities.value,
+    flightIdentityErrors: flightIdentities.errors,
     leaveTypes: parsedLeaveTypes.types,
     flightSeasonOverrides: flightSeasonOverrides.value,
     staff,
@@ -1365,6 +1378,7 @@ export function buildConfigWorkbook(state: AppState): XLSX.WorkBook {
   appendHalfRestSelections(workbook, state.halfRestSelections ?? []);
   appendFlightPlanConfirmations(workbook, state.flightPlanConfirmations ?? []);
   appendFlightSeasonOverrides(workbook, state.flightSeasonOverrides);
+  appendFlightIdentities(workbook, state.shared.flightIdentities);
   return workbook;
 }
 

@@ -88,7 +88,9 @@ export function buildWorkloadTasks(state: WorkloadFacts): WorkloadTask[] {
   return state.flights.flatMap((flight) =>
     activeFlightRules(state, flight)
       .filter(
-        (rule) => rule.category !== "行政支援" && shouldAutoAssign(flight, rule)
+        (rule) =>
+          rule.category !== "行政支援" &&
+          shouldAutoAssign(flight, rule, false, state)
       )
       .map((rule) => ({
         flight,

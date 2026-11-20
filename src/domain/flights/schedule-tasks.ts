@@ -1,4 +1,8 @@
 import type { Flight, PositionRule } from "../../model";
+import {
+  flightHasSpecialRule,
+  type FlightIdentityFacts,
+} from "./flight-identities";
 import { timeToMinutes } from "../shared/time";
 
 export interface AssignmentTask {
@@ -34,13 +38,11 @@ export function mustAutoFillPreNoon(
 
 export function isKe166MobileSupervisor(
   flight: Flight,
-  rule: PositionRule
+  rule: PositionRule,
+  context: FlightIdentityFacts = {}
 ): boolean {
   return (
-    flight.flightNo
-      .trim()
-      .toUpperCase()
-      .replaceAll(/[^A-Z0-9]/g, "") === "KE166" &&
+    flightHasSpecialRule(context, flight.flightNo, "KE166") &&
     isMobileSupervisor(flight, rule)
   );
 }
@@ -59,9 +61,10 @@ export function isNumberedRegularPosition(rule: PositionRule): boolean {
 export function shouldAutoAssign(
   flight: Flight,
   rule: PositionRule,
-  administrativeSupportEnabled = false
+  administrativeSupportEnabled = false,
+  context: FlightIdentityFacts = {}
 ): boolean {
-  if (isKe166MobileSupervisor(flight, rule)) return true;
+  if (isKe166MobileSupervisor(flight, rule, context)) return true;
   if (mustAutoFillPreNoon(flight, rule)) return true;
   if (rule.category === "行政支援") {
     return (

@@ -1,0 +1,65 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/app/flight-identity-transfer.test.ts (7 tests | 1 failed) 351ms
+     × a directory-only import inherits each group's own position source without overwriting existing jobs 53ms
+ ❯ tests/domain/flight-identity-integration.test.ts (5 tests | 1 failed) 52ms
+     × historical role evidence uses the exact original job before another version of the same identity 17ms
+npm.cmd :
+所在位置 行:2 字符: 1
++ npm.cmd exec vitest -- run tests/app/flight-identity-transfer.test.ts ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/app/flight-identity-transfer.test.ts > 航班档案事务与跨设备 > a directory-only import inherits each group's own posi
+tion source without overwriting existing jobs
+AssertionError: expected undefined to match object { qualifiedStaffIds: [ '1' ] }
+
+- Expected:
+{
+  "qualifiedStaffIds": [
+    "1",
+  ],
+}
+
++ Received:
+undefined
+
+ ❯ tests/app/flight-identity-transfer.test.ts:24:67
+     22|     state.groups.B.positionRules = [otherSource];
+     23|     expect(applyWorkbookImport(state, { flightIdentities: identities, …
+     24|     expect(state.positionRules.find(r => r.flightNo === "AB999")).toMa…
+       |                                                                   ^
+     25|     expect(state.groups.B.positionRules.find(r => r.flightNo === "AB99…
+     26|     const next = state.positionRules.find(r => r.flightNo === "AB999")…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/domain/flight-identity-integration.test.ts > 换号后的完整计次与规则链 > historical role evidence uses the exact origin
+al job before another version of the same identity
+AssertionError: expected +0 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ tests/domain/flight-identity-integration.test.ts:40:49
+     38|     state.history = [{ ...state.history[1]!, remark: "", assignmentRem…
+     39|     const row = buildMonthlyLatePriorityStatistics(state, "2026-11-20"…
+     40|     expect(row.categories["一号"].effectiveCount).toBe(1);
+       |                                                 ^
+     41|     expect(row.categories["报关"].effectiveCount).toBe(0);
+     42|     const profile = latePriorityFrequencyProfileForRule(state, staff.i…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  2 failed | 10 passed (12)
+   Start at  17:53:48
+   Duration  4.19s (transform 2.57s, setup 0ms, import 3.21s, tests 403ms, environment 0ms)

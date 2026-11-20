@@ -1,0 +1,207 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-20-flight-identities",
+  "title": "航班长期身份、换季规则与统计统一",
+  "startedFrom": "e0199c9f3df32faf9103f5f86861f1739c1bc232",
+  "expectation": {
+    "example": "将CX937早、CX937晚、CX937及完全换号后的CX999明确认定为同一航班；同日早晚两班分别有真实岗位及历史，并有各自人工次数和清零记录。",
+    "expected": "集中维护长期航班档案，组内航班规则自动共用，模板岗位按明确版本承接，统计统一列且明细保留原名称；保存、切组、Excel和完整恢复保持效果，Worker及最终检查读取同一关系。",
+    "unchanged": "不推测真实对应关系，不改历史名称、时刻、人员、工时及点数；实际早晚两班不合并，A/B人员和规则独立，普通重点保持航司加岗位，早走每天一次且显示筛选不改变均衡。",
+    "fallback": "坏目录、日期重叠、冲突规则、失效预览和未知稳定引用拒绝整个变更；不写真实生产迁移。旧无目录资料按原精确名称，不能猜配。已有用户改动及原证据保留。"
+  },
+  "testedVersion": "f16b00131bd0f7114298eab9562ee7f444189dbdb530ed97c14df888b2e41f14",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "先记录坏输入、预览/日期、重复冲突规则、草稿失败、账本、部分导入岗位、历史版本与页面追溯的实际失败，再用最终定向回归复验。失败日志保留原运行版本的行号，不冒充最终源码位置。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-20-flight-identities-editing-red.txt",
+          "summary": "草稿保护、第二次保存和存储失败的3项原失败",
+          "sha256": "81e46d13c91fd71b4b47cbb11c5ad026878793887ac8274b9bbbec00ab72362e"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-20-flight-identities-maintenance-red.txt",
+          "summary": "损坏输入、日期岗位来源、预览、规则冲突/去重和账本失败",
+          "sha256": "330e5c935358a4804f5bed5ea7caeac47d94b67334f47bdf343c6d0280a6c385"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-20-flight-identities-boundaries-red.txt",
+          "summary": "部分目录导入漏承接岗位、历史计次误取另一版本的实际失败",
+          "sha256": "724b201617490cc239150fb0ed30078248183a0b3879edbbb7ec1673524458a2"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-20-flight-identities-history-date-red.txt",
+          "summary": "历史编辑漏传归档日期的实际失败（合成资料，人员标签脱敏）",
+          "sha256": "43257d01a6fad8ce18d7035b0b544247ee21a8717833580d9edbe8a3fd84fcda"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-20-flight-identities-detail-red.txt",
+          "summary": "归并后明细漏原航班号的页面失败",
+          "sha256": "e5ab6b7dd01c1651d5914230b2fdce626f38bcd40b5a0640b1ad7764a7e7130e"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-20-flight-identities-database-normalization-red.txt",
+          "summary": "数据库重复统一名空白规范化遗漏的失败",
+          "sha256": "edf403efeca13ab51e1b56dedc366d34f932405651ca7263e2d2b7e0c7770904"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-20-flight-identities-database-type-red.txt",
+          "summary": "数据库错误类型岗位来源遗漏的失败",
+          "sha256": "9fc16a9af951b76416b86667c9c9da8e0983aa695ae44d0823d1a36584cd2c1e"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-20-flight-identities-targeted.txt",
+          "summary": "修复后的最终定向通过",
+          "sha256": "c4be294d38ec127c7089cea5ea249ce834b6f3968cdb6d20549fdb431b81e4ca"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "配置→航班长期档案实际新建和连续保存，组内规则稳定引用、组内岗位承接；统计统一列显示3次，明细分别保留同日早晚及新号。真实浏览器运行生产构建的隔离入口。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-20-flight-identities-browser.json",
+          "summary": "生产构建Edge隔离页面检查与匿名最终资料",
+          "sha256": "a83be063c4c4e01a08bab7fc2b7757eab1feca9989d991e2ae1e0221826edd1f"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-20-flight-identities-targeted.txt",
+          "summary": "domain/app/UI集中路径回归",
+          "sha256": "c4be294d38ec127c7089cea5ea249ce834b6f3968cdb6d20549fdb431b81e4ca"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "两组、第二套完全不同号码、日期边界、原号复用、多义/坏目录、旧无目录、缺/空表、部分导入、不同旧值目标、次数编号、重复导入、完整JSON及重启均已隔离验证。数据库只使用PGlite，不写真实Supabase。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-20-flight-identities-targeted.txt",
+          "summary": "迁移、两组、Worker/SQL和字段合同最终通过",
+          "sha256": "c4be294d38ec127c7089cea5ea249ce834b6f3968cdb6d20549fdb431b81e4ca"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-20-flight-identities-boundaries-green.txt",
+          "summary": "部分导入与历史岗位版本相关66项",
+          "sha256": "3d25fe92639feffc14be634f15759327c88725cad44edc3ea2e449895f85e185"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-20-flight-identities-field-contract.txt",
+          "summary": "独立扫描规则模型发现新增航班目标漏登记",
+          "sha256": "ff6b068d47114b85f1021ea888c4037ab89c7ea9b15775f0ae8c58a87cfdd4a0"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-20-flight-identities-browser.json",
+          "summary": "真实XLSX字节→不同旧值目标→JSON恢复→规则岗位统计实际使用",
+          "sha256": "a83be063c4c4e01a08bab7fc2b7757eab1feca9989d991e2ae1e0221826edd1f"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "旧改号入口不重写原人工账本，先来源截断/清零再汇总。补差开关统一引用，历史编辑用归档日期；手调后预览失效，同档案不同实际班次不互相占用。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-20-flight-identities-targeted.txt",
+          "summary": "账本、补差、手调指纹、显式改号及后置链路最终回归",
+          "sha256": "c4be294d38ec127c7089cea5ea249ce834b6f3968cdb6d20549fdb431b81e4ca"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-20-flight-identities-history-date-green.txt",
+          "summary": "归档日期岗位承接及原历史流程23项通过",
+          "sha256": "c29d65a1a227e95ecaf9b2a87362630a448ac904d2d5fa364bb9b19b91ca074c"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "真实Worker handler和WASM生成8岗位无空缺，保留900条历史；先合法分开班次，再破坏同班互斥由独立最终守卫拒绝。目录变更后旧安全凭证/Worker结果不能安装。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-20-flight-identities-targeted.txt",
+          "summary": "真实Worker/WASM、最终后置破坏及旧结果拒绝回归",
+          "sha256": "c4be294d38ec127c7089cea5ea249ce834b6f3968cdb6d20549fdb431b81e4ca"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "实际班次/原历史/工时点数不改，原来源账本不重写；早走每日一次和显示筛选不改均衡，普通重点仍航司加岗位。全量功能在原时间标准下通过；最终页面改动另外定向复验。性能为本机单worker实测，不宣称生产性能或性能改善。 本次按内容拆分后的独立提交树另完成完整npm run verify：功能250文件2364项、性能7文件20项及类型检查、生产构建通过；未包含历史临时岗位等其他任务。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-20-flight-identities-functional.txt",
+          "summary": "249文件2371项完整功能通过（后续小范围变更另有最终定向）",
+          "sha256": "02e9ccf9ddd6839fd6e0eb38dda83b034b0087ab3d0f9fb2936a951af2906876"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-20-flight-identities-performance.txt",
+          "summary": "完整性能通道及新增启用档案900历史分支，沿原阈值",
+          "sha256": "30be58a7641bac9f1f612299fd5b8973866ee486cd2e164c80272e48a1b02366"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-20-flight-identities-targeted.txt",
+          "summary": "最终变更直接消费者通过",
+          "sha256": "c4be294d38ec127c7089cea5ea249ce834b6f3968cdb6d20549fdb431b81e4ca"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-20-flight-identities-typecheck.txt",
+          "summary": "类型检查；最终构建亦包含tsc检查",
+          "sha256": "4b3f7cf1ed06cba39ee3b0608990fffcf42e1ff315949a5353a62ce478a2683c"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-20-flight-identities-build.txt",
+          "summary": "最终生产构建",
+          "sha256": "d0305258c7875a7a9670f22889493f5a24322e43aaa1584c983c7eb17b3670eb"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-20-flight-identities-commit-verify.txt",
+          "summary": "本次独立提交内容的完整verify实际输出，原阈值、单worker",
+          "sha256": "e215573d0fc80422ebe0334b608c6cd39bc51858cb91e003a4243f0484074d34"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "verified",
+      "reason": "实际Edge运行生产构建的隔离应用入口，合成人员、拦截外网；新建/连续保存/离开取消/旧号搜索/3次独立事件/真实XLSX与JSON重启/1440及390px/无页面异常已核对。不是Owner真实资料归属确认，不是线上部署或真实数据库验收。 本次独立提交树重新构建并重跑相同隔离页面检查，六条操作通过，未连接真实云资料。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-20-flight-identities-browser.json",
+          "summary": "生产构建页面输出、3个原始事件与迁移后实际效果",
+          "sha256": "a83be063c4c4e01a08bab7fc2b7757eab1feca9989d991e2ae1e0221826edd1f"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-20-flight-identities-desktop.png",
+          "summary": "桌面档案维护实际截图",
+          "sha256": "ff004ab509fbd3bd7a9af70af0a14c604e313f7056e2e7eb7c12773dea6582aa"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-20-flight-identities-mobile.png",
+          "summary": "390px档案页面实际截图",
+          "sha256": "869a44c8a92d23809a50536de267f07a7bfd1b6ea45235f05e27402dd88f612f"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-20-flight-identities-statistics.png",
+          "summary": "统一列3次及展开的原号明细实际截图",
+          "sha256": "3550ee1cd7cdbb689d6a93e3865665f41adfcd6ac4514473220b0d7551f2e792"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-20-flight-identities-browser-run.txt",
+          "summary": "生产构建隔离浏览器实际运行日志",
+          "sha256": "afa5a641a3c6c3856b652a47df2868988e13aa596e1147dfd198d476027c99b8"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "维护、草稿、岗位来源、历史日期和明细原号均保留修改前失败日志；最终targeted与完整功能输出证明修复。CX937实际对应由Owner明确，其他真实航班不猜。",
+    "laterChanges": "显式改号、清零、导入、切组、云保存草稿、手调、历史编辑、Worker返回和最终安装均可能漏接；对应事务、账本、日期、字段清单和合法后破坏回归保护。真实云端仍需授权迁移后验收。",
+    "finalArtifact": "同日前缀browser.json和desktop/mobile截图来自生产构建的隔离Edge入口；页面3次与三个原始事件独立对照，XLSX/JSON重启后规则/岗位/统计保留。源码和本机隔离交付完成，本次仅授权Git提交，未推送部署或改真实库。"
+  },
+  "review": {
+    "missedScope": "重点查草稿与正式状态、部分导入岗位、同档案不同岗位备注、归档日期、人工账本非线性截断、旧凭证、次数文件稳定编号及手机溢出，均实际发现遗漏并补回归。真实云库/多设备/现场资料未执行，保留为上线边界，不冒充已验。",
+    "rootCause": "旧flightNo兼任实际班次名称与长期业务身份；局部增加目录后，各保存/统计/规则/最终校验路径未完整传播，导致局部测试绿仍会漏行为。仅合表头、机械改号或重写历史账本无法满足长期维护。",
+    "earlyDetection": "设计时先列传播矩阵，新增目标用独立TypeScript模型扫描对照注册清单；新字段核对XLSX/JSON/重启实际使用。编码前保留失败证据，交付前从连续编辑、部分导入和后置破坏走到生产构建页面，并独立对账原事件。"
+  }
+}

@@ -1,0 +1,77 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+npm.cmd : stderr | tests/ui/flight-identity-editing.test.ts
+所在位置 行:2 字符: 1
++ npm.cmd exec vitest -- run tests/ui/flight-identity-editing.test.ts * ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (stderr | tests/...editing.test.ts:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+
+ ❯ tests/ui/flight-identity-editing.test.ts (3 tests | 3 failed) 850ms
+   × protects an unblurred directory draft on navigation, group switch and export 299ms
+   × resets the saved preview so a second edit can be saved 315ms
+   × retains both formal state and editable draft when storage rejects a save 235ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/ui/flight-identity-editing.test.ts > protects an unblurred directory draft on navigation, group switch and
+ export
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/ui/flight-identity-editing.test.ts:39:39
+     37|   const x = await mount(); await x.edit("国泰统一");
+     38|   expect(x.store.getState().model.shared.flightIdentities![0]!.display…
+     39|   expect(x.mounted.hasUnsavedRules()).toBe(true);
+       |                                       ^
+     40|   await x.app.commandHandler.handle({ type: "navigate", section: "poli…
+     41|   expect(x.app.view.section).toBe("config");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  tests/ui/flight-identity-editing.test.ts > resets the saved preview so a second edit can be saved
+AssertionError: expected '第一版' to be '第二版' // Object.is equality
+
+Expected: "第二版"
+Received: "第一版"
+
+ ❯ tests/ui/flight-identity-editing.test.ts:56:77
+     54|   expect(x.mounted.hasUnsavedRules()).toBe(false);
+     55|   await x.edit("第二版"); await x.save();
+     56|   expect(x.store.getState().model.shared.flightIdentities![0]!.display…
+       |                                                                             ^
+     57|   expect(x.mounted.hasUnsavedRules()).toBe(false);
+     58| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  tests/ui/flight-identity-editing.test.ts > retains both formal state and editable draft when storage rejects a s
+ave
+AssertionError: expected '存储失败草稿' to be '国泰' // Object.is equality
+
+Expected: "国泰"
+Received: "存储失败草稿"
+
+ ❯ tests/ui/flight-identity-editing.test.ts:62:77
+     60| it("retains both formal state and editable draft when storage rejects …
+     61|   const x = await mount(true); await x.edit("存储失败草稿"); await x.save();
+     62|   expect(x.store.getState().model.shared.flightIdentities![0]!.display…
+       |                                                                             ^
+     63|   expect(x.mounted.hasUnsavedRules()).toBe(true);
+     64|   expect(x.root.querySelector<HTMLInputElement>('[aria-label="航班档案统一名称…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  3 failed (3)
+   Start at  17:22:33
+   Duration  4.62s (transform 2.58s, setup 0ms, import 3.03s, tests 850ms, environment 519ms)

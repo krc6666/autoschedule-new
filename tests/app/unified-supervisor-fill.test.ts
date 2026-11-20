@@ -1,3 +1,4 @@
+import { flightIdentityKey } from "../../src/domain/flights/flight-identities";
 // @vitest-environment happy-dom
 import { describe, expect, it } from "vitest";
 import * as XLSX from "xlsx-js-style";
@@ -505,9 +506,15 @@ describe("unified supervisor fill configuration", () => {
       page.querySelector<HTMLSelectElement>(
         '[aria-label="编辑督导补位关系"] [aria-label="航班"]'
       )!.value
-    ).toBe("F200");
+    ).toBe(flightIdentityKey(renamed, "F200"));
 
-    expect(page.textContent).not.toContain("F100");
+    const selector = page.querySelector<HTMLSelectElement>(
+      '[aria-label="编辑督导补位关系"] [aria-label="航班"]'
+    )!;
+    expect(
+      [...selector.options].some((option) => option.value === "F100")
+    ).toBe(false);
+    expect(page.textContent).toContain("F100"); // original alias remains traceable
   });
 
   it("imports old relationship and position-only workbooks conservatively", () => {

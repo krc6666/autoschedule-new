@@ -1,6 +1,8 @@
 import { createStore, type StoreApi } from "zustand/vanilla";
 import { immer } from "zustand/middleware/immer";
 import { produce } from "immer";
+import { applyFlightIdentityChange } from "../flight-identity-actions";
+import type { FlightIdentity } from "../../model";
 import { markActiveScheduleStale } from "../../domain/kernel/schedule-lifecycle";
 
 import { createDefaultState } from "../../defaults";
@@ -34,6 +36,10 @@ export interface AutoscheduleStoreState {
   markExported(): void;
   persist(): StateSaveResult;
   savePolicySettings(settings: ScheduleSettings): StateSaveResult;
+  saveFlightIdentities(
+    identities: FlightIdentity[],
+    fingerprint: string
+  ): StateSaveResult;
   reset(): void;
 }
 
@@ -195,6 +201,21 @@ export function createAutoscheduleStore(
         persist: () => {
           set((store) => syncActiveGroupProjection(store.model));
           const result = options.persistence.save(get().model);
+          set({ model: result.state });
+          dirty = false;
+          return result;
+        },
+        saveFlightIdentities: (identities, fingerprint) => {
+          const candidate = produce(get().model, (model) => {
+            const change = applyFlightIdentityChange(
+              model,
+              identities,
+              fingerprint
+            );
+            if (!change.ok) throw new Error(change.message);
+            syncActiveGroupProjection(model);
+          });
+          const result = options.persistence.save(candidate);
           set({ model: result.state });
           dirty = false;
           return result;

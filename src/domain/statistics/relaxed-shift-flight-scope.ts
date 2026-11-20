@@ -1,5 +1,6 @@
 import type { SchedulingFacts } from "../shared/scheduling-facts";
 import { normalizeWeeklyFlightNo } from "../flights/weekly-flight-plan";
+import { flightIdentityKey } from "../flights/flight-identities";
 
 export function normalizeRelaxedShiftFlights(
   values: readonly string[]
@@ -18,7 +19,7 @@ export function relaxedShiftFlightScope(state: SchedulingFacts): {
   candidates: string[];
   selected: string[];
 } {
-  const candidates = normalizeRelaxedShiftFlights([
+  const rawCandidates = normalizeRelaxedShiftFlights([
     ...state.templates.map((f) => f.flightNo),
     ...state.flights.map((f) => f.flightNo),
     ...state.positionRules.map((r) => r.flightNo),
@@ -30,13 +31,22 @@ export function relaxedShiftFlightScope(state: SchedulingFacts): {
       .map((a) => a.flightNo),
     ...(state.settings.relaxedShiftFlightNumbers ?? []),
   ]);
+  const candidates = normalizeRelaxedShiftFlights(
+    rawCandidates.map((no) => flightIdentityKey(state, no))
+  );
   return {
     candidates,
     selected:
       state.settings.relaxedShiftFlightNumbers === null
-        ? candidates.filter((no) => /^(MF|CX)\d/.test(no))
+        ? normalizeRelaxedShiftFlights(
+            rawCandidates
+              .filter((no) => /^(MF|CX)\d/.test(no))
+              .map((no) => flightIdentityKey(state, no))
+          )
         : normalizeRelaxedShiftFlights(
-            state.settings.relaxedShiftFlightNumbers
+            state.settings.relaxedShiftFlightNumbers.map((no) =>
+              flightIdentityKey(state, no)
+            )
           ),
   };
 }

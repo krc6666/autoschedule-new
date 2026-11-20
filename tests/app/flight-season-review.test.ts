@@ -274,8 +274,18 @@ describe("seasonal flight confirmation and group isolation", () => {
       expect(after.templates).toEqual(original.templates);
       expect(after.weeklyFlightPlans).toEqual(original.weeklyFlightPlans);
       expect(after.latePriorityFrequencyAdjustments[0]!.flightNo).toBe(
-        "NEW100"
+        "OLD100"
       );
+      expect(after.latePriorityFrequencyAdjustments).toEqual(
+        original.latePriorityFrequencyAdjustments
+      );
+      expect(
+        after.shared.flightIdentities?.some(
+          (i) =>
+            i.aliases.some((a) => a.flightNo === "OLD100") &&
+            i.aliases.some((a) => a.flightNo === "NEW100")
+        )
+      ).toBe(true);
       expect(after.activeScheduleDate).toBeNull();
       expect(flightPlanReview(after).unmatchedFlightNos).not.toContain(
         "OLD100"

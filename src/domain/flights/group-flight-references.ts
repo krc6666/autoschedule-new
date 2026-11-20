@@ -2,6 +2,20 @@ import type { PositionRule, ScheduleSettings } from "../../model";
 import { orderPositionRules } from "../../utils";
 import { normalizeWeeklyFlightNo } from "./weekly-flight-plan";
 
+/** Every structured flight target is declared once for edits and execution. */
+export const FLIGHT_RULE_REFERENCE_FIELDS = {
+  positionTransitionPolicies: ["sourceFlightNo", "targetFlightNo"],
+  dutyPositionPriorities: ["flightNo"],
+  nextWorkdayRecoveryTargets: ["flightNo"],
+  lateShiftRecoveryPositionRules: ["flightNo"],
+  mobileSupervisorCoverageRules: ["flightNo"],
+  mobileSupervisorFillRules: ["sourceFlightNo", "targetFlightNo"],
+  crossWorkdayQualificationReservations: ["flightNo"],
+  crossFlightPriorityPolicies: ["flightNo"],
+  sameFlightStaffExclusions: ["flightNo"],
+  teamLeaderGapFillPositionPolicies: ["flightNo"],
+} as const;
+
 function slots<T, K extends keyof T>(items: readonly T[], key: K) {
   return items.map((item) => ({
     value: String(item[key]),

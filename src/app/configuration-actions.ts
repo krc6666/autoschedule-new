@@ -3,6 +3,7 @@ import {
   renameGroupFlightReferences,
 } from "../domain/flights/group-flight-references";
 import { isAuxiliaryCategory } from "../domain/flights/schedule-position-rules";
+import { flightRenameIdentityPlan } from "./flight-identity-rename";
 import type { FlightPlanReconciliation } from "../domain/flights/flight-plan-reconciliation";
 import type {
   AppState,
@@ -52,6 +53,7 @@ function flightRenameConflicts(
   const oldNo = normalizeWeeklyFlightNo(previous);
   const newNo = normalizeWeeklyFlightNo(next);
   if (oldNo === newNo) return false;
+  if (flightRenameIdentityPlan(state, previous, next).error) return true;
   if (
     [state, ...Object.values(state.groups)].some(
       (w) =>
@@ -85,6 +87,13 @@ function renameFlightConfigurationReferences(
 ): void {
   const previous = normalizeWeeklyFlightNo(previousFlightNo);
   const next = normalizeWeeklyFlightNo(nextFlightNo);
+  const identityPlan = flightRenameIdentityPlan(
+    state,
+    previousFlightNo,
+    nextFlightNo
+  );
+  if (!identityPlan.error)
+    state.shared.flightIdentities = identityPlan.identities;
   const rename = (flightNo: string) =>
     normalizeWeeklyFlightNo(flightNo) === previous ? next : flightNo;
   state.weeklyFlightPlans = replaceWeeklyFlightNumber(
@@ -113,9 +122,8 @@ function renameFlightConfigurationReferences(
     workspace.flights.forEach((flight) => {
       flight.flightNo = rename(flight.flightNo);
     });
-    workspace.latePriorityFrequencyAdjustments.forEach((adjustment) => {
-      adjustment.flightNo = rename(adjustment.flightNo);
-    });
+    // Keep source ledgers separate: clamp/reset belongs to each original name.
+    // The shared identity groups their final values without rewriting history.
     if (affected) clearSchedule(workspace);
   }
 }
@@ -153,12 +161,16 @@ function renameActiveFlightReferences(
   const previous = normalizeWeeklyFlightNo(previousFlightNo);
   const next = nextFlightNo.trim().toUpperCase();
   if (!previous || !next || previous === normalizeWeeklyFlightNo(next)) return;
+  const identityPlan = flightRenameIdentityPlan(
+    state,
+    previousFlightNo,
+    nextFlightNo
+  );
+  if (!identityPlan.error)
+    state.shared.flightIdentities = identityPlan.identities;
   const rename = (flightNo: string) =>
     normalizeWeeklyFlightNo(flightNo) === previous ? next : flightNo;
   renameGroupFlightReferences(state.positionRules, state.settings, rename);
-  state.latePriorityFrequencyAdjustments.forEach((item) => {
-    item.flightNo = rename(item.flightNo);
-  });
   renameFlightSeasonOverride(state, previous, next);
 }
 
@@ -718,6 +730,12 @@ export function updateConfigurationField(
     if (!flight) return "missing";
     const previousFlightNo = flight.flightNo;
     if (field === "positions") return "missing";
+    if (
+      field === "flightNo" &&
+      (flightRenameIdentityPlan(state, previousFlightNo, String(value)).error ||
+        !normalizeWeeklyFlightNo(String(value)))
+    )
+      return "duplicate";
     {
       const nextValue =
         typeof value === "string" && field === "flightNo"

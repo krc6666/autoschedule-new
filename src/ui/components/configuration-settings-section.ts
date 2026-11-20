@@ -6,14 +6,23 @@ import { currentFlightsWithoutTemplates } from "../../domain/flights/next-workda
 import { dispatchUiCommand } from "../events/ui-command";
 import { configurationInput } from "./configuration-field";
 import { LightDomElement } from "./light-dom-element";
+import "./flight-identities-section";
 
 export class ConfigurationSettingsSectionElement extends LightDomElement {
-  static override properties = { model: { attribute: false } };
+  static override properties = {
+    model: { attribute: false },
+    editing: { attribute: false },
+  };
   model!: AppState;
+  editing?: import("../../app/flight-identity-editing-session").FlightIdentityEditingView;
 
   protected override render() {
     const settings = this.model.settings;
-    return html`<section class="workspace-section settings-section">
+    return html`<autoschedule-flight-identities
+        .model=${this.model}
+        .editing=${this.editing}
+      ></autoschedule-flight-identities>
+      <section class="workspace-section settings-section">
         <div>
           <div class="section-heading"><h3>排班约束</h3></div>
           <div class="form-grid">

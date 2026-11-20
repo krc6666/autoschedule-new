@@ -400,7 +400,7 @@ export function mountCloudApplication(
       ) {
         render({
           message:
-            "请先结束排班计算、保存或取消历史编辑，并在规则页保存规则，再允许交接。当前修改保留。",
+            "请先结束排班计算、保存或取消历史编辑，并保存规则及航班档案，再允许交接。当前修改保留。",
           notice: "error",
         });
         return;
@@ -610,7 +610,7 @@ export function mountCloudApplication(
             command.type === "download")
         )
           throw new Error(
-            "规则有未保存的修改，请返回规则页点击“保存规则”，再进行云端保存、发布或下载。"
+            "规则或航班档案有未保存的修改，请先点击“保存规则”或配置页的“确认并保存航班档案”，再进行云端保存、发布或下载。"
           );
         if (command.type === "download") {
           download(workspace.recoveryJson());

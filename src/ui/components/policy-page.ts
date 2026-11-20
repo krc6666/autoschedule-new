@@ -1,4 +1,5 @@
 import { html } from "lit";
+import { flightIdentities } from "../../domain/flights/flight-identities";
 
 import type { AppState } from "../../model";
 import type { PolicyEditingView } from "../../app/policy-editing-session";
@@ -71,6 +72,14 @@ export class PolicyPageElement extends LightDomElement {
           >保存后请重新排班。云端版还需点击顶部“保存到云端”上传。</small
         >
       </div>
+      ${
+        flightIdentities(this.model).length
+          ? html`<details class="mb-3">
+              <summary>航班换号关联及规则适用范围</summary>
+              ${flightIdentities(this.model).map((i) => html`<p><strong>${i.displayName}</strong>：${i.aliases.map((a) => `${a.flightNo}${a.from || a.until ? `（${a.from || "不限"}至${a.until || "不限"}）` : ""}`).join("、")}；当前组规则自动共用。关联在配置页“航班长期档案”维护。</p>`)}
+            </details>`
+          : ""
+      }
       <nav class="nav nav-pills gap-2 mb-3" aria-label="规则分类">
         ${(
           [

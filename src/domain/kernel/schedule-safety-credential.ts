@@ -1,4 +1,8 @@
 import { isSupervisorFillTarget } from "../coverage/supervisor-fill-configuration";
+import {
+  flightIdentities,
+  type FlightIdentityFacts,
+} from "../flights/flight-identities";
 import type { Assignment, ScheduleResult } from "../../model";
 import type { ScheduleGuardContext } from "./schedule-guard";
 import { previousWorkdayLateProtection } from "../reviews/cross-day-recovery";
@@ -12,6 +16,7 @@ export interface ScheduleSafetyCredential {
   readonly date: string;
   readonly assignmentsFingerprint: string;
   readonly contextFingerprint: string;
+  readonly flightIdentityFingerprint: string;
   readonly integrityFingerprint: string;
 }
 
@@ -43,6 +48,22 @@ function contextFingerprint(context: ScheduleGuardContext): string {
   const sameFlightStaffExclusion = context.sameFlightStaffExclusionFacts;
   return fingerprint({
     phase: context.phase,
+    flightIdentityContexts: [
+      lateShiftCutoff?.state,
+      crossWorkdayReservation?.state,
+      latePriorityFrequency?.state,
+      latePriorityAggregateRotation?.state,
+      strictNextWorkdayRecovery?.state,
+      positionTransition?.state,
+      mobileSupervisorCoverage?.state,
+      dutyPosition?.state,
+      sameFlightStaffExclusion?.state,
+    ]
+      .filter((value) => value !== undefined)
+      .map((value) => ({
+        identities: flightIdentities(value!),
+        date: value!.flightIdentityDate,
+      })),
     halfRestFacts: halfRest
       ? {
           requestedStaffIds: [...halfRest.requestedStaffIds],
@@ -578,12 +599,26 @@ export function createScheduleSafetyCredential(options: {
     date: options.date,
     assignmentsFingerprint: fingerprint(options.assignments),
     contextFingerprint: contextFingerprint(options.context),
+    flightIdentityFingerprint: fingerprint(
+      flightIdentities(
+        options.context.sameFlightStaffExclusionFacts?.state ??
+          options.context.mobileSupervisorCoverageFacts?.state ??
+          {}
+      )
+    ),
     integrityFingerprint: fingerprint({
       kind: "schedule-safety-credential",
       phase: "final",
       date: options.date,
       assignmentsFingerprint: fingerprint(options.assignments),
       contextFingerprint: contextFingerprint(options.context),
+      flightIdentityFingerprint: fingerprint(
+        flightIdentities(
+          options.context.sameFlightStaffExclusionFacts?.state ??
+            options.context.mobileSupervisorCoverageFacts?.state ??
+            {}
+        )
+      ),
     }),
   });
 }
@@ -591,6 +626,7 @@ export function createScheduleSafetyCredential(options: {
 export function assertScheduleSafetyCredential(options: {
   date: string;
   result: ScheduleResult;
+  state?: FlightIdentityFacts;
 }): void {
   const credential = options.result.safetyCredential;
   if (!credential) throw new Error("排班结果缺少安全凭证，拒绝安装");
@@ -601,6 +637,9 @@ export function assertScheduleSafetyCredential(options: {
     credential.assignmentsFingerprint !==
       fingerprint(options.result.assignments) ||
     !credential.contextFingerprint ||
+    (options.state !== undefined &&
+      credential.flightIdentityFingerprint !==
+        fingerprint(flightIdentities(options.state))) ||
     credential.integrityFingerprint !==
       fingerprint({
         kind: credential.kind,
@@ -608,6 +647,7 @@ export function assertScheduleSafetyCredential(options: {
         date: credential.date,
         assignmentsFingerprint: credential.assignmentsFingerprint,
         contextFingerprint: credential.contextFingerprint,
+        flightIdentityFingerprint: credential.flightIdentityFingerprint,
       })
   ) {
     throw new Error("排班结果安全凭证无效或上下文不一致，拒绝安装");

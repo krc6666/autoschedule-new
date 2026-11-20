@@ -1,4 +1,8 @@
 import type { AppState } from "../../model";
+import {
+  flightIdentities,
+  type FlightIdentityFacts,
+} from "../flights/flight-identities";
 
 /**
  * Bump this when the meaning of a scheduling rule changes in code without a
@@ -16,7 +20,8 @@ type FingerprintState = Pick<
   | "latePriorityFrequencyAdjustments"
   | "settings"
 > &
-  Partial<Pick<AppState, "ordinaryPriorityFrequencyAdjustments">>;
+  Partial<Pick<AppState, "ordinaryPriorityFrequencyAdjustments">> &
+  FlightIdentityFacts;
 
 function canonicalize(value: unknown): unknown {
   if (Array.isArray(value)) return value.map(canonicalize);
@@ -49,6 +54,9 @@ export function scheduleRuleFingerprint(state: FingerprintState): string {
   return fnv64Fingerprint(
     {
       version: SCHEDULE_RULE_FINGERPRINT_VERSION,
+      ...(flightIdentities(state).length
+        ? { flightIdentities: flightIdentities(state) }
+        : {}),
       ...(Object.keys(state.flightSeasonOverrides ?? {}).length
         ? { flightSeasonOverrides: state.flightSeasonOverrides }
         : {}),

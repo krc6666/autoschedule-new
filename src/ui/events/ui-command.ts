@@ -14,6 +14,16 @@ import type { HalfRestMode } from "../../domain/shared/schedule-run-preferences"
 export type EditableValue = string | number | boolean;
 
 export type UiCommand =
+  | {
+      type: "save-flight-identities";
+      identities: import("../../model").FlightIdentity[];
+      fingerprint: string;
+    }
+  | {
+      type: "edit-flight-identities";
+      identities: import("../../model").FlightIdentity[];
+    }
+  | { type: "discard-flight-identities" }
   | { type: "set-relaxed-shift-flights"; flightNumbers: string[] }
   | { type: "sync-b-flight-season"; fingerprint: string }
   | { type: "set-flight-season-enabled"; flightNo: string; enabled: boolean }

@@ -3,10 +3,13 @@ import type { ScheduleGenerationFacts } from "../shared/scheduling-facts";
 import type { ScheduleFrequencyFacts } from "../statistics/schedule-frequency";
 import {
   latePriorityFrequencyKinds,
-  normalizeLatePriorityFlightNumber,
   normalizeLatePriorityPositionReference,
 } from "../reviews/late-priority-policy";
 import { assignmentRule } from "../flights/schedule-position-rules";
+import {
+  flightHasSpecialRule,
+  type FlightIdentityFacts,
+} from "../flights/flight-identities";
 
 export interface Tr121H02CooldownProfile {
   applies: boolean;
@@ -24,24 +27,35 @@ const NOT_APPLICABLE: Tr121H02CooldownProfile = {
 
 export function isTr121H02NumberOne(
   flightNo: string,
-  target: Pick<PositionRule, "name" | "remark">
+  target: Pick<PositionRule, "name" | "remark">,
+  context: FlightIdentityFacts = {},
+  date?: string
 ): boolean {
   return (
-    normalizeLatePriorityFlightNumber(flightNo) === "TR121" &&
+    flightHasSpecialRule(context, flightNo, "TR121", date) &&
     normalizeLatePriorityPositionReference(target.name) === "H02" &&
     latePriorityFrequencyKinds(target).includes("number-one")
   );
 }
 
-function isMatchingHistoryRecord(record: HistoryRecord): boolean {
-  return isTr121H02NumberOne(record.flightNo, {
-    name: record.position,
-    remark: record.remark,
-  });
+function isMatchingHistoryRecord(
+  record: HistoryRecord,
+  context: FlightIdentityFacts
+): boolean {
+  return isTr121H02NumberOne(
+    record.flightNo,
+    {
+      name: record.position,
+      remark: record.remark,
+    },
+    context,
+    record.date
+  );
 }
 
 export function tr121H02CooldownProfile(
-  state: Pick<ScheduleGenerationFacts, "history" | "settings">,
+  state: Pick<ScheduleGenerationFacts, "history" | "settings"> &
+    FlightIdentityFacts,
   staffId: string,
   flightNo: string,
   target: Pick<PositionRule, "name" | "remark">,
@@ -52,7 +66,7 @@ export function tr121H02CooldownProfile(
   if (
     cooldownWorkdays <= 0 ||
     facts.date !== date ||
-    !isTr121H02NumberOne(flightNo, target)
+    !isTr121H02NumberOne(flightNo, target, state, date)
   )
     return NOT_APPLICABLE;
   const matchingDates = new Set(
@@ -61,7 +75,7 @@ export function tr121H02CooldownProfile(
         (record) =>
           record.staffId === staffId &&
           record.date < date &&
-          isMatchingHistoryRecord(record)
+          isMatchingHistoryRecord(record, state)
       )
       .map((record) => record.date)
   );
@@ -108,7 +122,8 @@ export function tr121H02CooldownQuality(
   for (const assignment of assignments) {
     if (assignment.status !== "assigned" || !assignment.staffId) continue;
     const rule = assignmentRule(state, assignment);
-    if (!rule || !isTr121H02NumberOne(assignment.flightNo, rule)) continue;
+    if (!rule || !isTr121H02NumberOne(assignment.flightNo, rule, state, date))
+      continue;
     const profile = tr121H02CooldownProfile(
       state,
       assignment.staffId,

@@ -1,6 +1,15 @@
+import { flightRuleSettings } from "../flights/flight-rule-settings";
 import type { HistoryRecord, PositionRule, Staff } from "../../model";
+import {
+  flightIdentities,
+  flightIdentityKey,
+  flightRuleMatches,
+} from "../flights/flight-identities";
 import type { SchedulingFacts } from "../shared/scheduling-facts";
-import { latePriorityRecordSemantics } from "./late-priority-record-semantics";
+import {
+  latePriorityHistoryRule,
+  latePriorityRecordSemantics,
+} from "./late-priority-record-semantics";
 import {
   baselineStaffId,
   hasQualificationOverride,
@@ -14,7 +23,6 @@ import {
   LATE_PRIORITY_ALLOWED_DIFFERENCE,
   LATE_PRIORITY_FREQUENCY_ORDER,
   normalizeLatePriorityFlightNumber,
-  normalizeLatePriorityPositionReference,
   type LatePriorityKindLabel,
 } from "../reviews/late-priority-policy";
 import {
@@ -76,12 +84,188 @@ export interface MonthlyLatePriorityFlightStatistics {
 
 export interface MonthlyLatePriorityStatistics {
   month: string;
+  warnings?: string[];
   flightNumbers: string[];
   rows: MonthlyLatePriorityStatisticsRow[];
   ranges: Record<
     LatePriorityStatisticsCategory,
     { min: number; max: number; difference: number; allowedDifference: number }
   >;
+}
+
+/** Count and clamp each original ledger first, then group the resulting events.
+ * This preserves old resets/corrections and two actual flights on the same date. */
+export function buildMonthlyLatePriorityStatistics(
+  state: SchedulingFacts,
+  date: string
+): MonthlyLatePriorityStatistics {
+  const source = buildSourceMonthlyLatePriorityStatistics(state, date);
+  if (!flightIdentities(state).length) return source;
+  const warnings: string[] = [];
+  const numbers = new Set(latePriorityStatisticsFlightNumbers(state));
+  const rows = source.rows;
+  for (const adjustment of state.latePriorityFrequencyAdjustments) {
+    if (
+      !adjustment.flightNo.startsWith("@") ||
+      adjustment.month !== source.month ||
+      !numbers.has(flightIdentityKey(state, adjustment.flightNo)) ||
+      rows.some((r) => r.staff.id === adjustment.staffId)
+    )
+      continue;
+    const staff = state.staff.find(
+      (s) => s.id === adjustment.staffId && s.staffType === "常规"
+    );
+    if (staff)
+      rows.push({
+        staff,
+        totalCount: 0,
+        qualificationOverrideCount: 0,
+        qualificationUnrecordedCount: 0,
+        categories: emptyCategories(),
+        flights: {},
+      });
+  }
+  for (const row of rows) {
+    const grouped: Record<string, MonthlyLatePriorityFlightStatistics> = {};
+    const ensure = (key: string) =>
+      (grouped[key] ??= {
+        flightNo: key,
+        totalCount: 0,
+        applicableCategories: [],
+        categories: emptyCategories(),
+      });
+    for (const original of Object.values(row.flights)) {
+      const eventKeys = new Set(
+        Object.values(original.categories).flatMap((c) =>
+          c.details.map((d) => flightIdentityKey(state, d.flightNo, d.date))
+        )
+      );
+      if (!eventKeys.size)
+        eventKeys.add(flightIdentityKey(state, original.flightNo, date));
+      const ambiguousCorrection =
+        eventKeys.size > 1 &&
+        Object.values(original.categories).some(
+          (c) =>
+            c.manualCorrection !== 0 ||
+            c.visibleDetails.length !== c.details.length
+        );
+      if (ambiguousCorrection) {
+        warnings.push(
+          `${original.flightNo}本月有跨档案记录及人工次数，请先明确次数归属；暂按原号保留`
+        );
+        eventKeys.clear();
+        eventKeys.add(original.flightNo);
+      }
+      for (const key of eventKeys) {
+        numbers.add(key);
+        const target = ensure(key);
+        target.applicableCategories = [
+          ...new Set([
+            ...target.applicableCategories,
+            ...original.applicableCategories,
+          ]),
+        ];
+        for (const category of LATE_PRIORITY_STATISTICS_CATEGORIES) {
+          const before = original.categories[category],
+            cell = target.categories[category];
+          const details =
+            eventKeys.size === 1
+              ? before.details
+              : before.details.filter(
+                  (d) => flightIdentityKey(state, d.flightNo, d.date) === key
+                );
+          const visible =
+            eventKeys.size === 1
+              ? before.visibleDetails
+              : before.visibleDetails.filter(
+                  (d) => flightIdentityKey(state, d.flightNo, d.date) === key
+                );
+          cell.qualified ||= before.qualified;
+          cell.details.push(...details);
+          cell.visibleDetails.push(...visible);
+          cell.baseCount +=
+            eventKeys.size === 1 ? before.baseCount : details.length;
+          cell.manualCorrection +=
+            eventKeys.size === 1 ? before.manualCorrection : 0;
+          cell.effectiveCount +=
+            eventKeys.size === 1 ? before.effectiveCount : details.length;
+        }
+      }
+    }
+    for (const key of numbers) {
+      const flight = ensure(key);
+      for (const category of LATE_PRIORITY_STATISTICS_CATEGORIES) {
+        const cell = flight.categories[category];
+        const adjustments = state.latePriorityFrequencyAdjustments.filter(
+          (a) =>
+            a.month === source.month &&
+            a.staffId === row.staff.id &&
+            a.flightNo.startsWith("@") &&
+            flightIdentityKey(state, a.flightNo) === key &&
+            a.kind === latePriorityKindForLabel(category)
+        );
+        if (adjustments.length) {
+          const reset = adjustments.reduce(
+            (sum, a) => sum + (a.resetBaseline ?? 0),
+            0
+          );
+          cell.visibleDetails = sortedDetails(cell.visibleDetails).slice(reset);
+          cell.baseCount = Math.max(0, cell.baseCount - reset);
+          cell.effectiveCount = Math.max(
+            0,
+            cell.effectiveCount +
+              adjustments.reduce((sum, a) => sum + a.delta, 0)
+          );
+          cell.manualCorrection = cell.effectiveCount - cell.baseCount;
+          if (!flight.applicableCategories.includes(category))
+            flight.applicableCategories.push(category);
+        }
+        cell.details = sortedDetails(cell.details);
+        cell.visibleDetails = sortedDetails(cell.visibleDetails);
+      }
+      flight.totalCount = LATE_PRIORITY_STATISTICS_CATEGORIES.reduce(
+        (sum, c) => sum + flight.categories[c].effectiveCount,
+        0
+      );
+    }
+    row.flights = grouped;
+    for (const category of LATE_PRIORITY_STATISTICS_CATEGORIES) {
+      const cells = Object.values(grouped).map((f) => f.categories[category]);
+      row.categories[category] = {
+        qualified: cells.some((c) => c.qualified),
+        details: sortedDetails(cells.flatMap((c) => c.details)),
+        visibleDetails: sortedDetails(cells.flatMap((c) => c.visibleDetails)),
+        baseCount: cells.reduce((s, c) => s + c.baseCount, 0),
+        manualCorrection: cells.reduce((s, c) => s + c.manualCorrection, 0),
+        effectiveCount: cells.reduce((s, c) => s + c.effectiveCount, 0),
+      };
+    }
+    row.totalCount = Object.values(grouped).reduce(
+      (sum, f) => sum + f.totalCount,
+      0
+    );
+  }
+  // Every row has all visible columns, including a column discovered in another row.
+  for (const row of rows)
+    for (const key of numbers)
+      row.flights[key] ??= {
+        flightNo: key,
+        totalCount: 0,
+        applicableCategories: [],
+        categories: emptyCategories(),
+      };
+  return {
+    month: source.month,
+    flightNumbers: [...numbers],
+    rows,
+    warnings: [...new Set(warnings)],
+    ranges: Object.fromEntries(
+      LATE_PRIORITY_STATISTICS_CATEGORIES.map((category) => [
+        category,
+        statisticsRange(rows, category),
+      ])
+    ) as MonthlyLatePriorityStatistics["ranges"],
+  };
 }
 
 function categoryKinds(
@@ -95,12 +279,13 @@ function categoryKinds(
 
 function flightCategories(
   rules: readonly PositionRule[],
-  flightNo: string
+  flightNo: string,
+  state: SchedulingFacts
 ): LatePriorityStatisticsCategory[] {
   return LATE_PRIORITY_STATISTICS_CATEGORIES.filter((category) =>
     rules.some(
       (rule) =>
-        normalizeLatePriorityFlightNumber(rule.flightNo) === flightNo &&
+        flightRuleMatches(state, rule.flightNo, flightNo) &&
         categoryKinds(rule).includes(category)
     )
   );
@@ -111,22 +296,9 @@ function scopedRules(state: SchedulingFacts): PositionRule[] {
     (rule) =>
       latePriorityFlightInScope(
         state.settings.latePriorityFlightNumbers,
-        rule.flightNo
+        rule.flightNo,
+        state
       ) && categoryKinds(rule).length > 0
-  );
-}
-
-function matchingRule(
-  rules: readonly PositionRule[],
-  flightNo: string,
-  position: string
-): PositionRule | undefined {
-  return rules.find(
-    (rule) =>
-      normalizeLatePriorityFlightNumber(rule.flightNo) ===
-        normalizeLatePriorityFlightNumber(flightNo) &&
-      normalizeLatePriorityPositionReference(rule.name) ===
-        normalizeLatePriorityPositionReference(position)
   );
 }
 
@@ -199,16 +371,30 @@ export function latePriorityStatisticsFlightNumbers(
   state: SchedulingFacts
 ): string[] {
   return normalizeLatePriorityFlightNumbers(
-    state.settings.latePriorityFlightNumbers
+    state.settings.latePriorityFlightNumbers.map((no) =>
+      flightIdentityKey(state, no)
+    )
   );
 }
 
-export function buildMonthlyLatePriorityStatistics(
+function buildSourceMonthlyLatePriorityStatistics(
   state: SchedulingFacts,
   date: string
 ): MonthlyLatePriorityStatistics {
   const month = date.slice(0, 7);
-  const flightNumbers = latePriorityStatisticsFlightNumbers(state);
+  const flightNumbers = normalizeLatePriorityFlightNumbers([
+    ...flightRuleSettings(state).latePriorityFlightNumbers,
+    ...state.history
+      .filter((r) =>
+        latePriorityFlightInScope(
+          state.settings.latePriorityFlightNumbers,
+          r.flightNo,
+          state,
+          r.date
+        )
+      )
+      .map((r) => r.flightNo),
+  ]).filter((no) => !no.startsWith("@"));
   const rules = scopedRules(state);
   const countRecords = monthlyCountRecords(state, date);
   const recordCategories = new Map(
@@ -216,16 +402,14 @@ export function buildMonthlyLatePriorityStatistics(
       record,
       latePriorityFlightInScope(
         state.settings.latePriorityFlightNumbers,
-        record.flightNo
+        record.flightNo,
+        state,
+        record.date
       ) && endsAfterLateShiftThreshold(record, state.settings.lateShiftEndTime)
         ? categoryKinds(
             latePriorityRecordSemantics(
               record,
-              matchingRule(
-                state.positionRules,
-                record.flightNo,
-                record.position
-              )
+              latePriorityHistoryRule(state, state.positionRules, record)
             )
           )
         : [],
@@ -233,7 +417,7 @@ export function buildMonthlyLatePriorityStatistics(
   );
   const applicableCategoriesByFlight = new Map(
     flightNumbers.map((flightNo) => {
-      const configuredCategories = flightCategories(rules, flightNo);
+      const configuredCategories = flightCategories(rules, flightNo, state);
       return [
         flightNo,
         LATE_PRIORITY_STATISTICS_CATEGORIES.filter(
@@ -409,8 +593,7 @@ export function buildMonthlyLatePriorityStatistics(
                 row.staff.status === "正常" &&
                 rules.some(
                   (rule) =>
-                    normalizeLatePriorityFlightNumber(rule.flightNo) ===
-                      flightNo &&
+                    flightRuleMatches(state, rule.flightNo, flightNo) &&
                     categoryKinds(rule).includes(category) &&
                     rule.qualifiedStaffIds.includes(row.staff.id)
                 );

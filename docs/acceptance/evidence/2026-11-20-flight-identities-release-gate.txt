@@ -1,0 +1,70 @@
+node : 验收材料检查失败：
+所在位置 行:2 字符: 1
++ node scripts/check-acceptance.mjs *> .tmp/flight-identities/release-g ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (验收材料检查失败：:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+2026-10-05-unsaved-export-exit-warning / finalArtifact：尚未验收通过（unverified）
+2026-10-12-local-vacancy-recovery / finalArtifact：尚未验收通过（unverified）
+2026-10-12-policy-diagnostics / finalArtifact：尚未验收通过（unverified）
+2026-10-12-schedule-failure-language / finalArtifact：尚未验收通过（unverified）
+2026-10-12-vacancy-toast-only / finalArtifact：尚未验收通过（unverified）
+2026-10-13-supervisor-coverage-performance / finalArtifact：尚未验收通过（unverified）
+2026-10-13-vacancy-toast-reasons / finalArtifact：尚未验收通过（unverified）
+2026-10-14-supervisor-gap-fill / finalArtifact：尚未验收通过（unverified）
+2026-10-15-history-manual-corrections / finalArtifact：尚未验收通过（unverified）
+2026-10-15-mobile-supervisor-statistics / finalArtifact：尚未验收通过（unverified）
+2026-10-15-qualification-count-display / finalArtifact：尚未验收通过（unverified）
+2026-10-16-actionable-warning-reasons / finalArtifact：尚未验收通过（unverified）
+2026-10-16-category-independent-statistics / finalArtifact：尚未验收通过（unverified）
+2026-10-17-manual-cx-duty-overlap / finalArtifact：尚未验收通过（unverified）
+2026-10-17-weekly-plan-generate-default / reproduction：必须说明验证结果或不适用原因
+2026-10-26-group-specific-scheduling-config / finalArtifact：尚未验收通过（unverified）
+2026-10-26-template-position-rules-sync / finalArtifact：尚未验收通过（unverified）
+2026-10-27-import-flow-usability / finalArtifact：尚未验收通过（unverified）
+2026-10-27-position-rule-flights-to-template / finalArtifact：尚未验收通过（unverified）
+2026-10-27-weekly-plan-config-import / finalArtifact：尚未验收通过（unverified）
+2026-10-27-weekly-plan-import-safety / finalArtifact：尚未验收通过（unverified）
+2026-11-08-template-orphan-cleanup / finalArtifact：尚未验收通过（unverified）
+2026-11-10-monthly-staff-fatigue / finalArtifact：尚未验收通过（unverified）
+2026-11-10-schedule-timeout-adopt / finalArtifact：尚未验收通过（unverified）
+2026-11-11-duty-afternoon-flight-floor / finalArtifact：尚未验收通过（unverified）
+2026-11-11-flight-config-device-restore / finalArtifact：尚未验收通过（unverified）
+2026-11-11-flight-season-review / finalArtifact：尚未验收通过（unverified）
+2026-11-11-position-summary-compact / finalArtifact：尚未验收通过（unverified）
+2026-11-11-season-sync-preserve-positions / finalArtifact：尚未验收通过（unverified）
+2026-11-13-preflight-memory / finalArtifact：尚未验收通过（unverified）
+2026-11-14-airline-mix / finalArtifact：尚未验收通过（unverified）
+2026-11-14-duty-afternoon-relief / finalArtifact：尚未验收通过（unverified）
+2026-11-14-staff-work-continuity / finalArtifact：尚未验收通过（unverified）
+2026-11-15-candidate-menu-dismiss / finalArtifact：尚未验收通过（unverified）
+2026-11-15-cloud-save-reminders / finalArtifact：尚未验收通过（unverified）
+2026-11-15-independent-guide / finalArtifact：尚未验收通过（unverified）
+2026-11-15-operation-audit / finalArtifact：尚未验收通过（unverified）
+2026-11-15-recent-fatigue-balance / finalArtifact：尚未验收通过（unverified）
+2026-11-16-continuity-after-rotation / finalArtifact：尚未验收通过（unverified）
+2026-11-16-cross-flight-vacancy-coverage / finalArtifact：尚未验收通过（unverified）
+2026-11-16-mobile-supervisor-independent-first / finalArtifact：尚未验收通过（unverified）
+2026-11-16-policy-unified-save / finalArtifact：尚未验收通过（unverified）
+2026-11-16-priority-rotation-scope / finalArtifact：尚未验收通过（unverified）
+2026-11-17-audit-changes-only / finalArtifact：尚未验收通过（unverified）
+2026-11-17-audit-item-times / finalArtifact：尚未验收通过（unverified）
+2026-11-17-cloud-history-enable / finalGuard：证据内容已改变：docs/acceptance/evidence/2026-11-17-cloud-history-install.sql
+2026-11-17-cloud-workspace-versions / normalPath：证据内容已改变：docs/acceptance/evidence/2026-11-17-versions-final-database.js
+on
+2026-11-17-duty-earliest-morning / finalArtifact：尚未验收通过（unverified）
+2026-11-17-history-current-sync / postProcessing：证据内容已改变：docs/acceptance/evidence/2026-11-17-history-sync-result.xlsx
+2026-11-17-latest-schedule-view / postProcessing：证据内容已改变：docs/acceptance/evidence/2026-11-17-history-time-result.xlsx
+2026-11-17-ordinary-priority-dates / normalPath：证据内容已改变：docs/acceptance/evidence/2026-11-17-ordinary-dates.html
+2026-11-17-statistics-position-highlight / finalArtifact：尚未验收通过（unverified）
+2026-11-18-relaxed-shift-late-priority / finalArtifact：尚未验收通过（unverified）
+2026-11-18-relaxed-shift-quality / finalArtifact：尚未验收通过（unverified）
+2026-11-18-session-approval / finalArtifact：尚未验收通过（unverified）
+2026-11-19-desktop-database-upgrade / finalArtifact：尚未验收通过（unverified）
+2026-11-19-priority-rules-page / finalArtifact：尚未验收通过（unverified）
+2026-11-19-relaxed-shift-conflicting-starts / finalArtifact：尚未验收通过（unverified）
+2026-11-20-history-temporary-roundtrip / reproduction：必须说明验证结果或不适用原因
+flights-page-weekly-plan-layout-20261008 / reproduction：已验证项必须附证据
+schedule-preflight-duty-status-20261007 / finalArtifact：尚未验收通过（unverified）
+schedule-preflight-roster-default-20261008 / finalArtifact：尚未验收通过（unverified）

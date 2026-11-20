@@ -1,4 +1,14 @@
 import { normalizeFlightSeasonOverrides } from "../domain/flights/configured-flight-positions";
+import { inheritFlightIdentityPositions } from "./flight-identity-actions";
+import {
+  flightIdentityReferenceMapper,
+  previewFlightIdentityChange,
+} from "../domain/flights/flight-identity-change";
+import { validateFlightIdentityReferences } from "../domain/flights/flight-identities";
+import {
+  groupFlightReferenceNumbers,
+  renameGroupFlightReferences,
+} from "../domain/flights/group-flight-references";
 import {
   flightPlanReviewSummaries,
   type FlightPlanReviewSummary,
@@ -261,6 +271,49 @@ export function applyWorkbookImport(
       };
   }
   const importHistory = imported.history !== undefined;
+  if (importConfig && imported.flightIdentityErrors?.length)
+    return {
+      changedConfig: false,
+      recognized: "",
+      errors: imported.flightIdentityErrors,
+    };
+  if (importConfig && imported.flightIdentities === undefined) {
+    const referenceErrors = validateFlightIdentityReferences(state, [
+      ...groupFlightReferenceNumbers(
+        [],
+        applyScheduleSettingsPatch(state.settings, imported.settings ?? {})
+      ),
+      ...(
+        imported.latePriorityFrequencyAdjustments ??
+        state.latePriorityFrequencyAdjustments
+      ).map((a) => a.flightNo),
+    ]);
+    if (referenceErrors.length)
+      return { changedConfig: false, recognized: "", errors: referenceErrors };
+  }
+  const identityMap =
+    importConfig && imported.flightIdentities !== undefined
+      ? flightIdentityReferenceMapper(state, imported.flightIdentities)
+      : undefined;
+  if (identityMap && imported.flightIdentities !== undefined) {
+    const candidate = {
+      ...state,
+      settings: applyScheduleSettingsPatch(
+        state.settings,
+        imported.settings ?? {}
+      ),
+      positionRules: imported.positionRules ?? state.positionRules,
+      latePriorityFrequencyAdjustments:
+        imported.latePriorityFrequencyAdjustments ??
+        state.latePriorityFrequencyAdjustments,
+    };
+    const preview = previewFlightIdentityChange(
+      candidate,
+      imported.flightIdentities
+    );
+    if (preview.errors.length)
+      return { changedConfig: false, recognized: "", errors: preview.errors };
+  }
   const historySummary = importHistory
     ? summarizeHistoryImport(state, imported.history ?? [], imported.staff)
     : undefined;
@@ -460,6 +513,7 @@ export function applyWorkbookImport(
       imported.latePriorityFrequencyAdjustments !== undefined ||
       imported.ordinaryPriorityFrequencyAdjustments !== undefined ||
       imported.halfRestSelections !== undefined ||
+      imported.flightIdentities !== undefined ||
       imported.flightSeasonOverrides !== undefined ||
       imported.flightPlanConfirmations !== undefined ||
       imported.dutyRosterOverrides !== undefined
@@ -467,7 +521,19 @@ export function applyWorkbookImport(
   if (changedConfig) {
     clearActiveSchedule(state);
   }
+  if (identityMap && imported.flightIdentities !== undefined) {
+    inheritFlightIdentityPositions(state, imported.flightIdentities);
+    renameGroupFlightReferences([], state.settings, identityMap);
+    const other = state.groups[otherGroupId];
+    renameGroupFlightReferences([], other.settings, identityMap);
+    if (other.assignments.length) other.schedulePolicyStale = true;
+    other.scheduleRuleFingerprint = undefined;
+    state.shared.flightIdentities = structuredClone(imported.flightIdentities);
+  }
   const recognized = [
+    importConfig &&
+      imported.flightIdentities !== undefined &&
+      `${imported.flightIdentities.length} 个共用航班档案（影响A/B两组规则归属）`,
     importConfig &&
       imported.flightSeasonOverrides !== undefined &&
       `${Object.keys(imported.flightSeasonOverrides).length} 条本季航班状态`,

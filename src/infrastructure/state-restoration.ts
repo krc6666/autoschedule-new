@@ -1,4 +1,10 @@
 import { normalizeFlightPlanConfirmations } from "../domain/flights/flight-plan-review";
+import {
+  validateFlightIdentities,
+  validateFlightIdentityReferences,
+} from "../domain/flights/flight-identities";
+import { groupFlightReferenceNumbers } from "../domain/flights/group-flight-references";
+import type { FlightIdentity } from "../model";
 import { normalizeFlightSeasonOverrides } from "../domain/flights/configured-flight-positions";
 import { normalizeSupervisorAssignments } from "../domain/assignments/schedule-adjustment";
 import { restoreManualCountEvidence } from "./manual-count-evidence";
@@ -799,6 +805,8 @@ function groupWorkspaceFromState(state: AppState): GroupWorkspace {
 
 function sharedScheduleDataFromState(state: AppState): SharedScheduleData {
   return {
+    flightIdentities: structuredClone(state.shared.flightIdentities ?? []),
+    flightIdentitySchemaVersion: 1,
     templates: structuredClone(state.templates),
     weeklyFlightPlans: structuredClone(state.weeklyFlightPlans),
   };
@@ -960,6 +968,25 @@ export function restorePersistedState(
     });
     return null;
   }
+  const identities = isRecord(value.shared)
+    ? value.shared.flightIdentities
+    : undefined;
+  if (
+    isRecord(value.shared) &&
+    value.shared.flightIdentitySchemaVersion !== undefined &&
+    value.shared.flightIdentitySchemaVersion !== 1
+  ) {
+    issues.push({
+      collection: "state",
+      reason: "航班档案版本不受支持，未载入",
+    });
+    return null;
+  }
+  const identityErrors = validateFlightIdentities(identities ?? []);
+  if (identityErrors.length) {
+    issues.push({ collection: "state", reason: identityErrors.join("；") });
+    return null;
+  }
   const positionRules = restoredCollection(
     value.positionRules,
     fallback.positionRules,
@@ -971,7 +998,10 @@ export function restorePersistedState(
   );
   const next: AppState = {
     version: 12,
-    shared: structuredClone(fallback.shared),
+    shared: {
+      ...structuredClone(fallback.shared),
+      flightIdentities: structuredClone(identities ?? []) as FlightIdentity[],
+    },
     groups: structuredClone(fallback.groups),
     activeGroupId: "A",
     leaveTypes: [],
@@ -1162,6 +1192,18 @@ export function restorePersistedState(
       }
       if (addedPositionRules) projectActiveGroup(next);
     }
+  }
+  const referenceErrors = validateFlightIdentityReferences(next, [
+    ...groupFlightReferenceNumbers([], next.settings),
+    ...next.latePriorityFrequencyAdjustments.map((a) => a.flightNo),
+    ...Object.values(next.groups).flatMap((group) => [
+      ...groupFlightReferenceNumbers([], group.settings),
+      ...group.latePriorityFrequencyAdjustments.map((a) => a.flightNo),
+    ]),
+  ]);
+  if (referenceErrors.length) {
+    issues.push({ collection: "state", reason: referenceErrors.join("；") });
+    return null;
   }
   return next;
 }

@@ -1,3 +1,8 @@
+import { flightRuleSettings } from "../flights/flight-rule-settings";
+import {
+  flightRuleMatches,
+  type FlightIdentityFacts,
+} from "../flights/flight-identities";
 import type { Assignment, Flight, PositionRule, Staff } from "../../model";
 import {
   policyDiagnostic,
@@ -12,10 +17,7 @@ import { evaluateAutomaticHardConstraints } from "../rules/built-in-rule-registr
 import { assignmentRule } from "../flights/schedule-position-rules";
 import { isDisplayOnlyGuideReuse } from "../candidates/assignment-eligibility-facts";
 import { durationHours } from "../shared/time";
-import {
-  fillPositionMatches,
-  isSameFlightSupervisorFillRule,
-} from "./supervisor-fill-configuration";
+import { isSameFlightSupervisorFillRule } from "./supervisor-fill-configuration";
 
 export type SupervisorFillMode = "automatic" | "manual";
 
@@ -87,12 +89,15 @@ function matches(value: string, keyword: string): boolean {
 }
 
 function positionsForKeyword(
-  state: Pick<AssignmentEligibilityFacts, "positionRules">,
+  state: Pick<AssignmentEligibilityFacts, "positionRules"> &
+    FlightIdentityFacts,
   flightNo: string,
   keyword: string
 ): PositionRule[] {
-  return state.positionRules.filter((rule) =>
-    fillPositionMatches(rule, flightNo, keyword)
+  return state.positionRules.filter(
+    (rule) =>
+      flightRuleMatches(state, flightNo, rule.flightNo) &&
+      matches(rule.name, keyword)
   );
 }
 
@@ -104,7 +109,8 @@ export function diagnoseSupervisorFillRuleConfiguration(
   state: Pick<
     ScheduleGenerationFacts,
     "positionRules" | "flights" | "templates"
-  >,
+  > &
+    FlightIdentityFacts,
   rule: MobileSupervisorFillRule
 ): SupervisorFillConfigurationIssue | null {
   const issue = (
@@ -142,8 +148,8 @@ export function diagnoseSupervisorFillRuleConfiguration(
       "info"
     );
   const configuredFlights = [...state.templates, ...state.flights];
-  const sourceFlight = configuredFlights.find(
-    (flight) => normalize(flight.flightNo) === normalize(rule.sourceFlightNo)
+  const sourceFlight = configuredFlights.find((flight) =>
+    flightRuleMatches(state, rule.sourceFlightNo, flight.flightNo)
   );
   if (!sourceFlight)
     return issue(
@@ -156,9 +162,8 @@ export function diagnoseSupervisorFillRuleConfiguration(
       ]
     );
   if (
-    !state.templates.some(
-      (template) =>
-        normalize(template.flightNo) === normalize(rule.sourceFlightNo)
+    !state.templates.some((template) =>
+      flightRuleMatches(state, rule.sourceFlightNo, template.flightNo)
     )
   )
     return issue(
@@ -194,8 +199,8 @@ export function diagnoseSupervisorFillRuleConfiguration(
         `在配置 → 岗位配置找到 ${sourceFlight.flightNo} 对应来源岗位，将“分类”设为“机动督导”；或改用已配置的机动督导岗位。`,
       ]
     );
-  const targetFlight = configuredFlights.find(
-    (flight) => normalize(flight.flightNo) === normalize(rule.targetFlightNo)
+  const targetFlight = configuredFlights.find((flight) =>
+    flightRuleMatches(state, rule.targetFlightNo, flight.flightNo)
   );
   if (!targetFlight)
     return issue(
@@ -208,9 +213,8 @@ export function diagnoseSupervisorFillRuleConfiguration(
       ]
     );
   if (
-    !state.templates.some(
-      (template) =>
-        normalize(template.flightNo) === normalize(rule.targetFlightNo)
+    !state.templates.some((template) =>
+      flightRuleMatches(state, rule.targetFlightNo, template.flightNo)
     )
   )
     return issue(
@@ -268,8 +272,8 @@ export function diagnoseSupervisorFillRuleConfiguration(
     );
   const missingFromPlan = [rule.sourceFlightNo, rule.targetFlightNo].filter(
     (flightNo) =>
-      !state.flights.some(
-        (flight) => normalize(flight.flightNo) === normalize(flightNo)
+      !state.flights.some((flight) =>
+        flightRuleMatches(state, flightNo, flight.flightNo)
       )
   );
   if (missingFromPlan.length)
@@ -295,7 +299,7 @@ function matchingRule(
   targetRule: PositionRule,
   mode: SupervisorFillMode
 ): MobileSupervisorFillRule | undefined {
-  return state.settings.mobileSupervisorFillRules.find(
+  return flightRuleSettings(state).mobileSupervisorFillRules.find(
     (rule) =>
       rule.enabled &&
       isSameFlightSupervisorFillRule(rule) &&

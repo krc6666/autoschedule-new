@@ -1,4 +1,8 @@
 import type { PositionRule } from "../../model";
+import {
+  flightRuleMatches,
+  type FlightIdentityFacts,
+} from "../flights/flight-identities";
 import type { ScheduleGenerationFacts } from "../shared/scheduling-facts";
 import { diagnoseSupervisorFillRuleConfiguration } from "../coverage/supervisor-fill-facts";
 import {
@@ -23,7 +27,6 @@ import {
   latePriorityFlightInScope,
   latePriorityFlightScopeCandidates,
 } from "../statistics/late-priority-flight-scope";
-import { teamLeaderGapFillPositionKey } from "../coverage/team-leader-gap-fill-protection";
 import { STRUCTURED_POLICY_DEFINITIONS } from "./structured-policy-settings";
 import { SCHEDULE_SETTING_DEFINITIONS } from "./schedule-settings";
 import type { StructuredPolicyKey } from "./structured-policy-contract";
@@ -33,10 +36,18 @@ type DiagnosedKey = Exclude<
   StructuredPolicyKey,
   "teamLeaderGapFillPositionPolicies"
 >;
-export interface PolicyConfigurationFacts extends Pick<
-  ScheduleGenerationFacts,
-  "staff" | "flights" | "templates" | "positionRules" | "settings" | "history"
-> {}
+export interface PolicyConfigurationFacts
+  extends
+    FlightIdentityFacts,
+    Pick<
+      ScheduleGenerationFacts,
+      | "staff"
+      | "flights"
+      | "templates"
+      | "positionRules"
+      | "settings"
+      | "history"
+    > {}
 const normalized = (value: string) => value.trim().toUpperCase();
 const target = (rule: PositionRule) => ({
   flightNo: rule.flightNo,
@@ -55,7 +66,9 @@ function flightIssue(
   if (
     flightNo.trim() &&
     [...state.templates, ...state.flights].some(
-      (flight) => normalize(flight.flightNo) === normalize(flightNo)
+      (flight) =>
+        flightRuleMatches(state, flightNo, flight.flightNo) ||
+        normalize(flight.flightNo) === normalize(flightNo)
     )
   )
     return null;
@@ -96,7 +109,9 @@ function notInPlan(
   if (
     !flightNo.trim() ||
     state.flights.some(
-      (flight) => normalize(flight.flightNo) === normalize(flightNo)
+      (flight) =>
+        flightRuleMatches(state, flightNo, flight.flightNo) ||
+        normalize(flight.flightNo) === normalize(flightNo)
     )
   )
     return [];
@@ -362,8 +377,7 @@ export function diagnosePolicyConfiguration(
       const source = state.positionRules.filter(
         (position) =>
           !rule.sourceFlightNo.trim() ||
-          normalizedPolicyValue(position.flightNo) ===
-            normalizedPolicyValue(rule.sourceFlightNo)
+          flightRuleMatches(state, rule.sourceFlightNo, position.flightNo)
       );
       if (!rule.sourcePositions.length)
         checkPositions(source, "前序晚撤岗位", "全部岗位", "exact");
@@ -381,8 +395,7 @@ export function diagnosePolicyConfiguration(
       checkPositions(
         state.positionRules.filter(
           (position) =>
-            normalizedPolicyValue(position.flightNo) ===
-              normalizedPolicyValue(rule.targetFlightNo) &&
+            flightRuleMatches(state, rule.targetFlightNo, position.flightNo) &&
             normalizedPolicyValue(position.name) ===
               normalizedPolicyValue(rule.targetPosition)
         ),
@@ -437,7 +450,9 @@ export function diagnoseLatePriorityScope(
     ];
   const candidates = latePriorityFlightScopeCandidates(state.positionRules);
   return selected
-    .filter((flightNo) => !latePriorityFlightInScope(candidates, flightNo))
+    .filter(
+      (flightNo) => !latePriorityFlightInScope(candidates, flightNo, state)
+    )
     .map((flightNo) =>
       policyDiagnostic(
         "scope-position-missing",
@@ -486,8 +501,8 @@ export function diagnoseGapFillReferences(
       (policy) =>
         !state.positionRules.some(
           (rule) =>
-            teamLeaderGapFillPositionKey(rule.flightNo, rule.name) ===
-            teamLeaderGapFillPositionKey(policy.flightNo, policy.position)
+            flightRuleMatches(state, policy.flightNo, rule.flightNo) &&
+            normalized(rule.name) === normalized(policy.position)
         )
     )
     .map((policy) =>

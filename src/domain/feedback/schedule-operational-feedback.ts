@@ -1,3 +1,4 @@
+import { flightRuleSettings } from "../flights/flight-rule-settings";
 import type { ScheduleGenerationFacts } from "../shared/scheduling-facts";
 import { isValidAssignmentDiversionTransfer } from "../assignments/assignment-timing";
 import { dutyFatigueByStaff } from "../duty-roster/roster";
@@ -20,7 +21,7 @@ function matchingTransitionPolicies(
   connection: AssignmentConnection
 ) {
   const normalize = (value: string): string => value.trim().toUpperCase();
-  return state.settings.positionTransitionPolicies.filter(
+  return flightRuleSettings(state).positionTransitionPolicies.filter(
     (policy) =>
       policy.enabled &&
       normalize(policy.targetFlightNo) ===

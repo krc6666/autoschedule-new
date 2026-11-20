@@ -220,6 +220,8 @@ export function createDefaultState(): AppState {
   );
   const weeklyFlightPlans = createEmptyWeeklyFlightPlans();
   const shared: SharedScheduleData = {
+    flightIdentitySchemaVersion: 1,
+    flightIdentities: [],
     templates: structuredClone(templates),
     weeklyFlightPlans: structuredClone(weeklyFlightPlans),
   };
