@@ -15,6 +15,7 @@ export type ReassignmentIntent =
   | { kind: "position-frequency-review" }
   | { kind: "staff-work-continuity-review" }
   | { kind: "staff-airline-mix-review" }
+  | { kind: "flight-leader-coverage-review" }
   | { kind: "manual-swap-analysis" }
   | { kind: "next-workday-cutoff-recovery" }
   | {
@@ -56,6 +57,7 @@ export function reassignmentIntentReview(
       return "frequency";
     case "staff-work-continuity-review":
     case "staff-airline-mix-review":
+    case "flight-leader-coverage-review":
       return "continuity";
     case "late-shift-recovery-review":
     case "manual-swap-analysis":
@@ -126,6 +128,7 @@ export function reassignmentIntentPolicy(
       return STRICT_REASSIGNMENT_POLICY;
     case "staff-work-continuity-review":
     case "staff-airline-mix-review":
+    case "flight-leader-coverage-review":
       return STRICT_REASSIGNMENT_POLICY;
   }
 }

@@ -1,0 +1,172 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-22-flight-leader",
+  "title": "航班负责人保障：旧规则优先的每航班软目标",
+  "startedFrom": "c31bdf5f6fa4f75969ea354302af1c463a22c40a",
+  "expectation": {
+    "example": "两个航班均需1名负责人，甲有2名乙0名；只在原规则不退步时整体安全换人。目标可改为2；不足仍允许保存归档。",
+    "expected": "人员标签默认false，规则默认关闭/1；每航班独立去重计数；自动尽量补足、人工后实时提示并随当前状态及归档/Excel保存；A/B独立。",
+    "unchanged": "既有硬规则、值班/锁定、岗位覆盖、轮换频率与公平、恢复、疲劳、航班数、休息、早晚集中和航司搭配优先级不变；不造岗，不跨组，不自动重算旧档。",
+    "fallback": "找不到不损害原规则的完整方案或限时到，保留原安排并按最终人数提示；不拒绝保存或归档。历史教训：航司搭配软偏好、普通重点跨分类轮换后置保护、普通员工早晚集中、完整Excel缺字段与往返。页面由Owner验收，未取得证据保持未验收。"
+  },
+  "testedVersion": "53f2289c7df916263fa8f5c99a3410b649a133a89e59407c178af6705a7798e0",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "先证明缺少新领域功能；配置往返与后天归档漏接另有真实失败，最后完整回归通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-22-flight-leader-red.txt",
+          "summary": "改前缺少负责人领域模块导致失败。",
+          "sha256": "a946785246463c3e9eef754e2523ecc7574a455087283b575fdb2d2d95855865"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-22-flight-leader-settings-first.txt",
+          "summary": "捕获活跃组恢复漏字段、独立记录表导入及模板缺字段。",
+          "sha256": "d107d1353cec4ee9325cf379ed613e44b913d321c2efcedee6fdc5f6b04ed476"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-22-flight-leader-next-red.txt",
+          "summary": "正常完成及中途采用后天班表均漏存本班人数的2项失败。",
+          "sha256": "07bd3ad67f0c053fadccc905888c801843b81ee3142ca34b11b17768c85d82d5"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-22-flight-leader-verify.txt",
+          "summary": "完整verify退出0；功能2445项、性能21项、类型检查及构建通过。",
+          "sha256": "7650fb12b9938d4e7c43cfffc2a880c49f3a3a499d959af9bb016978acc8d9a8"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "人员勾选、统一规则草稿开关/人数、自动安全换人、目标2与同人去重、人工后提示及保存归档均通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-22-flight-leader-verify.txt",
+          "summary": "完整verify退出0；功能2445项、性能21项、类型检查及构建通过。",
+          "sha256": "7650fb12b9938d4e7c43cfffc2a880c49f3a3a499d959af9bb016978acc8d9a8"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-22-flight-leader-final.json",
+          "summary": "实际Worker模块/WASM最终输出：达标人数1/1，不足0/0；均4个真实岗位、有效最终安全凭证，保存归档不拒绝。",
+          "sha256": "63b761c8f5a0de5bf2f6578fd694455e21fe5327297ed9aac959afb2a660b5d6"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-22-flight-leader-independent.json",
+          "summary": "不调用负责人实现，按结果XLSX单元格与合成人员ID独立去重计数，核对归档快照与岗位数。",
+          "sha256": "ad5cfce0bb5c71b2b4967ae184a28920917e62db5f1d330f492af423fe8ca13c"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "旧JSON/旧Excel缺字段、显式否与坏值、完整恢复默认、配置和结果XLSX字节、A/B独立及900历史启用分支通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-22-flight-leader-verify.txt",
+          "summary": "完整verify退出0；功能2445项、性能21项、类型检查及构建通过。",
+          "sha256": "7650fb12b9938d4e7c43cfffc2a880c49f3a3a499d959af9bb016978acc8d9a8"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-22-flight-leader-performance.json",
+          "summary": "8航班16人900历史，启用负责人安全重排保持岗位和个人负荷；本机单次门禁。",
+          "sha256": "bfbdcf86641ff484deb56f021afd8fe46bf033b575c6ac305721936dcf102ea6"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-22-flight-leader-regression.txt",
+          "summary": "7文件109项，复核旧配置、班组与云JSON、模板及后天归档。",
+          "sha256": "54b7789759e22e998489276b062fe0b7df1a5fafec58005b2ccea3cd285c43c2"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "原补缺、恢复、轮岗、休息与航司搭配仍优先；最低优先级换人受共享安全保护。人工实际换人后最终投影重新报缺；普通归档、正常/中途采用后天、计算失败保留原表分别验证。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-22-flight-leader-verify.txt",
+          "summary": "完整verify退出0；功能2445项、性能21项、类型检查及构建通过。",
+          "sha256": "7650fb12b9938d4e7c43cfffc2a880c49f3a3a499d959af9bb016978acc8d9a8"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-22-flight-leader-next.txt",
+          "summary": "归档后天三分支及原控制器、反馈69项回归。",
+          "sha256": "8d223047101337b76173c3a721c85cba18878b734576fbc07143790ab4c4a114"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-22-flight-leader-final.json",
+          "summary": "实际Worker模块/WASM最终输出：达标人数1/1，不足0/0；均4个真实岗位、有效最终安全凭证，保存归档不拒绝。",
+          "sha256": "63b761c8f5a0de5bf2f6578fd694455e21fe5327297ed9aac959afb2a660b5d6"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "新偏好未加入硬安全拒绝；实际零负责人班表仍生成最终凭证，安装、保存及归档通过；资格/锁定/安全拒绝/超时保留原表。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-22-flight-leader-verify.txt",
+          "summary": "完整verify退出0；功能2445项、性能21项、类型检查及构建通过。",
+          "sha256": "7650fb12b9938d4e7c43cfffc2a880c49f3a3a499d959af9bb016978acc8d9a8"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-22-flight-leader-final.json",
+          "summary": "实际Worker模块/WASM最终输出：达标人数1/1，不足0/0；均4个真实岗位、有效最终安全凭证，保存归档不拒绝。",
+          "sha256": "63b761c8f5a0de5bf2f6578fd694455e21fe5327297ed9aac959afb2a660b5d6"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "旧规则相对顺序与严格重排策略保持；重点频率、每人工时/疲劳、航班数、休息与航司结果受保护。全量原有回归通过，旧证据按接手字节恢复。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-22-flight-leader-verify.txt",
+          "summary": "完整verify退出0；功能2445项、性能21项、类型检查及构建通过。",
+          "sha256": "7650fb12b9938d4e7c43cfffc2a880c49f3a3a499d959af9bb016978acc8d9a8"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-22-flight-leader-baseline.json",
+          "summary": "独立核对并恢复测试自动改写的旧证据；保留Owner开始时未提交内容。",
+          "sha256": "eb40a93ce8069792d19b80f946e9b60e5cac285dd9d28fdf2439948bab94de24"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "本次Node宿主实际Worker模块/WASM、真实DOM/controller/Store及XLSX产物已自动核对；按AGENTS要求未自行打开浏览器。Owner尚未提供实际页面验收，不能把自动测试冒充现场通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-22-flight-leader-final.json",
+          "summary": "实际Worker模块/WASM最终输出：达标人数1/1，不足0/0；均4个真实岗位、有效最终安全凭证，保存归档不拒绝。",
+          "sha256": "63b761c8f5a0de5bf2f6578fd694455e21fe5327297ed9aac959afb2a660b5d6"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-22-flight-leader-independent.json",
+          "summary": "不调用负责人实现，按结果XLSX单元格与合成人员ID独立去重计数，核对归档快照与岗位数。",
+          "sha256": "ad5cfce0bb5c71b2b4967ae184a28920917e62db5f1d330f492af423fe8ca13c"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-22-flight-leader-covered.xlsx",
+          "summary": "达标最终结果文件；4岗位，两航班各1名负责人。",
+          "sha256": "eb14fb4acc99a53bae23b3081c1ccac6af716452140a150701906bb34bf60dae"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-22-flight-leader-shortage.xlsx",
+          "summary": "不足仍可保存/归档的最终结果；4岗位，两航班各0名负责人，附当时人数记录。",
+          "sha256": "6f85c9207695c6e4a65833f529920e0f3513c5cffaaed9c89d43fcf981d9e5bb"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "改前red日志证明缺功能，settings-first与next-red保留边界失败；最终完整verify与独立XLSX计数证明新行为已实现，无负责人会从最终实际人员中发现。",
+    "laterChanges": "补缺、恢复、轮岗、督导收尾、休息及航司搭配均可能换人；旧规则继续优先，新最低目标不买入任何旧保护让步。全部写入后独立重算人数；实际人工交换及归档后天三分支有回归，不能把中途达标当成最终达标。",
+    "finalArtifact": "本次final.json、covered.xlsx、shortage.xlsx及独立计数材料证明两类最终结果、岗位守恒与保存归档；900历史性能分支另有材料。尚缺Owner实际页面证据，保持未验收，不发布。"
+  },
+  "review": {
+    "missedScope": "对照传播矩阵检查人员、标量规则、统一Store、Worker、最终反馈、归档三入口、旧值缺省、双组、JSON和Excel。补修活跃组顶层恢复、后天双提交、空数组污染另一组和旧表结构。仍未验证Owner浏览器视觉、私人真实班表及线上；不宣称这些已通过。",
+    "rootCause": "旧系统没有固定负责人标签和独立航班级人数投影；归档只投影已排历史，systemNotes不会自动持久化，也不能表示完全空岗航班的负责人提示。新增证据必须在旧日事实被后天草稿替换前捕获，并明确传到最终提交；缺省可选字段不应被无关操作填成空数组。",
+    "earlyDetection": "改前列传播矩阵，把最终真实人员计数与当时归档快照区分；先用跨航班集中、目标2、同人多岗、旧文件缺列/坏值及A/B不变反例。提交前逐入口跑正常/中途采用/失败和真实字节往返，独立数最终XLSX；Owner页面检查补齐最后入口证据。"
+  }
+}

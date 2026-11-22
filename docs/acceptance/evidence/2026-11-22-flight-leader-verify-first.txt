@@ -1,0 +1,284 @@
+
+> autoschedule@1.0.0 verify
+> npm run typecheck && npm test && npm run test:performance && npm run build
+
+
+> autoschedule@1.0.0 typecheck
+> tsc -b --pretty false
+
+
+> autoschedule@1.0.0 test
+> vitest run --exclude tests/performance/**
+
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/infrastructure/excel.test.ts (46 tests | 2 failed) 8143ms
+     × exports both operational and machine-readable schedule views 7747ms
+     × ships a downloadable configuration template with current qualification and rule fields 14ms
+ ❯ tests/app/flight-config-device-restore.test.ts (13 tests | 1 failed) 464ms
+     × keeps ordinary import, template-only replacement and history-only import behavior 65ms
+ ❯ tests/app/flight-leader-archive.test.ts (3 tests | 2 failed) 295ms
+   × captures the old day's warning before next-day preparation: completed 205ms
+   × captures the old day's warning before next-day preparation: stopped-with-result 70ms
+ ❯ tests/app/flight-season-review.test.ts (16 tests | 1 failed) 270ms
+     × refuses cancelled retirement and outdated old-flight choices without changing state 29ms
+ ❯ tests/app/late-airline-device-roundtrip.test.ts (4 tests | 2 failed) 162ms
+   × keeps setting=true and its actual effect after byte export, clean import, JSON restart and cloud restore 102ms
+   × keeps setting=false and its actual effect after byte export, clean import, JSON restart and cloud restore 41ms
+ ❯ tests/infrastructure/supabase-backend.test.ts (19 tests | 1 failed) 169ms
+     × reads uploader snapshots and validates selected content before invoking atomic restore without actor/model input 61ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 9 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/app/flight-config-device-restore.test.ts > device flight configuration restore > keeps ordinary import, template-only replacement and history-only import behavior
+AssertionError: expected { Object (version, shared, ...) } to deeply equal { Object (version, shared, ...) }
+
+- Expected
++ Received
+
+@@ -1,10 +1,11 @@
+  {
+    "activeGroupId": "A",
+    "activeScheduleDate": null,
+    "assignments": [],
+    "dutyRosterOverrides": [],
++   "flightLeaderCoverageHistory": [],
+    "flightPlanConfirmations": [],
+    "flightSeasonOverrides": {},
+    "flights": [
+      {
+        "bookedPassengers": 0,
+
+ ❯ tests/app/flight-config-device-restore.test.ts:303:20
+    301|     const before = structuredClone(target);
+    302|     applyWorkbookImport(target, imported, "history", restoreOptions);
+    303|     expect(target).toEqual(before);
+       |                    ^
+    304|   });
+    305|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/9]⎯
+
+ FAIL  tests/app/flight-leader-archive.test.ts > captures the old day's warning before next-day preparation: completed
+ FAIL  tests/app/flight-leader-archive.test.ts > captures the old day's warning before next-day preparation: stopped-with-result
+AssertionError: expected undefined to deeply equal [ 2, +0 ]
+
+- Expected:
+[
+  2,
+  0,
+]
+
++ Received:
+undefined
+
+ ❯ tests/app/flight-leader-archive.test.ts:58:7
+     56|         )
+     57|         ?.flights.map((f) => f.actual)
+     58|     ).toEqual([2, 0]);
+       |       ^
+     59|   }
+     60| );
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/9]⎯
+
+ FAIL  tests/app/flight-season-review.test.ts > seasonal flight confirmation and group isolation > refuses cancelled retirement and outdated old-flight choices without changing state
+AssertionError: expected { Object (version, shared, ...) } to deeply equal { Object (version, shared, ...) }
+
+- Expected
++ Received
+
+@@ -537,10 +537,11 @@
+      },
+      "B": {
+        "activeScheduleDate": null,
+        "assignments": [],
+        "dutyRosterOverrides": [],
++       "flightLeaderCoverageHistory": [],
+        "flightPlanConfirmations": [],
+        "flightSeasonOverrides": {},
+        "flights": [
+          {
+            "bookedPassengers": 123,
+@@ -586,10 +587,11 @@
+            ],
+            "remark": "",
+          },
+        ],
+        "schedulePolicyStale": false,
++       "scheduleRuleFingerprint": undefined,
+        "settings": {
+          "adminSupportEnabled": false,
+          "afternoonRestBalanceEnabled": true,
+          "afternoonRestEndTime": "18:00",
+          "afternoonRestMaxDifference": 1,
+
+ ❯ tests/app/flight-season-review.test.ts:711:38
+    709|         },
+    710|       });
+    711|       expect(store.getState().model).toEqual(before);
+       |                                      ^
+    712|     }
+    713|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/9]⎯
+
+ FAIL  tests/app/late-airline-device-roundtrip.test.ts > keeps setting=true and its actual effect after byte export, clean import, JSON restart and cloud restore
+ FAIL  tests/app/late-airline-device-roundtrip.test.ts > keeps setting=false and its actual effect after byte export, clean import, JSON restart and cloud restore
+AssertionError: expected { leaveTypes: [], …(16) } to deeply equal { flightSeasonOverrides: {}, …(14) }
+
+- Expected
++ Received
+
+@@ -1,9 +1,10 @@
+  {
+    "activeScheduleDate": null,
+    "assignments": [],
+    "dutyRosterOverrides": [],
++   "flightLeaderCoverageHistory": [],
+    "flightPlanConfirmations": [],
+    "flightSeasonOverrides": {},
+    "flights": [],
+    "halfRestSelections": [],
+    "history": [],
+@@ -990,10 +991,11 @@
+        ],
+        "remark": "",
+      },
+    ],
+    "schedulePolicyStale": false,
++   "scheduleRuleFingerprint": undefined,
+    "settings": {
+      "adminSupportEnabled": false,
+      "afternoonRestBalanceEnabled": true,
+      "afternoonRestEndTime": "18:00",
+      "afternoonRestMaxDifference": 1,
+
+ ❯ tests/app/late-airline-device-roundtrip.test.ts:59:31
+     57|     const restored = persistence.load();
+     58|     expect(restored.settings.lateAirlineRotationEnabled).toBe(enabled);
+     59|     expect(restored.groups.B).toEqual(otherGroup);
+       |                               ^
+     60|     const cloud = restoreCloudModel(JSON.parse(JSON.stringify(restored…
+     61|     expect(cloud.settings.lateAirlineRotationEnabled).toBe(enabled);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/9]⎯
+
+ FAIL  tests/infrastructure/excel.test.ts > workbook boundary > exports both operational and machine-readable schedule views
+AssertionError: expected [ Array(5) ] to deeply equal [ '保障明细', '排班结果', '人员排班', '半休选择' ]
+
+- Expected
++ Received
+
+  [
+    "保障明细",
+    "排班结果",
+    "人员排班",
+    "半休选择",
++   "负责人保障记录",
+  ]
+
+ ❯ tests/infrastructure/excel.test.ts:499:33
+    497|     state.activeScheduleDate = "2026-07-18";
+    498|     const workbook = buildScheduleWorkbook(state, "2026-07-18");
+    499|     expect(workbook.SheetNames).toEqual([
+       |                                 ^
+    500|       "保障明细",
+    501|       "排班结果",
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/9]⎯
+
+ FAIL  tests/infrastructure/excel.test.ts > workbook boundary > ships a downloadable configuration template with current qualification and rule fields
+AssertionError: expected [ 'maxDailyHours', …(40) ] to deeply equal [ Array(41) ]
+
+- Expected
++ Received
+
+@@ -1,8 +1,6 @@
+  [
+-   "flightLeaderCoverageEnabled",
+-   "minimumFlightLeaders",
+    "maxDailyHours",
+    "historyWindowDays",
+    "nightStart",
+    "nightEnd",
+    "consecutiveDayPenalty",
+@@ -38,6 +36,8 @@
+    "workloadBalanceEnabled",
+    "dailyFlightCountBalanceExemptHalfRest",
+    "dailyFlightCountBalanceExemptTeamLeaders",
+    "maxWorkHoursDifference",
+    "maxTodayFatigueDifference",
++   "flightLeaderCoverageEnabled",
++   "minimumFlightLeaders",
+  ]
+
+ ❯ tests/infrastructure/excel.test.ts:1017:26
+    1015|       .slice(1)
+    1016|       .map((row) => row[0]);
+    1017|     expect(settingCodes).toEqual(
+       |                          ^
+    1018|       SCHEDULE_SETTING_DEFINITIONS.map((definition) => definition.key)
+    1019|     );
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/9]⎯
+
+ FAIL  tests/infrastructure/supabase-backend.test.ts > official Supabase SDK adapter > reads uploader snapshots and validates selected content before invoking atomic restore without actor/model input
+AssertionError: expected { version: 3, model: { …(24) } } to deeply equal { version: 3, model: { …(24) } }
+
+- Expected
++ Received
+
+@@ -1154,10 +1154,11 @@
+              ],
+              "remark": "",
+            },
+          ],
+          "schedulePolicyStale": false,
++         "scheduleRuleFingerprint": undefined,
+          "settings": {
+            "adminSupportEnabled": false,
+            "afternoonRestBalanceEnabled": true,
+            "afternoonRestEndTime": "18:00",
+            "afternoonRestMaxDifference": 1,
+@@ -1630,10 +1631,11 @@
+        },
+        "B": {
+          "activeScheduleDate": null,
+          "assignments": [],
+          "dutyRosterOverrides": [],
++         "flightLeaderCoverageHistory": [],
+          "flightPlanConfirmations": [],
+          "flightSeasonOverrides": {},
+          "flights": [],
+          "halfRestSelections": [],
+          "history": [],
+@@ -2620,10 +2622,11 @@
+              ],
+              "remark": "",
+            },
+          ],
+          "schedulePolicyStale": false,
++         "scheduleRuleFingerprint": undefined,
+          "settings": {
+            "adminSupportEnabled": false,
+            "afternoonRestBalanceEnabled": true,
+            "afternoonRestEndTime": "18:00",
+            "afternoonRestMaxDifference": 1,
+
+ ❯ tests/infrastructure/supabase-backend.test.ts:209:50
+    207|     ]);
+    208|     expect(await backend.listVersions()).toEqual([entry]);
+    209|     expect(await backend.restoreVersion(2, "1")).toEqual({ version: 3,…
+       |                                                  ^
+    210|     expect(String(fetcher.mock.calls[1]![0])).toContain(
+    211|       "/rpc/cloud_read_workspace_version"
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/9]⎯
+
+
+ Test Files  6 failed | 255 passed (261)
+      Tests  9 failed | 2436 passed (2445)
+   Start at  13:19:58
+   Duration  368.32s (transform 9.35s, setup 0ms, import 57.85s, tests 238.91s, environment 19.63s)

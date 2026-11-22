@@ -65,6 +65,7 @@ export function scheduleRuleFingerprint(state: FingerprintState): string {
           id: person.id,
           staffType: person.staffType,
           teamLeader: person.teamLeader,
+          flightLeaderQualified: person.flightLeaderQualified === true,
           cxPreflightQualified: person.cxPreflightQualified,
           dutyQualified: person.dutyQualified,
           standbyQualified: person.standbyQualified,

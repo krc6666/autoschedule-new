@@ -1,0 +1,20 @@
+{
+  "method": "Independent XLSX cell/unique-ID count; does not call feature projection or optimizer",
+  "results": [
+    {
+      "tag": "covered",
+      "sha256": "eb14fb4acc99a53bae23b3081c1ccac6af716452140a150701906bb34bf60dae",
+      "actual": [1, 1],
+      "jobs": 4,
+      "snapshotMatchesOutput": true
+    },
+    {
+      "tag": "shortage",
+      "sha256": "6f85c9207695c6e4a65833f529920e0f3513c5cffaaed9c89d43fcf981d9e5bb",
+      "actual": [0, 0],
+      "jobs": 4,
+      "snapshotMatchesOutput": true
+    }
+  ],
+  "browserAcceptance": "not performed; owner-operated acceptance remains pending"
+}

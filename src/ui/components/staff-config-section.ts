@@ -86,6 +86,7 @@ export class StaffConfigSectionElement extends LightDomElement {
                 <th>值班资质</th>
                 <th>备勤资质</th>
                 <th>夜班</th>
+                <th>可担任负责人</th>
                 <th>状态</th>
                 <th>备注</th>
                 <th class="action-col">
@@ -120,6 +121,9 @@ export class StaffConfigSectionElement extends LightDomElement {
                     </td>
                     <td>
                       ${configurationToggle(this, "staff", person.id, "nightShift", person.nightShift, "可上夜班")}
+                    </td>
+                    <td>
+                      ${configurationToggle(this, "staff", person.id, "flightLeaderQualified", person.flightLeaderQualified === true, "可担任负责人")}
                     </td>
                     <td>
                       ${configurationSelect(this, "staff", person.id, "status", staffStatusValue(person), "状态", staffStatusOptions(this.model.leaveTypes, staffStatusValue(person)))}

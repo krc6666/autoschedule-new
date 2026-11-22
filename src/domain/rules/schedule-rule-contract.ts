@@ -313,6 +313,15 @@ export const SCHEDULING_RULES = [
     feedbackOrder: 11,
     optimization: "best-effort",
   },
+  {
+    id: "flight-leader-coverage",
+    stage: "post-schedule-review",
+    label: "航班负责人保障",
+    feedbackMode: "dedicated",
+    feedbackKey: "flight-leader-coverage",
+    feedbackOrder: 12,
+    optimization: "best-effort",
+  },
 ] as const satisfies readonly (
   | ({
       id: string;

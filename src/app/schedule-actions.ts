@@ -29,7 +29,12 @@ import {
   nextWorkdayCutoffProtection,
 } from "../domain/reviews/cross-day-recovery";
 import type { AppState, Assignment } from "../model";
-import type { Flight, HistoryRecord, ScheduleResult } from "../model";
+import type {
+  Flight,
+  HistoryRecord,
+  ScheduleResult,
+  FlightLeaderCoverageStatus,
+} from "../model";
 import { replaceHistoryForDate } from "./history-actions";
 import { installGeneratedSchedule } from "../domain/kernel/schedule-lifecycle";
 import { createId, normalizeText } from "../utils";
@@ -47,9 +52,10 @@ export function installArchivedNextWorkdaySchedule(
   records: HistoryRecord[],
   nextDate: string,
   flights: Flight[],
-  result: ScheduleResult
+  result: ScheduleResult,
+  coverageSnapshot: FlightLeaderCoverageStatus[]
 ): void {
-  replaceHistoryForDate(state, currentDate, records);
+  replaceHistoryForDate(state, currentDate, records, coverageSnapshot);
   state.flights = flights;
   installGeneratedSchedule(state, nextDate, result);
 }

@@ -183,7 +183,7 @@ function airlineProposalSafetyReasons(
   return [];
 }
 
-function preservesMix(
+export function preservesMix(
   before: readonly StaffAirlineMix[],
   after: readonly StaffAirlineMix[],
   mayYield: ReadonlySet<string> = new Set()

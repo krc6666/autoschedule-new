@@ -50,6 +50,7 @@ import { compactRegularAssignments } from "../coverage/schedule-coverage";
 import { balanceRelaxedShifts } from "../reviews/relaxed-shift-balance";
 import { improveStaffWorkContinuity } from "../reviews/staff-work-continuity";
 import { improveStaffAirlineMix } from "../reviews/staff-airline-mix";
+import { improveFlightLeaderCoverage } from "../reviews/flight-leader-coverage";
 import { enabledAirlineMixPolicies } from "./airline-mix-policy";
 
 export const CONFIGURABLE_RULE_SETTINGS: Partial<
@@ -64,9 +65,11 @@ export const CONFIGURABLE_RULE_SETTINGS: Partial<
       | "dailyPrimaryPositionUniqueEnabled"
       | "lateShiftRecoveryEnabled"
       | "workloadBalanceEnabled"
+      | "flightLeaderCoverageEnabled"
     >
   >
 > = {
+  "flight-leader-coverage": "flightLeaderCoverageEnabled",
   "late-shift-recovery": "lateShiftRecoveryEnabled",
   "late-shift-cutoff": "lateShiftRecoveryEnabled",
   "priority-position-consecutive": "positionRotationEnabled",
@@ -396,6 +399,9 @@ const RULE_EXECUTION: Readonly<
   "staff-airline-mix": [
     { kind: "final-review", execute: improveStaffAirlineMix },
   ],
+  "flight-leader-coverage": [
+    { kind: "final-review", execute: improveFlightLeaderCoverage },
+  ],
 };
 
 export const BUILT_IN_SCHEDULING_HOOKS: readonly SchedulingHook[] =
@@ -403,7 +409,7 @@ export const BUILT_IN_SCHEDULING_HOOKS: readonly SchedulingHook[] =
     id: rule.id,
     label: rule.label,
     stage: rule.stage,
-    defaultEnabled: true,
+    defaultEnabled: rule.id !== "flight-leader-coverage",
     configurable:
       rule.id === "staff-airline-mix" ||
       rule.id === "relaxed-shift-balance" ||

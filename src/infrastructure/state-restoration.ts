@@ -8,6 +8,7 @@ import type { FlightIdentity } from "../model";
 import { normalizeFlightSeasonOverrides } from "../domain/flights/configured-flight-positions";
 import { normalizeSupervisorAssignments } from "../domain/assignments/schedule-adjustment";
 import { restoreManualCountEvidence } from "./manual-count-evidence";
+import { normalizeFlightLeaderCoverageHistory } from "../domain/rules/flight-leader-coverage";
 import { normalizeScheduleSettings } from "../domain/rules/schedule-settings";
 import { removeUnavailableStaffAssignments } from "../domain/kernel/schedule-state";
 import {
@@ -272,6 +273,7 @@ function restoreStaff(value: unknown[]): Staff[] {
         name: item.name,
         staffType,
         teamLeader: staffType === "行政支援" ? false : Boolean(item.teamLeader),
+        flightLeaderQualified: item.flightLeaderQualified === true,
         cxPreflightQualified:
           staffType === "行政支援" ? false : Boolean(item.cxPreflightQualified),
         dutyQualified:
@@ -786,6 +788,13 @@ function groupWorkspaceFromState(state: AppState): GroupWorkspace {
       state.flightPlanConfirmations
     ),
     halfRestSelections: structuredClone(state.halfRestSelections ?? []),
+    ...(state.flightLeaderCoverageHistory === undefined
+      ? {}
+      : {
+          flightLeaderCoverageHistory: normalizeFlightLeaderCoverageHistory(
+            state.flightLeaderCoverageHistory
+          ),
+        }),
     leaveTypes: structuredClone(state.leaveTypes),
     flights: structuredClone(state.flights),
     staff: structuredClone(state.staff),
@@ -908,6 +917,13 @@ function restoreGroupWorkspace(
       value.flightPlanConfirmations
     ),
     halfRestSelections: normalizeHalfRestSelections(value.halfRestSelections),
+    ...(value.flightLeaderCoverageHistory === undefined
+      ? {}
+      : {
+          flightLeaderCoverageHistory: normalizeFlightLeaderCoverageHistory(
+            value.flightLeaderCoverageHistory
+          ),
+        }),
     flights,
     staff,
     positionRules,
@@ -943,6 +959,9 @@ function projectActiveGroup(next: AppState): void {
   next.flightPlanConfirmations = active.flightPlanConfirmations ?? [];
   next.flightSeasonOverrides = active.flightSeasonOverrides ?? {};
   next.halfRestSelections = active.halfRestSelections;
+  if (active.flightLeaderCoverageHistory !== undefined)
+    next.flightLeaderCoverageHistory = active.flightLeaderCoverageHistory;
+  else delete next.flightLeaderCoverageHistory;
   next.leaveTypes = active.leaveTypes;
   next.positionRules = active.positionRules;
   next.settings = active.settings;
@@ -1050,6 +1069,13 @@ export function restorePersistedState(
       typeof value.activeScheduleDate === "string"
         ? value.activeScheduleDate
         : fallback.activeScheduleDate,
+    ...(value.flightLeaderCoverageHistory === undefined
+      ? {}
+      : {
+          flightLeaderCoverageHistory: normalizeFlightLeaderCoverageHistory(
+            value.flightLeaderCoverageHistory
+          ),
+        }),
     schedulePolicyStale:
       typeof value.schedulePolicyStale === "boolean"
         ? value.schedulePolicyStale

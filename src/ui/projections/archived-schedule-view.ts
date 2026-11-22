@@ -1,5 +1,10 @@
 import { recentArchivedWorkdays } from "../../domain/statistics/fatigue";
-import type { AppState, HistoryRecord } from "../../model";
+import { flightLeaderWarnings } from "../../domain/rules/flight-leader-coverage";
+import type {
+  AppState,
+  HistoryRecord,
+  FlightLeaderCoverageStatus,
+} from "../../model";
 
 export interface ArchivedScheduleFlightGroup {
   flightNo: string;
@@ -9,6 +14,7 @@ export interface ArchivedScheduleFlightGroup {
 }
 
 export interface ArchivedScheduleDayView {
+  flightLeaderWarnings?: string[];
   date: string;
   groups: ArchivedScheduleFlightGroup[];
   recordCount: number;
@@ -74,10 +80,14 @@ function flightGroups(
 function dayView(
   date: string,
   records: HistoryRecord[],
-  order: ReadonlyMap<string, number>
+  order: ReadonlyMap<string, number>,
+  coverage?: readonly FlightLeaderCoverageStatus[]
 ): ArchivedScheduleDayView {
   const groups = flightGroups(records, order);
   return {
+    ...(coverage === undefined
+      ? {}
+      : { flightLeaderWarnings: flightLeaderWarnings(coverage) }),
     date,
     groups,
     recordCount: records.length,
@@ -90,7 +100,10 @@ function dayView(
 }
 
 export function buildArchivedScheduleDays(
-  state: Pick<AppState, "history" | "positionRules">
+  state: Pick<
+    AppState,
+    "history" | "positionRules" | "flightLeaderCoverageHistory"
+  >
 ): ArchivedScheduleDayView[] {
   const recordsByDate = new Map<string, HistoryRecord[]>();
   for (const record of state.history) {
@@ -101,16 +114,34 @@ export function buildArchivedScheduleDays(
   const order = positionOrder(state);
   return [...recordsByDate.entries()]
     .sort(([left], [right]) => right.localeCompare(left))
-    .map(([date, records]) => dayView(date, records, order));
+    .map(([date, records]) =>
+      dayView(
+        date,
+        records,
+        order,
+        state.flightLeaderCoverageHistory?.find((day) => day.date === date)
+          ?.flights
+      )
+    );
 }
 
 export function buildPreviousArchivedScheduleView(
-  state: Pick<AppState, "history" | "positionRules">,
+  state: Pick<
+    AppState,
+    "history" | "positionRules" | "flightLeaderCoverageHistory"
+  >,
   date: string
 ): ArchivedScheduleDayView | null {
   const records = recentArchivedWorkdays(state.history, date, 1);
   const previousDate = records[0]?.date;
   return previousDate
-    ? dayView(previousDate, records, positionOrder(state))
+    ? dayView(
+        previousDate,
+        records,
+        positionOrder(state),
+        state.flightLeaderCoverageHistory?.find(
+          (day) => day.date === previousDate
+        )?.flights
+      )
     : null;
 }

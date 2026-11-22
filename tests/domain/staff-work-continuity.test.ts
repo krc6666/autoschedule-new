@@ -116,9 +116,10 @@ describe("ordinary staff work continuity", () => {
     )
       .filter((h) => h.execute.some((e) => e.kind === "final-review"))
       .map((h) => h.id);
-    expect(ids.slice(-2)).toEqual([
+    expect(ids.slice(-3)).toEqual([
       "staff-work-continuity",
       "staff-airline-mix",
+      "flight-leader-coverage",
     ]);
   });
   it("retains locked assignments when no safe improvement exists", async () => {

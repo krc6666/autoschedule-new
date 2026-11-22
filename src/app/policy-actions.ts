@@ -53,6 +53,8 @@ export type PolicyEntity = Exclude<
 export type PolicyFieldUpdateResult = "not-policy" | "missing" | "saved";
 
 export interface SchedulePolicyInput {
+  flightLeaderCoverageEnabled?: boolean;
+  minimumFlightLeaders?: number;
   maxDailyHours: number;
   minimumRegularTransitionMinutes: number;
   highLoadProtectionEnabled: boolean;

@@ -23,6 +23,8 @@ import { STATISTICS_TIME_WINDOWS } from "../../domain/rules/schedule-settings";
 
 const POLICY_SETTING_SEARCH_TEXT = [
   "核心保护与公平参数",
+  "航班负责人保障",
+  "每个航班至少几名负责人",
   "保存后当前班表会标记为需要重新生成",
   "每日工时上限",
   "普通岗位最小衔接间隔（分钟）",
@@ -100,6 +102,8 @@ export class PolicySettingsFormElement extends LightDomElement {
         </summary>
         <div class="policy-rule-content">
           <div class="schedule-policy-controls">
+            ${this.toggle("flightLeaderCoverageEnabled", "航班负责人保障", "现有规则优先；不足只提示，允许保存和归档")}
+            ${this.number("minimumFlightLeaders", "每个航班至少几名负责人", 1, 100, 1)}
             ${this.number("maxDailyHours", "每日工时上限", 1, 24, 0.5)}
             ${this.number("minimumRegularTransitionMinutes", "普通岗位最小衔接间隔（分钟）", 0, 1440, 1)}
             ${this.toggle("highLoadProtectionEnabled", "高负荷岗位恢复", "优先避开恢复期内人员")}

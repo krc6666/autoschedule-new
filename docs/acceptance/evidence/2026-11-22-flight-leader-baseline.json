@@ -1,0 +1,15 @@
+{
+  "checked": 930,
+  "restoredAfterTests": [
+    "2026-11-17-history-sync-result.xlsx",
+    "2026-11-17-history-time-final.json",
+    "2026-11-17-history-time-result.xlsx",
+    "2026-11-17-latest-view.html",
+    "2026-11-17-ordinary-dates.html",
+    "2026-11-18-session-approval-rejected.html",
+    "2026-11-20-history-temporary-final.json",
+    "2026-11-21-late-airline-final.json",
+    "2026-11-21-late-airline-result.xlsx"
+  ],
+  "method": "Exact pre-task bytes; existing owner modifications were preserved"
+}

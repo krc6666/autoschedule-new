@@ -55,10 +55,12 @@ export class WorkbookImportDialogElement extends LightDomElement {
       this.dialog.changedConfig ||
       (replaceSharedTemplates && this.dialog.sharedTemplatesAvailable);
     const hasHistory = (this.dialog.historySummary?.total ?? 0) > 0;
+    const hasLeaderHistory = imported.flightLeaderCoverageHistory !== undefined;
     const canImport =
       !this.dialog.restoreErrors?.length &&
       (this.dialog.changedConfig ||
         hasHistory ||
+        hasLeaderHistory ||
         (replaceSharedTemplates && this.dialog.sharedTemplatesAvailable));
     const confirmLabel = changesConfig
       ? hasHistory

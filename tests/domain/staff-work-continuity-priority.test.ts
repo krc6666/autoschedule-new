@@ -40,6 +40,7 @@ describe("priority rotation before work continuity", () => {
   it.each([
     "staff-work-continuity-review",
     "staff-airline-mix-review",
+    "flight-leader-coverage-review",
   ] as const)(
     "%s cannot move a priority slot to a higher-frequency worker",
     (kind) => {

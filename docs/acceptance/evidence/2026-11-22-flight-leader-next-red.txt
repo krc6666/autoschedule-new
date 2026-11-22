@@ -1,0 +1,37 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/app/flight-leader-archive.test.ts (3 tests | 2 failed) 365ms
+   × captures the old day's warning before next-day preparation: completed 258ms
+   × captures the old day's warning before next-day preparation: stopped-with-result 87ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/app/flight-leader-archive.test.ts > captures the old day's warning before next-day preparation: completed
+ FAIL  tests/app/flight-leader-archive.test.ts > captures the old day's warning before next-day preparation: stopped-with-result
+AssertionError: expected undefined to deeply equal [ 2, +0 ]
+
+- Expected:
+[
+  2,
+  0,
+]
+
++ Received:
+undefined
+
+ ❯ tests/app/flight-leader-archive.test.ts:30:129
+     28|   expect(store.getState().model.activeScheduleDate).toBe("2026-11-24");
+     29|   expect(store.getState().model.history.filter(r => r.date === LEADER_…
+     30|   expect(store.getState().model.flightLeaderCoverageHistory?.find(day …
+       |                                                                                                                                 ^
+     31| });
+     32|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 1 passed (3)
+   Start at  13:17:37
+   Duration  2.72s (transform 1.88s, setup 0ms, import 2.15s, tests 365ms, environment 0ms)

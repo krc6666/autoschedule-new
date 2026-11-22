@@ -1,4 +1,5 @@
 import type { UiCommand } from "../../ui/events/ui-command";
+import { flightLeaderCoverage } from "../../domain/rules/flight-leader-coverage";
 import type {
   ApplicationContext,
   UiCommandController,
@@ -109,6 +110,7 @@ export class RecordsController implements UiCommandController {
               (item) => item.date === date && item.flightNo === "轮值"
             )
         );
+        const coverage = flightLeaderCoverage(this.context.model());
         const restored = structuredClone(this.context.model());
         const snapshot = this.historicalEditSnapshot;
         const syncCurrent = snapshot?.activeScheduleDate === date;
@@ -128,7 +130,7 @@ export class RecordsController implements UiCommandController {
             restored.scheduleRuleFingerprint = snapshot.scheduleRuleFingerprint;
           }
         }
-        replaceHistoryForDate(restored, date, replacement);
+        replaceHistoryForDate(restored, date, replacement, coverage);
         this.context.store.getState().replaceModel(restored);
         this.historicalEditSnapshot = null;
         this.historicalEditWarnings = [];

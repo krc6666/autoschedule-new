@@ -1,4 +1,6 @@
 import { getDutyRosterForDate } from "../domain/duty-roster/roster";
+import { flightLeaderCoverage } from "../domain/rules/flight-leader-coverage";
+import type { FlightLeaderCoverageStatus } from "../model";
 import { flightPositionSource } from "../domain/flights/flight-identities";
 import { assignmentUsesUnavailableStaff } from "../domain/kernel/schedule-state";
 import { isCountedWorkloadAssignment } from "../domain/shared/workload-accounting";
@@ -300,8 +302,22 @@ export function currentScheduleHistory(
 export function replaceHistoryForDate(
   state: AppState,
   date: string,
-  records: HistoryRecord[]
+  records: HistoryRecord[],
+  coverage?: FlightLeaderCoverageStatus[]
 ): void {
+  const snapshot =
+    coverage ??
+    (state.activeScheduleDate === date
+      ? flightLeaderCoverage(state)
+      : undefined);
+  state.flightLeaderCoverageHistory = [
+    ...(state.flightLeaderCoverageHistory ?? []).filter(
+      (day) => day.date !== date
+    ),
+    ...(snapshot === undefined
+      ? []
+      : [{ date, flights: structuredClone(snapshot) }]),
+  ];
   state.history = [
     ...state.history.filter((item) => item.date !== date),
     ...records,
@@ -309,9 +325,14 @@ export function replaceHistoryForDate(
 }
 
 export function clearHistory(state: AppState): void {
+  state.flightLeaderCoverageHistory = [];
   state.history = [];
 }
 
 export function deleteHistory(state: AppState, id: string): void {
+  const date = state.history.find((record) => record.id === id)?.date;
   state.history = state.history.filter((item) => item.id !== id);
+  state.flightLeaderCoverageHistory = state.flightLeaderCoverageHistory?.filter(
+    (day) => day.date !== date
+  );
 }

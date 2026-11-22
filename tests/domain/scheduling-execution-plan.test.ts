@@ -86,6 +86,7 @@ describe("compiled scheduling execution plan", () => {
       "daily-flight-count-balance",
       "staff-work-continuity",
       "staff-airline-mix",
+      "flight-leader-coverage",
     ]);
   });
 

@@ -1,0 +1,38 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/domain/schedule-feedback.test.ts (16 tests | 1 failed) 7207ms
+     × returns concise evidence-based items including duty arrangements and a missing history baseline 6867ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/domain/schedule-feedback.test.ts > schedule feedback > returns concise evidence-based items including duty arrangements and a missing history baseline
+AssertionError: expected [ '人员覆盖', '负荷均衡', '航班衔接', …(14) ] to deeply equal [ '人员覆盖', '负荷均衡', '航班衔接', …(13) ]
+
+- Expected
++ Received
+
+@@ -13,6 +13,7 @@
+    "本班末班人员预告",
+    "值班与轮值",
+    "同一工作班航班数均衡",
+    "普通员工早晚任务集中",
+    "航司搭配偏好",
++   "航班负责人保障",
+  ]
+
+ ❯ tests/domain/schedule-feedback.test.ts:238:48
+    236|     const feedback = buildScheduleFeedback(state, "2026-07-20");
+    237|     expect(feedback).toHaveLength(17);
+    238|     expect(feedback.map((item) => item.label)).toEqual([
+       |                                                ^
+    239|       "人员覆盖",
+    240|       "负荷均衡",
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 6 passed (7)
+      Tests  1 failed | 86 passed (87)
+   Start at  13:12:38
+   Duration  9.62s (transform 11.27s, setup 0ms, import 14.47s, tests 10.50s, environment 687ms)

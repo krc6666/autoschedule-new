@@ -29,6 +29,8 @@ export class ArchivedScheduleBoardElement extends LightDomElement {
       "--schedule-tiny-size": "9px",
     };
     return html`<div class="history-schedule-board">
+      ${this.view.flightLeaderWarnings === undefined ? html`<p class="small text-muted" data-flight-leader-unrecorded>负责人保障：当时未设置或未记录，不按当前配置推算。</p>` : null}
+      ${(this.view.flightLeaderWarnings ?? []).map((warning) => html`<p class="alert alert-warning py-2" data-flight-leader-warning>${warning}</p>`)}
       <table
         class="schedule-grid-table history-schedule-grid"
         style=${styleMap(styles)}

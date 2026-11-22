@@ -5,7 +5,11 @@ import {
   withConfiguredFlightPositions,
 } from "../../domain/flights/configured-flight-positions";
 import { setStaffStatus, staffStatusValue } from "../../domain/staff-status";
-import { currentScheduleHistory } from "../history-actions";
+import {
+  currentScheduleHistory,
+  replaceHistoryForDate,
+} from "../history-actions";
+import { flightLeaderCoverage } from "../../domain/rules/flight-leader-coverage";
 import { halfRestSelectionForDate } from "../../domain/records/half-rest-selections";
 import { installArchivedNextWorkdaySchedule } from "../schedule-actions";
 import { addIsoDays } from "../../domain/shared/time";
@@ -1195,10 +1199,13 @@ export class ScheduleController implements UiCommandController {
         },
       ];
     }
-    temporaryState.history = [
-      ...temporaryState.history.filter((item) => item.date !== currentDate),
-      ...records,
-    ];
+    const coverageSnapshot = flightLeaderCoverage(this.context.model());
+    replaceHistoryForDate(
+      temporaryState,
+      currentDate,
+      records,
+      coverageSnapshot
+    );
     temporaryState.flights = flights;
     temporaryState.assignments = [];
     temporaryState.activeScheduleDate = null;
@@ -1224,7 +1231,8 @@ export class ScheduleController implements UiCommandController {
         records,
         nextDate,
         flights,
-        outcome.result
+        outcome.result,
+        coverageSnapshot
       );
       this.context.store.getState().replaceModel(temporaryState);
       this.context.preferences.saveScheduleDate(nextDate);

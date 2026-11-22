@@ -1,0 +1,30 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/domain/flight-leader-coverage.test.ts (0 test)
+npm.cmd :
+所在位置 行:2 字符: 1
++ npm.cmd exec vitest -- run tests/domain/flight-leader-coverage.test.t ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/domain/flight-leader-coverage.test.ts [ tests/domain/flight-leader-coverage.test.ts ]
+Error: Cannot find module '../../src/domain/rules/flight-leader-coverage' imported from D:/autoschedule-migrate/autosch
+edule/tests/domain/flight-leader-coverage.test.ts
+ ❯ tests/domain/flight-leader-coverage.test.ts:2:1
+      1| import { expect, it, vi } from "vitest";
+      2| import { flightLeaderCoverage, flightLeaderWarnings } from "../../src/…
+       | ^
+      3| import { improveFlightLeaderCoverage } from "../../src/domain/reviews/…
+      4| import { createScheduleRunFacts } from "../../src/domain/shared/schedu…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Start at  12:59:38
+   Duration  277ms (transform 40ms, setup 0ms, import 0ms, tests 0ms, environment 0ms)

@@ -39,6 +39,24 @@ export interface ScheduleSettingDefinition {
 export const SCHEDULE_SETTING_DEFINITIONS: readonly ScheduleSettingDefinition[] =
   [
     {
+      key: "flightLeaderCoverageEnabled",
+      label: "航班负责人保障",
+      type: "boolean",
+      description:
+        "旧规则优先，每航班尽量达到指定负责人人数；不足只提示，允许保存和归档",
+      defaultValue: false,
+    },
+    {
+      key: "minimumFlightLeaders",
+      label: "每个航班至少几名负责人",
+      type: "number",
+      description: "同一航班按实际人员去重；不额外生成岗位",
+      defaultValue: 1,
+      min: 1,
+      max: 100,
+      integer: true,
+    },
+    {
       key: "maxDailyHours",
       label: "每日工时上限",
       type: "number",

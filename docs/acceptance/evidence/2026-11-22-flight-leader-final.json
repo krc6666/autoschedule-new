@@ -1,0 +1,75 @@
+[
+  {
+    "shortage": false,
+    "actual": [
+      {
+        "flight": "ZZ100",
+        "count": 1
+      },
+      {
+        "flight": "ZZ101",
+        "count": 1
+      }
+    ],
+    "jobs": 4,
+    "warnings": [],
+    "archived": [
+      {
+        "date": "2026-11-22",
+        "flights": [
+          {
+            "flightId": "flight-0",
+            "flightNo": "ZZ100",
+            "required": 1,
+            "actual": 1
+          },
+          {
+            "flightId": "flight-1",
+            "flightNo": "ZZ101",
+            "required": 1,
+            "actual": 1
+          }
+        ]
+      }
+    ],
+    "safetyCredential": "final"
+  },
+  {
+    "shortage": true,
+    "actual": [
+      {
+        "flight": "ZZ100",
+        "count": 0
+      },
+      {
+        "flight": "ZZ101",
+        "count": 0
+      }
+    ],
+    "jobs": 4,
+    "warnings": [
+      "ZZ100无负责人：需要1名，实际0名，还差1名。仅提示，不影响保存和归档。",
+      "ZZ101无负责人：需要1名，实际0名，还差1名。仅提示，不影响保存和归档。"
+    ],
+    "archived": [
+      {
+        "date": "2026-11-22",
+        "flights": [
+          {
+            "flightId": "flight-0",
+            "flightNo": "ZZ100",
+            "required": 1,
+            "actual": 0
+          },
+          {
+            "flightId": "flight-1",
+            "flightNo": "ZZ101",
+            "required": 1,
+            "actual": 0
+          }
+        ]
+      }
+    ],
+    "safetyCredential": "final"
+  }
+]

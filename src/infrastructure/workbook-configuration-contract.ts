@@ -9,6 +9,8 @@ import { normalizeWeeklyFlightNo as normalize } from "../domain/flights/weekly-f
 
 /** Added after existing workbooks; absent values have a defined initial meaning. */
 export const OPTIONAL_CONFIGURATION_SCALARS = new Set([
+  "flightLeaderCoverageEnabled",
+  "minimumFlightLeaders",
   "lateAirlineRotationEnabled",
   "morningStatsStartTime",
   "morningStatsEndTime",
@@ -100,6 +102,19 @@ export function compileWorkbookConfigurationRestore(input: WorkbookImport): {
 } {
   const imported = { ...input, settings: { ...input.settings } };
   const restoreDefaults: string[] = [];
+  if (
+    imported.staff?.some((person) => person.flightLeaderQualified === undefined)
+  ) {
+    imported.staff = imported.staff.map((person) => ({
+      ...person,
+      flightLeaderQualified: person.flightLeaderQualified === true,
+    }));
+    restoreDefaults.push("可担任负责人：旧文件未记录，默认不勾选");
+  }
+  if (imported.flightLeaderCoverageHistory === undefined) {
+    imported.flightLeaderCoverageHistory = [];
+    restoreDefaults.push("负责人保障记录：旧文件未记录，不重新推算旧班表");
+  }
   if (imported.settings.relaxedShiftFlightNumbers === undefined) {
     imported.settings.relaxedShiftFlightNumbers = null;
     restoreDefaults.push("轻松班次航班范围：文件未记录，默认选择可用MF/CX航班");

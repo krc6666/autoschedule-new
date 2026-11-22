@@ -501,6 +501,7 @@ describe("workbook boundary", () => {
       "排班结果",
       "人员排班",
       "半休选择",
+      "负责人保障记录",
     ]);
     expect(workbook.Sheets[workbook.SheetNames[0]!]!["!ref"]).toBeTruthy();
     expect(workbook.Sheets[workbook.SheetNames[1]!]!["!ref"]).toBeTruthy();

@@ -1,4 +1,8 @@
 import type { Assignment } from "../../model";
+import {
+  flightLeaderCoverage,
+  flightLeaderWarnings,
+} from "../rules/flight-leader-coverage";
 import type { ScheduleGenerationFacts } from "../shared/scheduling-facts";
 import type { RuleFeedbackKey } from "../rules/schedule-rule-contract";
 import { staffWorkContinuity } from "../reviews/staff-work-continuity";
@@ -884,6 +888,27 @@ type RuleFeedbackBuilder = (
 const RULE_FEEDBACK_BUILDERS: Readonly<
   Record<RuleFeedbackKey, RuleFeedbackBuilder>
 > = {
+  "flight-leader-coverage": (state) => {
+    const rows = flightLeaderCoverage(state),
+      warnings = flightLeaderWarnings(rows);
+    return feedbackItem(
+      "rule-execution",
+      "flight-leader-coverage",
+      "航班负责人保障",
+      !state.settings.flightLeaderCoverageEnabled || !rows.length
+        ? "info"
+        : warnings.length
+          ? "attention"
+          : "ok",
+      !state.settings.flightLeaderCoverageEnabled
+        ? "未启用航班负责人保障。"
+        : !rows.length
+          ? "本班没有可检查的航班。"
+          : warnings.length
+            ? warnings.join("\n")
+            : `每个航班均已达到至少${state.settings.minimumFlightLeaders}名负责人；按最终实际人员去重。`
+    );
+  },
   "staff-airline-mix": (state, date) => {
     const policies = enabledAirlineMixPolicies(state.settings);
     const targets = staffAirlineMix(state, state.assignments).filter(

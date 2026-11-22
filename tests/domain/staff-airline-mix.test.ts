@@ -72,7 +72,11 @@ it("registers the final mix review after work continuity", () => {
   const ids = BUILT_IN_RULE_REGISTRY.executionPlan()
     .filter((h) => h.execute.some((e) => e.kind === "final-review"))
     .map((h) => h.id);
-  expect(ids.slice(-2)).toEqual(["staff-work-continuity", "staff-airline-mix"]);
+  expect(ids.slice(-3)).toEqual([
+    "staff-work-continuity",
+    "staff-airline-mix",
+    "flight-leader-coverage",
+  ]);
 });
 
 it("allows the combination if the day only contains those carriers", async () => {

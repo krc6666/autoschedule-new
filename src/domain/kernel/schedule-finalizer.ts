@@ -49,6 +49,10 @@ import { dutyRosterStatusIssues } from "../duty-roster/roster";
 import { fillConfiguredSupervisorTargets } from "../assignments/supervisor-fill";
 import { restoreIndependentMobileSupervisors } from "../coverage/mobile-supervisor-independence";
 import { ScheduleGuardError } from "./schedule-guard";
+import {
+  flightLeaderCoverage,
+  flightLeaderWarnings,
+} from "../rules/flight-leader-coverage";
 import type { SchedulePipelineContext } from "./schedule-pipeline";
 import { guardExplanation } from "../shared/schedule-issue-explanation";
 import {
@@ -158,6 +162,7 @@ function rebuildWarnings(
       ...reservationWarnings,
       ...postReviewWarnings,
       ...persistentRunWarnings,
+      ...flightLeaderWarnings(flightLeaderCoverage(state, assignments)),
       ...(optimizationWarning ? [optimizationWarning] : []),
     ]),
   ];

@@ -210,7 +210,10 @@ export function createDefaultState(): AppState {
   ];
   settings.latePriorityFlightNumbers =
     latePriorityFlightScopeCandidates(positionRules);
-  const staff = structuredClone(defaultStaff);
+  const staff = structuredClone(defaultStaff).map((person) => ({
+    ...person,
+    flightLeaderQualified: false,
+  }));
   const flights = structuredClone(defaultFlights);
   const templates = defaultFlights.map(
     ({ id, bookedPassengers: _bookedPassengers, ...flight }) => ({

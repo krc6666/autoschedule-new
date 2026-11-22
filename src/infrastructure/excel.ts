@@ -85,6 +85,12 @@ import {
   parseHalfRestSelections,
 } from "./half-rest-selections-excel";
 import type { HalfRestSelection } from "../model";
+import type { FlightLeaderCoverageHistory } from "../model";
+import { flightLeaderCoverage } from "../domain/rules/flight-leader-coverage";
+import {
+  appendFlightLeaderCoverageHistory,
+  parseFlightLeaderCoverageHistory,
+} from "./flight-leader-coverage-excel";
 import { buildSchedulePrintSheet } from "./schedule-print-sheet";
 import {
   BUILTIN_STAFF_STATUSES,
@@ -92,6 +98,7 @@ import {
 } from "../domain/staff-status";
 
 export interface WorkbookImport {
+  flightLeaderCoverageHistory?: FlightLeaderCoverageHistory[];
   flightIdentities?: FlightIdentity[];
   flightIdentityErrors?: string[];
   flightSeasonOverrides?: Record<string, boolean>;
@@ -401,8 +408,25 @@ function parseStaff(
       normalizeText(cell).includes(candidate)
     )
   );
+  const leaderIndex = header.findIndex(
+    (cell) => normalizeText(cell) === "可担任负责人"
+  );
   return data.slice(1).flatMap((row, rowIndex) => {
     if (row.every((value) => !normalizeText(value))) return [];
+    const leaderValue =
+      leaderIndex < 0
+        ? undefined
+        : normalizeText(row[leaderIndex]).toLowerCase();
+    const leaderValid =
+      leaderValue !== undefined &&
+      ["", "是", "有", "true", "1", "否", "无", "false", "0"].includes(
+        leaderValue
+      );
+    if (leaderValue !== undefined && !leaderValid) {
+      const message = `人员信息第${rowIndex + 2}行：可担任负责人须填写是或否，未覆盖已有标记`;
+      warnings.push(message);
+      restoreErrors.push(message);
+    }
     const id = normalizeText(row[idIndex]);
     const name = normalizeText(row[nameIndex]);
     if (!id || !name) {
@@ -463,6 +487,13 @@ function parseStaff(
         nightShift: !["否", "不可以", "false", "0"].includes(
           normalizeText(row[nightIndex]).toLowerCase()
         ),
+        ...(leaderValid
+          ? {
+              flightLeaderQualified: ["是", "有", "true", "1"].includes(
+                leaderValue!
+              ),
+            }
+          : {}),
         status,
         ...(leaveType || leaveId
           ? { leaveTypeId: leaveType?.id ?? leaveId }
@@ -989,6 +1020,7 @@ export function parseWorkbook(
   const ordinaryPriorityPositions = parseOrdinaryPriorityPositions(workbook);
   const dutyRoster = parseDutyRosterOverrides(workbook, effectiveStaff);
   const halfRest = parseHalfRestSelections(workbook);
+  const leaderHistory = parseFlightLeaderCoverageHistory(workbook);
   const flightPlanConfirmations = parseFlightPlanConfirmations(workbook);
   const flightSeasonOverrides = parseFlightSeasonOverrides(workbook);
   const flightIdentities = parseFlightIdentities(workbook);
@@ -1002,6 +1034,7 @@ export function parseWorkbook(
     ...flightIdentities.errors,
     ...flightConfigurationErrors,
     ...halfRest.warnings,
+    ...leaderHistory.warnings,
     ...flightPlanConfirmations.warnings,
     ...flightSeasonOverrides.warnings,
     ...parsedRules.warnings,
@@ -1032,6 +1065,7 @@ export function parseWorkbook(
   if (weeklyFlightPlanImport?.status === "invalid")
     warnings.push(weeklyFlightPlanImport.warning);
   const hasStandardSheet = Boolean(
+    workbook.Sheets["负责人保障记录"] ||
     workbook.Sheets["航班长期档案"] ||
     workbook.Sheets["航班换季确认"] ||
     workbook.Sheets["半休选择"] ||
@@ -1116,6 +1150,7 @@ export function parseWorkbook(
     ordinaryPriorityFrequencyAdjustments,
     dutyRosterOverrides: dutyRoster.value,
     halfRestSelections: halfRest.value,
+    flightLeaderCoverageHistory: leaderHistory.value,
     flightPlanConfirmations: flightPlanConfirmations.value,
     dutyRosterInvalid: dutyRoster.warnings.length > 0,
     warnings,
@@ -1153,6 +1188,7 @@ export function buildConfigWorkbook(state: AppState): XLSX.WorkBook {
         "备勤资质",
         "是否为分队长",
         "休假类别编号",
+        "可担任负责人",
       ],
       ...state.staff.map((person) => [
         person.id,
@@ -1166,9 +1202,10 @@ export function buildConfigWorkbook(state: AppState): XLSX.WorkBook {
         person.standbyQualified ? "是" : "否",
         person.teamLeader ? "是" : "否",
         person.leaveTypeId ?? "",
+        person.flightLeaderQualified === true ? "是" : "否",
       ]),
     ],
-    [10, 14, 16, 16, 24, 14, 14, 14, 14, 16, 30]
+    [10, 14, 16, 16, 24, 14, 14, 14, 14, 16, 30, 18]
   );
   append(
     workbook,
@@ -1383,6 +1420,10 @@ export function buildConfigWorkbook(state: AppState): XLSX.WorkBook {
   );
   appendLeaveTypes(workbook, state.leaveTypes);
   appendHalfRestSelections(workbook, state.halfRestSelections ?? []);
+  appendFlightLeaderCoverageHistory(
+    workbook,
+    state.flightLeaderCoverageHistory ?? []
+  );
   appendFlightPlanConfirmations(workbook, state.flightPlanConfirmations ?? []);
   appendFlightSeasonOverrides(workbook, state.flightSeasonOverrides);
   appendFlightIdentities(workbook, state.shared.flightIdentities);
@@ -1512,6 +1553,9 @@ export function buildScheduleWorkbook(
     workbook,
     (state.halfRestSelections ?? []).filter((row) => row.date === date)
   );
+  appendFlightLeaderCoverageHistory(workbook, [
+    { date, flights: flightLeaderCoverage(state) },
+  ]);
   return workbook;
 }
 

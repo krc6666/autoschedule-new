@@ -13,7 +13,10 @@ import type {
   PositionRule,
 } from "../model";
 import { currentFlightsWithoutTemplates } from "../domain/flights/next-workday-flight-plan";
-import { clearActiveSchedule } from "../domain/kernel/schedule-lifecycle";
+import {
+  clearActiveSchedule,
+  markActiveScheduleStale,
+} from "../domain/kernel/schedule-lifecycle";
 import { clearUnqualifiedStandbyOverrides } from "../domain/duty-roster/roster";
 import {
   createId,
@@ -494,6 +497,7 @@ export function addStaff(state: AppState): void {
     name: "新人员",
     staffType: "常规",
     teamLeader: false,
+    flightLeaderQualified: false,
     cxPreflightQualified: false,
     dutyQualified: true,
     standbyQualified: true,
@@ -518,6 +522,7 @@ export function addAdministrativeStaff(state: AppState): void {
     teamLeader: false,
     cxPreflightQualified: false,
     dutyQualified: false,
+    flightLeaderQualified: false,
     standbyQualified: false,
     nightShift: true,
     status: "正常",
@@ -924,7 +929,8 @@ export function updateConfigurationField(
       person.teamLeader = false;
     if (field === "standbyQualified" || field === "staffType")
       clearUnqualifiedStandbyOverrides(state);
-    clearSchedule(state);
+    if (field === "flightLeaderQualified") markActiveScheduleStale(state);
+    else clearSchedule(state);
     return "updated";
   }
   return "missing";

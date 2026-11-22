@@ -28,6 +28,7 @@ import { clearActiveSchedule } from "../domain/kernel/schedule-lifecycle";
 import type { AppState, HistoryRecord } from "../model";
 import { createId, orderPositionRules } from "../utils";
 import { normalizeHalfRestSelections } from "../domain/records/half-rest-selections";
+import { normalizeFlightLeaderCoverageHistory } from "../domain/rules/flight-leader-coverage";
 import {
   createEmptyWeeklyFlightPlans,
   normalizeWeeklyFlightNo,
@@ -364,7 +365,17 @@ export function applyWorkbookImport(
   if (importConfig && imported.leaveTypes !== undefined)
     state.leaveTypes = structuredClone(imported.leaveTypes);
   if (importConfig && imported.staff !== undefined) {
-    state.staff = imported.staff;
+    const previous = new Map(
+      state.staff.map((person) => [
+        person.id,
+        person.flightLeaderQualified === true,
+      ])
+    );
+    state.staff = imported.staff.map((person) => ({
+      ...person,
+      flightLeaderQualified:
+        person.flightLeaderQualified ?? previous.get(person.id) ?? false,
+    }));
     clearUnqualifiedStandbyOverrides(state);
   }
   if (importConfig && imported.positionRules !== undefined)
@@ -444,6 +455,24 @@ export function applyWorkbookImport(
         ]);
   }
   if (
+    imported.flightLeaderCoverageHistory !== undefined &&
+    (importConfig || mode === "history")
+  ) {
+    const incoming = normalizeFlightLeaderCoverageHistory(
+      imported.flightLeaderCoverageHistory
+    );
+    const dates = new Set(incoming.map((day) => day.date));
+    if (importConfig || incoming.length)
+      state.flightLeaderCoverageHistory = importConfig
+        ? incoming
+        : [
+            ...(state.flightLeaderCoverageHistory ?? []).filter(
+              (day) => !dates.has(day.date)
+            ),
+            ...incoming,
+          ];
+  }
+  if (
     importConfig &&
     replaceSharedTemplates &&
     imported.flights !== undefined &&
@@ -505,8 +534,16 @@ export function applyWorkbookImport(
       ),
     };
   }
-  if (importHistory && imported.history)
+  if (importHistory && imported.history) {
+    if (imported.flightLeaderCoverageHistory === undefined) {
+      const dates = new Set(imported.history.map((record) => record.date));
+      state.flightLeaderCoverageHistory =
+        state.flightLeaderCoverageHistory?.filter(
+          (day) => !dates.has(day.date)
+        );
+    }
     mergeHistoryImport(state, imported.history);
+  }
   const changedConfig =
     importConfig &&
     Boolean(
@@ -542,6 +579,12 @@ export function applyWorkbookImport(
     state.shared.flightIdentities = structuredClone(imported.flightIdentities);
   }
   const recognized = [
+    importHistory &&
+      imported.history?.length &&
+      imported.flightLeaderCoverageHistory === undefined &&
+      "导入历史未记录负责人保障，受影响日期标为未记录，不沿用旧提示",
+    imported.flightLeaderCoverageHistory !== undefined &&
+      `${imported.flightLeaderCoverageHistory.length} 个工作日负责人保障记录`,
     importConfig &&
       imported.flightIdentities !== undefined &&
       `${imported.flightIdentities.length} 个共用航班档案（影响A/B两组规则归属）`,

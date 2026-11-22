@@ -73,6 +73,9 @@ function reconcileInitialProjection(model: AppState): void {
   active.flightSeasonOverrides = model.flightSeasonOverrides ?? {};
   active.flightPlanConfirmations = model.flightPlanConfirmations ?? [];
   active.halfRestSelections = model.halfRestSelections ?? [];
+  if (model.flightLeaderCoverageHistory !== undefined)
+    active.flightLeaderCoverageHistory = model.flightLeaderCoverageHistory;
+  else delete active.flightLeaderCoverageHistory;
   active.leaveTypes = model.leaveTypes;
   active.flights = model.flights;
   active.history = model.history;
@@ -100,6 +103,9 @@ function syncActiveGroupProjection(model: AppState): void {
   group.flightSeasonOverrides = model.flightSeasonOverrides ?? {};
   group.flightPlanConfirmations = model.flightPlanConfirmations ?? [];
   group.halfRestSelections = model.halfRestSelections;
+  if (model.flightLeaderCoverageHistory !== undefined)
+    group.flightLeaderCoverageHistory = model.flightLeaderCoverageHistory;
+  else delete group.flightLeaderCoverageHistory;
   group.leaveTypes = model.leaveTypes;
   group.history = model.history;
   group.dutyRosterOverrides = model.dutyRosterOverrides;
@@ -130,6 +136,9 @@ function activateGroupProjection(
   model.flightSeasonOverrides = group.flightSeasonOverrides ?? {};
   model.flightPlanConfirmations = group.flightPlanConfirmations ?? [];
   model.halfRestSelections = group.halfRestSelections ?? [];
+  if (group.flightLeaderCoverageHistory !== undefined)
+    model.flightLeaderCoverageHistory = group.flightLeaderCoverageHistory;
+  else delete model.flightLeaderCoverageHistory;
   model.leaveTypes = group.leaveTypes;
   model.history = group.history;
   model.dutyRosterOverrides = group.dutyRosterOverrides;

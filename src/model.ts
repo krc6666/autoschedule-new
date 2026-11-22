@@ -28,6 +28,8 @@ export interface Staff {
   name: string;
   staffType: StaffType;
   teamLeader: boolean;
+  /** Missing in older data means false; this label grants no job qualification. */
+  flightLeaderQualified?: boolean;
   cxPreflightQualified: boolean;
   dutyQualified: boolean;
   standbyQualified: boolean;
@@ -187,6 +189,8 @@ export interface OrdinaryPriorityFrequencyAdjustment {
 }
 
 export interface ScheduleSettings {
+  flightLeaderCoverageEnabled: boolean;
+  minimumFlightLeaders: number;
   airlineMixPolicies: AirlineMixPolicy[];
   sameFlightStaffExclusions: SameFlightStaffExclusion[];
   maxDailyHours: number;
@@ -288,8 +292,22 @@ export interface HalfRestSelection {
   >;
 }
 
+export interface FlightLeaderCoverageStatus {
+  flightId: string;
+  flightNo: string;
+  required: number;
+  actual: number;
+}
+
+/** Immutable counts at archive time; never inferred from today's personnel. */
+export interface FlightLeaderCoverageHistory {
+  date: string;
+  flights: FlightLeaderCoverageStatus[];
+}
+
 /** Scheduling facts and configuration owned exclusively by one group. */
 export interface GroupWorkspace {
+  flightLeaderCoverageHistory?: FlightLeaderCoverageHistory[];
   /** Explicit seasonal choices; absent choices follow configured jobs. */
   flightSeasonOverrides?: Record<string, boolean>;
   flightPlanConfirmations?: FlightPlanConfirmation[];
@@ -312,6 +330,7 @@ export interface GroupWorkspace {
 export type GroupWorkspaces = Record<ScheduleGroupId, GroupWorkspace>;
 
 export interface AppState {
+  flightLeaderCoverageHistory?: FlightLeaderCoverageHistory[];
   flightSeasonOverrides?: Record<string, boolean>;
   flightPlanConfirmations?: FlightPlanConfirmation[];
   halfRestSelections: HalfRestSelection[];
