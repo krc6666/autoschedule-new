@@ -1,0 +1,8 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule/.tmp/late-airline-rotation
+
+
+ Test Files  6 passed (6)
+      Tests  72 passed (72)
+   Start at  10:14:25
+   Duration  9.68s (transform 4.50s, setup 0ms, import 6.26s, tests 1.84s, environment 352ms)

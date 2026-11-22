@@ -1,0 +1,277 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-21-late-airline-rotation",
+  "title": "末班航司交替与全天航司搭配联合软优化",
+  "startedFrom": "b5ef113746a7c894931c014b6cc5f33d51c31719",
+  "expectation": {
+    "example": "Owner要求末班AK/TR尽量跨工作班交替，并纠正仅交换晚班的错误理解：上一班TR，本班FD+AK时可改上午为CX+AK；只有FD上午可排时允许原搭配偏好为末班交替让步。不限具体姓名或CX模板。",
+    "expected": "先同时改善末班连续同航司和全天组合，候选覆盖全天可移动岗位；原上午可换任意合法组外航司。无法兼顾时优先改善末班交替，允许仅为此必要的组合让步，不转移连续重复给他人。末班范围沿已配置末班航班及结束界线，基于上一份完整已归档工作班实际人员/航司；新增可迁移开关默认启用，关闭保持旧搭配行为。",
+    "unchanged": "岗位完整、资质、状态、夜班、时间、半休、工时、值班/人工锁定、重点次数轮换、月度休息继续优先。为实际CX/FD早晚不等时段可轮换，联合模式允许已有长短日/割裂日轮换，但全队跨度/空挡排序及合计、割裂人数不退步；关闭或无可比末班保留原逐人保护。有限搜索无结果保留原合法表。A/B隔离，历史不改写，换季已提交和验收状态不变。命中G01/G03/G04/G05/G06、R01/R03、D01/D02、V02/V04。",
+    "fallback": "只在独立目录实施；原工作区逐项指纹核对再合回，冲突停止覆盖。不存在双满足方案或有限预算不足时说明让步或保留原因，不清空岗位，不把软偏好变成拒绝整表的硬约束。不自动commit/push/部署，不操作真实浏览器或云库。"
+  },
+  "testedVersion": "86b9dc00c2d42953f8aa27620be2f4adf2071da5058afc9ebbe63ab81a4797b3",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "Original alternate-carrier examples and actual unequal morning/late periods failed first; both causes addressed.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-21-late-airline-red.txt",
+          "summary": "Original three late-rotation examples failed before implementation",
+          "sha256": "be6cd47050cf6e96ac47d0a060f72a664c44c19ca3df53d6f4d61bbc6d4a7ca6"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-21-late-airline-real-times-red.txt",
+          "summary": "Three unequal real-time examples proved existing personal-span protection blocked rotation",
+          "sha256": "4b1c529951d3142dfc4f9b2933f37d2f7b5d5dce4c134dfc33e88adbd8e627b3"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-21-late-airline-targeted.txt",
+          "summary": "Six files and 72 targeted tests passed with real unequal times",
+          "sha256": "b1f4f000c7f1388662df7fde58fed8c9a184ce3db3d4bfbbc586f5b01f228368"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "Whole-day two-person and three-person qualification cycles, comparable archived carrier facts and original late flight cutoff.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-21-late-airline-targeted.txt",
+          "summary": "Six files and 72 targeted tests passed with real unequal times",
+          "sha256": "b1f4f000c7f1388662df7fde58fed8c9a184ce3db3d4bfbbc586f5b01f228368"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-21-late-airline-verify.txt",
+          "summary": "Final typecheck and all 2412 functional tests passed; verify invocation interrupted at owner request during performance",
+          "sha256": "6ed702583915e74867d4ecc79a758df60b22c8b3566ee300f0768899539f5151"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-21-late-airline-performance.txt",
+          "summary": "Resumed same-source performance tests: all 20 passed",
+          "sha256": "b690ae61aea4f3f0a42428e1e4a58fe7bfaa7594aec5f9cf2087ec85116dd45c"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-21-late-airline-build.txt",
+          "summary": "Resumed same-source production build passed",
+          "sha256": "8c9ff483665ab061c3e5f3ac5bd52ec4bae78663a45254f8b8a00f51d38814c5"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-21-late-airline-verification-stages.txt",
+          "summary": "Explicit evidence boundary between interrupted verify and successful resumed stages",
+          "sha256": "751b11d909b51a7321b27e886c3689dfc0efad3fd2e2e0e9ce6c0bdfa1c4c1cb"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-21-late-airline-independent.json",
+          "summary": "Python independently parsed exported XLSX XML and JSON against expected people, flights and original times",
+          "sha256": "5e619f20a967de76d09b3fd351897dd65293f1e0e939ebf73a8ec92ceaf18fb6"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "Only FD morning yields mix preference; other outside airline works; disabled/no history/partial/same-date/cleared/cross-midnight and early-release boundaries.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-21-late-airline-targeted.txt",
+          "summary": "Six files and 72 targeted tests passed with real unequal times",
+          "sha256": "b1f4f000c7f1388662df7fde58fed8c9a184ce3db3d4bfbbc586f5b01f228368"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-21-late-airline-verify.txt",
+          "summary": "Final typecheck and all 2412 functional tests passed; verify invocation interrupted at owner request during performance",
+          "sha256": "6ed702583915e74867d4ecc79a758df60b22c8b3566ee300f0768899539f5151"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-21-late-airline-performance.txt",
+          "summary": "Resumed same-source performance tests: all 20 passed",
+          "sha256": "b690ae61aea4f3f0a42428e1e4a58fe7bfaa7594aec5f9cf2087ec85116dd45c"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-21-late-airline-build.txt",
+          "summary": "Resumed same-source production build passed",
+          "sha256": "8c9ff483665ab061c3e5f3ac5bd52ec4bae78663a45254f8b8a00f51d38814c5"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-21-late-airline-verification-stages.txt",
+          "summary": "Explicit evidence boundary between interrupted verify and successful resumed stages",
+          "sha256": "751b11d909b51a7321b27e886c3689dfc0efad3fd2e2e0e9ce6c0bdfa1c4c1cb"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-21-late-airline-independent.json",
+          "summary": "Python independently parsed exported XLSX XML and JSON against expected people, flights and original times",
+          "sha256": "5e619f20a967de76d09b3fd351897dd65293f1e0e939ebf73a8ec92ceaf18fb6"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "Worker/WASM snapshots and final pipeline, Store install, byte Excel import into clean target, JSON restart and actual effect; old cloud data does not mutate.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-21-late-airline-targeted.txt",
+          "summary": "Six files and 72 targeted tests passed with real unequal times",
+          "sha256": "b1f4f000c7f1388662df7fde58fed8c9a184ce3db3d4bfbbc586f5b01f228368"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-21-late-airline-verify.txt",
+          "summary": "Final typecheck and all 2412 functional tests passed; verify invocation interrupted at owner request during performance",
+          "sha256": "6ed702583915e74867d4ecc79a758df60b22c8b3566ee300f0768899539f5151"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-21-late-airline-performance.txt",
+          "summary": "Resumed same-source performance tests: all 20 passed",
+          "sha256": "b690ae61aea4f3f0a42428e1e4a58fe7bfaa7594aec5f9cf2087ec85116dd45c"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-21-late-airline-build.txt",
+          "summary": "Resumed same-source production build passed",
+          "sha256": "8c9ff483665ab061c3e5f3ac5bd52ec4bae78663a45254f8b8a00f51d38814c5"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-21-late-airline-verification-stages.txt",
+          "summary": "Explicit evidence boundary between interrupted verify and successful resumed stages",
+          "sha256": "751b11d909b51a7321b27e886c3689dfc0efad3fd2e2e0e9ce6c0bdfa1c4c1cb"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-21-late-airline-independent.json",
+          "summary": "Python independently parsed exported XLSX XML and JSON against expected people, flights and original times",
+          "sha256": "5e619f20a967de76d09b3fd351897dd65293f1e0e939ebf73a8ec92ceaf18fb6"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "Qualification, locks, priority fairness, no extra vacancy, actual final safety rejection, finite timeout and deliberate manual reversion remain detected.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-21-late-airline-targeted.txt",
+          "summary": "Six files and 72 targeted tests passed with real unequal times",
+          "sha256": "b1f4f000c7f1388662df7fde58fed8c9a184ce3db3d4bfbbc586f5b01f228368"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-21-late-airline-verify.txt",
+          "summary": "Final typecheck and all 2412 functional tests passed; verify invocation interrupted at owner request during performance",
+          "sha256": "6ed702583915e74867d4ecc79a758df60b22c8b3566ee300f0768899539f5151"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-21-late-airline-performance.txt",
+          "summary": "Resumed same-source performance tests: all 20 passed",
+          "sha256": "b690ae61aea4f3f0a42428e1e4a58fe7bfaa7594aec5f9cf2087ec85116dd45c"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-21-late-airline-build.txt",
+          "summary": "Resumed same-source production build passed",
+          "sha256": "8c9ff483665ab061c3e5f3ac5bd52ec4bae78663a45254f8b8a00f51d38814c5"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-21-late-airline-verification-stages.txt",
+          "summary": "Explicit evidence boundary between interrupted verify and successful resumed stages",
+          "sha256": "751b11d909b51a7321b27e886c3689dfc0efad3fd2e2e0e9ce6c0bdfa1c4c1cb"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-21-late-airline-independent.json",
+          "summary": "Python independently parsed exported XLSX XML and JSON against expected people, flights and original times",
+          "sha256": "5e619f20a967de76d09b3fd351897dd65293f1e0e939ebf73a8ec92ceaf18fb6"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "Existing airline mix and continuity tests, all configuration fields, storage/cloud and original hard safety pass; broader/full checks attached. The owner subsequently authorized a local commit; complete uninterrupted verification of the exact commit source passed.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-21-late-airline-targeted.txt",
+          "summary": "Six files and 72 targeted tests passed with real unequal times",
+          "sha256": "b1f4f000c7f1388662df7fde58fed8c9a184ce3db3d4bfbbc586f5b01f228368"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-21-late-airline-verify.txt",
+          "summary": "Final typecheck and all 2412 functional tests passed; verify invocation interrupted at owner request during performance",
+          "sha256": "6ed702583915e74867d4ecc79a758df60b22c8b3566ee300f0768899539f5151"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-21-late-airline-performance.txt",
+          "summary": "Resumed same-source performance tests: all 20 passed",
+          "sha256": "b690ae61aea4f3f0a42428e1e4a58fe7bfaa7594aec5f9cf2087ec85116dd45c"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-21-late-airline-build.txt",
+          "summary": "Resumed same-source production build passed",
+          "sha256": "8c9ff483665ab061c3e5f3ac5bd52ec4bae78663a45254f8b8a00f51d38814c5"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-21-late-airline-verification-stages.txt",
+          "summary": "Explicit evidence boundary between interrupted verify and successful resumed stages",
+          "sha256": "751b11d909b51a7321b27e886c3689dfc0efad3fd2e2e0e9ce6c0bdfa1c4c1cb"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-21-late-airline-independent.json",
+          "summary": "Python independently parsed exported XLSX XML and JSON against expected people, flights and original times",
+          "sha256": "5e619f20a967de76d09b3fd351897dd65293f1e0e939ebf73a8ec92ceaf18fb6"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-21-late-airline-integration.json",
+          "summary": "Conflict-checked integration, pre-write backup, no unrelated files changed, shared source matches validated isolated implementation",
+          "sha256": "dcc83ae38a361d6c835e681389ad173bbeb131df23ae02a90bdefce90483f8a2"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-21-late-airline-commit-verify.txt",
+          "summary": "Task-only commit checkout: full npm run verify exited 0; 2412 functional tests, 20 performance tests, typecheck and build",
+          "sha256": "7a5114060dd7de25ca6309ff87aec871620a3a8283d53c6f891a29d8fd5e4d2f"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "Actual Worker/WASM XLSX, mounted application and independently parsed output pass, but original browser/public website has not been operated or deployed. Keep field acceptance pending.",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-21-late-airline-final.json",
+          "summary": "Worker/WASM final four-post schedule with prior carriers and safe snapshots",
+          "sha256": "c5fe3521cd6a77b7798a9cf2e290919dd3f99a2d518b96a45d15e952c82df815"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-21-late-airline-result.xlsx",
+          "summary": "Actual generated schedule workbook with CX+AK and FD+TR",
+          "sha256": "fa1c1fe5e4c6df4f884769d4aef4f6b4d0503b3a3cc8b075422fe0afac57e3d1"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-21-late-airline-independent.json",
+          "summary": "Python independently parsed exported XLSX XML and JSON against expected people, flights and original times",
+          "sha256": "5e619f20a967de76d09b3fd351897dd65293f1e0e939ebf73a8ec92ceaf18fb6"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-21-late-airline-verify.txt",
+          "summary": "Final typecheck and all 2412 functional tests passed; verify invocation interrupted at owner request during performance",
+          "sha256": "6ed702583915e74867d4ecc79a758df60b22c8b3566ee300f0768899539f5151"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-21-late-airline-performance.txt",
+          "summary": "Resumed same-source performance tests: all 20 passed",
+          "sha256": "b690ae61aea4f3f0a42428e1e4a58fe7bfaa7594aec5f9cf2087ec85116dd45c"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-21-late-airline-build.txt",
+          "summary": "Resumed same-source production build passed",
+          "sha256": "8c9ff483665ab061c3e5f3ac5bd52ec4bae78663a45254f8b8a00f51d38814c5"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-21-late-airline-verification-stages.txt",
+          "summary": "Explicit evidence boundary between interrupted verify and successful resumed stages",
+          "sha256": "751b11d909b51a7321b27e886c3689dfc0efad3fd2e2e0e9ce6c0bdfa1c4c1cb"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "Three tests first caught missing historic carrier alternation; three realistic unequal-time tests then caught old comfort checks freezing existing long/short days. Same cases now pass.",
+    "laterChanges": "Final mix phase cannot reverse alternation or transfer repeat to another person; shared continuity comparator checks team spans/gaps/splits, original safety and priority checks remain; manual edits reflected in final feedback.",
+    "finalArtifact": "Worker-produced XLSX and JSON independently match peer-a CX102/AK103 and peer-b FD101/TR104 at original unequal periods, four rows and zero vacancies, with safe snapshots and final credential. Real-page acceptance pending."
+  },
+  "review": {
+    "missedScope": "No private real-day solve or real browser acceptance. Missing/partial prior archive and persons absent on previous workday do not invent older late history. Finite search and five-person cap are explicitly best effort. Shared worktree integration is conflict checked.",
+    "rootCause": "Previous preference only measured same-day airline combinations. A late-only trade-off was initially assumed, and equal-time tests hid personal-span/split protections freezing existing shifts. Whole-day optimization and guarded burden redistribution address the real example.",
+    "earlyDetection": "Before implementation derive expected whole-day outcomes from original varied flight times, not equal-time fixtures. Test both an already alternating late assignment and repeated late assignments; then verify only-FD fallback, three-person cycles, migration effects and actual Worker/XLSX output."
+  }
+}

@@ -106,6 +106,42 @@ function compareLargestFirst(a: number[], b: number[]): number {
   return 0;
 }
 
+/** Redistribution may rotate existing long/short days, but must not add split
+ * days or worsen the team's ordered spans/gaps and their totals. */
+export function preservesStaffWorkContinuity(
+  before: readonly StaffWorkContinuity[],
+  after: readonly StaffWorkContinuity[],
+  allowRedistribution = false
+): boolean {
+  if (
+    after.some((p) => {
+      const old = before.find((b) => b.staffId === p.staffId);
+      return (
+        !old ||
+        p.flightCount !== old.flightCount ||
+        (!allowRedistribution &&
+          ((p.split && !old.split) ||
+            p.spanMinutes > old.spanMinutes ||
+            p.maximumGapMinutes > old.maximumGapMinutes))
+      );
+    })
+  )
+    return false;
+  return (
+    !allowRedistribution ||
+    (after.filter((p) => p.split).length <=
+      before.filter((p) => p.split).length &&
+      (["spanMinutes", "maximumGapMinutes"] as const).every((key) => {
+        const old = before.map((p) => p[key]),
+          now = after.map((p) => p[key]);
+        return (
+          compareLargestFirst(now, old) <= 0 &&
+          now.reduce((n, x) => n + x, 0) <= old.reduce((n, x) => n + x, 0)
+        );
+      }))
+  );
+}
+
 /** No extra flights, no new split recipient, and genuinely shorter days. */
 export function improvesStaffWorkContinuity(
   before: readonly StaffWorkContinuity[],

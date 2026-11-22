@@ -1,0 +1,27 @@
+
+> autoschedule@1.0.0 verify
+> npm run typecheck && npm test && npm run test:performance && npm run build
+
+
+> autoschedule@1.0.0 typecheck
+> tsc -b --pretty false
+
+
+> autoschedule@1.0.0 test
+> vitest run --exclude tests/performance/**
+
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule/.tmp/late-airline-rotation
+
+
+ Test Files  256 passed (256)
+      Tests  2407 passed (2407)
+   Start at  09:58:17
+   Duration  366.51s (transform 9.84s, setup 0ms, import 58.88s, tests 237.50s, environment 19.33s)
+
+
+> autoschedule@1.0.0 test:performance
+> vitest run tests/performance
+
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule/.tmp/late-airline-rotation

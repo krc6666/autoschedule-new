@@ -1,0 +1,13 @@
+{
+  "integratedFiles": 37,
+  "ownedFiles": 21,
+  "validatedSourceFiles": 603,
+  "concurrentConflicts": [],
+  "unrelatedChangedDuringIntegration": [],
+  "validatedSourceMismatches": [],
+  "backup": "backups\\20261122-late-airline-before-integration",
+  "committed": false,
+  "pushed": false,
+  "deployed": false,
+  "realBrowserOperated": false
+}

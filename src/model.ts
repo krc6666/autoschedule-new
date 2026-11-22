@@ -227,6 +227,8 @@ export interface ScheduleSettings {
   teamLeaderGapFillPositionPolicies: TeamLeaderGapFillPositionPolicy[];
   earlyDepartureCutoffTime: string;
   earlyDepartureBalanceEnabled: boolean;
+  /** Best-effort alternation of actual late-duty carriers across workdays. */
+  lateAirlineRotationEnabled: boolean;
   earlyDepartureMaxDifference: number;
   afternoonRestBalanceEnabled: boolean;
   afternoonRestMaxDifference: number;

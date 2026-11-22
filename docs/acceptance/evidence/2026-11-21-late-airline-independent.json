@@ -1,0 +1,17 @@
+{
+  "independentXlsxXmlAndJsonChecks": "passed",
+  "expected": {
+    "peer-a": ["AK103", "CX102"],
+    "peer-b": ["FD101", "TR104"]
+  },
+  "actual": {
+    "peer-a": ["AK103", "CX102"],
+    "peer-b": ["FD101", "TR104"]
+  },
+  "expectedRows": 4,
+  "actualRows": 4,
+  "allTimesMatch": true,
+  "previousLateCarriersSwitched": true,
+  "morningMixAlsoImproved": true,
+  "realBrowserNotOperated": true
+}

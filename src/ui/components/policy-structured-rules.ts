@@ -59,6 +59,7 @@ export class PolicyStructuredRulesElement extends LightDomElement {
         "航司搭配偏好",
         "软约束",
         "航司组合",
+        "末班航司交替 AK TR 轮换",
         items.map((p) => p.airlineCodes)
       )
     )
@@ -80,6 +81,29 @@ export class PolicyStructuredRulesElement extends LightDomElement {
       <div class="policy-rule-content">
         <p class="text-muted small">
           同一天有多班且全在某条航司组内时，尽量搭配组外航司。组内互换不算改善；当天只有组内航班或没有安全替代时允许原搭配，不留空岗。每条填写至少两个航司代码，用逗号分隔；不足两个暂不执行。修改后重新排班生效。
+        </p>
+        <label class="form-check d-flex gap-2 align-items-center">
+          <input
+            type="checkbox"
+            class="form-check-input"
+            data-policy-setting="lateAirlineRotationEnabled"
+            .checked=${this.model.settings.lateAirlineRotationEnabled}
+            @change=${(event: Event) =>
+              dispatchUiCommand(this, {
+                type: "edit-policy-input",
+                input: {
+                  lateAirlineRotationEnabled: (
+                    event.currentTarget as HTMLInputElement
+                  ).checked,
+                },
+              })}
+          />
+          <span>尽量交替末班航司（例如 AK、TR）</span>
+        </label>
+        <p class="text-muted small">
+          参考上一完整工作班的实际末班，在现有末班航班范围内尽量换航司；同时调整上午等全天岗位，优先兼顾航司搭配。只有
+          FD
+          等上午可排时，搭配偏好可为末班交替让步；资质、覆盖、锁定和重点公平优先，无安全方案保留原表。修改后重新排班生效。
         </p>
         ${this.addButton("airlineMixPolicies", "新增航司组合")}
         ${items.map(

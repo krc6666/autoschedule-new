@@ -9,6 +9,7 @@ import { normalizeWeeklyFlightNo as normalize } from "../domain/flights/weekly-f
 
 /** Added after existing workbooks; absent values have a defined initial meaning. */
 export const OPTIONAL_CONFIGURATION_SCALARS = new Set([
+  "lateAirlineRotationEnabled",
   "morningStatsStartTime",
   "morningStatsEndTime",
   "eveningStatsStartTime",

@@ -236,6 +236,14 @@ export const SCHEDULE_SETTING_DEFINITIONS: readonly ScheduleSettingDefinition[] 
       defaultValue: true,
     },
     {
+      key: "lateAirlineRotationEnabled",
+      label: "启用末班航司交替",
+      type: "boolean",
+      description:
+        "尽量交替上一完整工作班的末班航司，联合调整全天搭配；无法兼顾时航司组合软偏好可让步",
+      defaultValue: true,
+    },
+    {
       key: "earlyDepartureMaxDifference",
       label: "提前下班本月次数目标差距",
       type: "number",

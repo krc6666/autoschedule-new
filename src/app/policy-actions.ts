@@ -79,6 +79,7 @@ export interface SchedulePolicyInput {
   dutyFatiguePoints: number;
   earlyDepartureCutoffTime: string;
   earlyDepartureBalanceEnabled?: boolean;
+  lateAirlineRotationEnabled?: boolean;
   earlyDepartureMaxDifference?: number;
   afternoonRestBalanceEnabled?: boolean;
   afternoonRestMaxDifference?: number;

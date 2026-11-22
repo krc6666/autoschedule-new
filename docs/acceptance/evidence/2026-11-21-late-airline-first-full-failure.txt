@@ -1,0 +1,84 @@
+
+> autoschedule@1.0.0 verify
+> npm run typecheck && npm test && npm run test:performance && npm run build
+
+
+> autoschedule@1.0.0 typecheck
+> tsc -b --pretty false
+
+
+> autoschedule@1.0.0 test
+> vitest run --exclude tests/performance/**
+
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule/.tmp/late-airline-rotation
+
+ ❯ tests/infrastructure/excel.test.ts (46 tests | 1 failed) 8346ms
+     × ships a downloadable configuration template with current qualification and rule fields 21ms
+ ❯ tests/infrastructure/schedule-worker-late-priority.test.ts (1 test | 1 failed) 1324ms
+   × uses real Worker handler and WASM with late history, supervision and safe checkpoints 1323ms
+npm.cmd :
+所在位置 行:7 字符: 1
++ npm.cmd run verify *> .tmp/late-airline-verify-final.txt
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/infrastructure/excel.test.ts > workbook boundary > ships a downloadable configuration template with curren
+t qualification and rule fields
+AssertionError: expected [ 'maxDailyHours', …(38) ] to deeply equal [ 'maxDailyHours', …(38) ]
+
+- Expected
++ Received
+
+@@ -21,11 +21,10 @@
+    "lateShiftEndTime",
+    "teamLeaderConcurrentSupervisionMaxOverlapMinutes",
+    "dutyFatiguePoints",
+    "earlyDepartureCutoffTime",
+    "earlyDepartureBalanceEnabled",
+-   "lateAirlineRotationEnabled",
+    "earlyDepartureMaxDifference",
+    "afternoonRestBalanceEnabled",
+    "afternoonRestMaxDifference",
+    "afternoonRestStartTime",
+    "afternoonRestEndTime",
+@@ -36,6 +35,7 @@
+    "workloadBalanceEnabled",
+    "dailyFlightCountBalanceExemptHalfRest",
+    "dailyFlightCountBalanceExemptTeamLeaders",
+    "maxWorkHoursDifference",
+    "maxTodayFatigueDifference",
++   "lateAirlineRotationEnabled",
+  ]
+
+ ❯ tests/infrastructure/excel.test.ts:1017:26
+    1015|       .slice(1)
+    1016|       .map((row) => row[0]);
+    1017|     expect(settingCodes).toEqual(
+       |                          ^
+    1018|       SCHEDULE_SETTING_DEFINITIONS.map((definition) => definition.key)
+    1019|     );
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/infrastructure/schedule-worker-late-priority.test.ts > uses real Worker handler and WASM with late history
+, supervision and safe checkpoints
+AssertionError: expected 0 to be greater than 0
+ ❯ tests/infrastructure/schedule-worker-late-priority.test.ts:59:30
+     57|     (message) => message.type === "safe-result"
+     58|   );
+     59|   expect(checkpoints.length).toBeGreaterThan(0);
+       |                              ^
+     60|   for (const checkpoint of checkpoints)
+     61|     if (checkpoint.type === "safe-result")
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed | 254 passed (256)
+      Tests  2 failed | 2405 passed (2407)
+   Start at  09:51:12
+   Duration  373.78s (transform 10.26s, setup 0ms, import 60.72s, tests 240.64s, environment 19.93s)

@@ -7,6 +7,7 @@ import {
   applicableAirlineMixPolicies,
 } from "../reviews/staff-airline-mix";
 import { enabledAirlineMixPolicies } from "../rules/airline-mix-policy";
+import { staffLateAirlineRotation } from "../reviews/late-airline-rotation";
 import { diagnoseAutomaticAssignmentEligibility } from "../candidates/assignment-eligibility";
 import { conciseAssignmentWarningReason } from "../reviews/schedule-warning-message";
 import { groupStaffFlightsByNormalizedNumber } from "../statistics/staff-flight-count";
@@ -883,7 +884,7 @@ type RuleFeedbackBuilder = (
 const RULE_FEEDBACK_BUILDERS: Readonly<
   Record<RuleFeedbackKey, RuleFeedbackBuilder>
 > = {
-  "staff-airline-mix": (state) => {
+  "staff-airline-mix": (state, date) => {
     const policies = enabledAirlineMixPolicies(state.settings);
     const targets = staffAirlineMix(state, state.assignments).filter(
       (p) => p.policyIds.length
@@ -899,18 +900,43 @@ const RULE_FEEDBACK_BUILDERS: Readonly<
       );
       return `${name}：${p.flightNumbers.join("、")}；${decisions.join("；") || "尚未落实安全的组外搭配，请核对资格、锁定、时间和公平保护"}`;
     });
+    const rotation = staffLateAirlineRotation(state, state.assignments, date);
+    const repeated = rotation.filter((p) => p.repeatedAirlines.length);
+    const rotationEvidence = !state.settings.lateAirlineRotationEnabled
+      ? ""
+      : repeated.length
+        ? `末班航司仍有连续：${repeated
+            .map(
+              (p) =>
+                `${state.staff.find((s) => s.id === p.staffId)!.name}上一工作班（${p.previousDate}）与本班均有${p.repeatedAirlines.join("、")}；${
+                  assignmentDecisionMessages(
+                    state.assignments.filter((a) => a.staffId === p.staffId),
+                    {
+                      ruleIds: new Set(["staff-airline-mix"]),
+                      outcomes: new Set(["fallback"]),
+                    }
+                  ).join("；") || "尚未落实完整安全替代，可保留原安排"
+                }`
+            )
+            .join("；")}。`
+        : rotation.some(
+              (p) => p.previousAirlines.length && p.currentAirlines.length
+            )
+          ? "最终末班航司未发现与上一完整工作班重复；优先兼顾全天搭配，必要时搭配软偏好让步。"
+          : "末班航司交替：缺少可比的上一完整工作班末班记录，或本班没有范围内末班，不猜测轮换。";
     return feedbackItem(
       "rule-execution",
       "staff-airline-mix",
       "航司搭配偏好",
-      targets.length ? "attention" : "ok",
-      !policies.length
+      targets.length || repeated.length ? "attention" : "ok",
+      (!policies.length
         ? "没有启用且完整的航司组合偏好，本次不限制搭配。"
         : !applicableAirlineMixPolicies(state, state.assignments).length
           ? "本次只有配置组内航班或没有航班岗位，搭配偏好不适用，允许原搭配。"
           : targets.length
             ? `${details.join("；")}。允许保留原搭配，不留空岗；人工调整后按最终事实重算。`
-            : "最终班表没有发现多班全部落在已配置航司组内的人员；单班不强行增加任务。"
+            : "最终班表没有发现多班全部落在已配置航司组内的人员；单班不强行增加任务。") +
+        (rotationEvidence ? ` ${rotationEvidence}` : "")
     );
   },
   "staff-work-continuity": (state, date) => {

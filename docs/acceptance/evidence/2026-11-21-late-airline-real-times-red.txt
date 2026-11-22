@@ -1,0 +1,63 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule/.tmp/late-airline-rotation
+
+ ❯ tests/domain/late-airline-rotation.test.ts (24 tests | 3 failed) 485ms
+   × uses the real unequal CX/FD and AK/TR times instead of freezing individual attendance spans: already-alternating 19ms
+   × uses the real unequal CX/FD and AK/TR times instead of freezing individual attendance spans: repeated 18ms
+   × uses the real unequal CX/FD and AK/TR times instead of freezing individual attendance spans: only-fd-morning 21ms
+node :
+所在位置 行:4 字符: 1
++ node node_modules/vitest/vitest.mjs run tests/domain/late-airline-rot ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/domain/late-airline-rotation.test.ts > uses the real unequal CX/FD and AK/TR times instead of freezing ind
+ividual attendance spans: already-alternating
+AssertionError: expected [ 'AK103', 'FD101' ] to deeply equal [ 'AK103', 'CX102' ]
+
+- Expected
++ Received
+
+  [
+    "AK103",
+-   "CX102",
++   "FD101",
+  ]
+
+ ❯ tests/domain/late-airline-rotation.test.ts:428:44
+    426|     expect(result.find(a=>a.flightNo==="TR104")?.staffId).toBe("peer-b…
+    427|     if (kind !== "only-fd-morning") {
+    428|       expect(flightsFor(result, "peer-a")).toEqual(["AK103", "CX102"]);
+       |                                            ^
+    429|       expect(flightsFor(result, "peer-b")).toEqual(["FD101", "TR104"]);
+    430|     }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  tests/domain/late-airline-rotation.test.ts > uses the real unequal CX/FD and AK/TR times instead of freezing ind
+ividual attendance spans: repeated
+ FAIL  tests/domain/late-airline-rotation.test.ts > uses the real unequal CX/FD and AK/TR times instead of freezing ind
+ividual attendance spans: only-fd-morning
+AssertionError: expected 'peer-b' to be 'peer-a' // Object.is equality
+
+Expected: "peer-a"
+Received: "peer-b"
+
+ ❯ tests/domain/late-airline-rotation.test.ts:425:59
+    423|     }
+    424|     const result = await review(state);
+    425|     expect(result.find(a=>a.flightNo==="AK103")?.staffId).toBe("peer-a…
+       |                                                           ^
+    426|     expect(result.find(a=>a.flightNo==="TR104")?.staffId).toBe("peer-b…
+    427|     if (kind !== "only-fd-morning") {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  3 failed | 21 passed (24)
+   Start at  10:10:03
+   Duration  2.38s (transform 1.46s, setup 0ms, import 1.69s, tests 485ms, environment 0ms)

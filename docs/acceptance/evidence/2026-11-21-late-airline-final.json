@@ -1,0 +1,15 @@
+{
+  "date": "2026-11-14",
+  "previous": {
+    "peer-a": "TR104",
+    "peer-b": "AK103"
+  },
+  "current": {
+    "peer-a": ["AK103", "CX102"],
+    "peer-b": ["FD101", "TR104"]
+  },
+  "rows": 4,
+  "unfilledCount": 0,
+  "safetyCredential": true,
+  "safeSnapshots": 1
+}

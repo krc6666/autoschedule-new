@@ -13,6 +13,7 @@ import { mountElement, settleLit } from "./lit-test-helpers";
 
 it("edits, disables, adds and deletes carrier groups through actual controls, controller and Store", async () => {
   const initial = createDefaultState();
+  initial.settings.lateAirlineRotationEnabled = false;
   initial.assignments = [
     {
       id: "manual",
@@ -98,7 +99,7 @@ it("edits, disables, adds and deletes carrier groups through actual controls, co
   await pending;
   await settleLit();
   const toggle = card().querySelector<HTMLInputElement>(
-    'input[type="checkbox"]'
+    '[data-airline-mix-id] input[type="checkbox"]'
   )!;
   toggle.checked = false;
   toggle.dispatchEvent(new Event("change", { bubbles: true }));

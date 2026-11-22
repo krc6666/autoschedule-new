@@ -446,7 +446,8 @@ export function builtInRulePreferences(
       id: hook.id,
       enabled:
         hook.id === "staff-airline-mix"
-          ? enabledAirlineMixPolicies(settings).length > 0
+          ? enabledAirlineMixPolicies(settings).length > 0 ||
+            settings.lateAirlineRotationEnabled
           : hook.id === "relaxed-shift-balance"
             ? settings.earlyDepartureBalanceEnabled ||
               settings.afternoonRestBalanceEnabled

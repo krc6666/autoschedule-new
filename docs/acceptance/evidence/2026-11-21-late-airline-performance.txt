@@ -1,0 +1,12 @@
+
+> autoschedule@1.0.0 test:performance
+> vitest run tests/performance
+
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule/.tmp/late-airline-rotation
+
+
+ Test Files  7 passed (7)
+      Tests  20 passed (20)
+   Start at  11:50:53
+   Duration  569.83s (transform 1.87s, setup 0ms, import 3.19s, tests 564.34s, environment 789ms)
