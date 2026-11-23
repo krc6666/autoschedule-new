@@ -302,6 +302,20 @@ export function applyWorkbookImport(
     ]);
     if (referenceErrors.length)
       return { changedConfig: false, recognized: "", errors: referenceErrors };
+    if (imported.settings?.flightLeaderRequirements !== undefined) {
+      const preview = previewFlightIdentityChange(
+        {
+          ...state,
+          settings: applyScheduleSettingsPatch(
+            state.settings,
+            imported.settings
+          ),
+        },
+        state.shared.flightIdentities ?? []
+      );
+      if (preview.errors.length)
+        return { changedConfig: false, recognized: "", errors: preview.errors };
+    }
   }
   const identityMap =
     importConfig && imported.flightIdentities !== undefined

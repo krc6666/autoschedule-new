@@ -42,6 +42,7 @@ describe("schedule settings module", () => {
 
   it("owns every scalar setting default and validation rule", () => {
     const complexKeys = new Set([
+      "flightLeaderRequirements",
       "adminSupportEnabled",
       "positionTransitionPolicies",
       "dutyPositionPriorities",

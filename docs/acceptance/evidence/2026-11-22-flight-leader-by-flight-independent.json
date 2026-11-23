@@ -1,0 +1,7 @@
+{
+  "actual": [1, 2],
+  "requirements": [1, 2],
+  "jobs": 6,
+  "method": "独立读取XLSX单元格及人员编号计数，不调用负责人投影",
+  "browser": "未执行；owner页面验收待完成"
+}

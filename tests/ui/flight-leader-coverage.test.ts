@@ -70,6 +70,20 @@ it("saves the switch and required number through the existing unified rule draft
     "autoschedule-policy-page",
     { model: store.getState().model, editing: coordinator.view().policyEditing }
   );
+  const panel = element.querySelector<HTMLElement>(
+    '[data-policy-panel="leaders"]'
+  )!;
+  expect(panel.hidden).toBe(true);
+  element
+    .querySelector<HTMLButtonElement>('[data-policy-section="leaders"]')!
+    .click();
+  await settleLit();
+  expect(panel.hidden).toBe(false);
+  expect(
+    element.querySelector(
+      '[data-policy-panel="general"] [data-policy-setting="minimumFlightLeaders"]'
+    )
+  ).toBeNull();
   let pending: Promise<void> | undefined;
   element.addEventListener("autoschedule-command", (event) => {
     pending = coordinator
@@ -99,6 +113,17 @@ it("saves the switch and required number through the existing unified rule draft
   expect(store.getState().model.settings.flightLeaderCoverageEnabled).toBe(
     false
   );
+  const perFlight = element.querySelector<HTMLInputElement>(
+    '[data-flight-leader-flight="ZZ100"]'
+  )!;
+  perFlight.value = "3";
+  perFlight.dispatchEvent(new Event("input", { bubbles: true }));
+  await pending;
+  await settleLit();
+  element
+    .querySelector<HTMLButtonElement>('[data-policy-section="general"]')!
+    .click();
+  await settleLit();
   element
     .querySelector<HTMLButtonElement>(".policy-save-bar .btn-primary")!
     .click();
@@ -107,6 +132,7 @@ it("saves the switch and required number through the existing unified rule draft
   expect(store.getState().model.settings).toMatchObject({
     flightLeaderCoverageEnabled: true,
     minimumFlightLeaders: 2,
+    flightLeaderRequirements: [{ flightNo: "ZZ100", minimum: 3 }],
   });
   expect(store.getState().model.assignments).toHaveLength(4);
 });

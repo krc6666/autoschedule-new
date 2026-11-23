@@ -20,6 +20,7 @@ import type {
 } from "../domain/rules/structured-policy-contract";
 import { STRUCTURED_POLICY_DEFINITIONS } from "../domain/rules/structured-policy-settings";
 import { applyScheduleSettingsPatch } from "../domain/rules/schedule-settings";
+import type { ScheduleSettings } from "../model";
 import {
   fixedTeamLeaderGapFillPositionReason,
   teamLeaderGapFillPositionKey,
@@ -53,6 +54,7 @@ export type PolicyEntity = Exclude<
 export type PolicyFieldUpdateResult = "not-policy" | "missing" | "saved";
 
 export interface SchedulePolicyInput {
+  flightLeaderRequirements?: ScheduleSettings["flightLeaderRequirements"];
   flightLeaderCoverageEnabled?: boolean;
   minimumFlightLeaders?: number;
   maxDailyHours: number;

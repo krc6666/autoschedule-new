@@ -87,6 +87,12 @@ export function flightIdentityReferenceMapper(
 
 function conflictingRules(settings: ScheduleSettings): string[] {
   const errors: string[] = [];
+  const leaders = new Map<string, number>();
+  for (const row of settings.flightLeaderRequirements ?? []) {
+    if (leaders.has(row.flightNo) && leaders.get(row.flightNo) !== row.minimum)
+      errors.push(`${row.flightNo}的负责人人数冲突，请先统一人数`);
+    leaders.set(row.flightNo, row.minimum);
+  }
   const gap = new Map<string, boolean>();
   for (const row of settings.teamLeaderGapFillPositionPolicies) {
     const key = `${row.flightNo}|${row.position.trim().toUpperCase()}`;

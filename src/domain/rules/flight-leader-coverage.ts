@@ -4,11 +4,27 @@ import type {
   FlightLeaderCoverageStatus,
 } from "../../model";
 import type { ScheduleGenerationFacts } from "../shared/scheduling-facts";
+import {
+  flightRuleMatches,
+  type FlightIdentityFacts,
+} from "../flights/flight-identities";
 
 type CoverageFacts = Pick<
   ScheduleGenerationFacts,
   "staff" | "flights" | "assignments" | "settings"
->;
+> &
+  FlightIdentityFacts;
+
+export function flightLeaderMinimum(
+  state: Pick<CoverageFacts, "settings"> & FlightIdentityFacts,
+  flightNo: string
+): number {
+  return (
+    state.settings.flightLeaderRequirements?.find((row) =>
+      flightRuleMatches(state, row.flightNo, flightNo)
+    )?.minimum ?? state.settings.minimumFlightLeaders
+  );
+}
 
 /** One actual flight, one person, one count, regardless of duplicated/reused jobs. */
 export function flightLeaderCoverage(
@@ -22,7 +38,7 @@ export function flightLeaderCoverage(
   return state.flights.map((flight) => ({
     flightId: flight.id,
     flightNo: flight.flightNo,
-    required: state.settings.minimumFlightLeaders,
+    required: flightLeaderMinimum(state, flight.flightNo),
     actual: new Set(
       assignments
         .filter(

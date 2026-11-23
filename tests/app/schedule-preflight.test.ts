@@ -525,6 +525,12 @@ describe.each(entries)("排班前确认：$name", (entry) => {
 
 it("空白航班显示模板，勾选确认前不运行排班", async () => {
   const state = fixture();
+  // This case has no weekly preset. A real Monday must not select the
+  // fixture's Monday flight before the test exercises manual selection.
+  state.weeklyFlightPlans = state.weeklyFlightPlans.map((row) => ({
+    ...row,
+    flightNos: [],
+  }));
   state.flights = [];
   state.assignments = [];
   state.activeScheduleDate = null;

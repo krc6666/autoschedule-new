@@ -1,0 +1,26 @@
+{
+  "counts": [1, 2],
+  "requirements": [1, 2],
+  "jobs": 6,
+  "safetyCredential": "final",
+  "archived": [
+    {
+      "date": "2026-11-22",
+      "flights": [
+        {
+          "flightId": "flight-mwrnch3b-rplcqe",
+          "flightNo": "ZZ100",
+          "required": 1,
+          "actual": 1
+        },
+        {
+          "flightId": "flight-mwrnch3b-dcxsdv",
+          "flightNo": "ZZ101",
+          "required": 2,
+          "actual": 2
+        }
+      ]
+    }
+  ],
+  "checked": "从最终XLSX人员编号独立去重，不调用负责人投影"
+}

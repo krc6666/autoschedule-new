@@ -1,0 +1,172 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-22-flight-leader-by-flight",
+  "title": "航班负责人独立子页与按航班人数",
+  "startedFrom": "4b209df3294511dca158025e05e5e23c2fb7e22f",
+  "expectation": {
+    "example": "默认1名，ZZ100单独2名，ZZ101未设置为1名；负责人独立规则子页统一保存。",
+    "expected": "开关和默认人数移入负责人子页；可为每航班设置1至100人数，清空恢复默认；Excel/JSON/A-B迁移完整。",
+    "unchanged": "原软目标优先级、硬安全、原始标签、人工保存归档权限不变；旧归档快照不重算。",
+    "fallback": "没有完整安全方案保留班表，按各航班人数提示；保存失败保留草稿；坏Excel表不覆盖，旧文件缺表局部保留、完整恢复空列表。"
+  },
+  "testedVersion": "56846c285fe45fc4c8509e4c478925a542d4ec783733408f0497da76550f1925",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "原投影忽略单独人数、缺少新字段的两项失败及局部导入冲突失败已保留，最终回归通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-22-flight-leader-by-flight-red.txt",
+          "summary": "改前默认/单独2项失败。",
+          "sha256": "b007a936391ef624007adeb7901e569f8a17a5fca8ed3e2a7161dabc29da6461"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-22-flight-leader-by-flight-conflict-red.txt",
+          "summary": "局部Excel没有档案表时原代码未拒绝冲突。",
+          "sha256": "a2bb0eb2dfbaca9de6d5e9a0b2cb03c9372ad5e4523ee8e7e8a1f6cccdd1d5a4"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-22-flight-leader-by-flight-commit-verify.txt",
+          "summary": "提交前最新完整verify退出0，2455功能/21性能/类型及构建通过。",
+          "sha256": "f3ac73f5cd2a7bb5dd3b2d4723233c7f52bc49104e15c68ac5d08b5baf8dd5a3"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "独立子页、人数默认/覆盖、统一草稿跨页保存与完整求解通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-22-flight-leader-by-flight-commit-verify.txt",
+          "summary": "提交前最新完整verify退出0，2455功能/21性能/类型及构建通过。",
+          "sha256": "f3ac73f5cd2a7bb5dd3b2d4723233c7f52bc49104e15c68ac5d08b5baf8dd5a3"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-22-flight-leader-by-flight-final.json",
+          "summary": "完整排班→Store安全安装→归档→XLSX，默认1/单独2、六岗位及安全凭证。",
+          "sha256": "48a57f526b386822a4b20a0cd6398789ee097137cf2014600c117bbf34c0c04d"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-22-flight-leader-by-flight-independent.json",
+          "summary": "独立按XLSX最终人员编号去重数1/2，要求与归档一致。",
+          "sha256": "f7259309128e471e81f8a83f5af29825e7259d7000a4cc93d06744f79b44b028"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "空/缺/坏Excel、旧完整恢复、字节往返、A/B/JSON、改号清理、共享档案冲突及规模性能分支通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-22-flight-leader-by-flight-commit-verify.txt",
+          "summary": "提交前最新完整verify退出0，2455功能/21性能/类型及构建通过。",
+          "sha256": "f3ac73f5cd2a7bb5dd3b2d4723233c7f52bc49104e15c68ac5d08b5baf8dd5a3"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-22-flight-leader-by-flight-final.json",
+          "summary": "完整排班→Store安全安装→归档→XLSX，默认1/单独2、六岗位及安全凭证。",
+          "sha256": "48a57f526b386822a4b20a0cd6398789ee097137cf2014600c117bbf34c0c04d"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-22-flight-leader-by-flight-independent.json",
+          "summary": "独立按XLSX最终人员编号去重数1/2，要求与归档一致。",
+          "sha256": "f7259309128e471e81f8a83f5af29825e7259d7000a4cc93d06744f79b44b028"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "verified",
+      "reason": "最终负责人优化与人工反馈消费同一投影，旧规则优先；保留原后置换人和归档回归，最终快照按每航班要求保存。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-22-flight-leader-by-flight-commit-verify.txt",
+          "summary": "提交前最新完整verify退出0，2455功能/21性能/类型及构建通过。",
+          "sha256": "f3ac73f5cd2a7bb5dd3b2d4723233c7f52bc49104e15c68ac5d08b5baf8dd5a3"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-22-flight-leader-by-flight-final.json",
+          "summary": "完整排班→Store安全安装→归档→XLSX，默认1/单独2、六岗位及安全凭证。",
+          "sha256": "48a57f526b386822a4b20a0cd6398789ee097137cf2014600c117bbf34c0c04d"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-22-flight-leader-by-flight-independent.json",
+          "summary": "独立按XLSX最终人员编号去重数1/2，要求与归档一致。",
+          "sha256": "f7259309128e471e81f8a83f5af29825e7259d7000a4cc93d06744f79b44b028"
+        }
+      ]
+    },
+    "finalGuard": {
+      "status": "verified",
+      "reason": "没有新增硬拒绝；资格/锁定/原规则优先、不足提示仍可保存归档及安全凭证原回归通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-22-flight-leader-by-flight-commit-verify.txt",
+          "summary": "提交前最新完整verify退出0，2455功能/21性能/类型及构建通过。",
+          "sha256": "f3ac73f5cd2a7bb5dd3b2d4723233c7f52bc49104e15c68ac5d08b5baf8dd5a3"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-22-flight-leader-by-flight-final.json",
+          "summary": "完整排班→Store安全安装→归档→XLSX，默认1/单独2、六岗位及安全凭证。",
+          "sha256": "48a57f526b386822a4b20a0cd6398789ee097137cf2014600c117bbf34c0c04d"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-22-flight-leader-by-flight-independent.json",
+          "summary": "独立按XLSX最终人员编号去重数1/2，要求与归档一致。",
+          "sha256": "f7259309128e471e81f8a83f5af29825e7259d7000a4cc93d06744f79b44b028"
+        }
+      ]
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "完整旧功能回归通过，旧班表不重算、原优先级/软硬强度保持；全量改写旧证据已恢复接手字节。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-22-flight-leader-by-flight-commit-verify.txt",
+          "summary": "提交前最新完整verify退出0，2455功能/21性能/类型及构建通过。",
+          "sha256": "f3ac73f5cd2a7bb5dd3b2d4723233c7f52bc49104e15c68ac5d08b5baf8dd5a3"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-22-flight-leader-by-flight-final.json",
+          "summary": "完整排班→Store安全安装→归档→XLSX，默认1/单独2、六岗位及安全凭证。",
+          "sha256": "48a57f526b386822a4b20a0cd6398789ee097137cf2014600c117bbf34c0c04d"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-22-flight-leader-by-flight-independent.json",
+          "summary": "独立按XLSX最终人员编号去重数1/2，要求与归档一致。",
+          "sha256": "f7259309128e471e81f8a83f5af29825e7259d7000a4cc93d06744f79b44b028"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "本机实际DOM/controller/Store、完整求解与XLSX产物已核对；未主动打开浏览器，Owner页面现场仍未验收。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-22-flight-leader-by-flight-final.json",
+          "summary": "完整排班→Store安全安装→归档→XLSX，默认1/单独2、六岗位及安全凭证。",
+          "sha256": "48a57f526b386822a4b20a0cd6398789ee097137cf2014600c117bbf34c0c04d"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-22-flight-leader-by-flight-independent.json",
+          "summary": "独立按XLSX最终人员编号去重数1/2，要求与归档一致。",
+          "sha256": "f7259309128e471e81f8a83f5af29825e7259d7000a4cc93d06744f79b44b028"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-22-flight-leader-by-flight-result.xlsx",
+          "summary": "本次最终六岗位、两航班分别1/2名结果。",
+          "sha256": "ee66ecf8b13b31242761bfca5f1b0e7ee1006e4ac5f1d6d92fa9069ab290a67c"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "红灯证明每航班设置原被忽略；单独人数及旧配置空列表断言、局部Excel冲突断言均先失败后通过。",
+    "laterChanges": "原后置软换人、人工调整和归档均使用集中人数投影；不改旧阶段顺序，覆盖/不足/保存归档旧回归保持。",
+    "finalArtifact": "本任务result.xlsx、final.json及独立计数证明默认1与单独2实际落实且归档保留；页面现场仍未验收。"
+  },
+  "review": {
+    "missedScope": "核对集中传播矩阵、规则草稿、页面子页/搜索、Excel缺空坏表、A/B与JSON、Worker事实、最终人数及归档；补齐局部导入档案冲突。Owner真实页面/真实班表未验证。；提交钩子捕获现实日期为周一影响旧测试选择，明确用例无周计划后复验，产品代码不变。",
+    "rootCause": "负责人旧实现只读全局minimumFlightLeaders，缺少每航班例外及专用入口；新列表必须同时接默认清洗、引用传播和所有配置入口，单独页面字段并不能代表完整功能。",
+    "earlyDetection": "改前用默认1/指定2与未设置字段建立红灯；按传播矩阵核对真实字节迁移和集中引用清单，再用最终XLSX单独数人员，避免页面目标与实际求解不一致。"
+  }
+}

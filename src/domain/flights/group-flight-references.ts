@@ -4,6 +4,7 @@ import { normalizeWeeklyFlightNo } from "./weekly-flight-plan";
 
 /** Every structured flight target is declared once for edits and execution. */
 export const FLIGHT_RULE_REFERENCE_FIELDS = {
+  flightLeaderRequirements: ["flightNo"],
   positionTransitionPolicies: ["sourceFlightNo", "targetFlightNo"],
   dutyPositionPriorities: ["flightNo"],
   nextWorkdayRecoveryTargets: ["flightNo"],
@@ -47,6 +48,13 @@ function ruleCollection<T>(
 /** One field list owns review, rename and removal; historical ledgers are absent. */
 function collections(settings: ScheduleSettings) {
   return [
+    ruleCollection(
+      settings.flightLeaderRequirements ?? [],
+      ["flightNo"],
+      (rows) => {
+        settings.flightLeaderRequirements = rows;
+      }
+    ),
     {
       slots: (settings.relaxedShiftFlightNumbers ?? []).map((value, index) => ({
         value,

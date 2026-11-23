@@ -42,6 +42,8 @@ const FIELDS: Record<string, string> = {
   staffType: "人员类型",
   teamLeader: "分队长",
   flightLeaderQualified: "可担任负责人",
+  flightLeaderRequirements: "各航班负责人人数",
+  minimum: "至少负责人人数",
   cxPreflightQualified: "CX航前资质",
   dutyQualified: "值班资质",
   standbyQualified: "备勤资质",

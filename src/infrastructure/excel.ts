@@ -90,6 +90,8 @@ import { flightLeaderCoverage } from "../domain/rules/flight-leader-coverage";
 import {
   appendFlightLeaderCoverageHistory,
   parseFlightLeaderCoverageHistory,
+  appendFlightLeaderRequirements,
+  parseFlightLeaderRequirements,
 } from "./flight-leader-coverage-excel";
 import { buildSchedulePrintSheet } from "./schedule-print-sheet";
 import {
@@ -1021,6 +1023,12 @@ export function parseWorkbook(
   const dutyRoster = parseDutyRosterOverrides(workbook, effectiveStaff);
   const halfRest = parseHalfRestSelections(workbook);
   const leaderHistory = parseFlightLeaderCoverageHistory(workbook);
+  const leaderRequirements = parseFlightLeaderRequirements(workbook);
+  if (leaderRequirements.value !== undefined)
+    parsedRules.settings = {
+      ...parsedRules.settings,
+      flightLeaderRequirements: leaderRequirements.value,
+    };
   const flightPlanConfirmations = parseFlightPlanConfirmations(workbook);
   const flightSeasonOverrides = parseFlightSeasonOverrides(workbook);
   const flightIdentities = parseFlightIdentities(workbook);
@@ -1035,6 +1043,7 @@ export function parseWorkbook(
     ...flightConfigurationErrors,
     ...halfRest.warnings,
     ...leaderHistory.warnings,
+    ...leaderRequirements.warnings,
     ...flightPlanConfirmations.warnings,
     ...flightSeasonOverrides.warnings,
     ...parsedRules.warnings,
@@ -1065,6 +1074,7 @@ export function parseWorkbook(
   if (weeklyFlightPlanImport?.status === "invalid")
     warnings.push(weeklyFlightPlanImport.warning);
   const hasStandardSheet = Boolean(
+    workbook.Sheets["航班负责人人数"] ||
     workbook.Sheets["负责人保障记录"] ||
     workbook.Sheets["航班长期档案"] ||
     workbook.Sheets["航班换季确认"] ||
@@ -1423,6 +1433,10 @@ export function buildConfigWorkbook(state: AppState): XLSX.WorkBook {
   appendFlightLeaderCoverageHistory(
     workbook,
     state.flightLeaderCoverageHistory ?? []
+  );
+  appendFlightLeaderRequirements(
+    workbook,
+    state.settings.flightLeaderRequirements ?? []
   );
   appendFlightPlanConfirmations(workbook, state.flightPlanConfirmations ?? []);
   appendFlightSeasonOverrides(workbook, state.flightSeasonOverrides);

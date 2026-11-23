@@ -1,0 +1,55 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/domain/flight-leader-by-flight.test.ts (2 tests | 2 failed) 17ms
+   × uses the flight override and keeps one for flights without a row 13ms
+   × defaults old settings to an empty override list 2ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/domain/flight-leader-by-flight.test.ts > uses the flight override and keeps one for flights without a row
+AssertionError: expected [ 1, 1 ] to deeply equal [ 2, 1 ]
+
+- Expected
++ Received
+
+  [
+-   2,
++   1,
+    1,
+  ]
+
+ ❯ tests/domain/flight-leader-by-flight.test.ts:9:64
+      7|   const state = flightLeaderScenario();
+      8|   state.settings.flightLeaderRequirements = [{ flightNo: "ZZ100", mini…
+      9|   expect(flightLeaderCoverage(state).map(row => row.required)).toEqual…
+       |                                                                ^
+     10| });
+     11|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/domain/flight-leader-by-flight.test.ts > defaults old settings to an empty override list
+AssertionError: expected undefined to deeply equal []
+
+- Expected:
+[]
+
++ Received:
+undefined
+
+ ❯ tests/domain/flight-leader-by-flight.test.ts:13:66
+     11|
+     12| it("defaults old settings to an empty override list", () => {
+     13|   expect(normalizeScheduleSettings({}).flightLeaderRequirements).toEqu…
+       |                                                                  ^
+     14| });
+     15|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed (2)
+   Start at  17:29:49
+   Duration  581ms (transform 303ms, setup 0ms, import 350ms, tests 17ms, environment 0ms)

@@ -906,7 +906,7 @@ const RULE_FEEDBACK_BUILDERS: Readonly<
           ? "本班没有可检查的航班。"
           : warnings.length
             ? warnings.join("\n")
-            : `每个航班均已达到至少${state.settings.minimumFlightLeaders}名负责人；按最终实际人员去重。`
+            : `每个航班均已达到各自设置的负责人人数；${rows.map((row) => `${row.flightNo} ${row.actual}/${row.required}名`).join("、")}。按最终实际人员去重。`
     );
   },
   "staff-airline-mix": (state, date) => {

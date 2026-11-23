@@ -1,4 +1,5 @@
 import type { ScheduleSettings } from "../../model";
+import { normalizeFlightLeaderRequirements } from "./flight-leader-requirements";
 import {
   createDefaultStructuredPolicies,
   normalizeStructuredPolicies,
@@ -8,6 +9,7 @@ import { normalizeRelaxedShiftFlights } from "../statistics/relaxed-shift-flight
 
 export type ScalarScheduleSettingKey = Exclude<
   keyof ScheduleSettings,
+  | "flightLeaderRequirements"
   | "adminSupportEnabled"
   | "airlineMixPolicies"
   | "positionTransitionPolicies"
@@ -386,6 +388,7 @@ export const STATISTICS_TIME_WINDOWS = [
 
 function scalarDefaults(): Omit<
   ScheduleSettings,
+  | "flightLeaderRequirements"
   | "adminSupportEnabled"
   | "airlineMixPolicies"
   | "positionTransitionPolicies"
@@ -414,6 +417,7 @@ export function createDefaultScheduleSettings(): ScheduleSettings {
   return structuredClone({
     ...scalarDefaults(),
     adminSupportEnabled: false,
+    flightLeaderRequirements: [],
     latePriorityFlightNumbers: [],
     relaxedShiftFlightNumbers: null,
     ordinaryPriorityPositions: [],
@@ -448,6 +452,9 @@ export function normalizeScheduleSettings(
   fallback = createDefaultScheduleSettings()
 ): ScheduleSettings {
   const result = {} as ScheduleSettings;
+  result.flightLeaderRequirements = normalizeFlightLeaderRequirements(
+    input.flightLeaderRequirements ?? fallback.flightLeaderRequirements
+  );
   for (const definition of SCHEDULE_SETTING_DEFINITIONS) {
     (result as unknown as Record<string, unknown>)[definition.key] =
       normalizeScalar(

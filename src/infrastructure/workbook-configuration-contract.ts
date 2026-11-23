@@ -102,6 +102,10 @@ export function compileWorkbookConfigurationRestore(input: WorkbookImport): {
 } {
   const imported = { ...input, settings: { ...input.settings } };
   const restoreDefaults: string[] = [];
+  if (imported.settings.flightLeaderRequirements === undefined) {
+    imported.settings.flightLeaderRequirements = [];
+    restoreDefaults.push("航班负责人人数：旧文件未记录单独设置，沿用默认人数");
+  }
   if (
     imported.staff?.some((person) => person.flightLeaderQualified === undefined)
   ) {

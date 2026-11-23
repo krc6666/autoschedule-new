@@ -1,0 +1,60 @@
+⋯ Backing up original state…
+✔ Done backing up original state (333359a)!
+⋯ Hiding unstaged changes to partially staged files…
+✔ Done hiding unstaged changes to partially staged files!
+⋯ Running tasks for staged files…
+    * — 39 files
+      ⋯ prettier --ignore-unknown --write
+
+✔ prettier --ignore-unknown --write
+
+✔ Done running tasks for staged files!
+⋯ Staging changes from tasks…
+✔ Done staging changes from tasks!
+⋯ Restoring unstaged changes…
+⋯ Cleaning up temporary files…
+✔ Done cleaning up temporary files!
+
+> autoschedule@1.0.0 typecheck
+> tsc -b --pretty false
+
+
+> autoschedule@1.0.0 test
+> vitest run --exclude tests/performance/**
+
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/app/schedule-preflight.test.ts (55 tests | 1 failed) 1574ms
+   × 空白航班显示模板，勾选确认前不运行排班 18ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/app/schedule-preflight.test.ts > 空白航班显示模板，勾选确认前不运行排班
+AssertionError: expected [ 'template:template-flight-cx937' ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "template:template-flight-cx937",
++ ]
+
+ ❯ tests/app/schedule-preflight.test.ts:541:30
+    539|   if (dialog?.kind !== "schedule-preflight") throw new Error("缺少预检弹窗");
+    540|   expect(dialog.candidates.length).toBeGreaterThan(0);
+    541|   expect(dialog.selectedIds).toEqual([]);
+       |                              ^
+    542|   expect(calculate).not.toHaveBeenCalled();
+    543| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 262 passed (263)
+      Tests  1 failed | 2454 passed (2455)
+   Start at  12:16:51
+   Duration  357.33s (transform 9.33s, setup 0ms, import 57.23s, tests 230.78s, environment 18.66s)
+
+husky - pre-commit script failed (code 1)

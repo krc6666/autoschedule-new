@@ -8,6 +8,7 @@ import { LightDomElement } from "./light-dom-element";
 import "./policy-rule-ledger";
 import "./policy-settings-form";
 import "./policy-structured-rules";
+import "./flight-leader-settings";
 import "./team-leader-gap-fill-protection-settings";
 
 export class PolicyPageElement extends LightDomElement {
@@ -20,7 +21,7 @@ export class PolicyPageElement extends LightDomElement {
   model!: AppState;
   query = "";
   editing?: PolicyEditingView;
-  private section: "general" | "priority" = "general";
+  private section: "general" | "priority" | "leaders" = "general";
 
   protected override render() {
     return html`<section class="workspace-section policy-workspace">
@@ -85,6 +86,7 @@ export class PolicyPageElement extends LightDomElement {
           [
             ["general", "通用规则"],
             ["priority", "重点岗位"],
+            ["leaders", "航班负责人"],
           ] as const
         ).map(
           ([section, label]) =>
@@ -101,7 +103,7 @@ export class PolicyPageElement extends LightDomElement {
             </button>`
         )}
       </nav>
-      ${this.query.trim() ? html`<p class="small text-secondary">搜索结果包含通用规则和重点岗位；清空搜索后返回所选分类。</p>` : ""}
+      ${this.query.trim() ? html`<p class="small text-secondary">搜索结果包含所有规则分类；清空搜索后返回所选分类。</p>` : ""}
       <div
         data-policy-panel="general"
         ?hidden=${!this.query.trim() && this.section !== "general"}
@@ -145,6 +147,15 @@ export class PolicyPageElement extends LightDomElement {
           .editing=${this.editing}
           .section=${"priority"}
         ></autoschedule-policy-structured-rules>
+      </div>
+      <div
+        data-policy-panel="leaders"
+        ?hidden=${!this.query.trim() && this.section !== "leaders"}
+      >
+        <autoschedule-flight-leader-settings
+          .model=${this.model}
+          .query=${this.query}
+        ></autoschedule-flight-leader-settings>
       </div>
     </section>`;
   }

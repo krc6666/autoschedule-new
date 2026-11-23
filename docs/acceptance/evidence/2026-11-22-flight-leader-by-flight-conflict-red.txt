@@ -1,0 +1,25 @@
+
+ RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+ ❯ tests/infrastructure/flight-leader-by-flight.test.ts (6 tests | 1 failed | 5 skipped) 12ms
+   × rejects conflicting partial Excel settings even when the workbook omits the identity directory 11ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/infrastructure/flight-leader-by-flight.test.ts > rejects conflicting partial Excel settings even when the workbook omits the identity directory
+AssertionError: the given combination of arguments (undefined and string) is invalid for this assertion. You can use an array, a map, an object, a set, a string, or a weakset instead of a string
+ ❯ tests/infrastructure/flight-leader-by-flight.test.ts:196:37
+    194|     { flightNo: "ZZ100", minimum: 2 }, { flightNo: "ZZ101", minimum: 3…
+    195|   ] } }, "config");
+    196|   expect(applied.errors?.join(" ")).toContain("负责人人数冲突");
+       |                                     ^
+    197|   expect(state).toEqual(original);
+    198| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 5 skipped (6)
+   Start at  17:35:55
+   Duration  2.63s (transform 1.99s, setup 0ms, import 2.41s, tests 12ms, environment 0ms)

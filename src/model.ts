@@ -189,6 +189,7 @@ export interface OrdinaryPriorityFrequencyAdjustment {
 }
 
 export interface ScheduleSettings {
+  flightLeaderRequirements: Array<{ flightNo: string; minimum: number }>;
   flightLeaderCoverageEnabled: boolean;
   minimumFlightLeaders: number;
   airlineMixPolicies: AirlineMixPolicy[];
