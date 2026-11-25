@@ -2334,32 +2334,36 @@ autoschedule-schedule-grid {
   background: #fff0f0;
   box-shadow: inset 3px 0 0 #d94343;
 }
-.schedule-soft-warning-icon {
-  flex: 0 0 auto;
-  color: #ad6800;
-  font-size: var(--schedule-small-size);
+.schedule-cell-warning {
+  position: absolute;
+  z-index: 5;
+  inset-block-start: 100%;
+  inset-inline-start: 0;
+  width: min(18rem, 75vw);
+  padding: 8px 10px;
+  border: 1px solid #d88a00;
+  border-radius: 6px;
+  background: #fff7df;
+  box-shadow: 0 3px 10px rgb(0 0 0 / 12%);
+  opacity: 0;
+  pointer-events: none;
 }
-.schedule-manual-warning-icon {
-  flex: 0 0 auto;
-  color: #ad6800;
-  font-size: var(--schedule-small-size);
+.schedule-person-slot:nth-last-child(-n + 4):not(:nth-child(-n + 4))
+  .schedule-cell-warning {
+  inset-inline-start: auto;
+  inset-inline-end: 0;
 }
-.schedule-soft-warning-button {
-  display: inline-grid;
-  flex: 0 0 auto;
-  place-items: center;
-  width: 18px;
-  height: 18px;
-  padding: 0;
-  border: 0;
-  border-radius: 3px;
-  background: transparent;
+.schedule-person-cell.shows-cell-warning > .schedule-cell-warning,
+.schedule-cell-warning:has(:focus-visible) {
+  opacity: 1;
+  pointer-events: auto;
 }
-.schedule-soft-warning-button:hover,
-.schedule-soft-warning-button:focus-visible {
-  background: #ffe8a8;
-  outline: 1px solid #c77c02;
-  outline-offset: 1px;
+.schedule-cell-warning-message {
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+.schedule-cell-warning > button {
+  margin-top: 6px;
 }
 .swap-analysis-body {
   display: grid;

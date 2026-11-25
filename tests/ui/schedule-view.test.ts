@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
@@ -1602,9 +1602,8 @@ describe("schedule page", () => {
     ).toBe("行政一号");
     expect(element.textContent).toContain("150%");
     expect(
-      element
-        .querySelector(".schedule-soft-warning-icon")
-        ?.getAttribute("title")
+      element.querySelector(".schedule-person-cell .schedule-cell-warning")
+        ?.textContent
     ).toContain("上一班末班重点岗位人员作为最后兜底接替");
     const rotationWarning =
       "甲在KE166/H02连续承担。\n乙 —— 9/18 做过 TR121 末班岗，下一班不能接 KE166\n这次自动排班没有找到能完成的换人办法，原安排保留。";
@@ -1618,13 +1617,60 @@ describe("schedule page", () => {
     ];
     element.model = { ...state, assignments: [...state.assignments] };
     await element.updateComplete;
-    const rotationIcon = element.querySelector(".schedule-soft-warning-icon");
-    expect(rotationIcon?.getAttribute("title")).toBe(rotationWarning);
-    expect(rotationIcon?.closest("button")?.getAttribute("title")).toContain(
-      rotationWarning
+    const rotationCell = element.querySelector(
+      ".schedule-person-cell.is-soft-rule-warning"
     );
-    const warningButton = element.querySelector<HTMLButtonElement>(
-      'button[aria-label="分析这个岗位的调换方案"]'
+    expect(
+      rotationCell?.querySelector(".schedule-cell-warning")?.textContent
+    ).toContain(rotationWarning);
+    expect(
+      rotationCell?.querySelector(
+        ".schedule-name-row .bi-exclamation-triangle-fill"
+      )
+    ).toBeNull();
+    expect(
+      rotationCell?.querySelector<HTMLInputElement>(".schedule-name-input")
+        ?.value
+    ).toBe(assignment.staffName);
+    expect(rotationCell).not.toBeNull();
+    vi.useFakeTimers();
+    try {
+      const enter = (buttons = 0) =>
+        rotationCell!.dispatchEvent(
+          new MouseEvent("pointerenter", { buttons })
+        );
+      const leave = () =>
+        rotationCell!.dispatchEvent(new MouseEvent("pointerleave"));
+      const visible = () =>
+        rotationCell!.classList.contains("shows-cell-warning");
+
+      enter();
+      vi.advanceTimersByTime(1999);
+      expect(visible()).toBe(false);
+      leave();
+      vi.advanceTimersByTime(2000);
+      expect(visible()).toBe(false);
+
+      enter(1);
+      vi.advanceTimersByTime(2000);
+      expect(visible()).toBe(false);
+
+      enter();
+      vi.advanceTimersByTime(2000);
+      expect(visible()).toBe(true);
+      rotationCell!.dispatchEvent(new Event("dragover", { cancelable: true }));
+      expect(visible()).toBe(false);
+
+      enter();
+      vi.advanceTimersByTime(2000);
+      expect(visible()).toBe(true);
+      leave();
+      expect(visible()).toBe(false);
+    } finally {
+      vi.useRealTimers();
+    }
+    const warningButton = rotationCell?.querySelector<HTMLButtonElement>(
+      ".schedule-cell-warning button"
     );
     expect(warningButton).not.toBeNull();
     const commands: UiCommandEvent["detail"][] = [];
@@ -1655,11 +1701,11 @@ describe("schedule page", () => {
     >("autoschedule-schedule-grid");
     await grid?.updateComplete;
 
-    expect(element.querySelector(".schedule-soft-warning-icon")).toBeNull();
+    expect(element.querySelector(".schedule-cell-warning")).toBeNull();
     expect(comparisonOnlyAssignment.decisionTrace).toHaveLength(1);
   }, 30_000);
 
-  it("shows a persistent yellow warning icon for a manual override", async () => {
+  it("keeps a manual override highlighted with its warning outside the name row", async () => {
     const state = createDefaultState();
     state.assignments = (
       await generateSchedule(state, "2026-07-18")
@@ -1679,13 +1725,16 @@ describe("schedule page", () => {
       zoom: 1,
     });
 
-    const icon = element.querySelector(".schedule-manual-warning-icon");
-    expect(icon?.getAttribute("title")).toContain("不具备该岗位资质");
+    const cell = element.querySelector(
+      ".schedule-person-cell.is-manual-override-warning"
+    );
     expect(
-      icon
-        ?.closest(".schedule-cell")
-        ?.classList.contains("is-manual-override-warning")
-    ).toBe(true);
+      cell?.querySelector(".schedule-cell-warning")?.textContent
+    ).toContain("不具备该岗位资质");
+    expect(
+      cell?.querySelector(".schedule-name-row .bi-exclamation-triangle-fill")
+    ).toBeNull();
+    expect(cell?.querySelector(".schedule-cell-warning button")).toBeNull();
   }, 30_000);
 
   it("highlights every assigned cell in a real cross-flight time conflict", async () => {

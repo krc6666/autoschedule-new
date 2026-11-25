@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-25-yellow-cell-hover",
+  "title": "排班表黄格悬停提醒",
+  "startedFrom": "af93ca451c533cf32bcb6b1a43f63ee468bdbf93",
+  "expectation": {
+    "example": "12 月 1 日 CX937 G18，表格 90%，格内 100%",
+    "expected": "姓名旁无感叹号，保留黄底，鼠标在同一人员格停满 2 秒显示提醒，快速扫过或拖动时不弹，移出隐藏",
+    "unchanged": "提醒来源、调换分析、姓名编辑和拖拽、空岗提示与保存沿用现有逻辑",
+    "fallback": "需要回退时仅撤回本次界面改动，排班数据不受影响"
+  },
+  "testedVersion": "01e8a58011752b6ce7daffe4f3f9420cd19d14b6d4284a9c0c6dc9ad70f50d4e",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "两类原提醒回归先失败再通过",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-25-yellow-cell-red.txt",
+          "summary": "两项用例因缺少独立提醒而失败",
+          "sha256": "2937102deeb5cffe668083a36efc437911e2d1141a9761ad77149c3fce04d833"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-25-yellow-cell-delay-tests.txt",
+          "summary": "75 项通过，覆盖快速扫过、满 2 秒显示、移出与拖动取消",
+          "sha256": "641922bf9b843bfb28aed45e73c74b107111b7adc11913a4bcbb051933c05c0f"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-25-yellow-cell-delay-red.txt",
+          "summary": "未实现 2 秒触发时定时回归失败",
+          "sha256": "5604f981bc3a8f0f25ca0f5ca1a1b0013e9a895e0acb2a3718829e666f25a972"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "自动提醒保留内容、姓名值及调换命令，停满 2 秒才显示，提前移出取消",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-25-yellow-cell-delay-tests.txt",
+          "summary": "75 项通过，覆盖快速扫过、满 2 秒显示、移出与拖动取消",
+          "sha256": "641922bf9b843bfb28aed45e73c74b107111b7adc11913a4bcbb051933c05c0f"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "人工提醒共享触发机制，普通比较不标黄，拖动经过及开始原生拖动时隐藏",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-25-yellow-cell-delay-tests.txt",
+          "summary": "75 项通过，覆盖快速扫过、满 2 秒显示、移出与拖动取消",
+          "sha256": "641922bf9b843bfb28aed45e73c74b107111b7adc11913a4bcbb051933c05c0f"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "not_applicable",
+      "reason": "仅调整当前班表渲染，未经过求解、后置改写或提交守卫",
+      "evidence": []
+    },
+    "finalGuard": {
+      "status": "not_applicable",
+      "reason": "仅调整当前班表渲染，未经过求解、后置改写或提交守卫",
+      "evidence": []
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "原调换命令及页面与协调器回归通过",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-25-yellow-cell-delay-tests.txt",
+          "summary": "75 项通过，覆盖快速扫过、满 2 秒显示、移出与拖动取消",
+          "sha256": "641922bf9b843bfb28aed45e73c74b107111b7adc11913a4bcbb051933c05c0f"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-25-yellow-cell-delay-typecheck.txt",
+          "summary": "TypeScript 类型检查通过",
+          "sha256": "6fca04d3c72065bc025ab49945050cc2dfbc1bdaca455b60715aa1bc1e49aa76"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "页面测试验证结构及操作命令，真实浏览器下的悬停及 90% 缩放姓名宽度待验收",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-25-yellow-cell-delay-tests.txt",
+          "summary": "75 项通过，覆盖快速扫过、满 2 秒显示、移出与拖动取消",
+          "sha256": "641922bf9b843bfb28aed45e73c74b107111b7adc11913a4bcbb051933c05c0f"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "两类提醒结构回归及 2 秒定时回归先失败再通过。",
+    "laterChanges": "相同板件消费最终排班数据，测试覆盖更新后的轮换提醒、人工提醒及不标黄类型。",
+    "finalArtifact": "tests 记录确认实际组件结构和调换命令，真实页面视觉产物待验收。"
+  },
+  "review": {
+    "missedScope": "真实缩放宽度和提示遮挡只能由页面核对，现已标为待验收。",
+    "rootCause": "初版图标占姓名行宽度，后续立即悬停触发导致扫过时弹窗。",
+    "earlyDetection": "在 90% 缩放核对有无提醒的姓名，回归验证 1999/2000 毫秒、移出和拖动。"
+  }
+}

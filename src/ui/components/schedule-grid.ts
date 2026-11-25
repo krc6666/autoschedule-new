@@ -16,6 +16,8 @@ import type {
 import { dispatchUiCommand } from "../events/ui-command";
 import { LightDomElement } from "./light-dom-element";
 
+const CELL_WARNING_HOVER_DELAY_MS = 2000;
+
 interface DragPayload {
   staffId?: string;
   assignmentId?: string;
@@ -32,6 +34,8 @@ export class ScheduleGridElement extends LightDomElement {
     string,
     { position: string; staffName: string }
   >();
+  private warningCell: HTMLElement | null = null;
+  private warningTimer: ReturnType<typeof setTimeout> | undefined;
   private candidateAssignmentId: string | null = null;
 
   override connectedCallback(): void {
@@ -44,6 +48,7 @@ export class ScheduleGridElement extends LightDomElement {
   }
 
   override disconnectedCallback(): void {
+    this.hideCellWarning();
     super.disconnectedCallback();
     this.ownerDocument.removeEventListener(
       "click",
@@ -260,9 +265,24 @@ export class ScheduleGridElement extends LightDomElement {
           class="schedule-cell schedule-person-cell ${personStateClasses}"
           data-assignment-id=${assignment.id}
           title=${earlyDepartureLast ? "今日提前下班人员的最后岗位" : ""}
-          @dragover=${(event: DragEvent) => event.preventDefault()}
+          @dragover=${(event: DragEvent) => {
+            event.preventDefault();
+            this.hideCellWarning();
+          }}
           @drop=${(event: DragEvent) => this.drop(event, assignment.id)}
-          @pointerenter=${() => this.pointerTarget(assignment.id)}
+          @pointerenter=${(event: PointerEvent) => {
+            this.pointerTarget(assignment.id);
+            if (
+              (manualWarning || warning) &&
+              event.buttons === 0 &&
+              event.pointerType !== "touch"
+            ) {
+              this.scheduleCellWarning(event.currentTarget as HTMLElement);
+            }
+          }}
+          @pointerleave=${this.hideCellWarning}
+          @pointercancel=${this.hideCellWarning}
+          @dragstart=${this.hideCellWarning}
         >
           <div class="schedule-name-row">
             <div
@@ -284,37 +304,6 @@ export class ScheduleGridElement extends LightDomElement {
               >
                 <i class="bi bi-person-plus" aria-hidden="true"></i>
               </button>
-              ${
-                manualWarning
-                  ? html`<i
-                      class="bi bi-exclamation-triangle-fill schedule-manual-warning-icon"
-                      title=${
-                      assignment.manualOverrideWarnings
-                        ?.map((item) => item.message)
-                        .join("；") ?? "人工调整提醒"
-                    }
-                      aria-label="人工调整提醒"
-                    ></i>`
-                  : warning
-                    ? html`<button
-                        class="schedule-soft-warning-button"
-                        type="button"
-                        title=${`${warning.message}\n点击查看与他人轮换`}
-                        aria-label="分析这个岗位的调换方案"
-                        @click=${() =>
-                        dispatchUiCommand(this, {
-                          type: "open-swap-analysis",
-                          assignmentId: assignment.id,
-                        })}
-                      >
-                        <i
-                          class="bi bi-exclamation-triangle-fill schedule-soft-warning-icon"
-                          title=${warning.message}
-                          aria-hidden="true"
-                        ></i>
-                      </button>`
-                    : null
-              }
               <input
                 class="schedule-name-input"
                 list=${guide ? guideListId : auxiliary ? "" : "schedule-staff-names"}
@@ -357,6 +346,37 @@ export class ScheduleGridElement extends LightDomElement {
             aria-label="${assignment.position}临时备注"
             @change=${(event: Event) => this.updateAssignment(assignment.id, "manualRemark", event)}
           />
+          ${
+            manualWarning || warning
+              ? html`<div class="schedule-cell-warning">
+                  <div class="schedule-cell-warning-message">
+                    ${
+                      manualWarning
+                        ? assignment.manualOverrideWarnings
+                            ?.map((item) => item.message)
+                            .join("；")
+                        : warning?.message
+                    }
+                  </div>
+                  ${
+                    !manualWarning && warning
+                      ? html`<button
+                          class="btn btn-sm btn-outline-secondary"
+                          type="button"
+                          aria-label="分析这个岗位的调换方案"
+                          @click=${() =>
+                          dispatchUiCommand(this, {
+                            type: "open-swap-analysis",
+                            assignmentId: assignment.id,
+                          })}
+                        >
+                          查看调换方案
+                        </button>`
+                      : null
+                  }
+                </div>`
+              : null
+          }
           ${this.candidateMenu(assignment)}
         </article>
       </td>`,
@@ -484,6 +504,21 @@ export class ScheduleGridElement extends LightDomElement {
       layoutIndex,
     });
     this.temporaryDrafts.delete(key);
+  }
+
+  private scheduleCellWarning(cell: HTMLElement): void {
+    this.hideCellWarning();
+    this.warningCell = cell;
+    this.warningTimer = setTimeout(() => {
+      cell.classList.add("shows-cell-warning");
+    }, CELL_WARNING_HOVER_DELAY_MS);
+  }
+
+  private hideCellWarning(): void {
+    clearTimeout(this.warningTimer);
+    this.warningTimer = undefined;
+    this.warningCell?.classList.remove("shows-cell-warning");
+    this.warningCell = null;
   }
 
   private dragAssignment(event: DragEvent, assignment: Assignment): void {
