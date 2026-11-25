@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-25-clear-person-position",
+  "title": "人员格清除键固定在姓名行右端",
+  "startedFrom": "659956dfed5dffa17128c9bf011836272560fecc",
+  "expectation": {
+    "example": "H06 有申报备注，H07 没有备注，另有临时岗位。",
+    "expected": "每格只有一个清除键，始终位于姓名行最右侧。",
+    "unchanged": "岗位行仍可加人，备注保留原文与单行展示，临时岗位可删除。",
+    "fallback": "备注为空省去备注行，清除操作继续使用原单岗清空命令。"
+  },
+  "testedVersion": "2cbd575d75561893ebeaff61ad8ae731629cd871b130cdc0c03b6d5cf1a2f919",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "同一 H06 依次切换短、长、空备注。改前定位失败，修后通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-25-clear-person-red.txt",
+          "summary": "有岗位备注时，旧岗位列仍显示清除键，断言失败。",
+          "sha256": "55c6daa72c6b3017001ea5b9f81d03b101e5cab79fe20077f5db07527e74a68c"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-25-clear-person-tests.txt",
+          "summary": "排班页、历史临时岗、清除命令共32项测试通过。",
+          "sha256": "8aad0db95cb67329f4eafe3d57fdef238a7dad8a6b1593c57fc5057720718914"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "姓名行右端有且仅有一个清除键。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-25-clear-person-tests.txt",
+          "summary": "排班页、历史临时岗、清除命令共32项测试通过。",
+          "sha256": "8aad0db95cb67329f4eafe3d57fdef238a7dad8a6b1593c57fc5057720718914"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "临时岗位删除与清除并列，清除后可以填写人员并保存历史。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-25-clear-person-tests.txt",
+          "summary": "排班页、历史临时岗、清除命令共32项测试通过。",
+          "sha256": "8aad0db95cb67329f4eafe3d57fdef238a7dad8a6b1593c57fc5057720718914"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "not_applicable",
+      "reason": "纯页面布局没有后置排班流程。",
+      "evidence": []
+    },
+    "finalGuard": {
+      "status": "not_applicable",
+      "reason": "沿用单格清空命令，没有新的规则输入。",
+      "evidence": []
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "岗位与备注仍各占一行；原单格和整表清除测试通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-25-clear-person-tests.txt",
+          "summary": "排班页、历史临时岗、清除命令共32项测试通过。",
+          "sha256": "8aad0db95cb67329f4eafe3d57fdef238a7dad8a6b1593c57fc5057720718914"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "真实页面视觉效果待现场核对。",
+      "evidence": []
+    }
+  },
+  "answers": {
+    "originalFailure": "有岗位备注时，旧岗位列仍显示清除键，断言失败。",
+    "laterChanges": "临时岗位删除与清除并列，清除后可以填写人员并保存历史。",
+    "finalArtifact": "排班页、历史临时岗、清除命令共32项测试通过。 现场待核对。"
+  },
+  "review": {
+    "missedScope": "未现场核对不同屏宽下的控件尺寸。",
+    "rootCause": "清除键此前按岗位备注有无在两列之间切换。",
+    "earlyDetection": "同一岗位依次设置短、长、空备注，逐次检查清除键的唯一性和位置，再实际清除临时岗人员。"
+  }
+}

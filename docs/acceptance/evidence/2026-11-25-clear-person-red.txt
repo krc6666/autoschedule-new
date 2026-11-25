@@ -1,0 +1,54 @@
+RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+npx.cmd : stderr | tests/ui/schedule-view.test.ts
+所在位置 行:2 字符: 1
++ npx.cmd vitest run tests/ui/schedule-view.test.ts -t "keeps vacant pe ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (stderr | tests/ui/schedule-view.test.ts:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+
+ ❯ tests/ui/schedule-view.test.ts (25 tests | 1 failed | 24 skipped) 126ms
+     × keeps vacant person cells free of explanations and usable for manual filling 124ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/ui/schedule-view.test.ts > schedule page > keeps vacant person cells free of explanations and usable for m
+anual filling
+AssertionError: expected <button …(4)><i …(1)></i></button> to be null
+
+- Expected:
+null
+
++ Received:
+<button
+  aria-label="清空人员"
+  class="btn btn-sm btn-light icon-btn position-action"
+  title="清空人员"
+  type="button"
+>
+
+
+  <i
+    class="bi bi-eraser"
+  />
+
+
+</button>
+
+ ❯ tests/ui/schedule-view.test.ts:140:61
+    138|         ).toBe(note);
+    139|       }
+    140|       expect(position.querySelector('[aria-label="清空人员"]')).toBeNull();
+       |                                                             ^
+    141|       expect(cell.querySelectorAll('[aria-label="清空人员"]')).toHaveLengt…
+    142|       expect(
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 24 skipped (25)
+   Start at  13:30:28
+   Duration  2.55s (transform 1.55s, setup 0ms, import 1.83s, tests 126ms, environment 372ms)

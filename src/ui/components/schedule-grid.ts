@@ -212,15 +212,6 @@ export class ScheduleGridElement extends LightDomElement {
       .filter(Boolean)
       .join(" ");
     const remark = visiblePositionRemark(assignment.remark);
-    const clearPerson = html`<button
-      class="btn btn-sm btn-light icon-btn position-action"
-      type="button"
-      title="清空人员"
-      aria-label="清空人员"
-      @click=${() => dispatchUiCommand(this, { type: "assign-staff", assignmentId: assignment.id, staffId: "" })}
-    >
-      <i class="bi bi-eraser"></i>
-    </button>`;
     return [
       html`<td class="schedule-grid-slot schedule-position-slot">
         <article class="schedule-cell schedule-position-cell ${stateClasses}">
@@ -259,7 +250,6 @@ export class ScheduleGridElement extends LightDomElement {
             remark
               ? html`<div class="position-remark-row">
                   <span class="position-remark" title=${remark}>${remark}</span>
-                  ${clearPerson}
                 </div>`
               : null
           }
@@ -274,85 +264,91 @@ export class ScheduleGridElement extends LightDomElement {
           @drop=${(event: DragEvent) => this.drop(event, assignment.id)}
           @pointerenter=${() => this.pointerTarget(assignment.id)}
         >
-          <div
-            class="schedule-person-edit"
-            draggable=${String(Boolean(assignment.staffId))}
-            title=${assignment.staffId ? "按住姓名可拖动调整岗位" : ""}
-            @dragstart=${(event: DragEvent) => this.dragAssignment(event, assignment)}
-            @pointerdown=${() => this.pointerSource(assignment)}
-          >
-            ${assignment.staffId ? html`<i class="bi bi-grip-vertical assignment-drag-handle" aria-hidden="true"></i>` : null}
-            <button
-              type="button"
-              class="schedule-candidate-trigger legacy-hidden-trigger"
-              title="查看当前合格空闲人员"
-              aria-label="查看${assignment.position}当前合格空闲人员"
-              data-candidate-assignment-id=${assignment.id}
-              @pointerdown=${(event: Event) => event.stopPropagation()}
-              @click=${() => this.toggleCandidates(assignment.id)}
+          <div class="schedule-name-row">
+            <div
+              class="schedule-person-edit"
+              draggable=${String(Boolean(assignment.staffId))}
+              title=${assignment.staffId ? "按住姓名可拖动调整岗位" : ""}
+              @dragstart=${(event: DragEvent) => this.dragAssignment(event, assignment)}
+              @pointerdown=${() => this.pointerSource(assignment)}
             >
-              <i class="bi bi-person-plus" aria-hidden="true"></i>
-            </button>
-            ${
-              manualWarning
-                ? html`<i
-                    class="bi bi-exclamation-triangle-fill schedule-manual-warning-icon"
-                    title=${
+              ${assignment.staffId ? html`<i class="bi bi-grip-vertical assignment-drag-handle" aria-hidden="true"></i>` : null}
+              <button
+                type="button"
+                class="schedule-candidate-trigger legacy-hidden-trigger"
+                title="查看当前合格空闲人员"
+                aria-label="查看${assignment.position}当前合格空闲人员"
+                data-candidate-assignment-id=${assignment.id}
+                @pointerdown=${(event: Event) => event.stopPropagation()}
+                @click=${() => this.toggleCandidates(assignment.id)}
+              >
+                <i class="bi bi-person-plus" aria-hidden="true"></i>
+              </button>
+              ${
+                manualWarning
+                  ? html`<i
+                      class="bi bi-exclamation-triangle-fill schedule-manual-warning-icon"
+                      title=${
                       assignment.manualOverrideWarnings
                         ?.map((item) => item.message)
                         .join("；") ?? "人工调整提醒"
                     }
-                    aria-label="人工调整提醒"
-                  ></i>`
-                : warning
-                  ? html`<button
-                      class="schedule-soft-warning-button"
-                      type="button"
-                      title=${`${warning.message}\n点击查看与他人轮换`}
-                      aria-label="分析这个岗位的调换方案"
-                      @click=${() =>
+                      aria-label="人工调整提醒"
+                    ></i>`
+                  : warning
+                    ? html`<button
+                        class="schedule-soft-warning-button"
+                        type="button"
+                        title=${`${warning.message}\n点击查看与他人轮换`}
+                        aria-label="分析这个岗位的调换方案"
+                        @click=${() =>
                         dispatchUiCommand(this, {
                           type: "open-swap-analysis",
                           assignmentId: assignment.id,
                         })}
+                      >
+                        <i
+                          class="bi bi-exclamation-triangle-fill schedule-soft-warning-icon"
+                          title=${warning.message}
+                          aria-hidden="true"
+                        ></i>
+                      </button>`
+                    : null
+              }
+              <input
+                class="schedule-name-input"
+                list=${guide ? guideListId : auxiliary ? "" : "schedule-staff-names"}
+                .value=${assignment.staffName}
+                placeholder=${ke166Unfilled ? "KE166机动督导未安排" : ""}
+                aria-label="${assignment.position}人员"
+                @change=${(event: Event) => this.updateAssignment(assignment.id, "staffName", event)}
+              />
+            </div>
+            <div class="person-row-actions">
+              ${
+                temporary
+                  ? html`<button
+                      class="btn btn-sm btn-light icon-btn"
+                      type="button"
+                      title="删除本次临时岗位"
+                      aria-label="删除本次临时岗位"
+                      @click=${() => dispatchUiCommand(this, { type: "delete-temporary-assignment", id: assignment.id })}
                     >
-                      <i
-                        class="bi bi-exclamation-triangle-fill schedule-soft-warning-icon"
-                        title=${warning.message}
-                        aria-hidden="true"
-                      ></i>
+                      <i class="bi bi-x-lg"></i>
                     </button>`
                   : null
-            }
-            <input
-              class="schedule-name-input"
-              list=${guide ? guideListId : auxiliary ? "" : "schedule-staff-names"}
-              .value=${assignment.staffName}
-              placeholder=${ke166Unfilled ? "KE166机动督导未安排" : ""}
-              aria-label="${assignment.position}人员"
-              @change=${(event: Event) => this.updateAssignment(assignment.id, "staffName", event)}
-            />
+              }
+              <button
+                class="btn btn-sm btn-light icon-btn"
+                type="button"
+                title="清空人员"
+                aria-label="清空人员"
+                @click=${() => dispatchUiCommand(this, { type: "assign-staff", assignmentId: assignment.id, staffId: "" })}
+              >
+                <i class="bi bi-eraser"></i>
+              </button>
+            </div>
           </div>
-          ${
-            !remark || temporary
-              ? html`<div class="schedule-cell-actions person-row-actions">
-                  ${!remark ? clearPerson : null}
-                  ${
-                    temporary
-                      ? html`<button
-                          class="btn btn-sm btn-light icon-btn"
-                          type="button"
-                          title="删除本次临时岗位"
-                          aria-label="删除本次临时岗位"
-                          @click=${() => dispatchUiCommand(this, { type: "delete-temporary-assignment", id: assignment.id })}
-                        >
-                          <i class="bi bi-x-lg"></i>
-                        </button>`
-                      : null
-                  }
-                </div>`
-              : null
-          }
           <input
             class="schedule-manual-remark"
             .value=${assignment.manualRemark}

@@ -60,6 +60,18 @@ it("restores a bottom temporary slot, changes its person in the mounted form, sa
   expect(temporary.layoutGroup).toBe("bottom");
   const row = label!.closest("tr")!;
   const input = row.querySelector<HTMLInputElement>(".schedule-name-input")!;
+  const controls = input
+    .closest(".schedule-name-row")!
+    .querySelectorAll("button.icon-btn");
+  expect(
+    [...controls].map((button) => button.getAttribute("aria-label"))
+  ).toEqual(["删除本次临时岗位", "清空人员"]);
+  (controls[1] as HTMLButtonElement).click();
+  await settleLit();
+  expect(
+    store.getState().model.assignments.find((a) => a.id === temporary.id)
+      ?.staffName
+  ).toBe("");
   input.value = state.staff[0]!.name;
   input.dispatchEvent(new Event("change", { bubbles: true }));
   await settleLit();

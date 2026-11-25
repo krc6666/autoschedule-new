@@ -136,8 +136,14 @@ describe("schedule page", () => {
         expect(
           row?.querySelector(".position-remark")?.getAttribute("title")
         ).toBe(note);
-        expect(row?.querySelector('[aria-label="清空人员"]')).toBeTruthy();
       }
+      expect(position.querySelector('[aria-label="清空人员"]')).toBeNull();
+      expect(cell.querySelectorAll('[aria-label="清空人员"]')).toHaveLength(1);
+      expect(
+        cell
+          .querySelector(".schedule-name-row .person-row-actions > :last-child")
+          ?.getAttribute("aria-label")
+      ).toBe("清空人员");
     }
     expect(cell.querySelector("details")).toBeNull();
     expect(cell.textContent).not.toContain("上一班做了需要休息保护的晚班岗位");
