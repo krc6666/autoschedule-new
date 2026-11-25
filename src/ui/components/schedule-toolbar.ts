@@ -60,11 +60,9 @@ export class ScheduleToolbarElement extends LightDomElement {
                 "btn-outline-primary"
               )
         }
-        ${this.command("calendar2-plus", "归档并排后天", "archive-next-duty-day", "btn-success")}
+        ${this.historyEditDate === this.date ? null : this.command("calendar2-plus", "归档并排后天", "archive-next-duty-day", "btn-success")}
         ${this.command("file-earmark-excel", "导出结果", "export-schedule", "btn-outline-success")}
-        ${this.iconCommand("filetype-html", "导出 HTML", "export-share-html")}
-        ${this.iconCommand("file-earmark-image", "导出图片", "export-share-png")}
-        ${this.command("archive", "仅归档", "archive-schedule", "btn-outline-secondary")}
+        ${this.historyEditDate === this.date ? null : this.command("archive", "仅归档", "archive-schedule", "btn-outline-secondary")}
         ${this.previousScheduleCommand()}
         ${this.iconCommand("x-circle", "清空全部人员", "clear-schedule", "btn-outline-danger")}
       </div>
@@ -146,7 +144,7 @@ export class ScheduleToolbarElement extends LightDomElement {
   private iconCommand(
     icon: string,
     label: string,
-    type: "export-share-html" | "export-share-png" | "clear-schedule",
+    type: "clear-schedule",
     style = "btn-outline-primary"
   ) {
     return html`<button

@@ -18,6 +18,43 @@ import "../../src/ui/components/schedule-page";
 import { mountElement, settleLit } from "./lit-test-helpers";
 
 describe("schedule page", () => {
+  it.each([false, true])(
+    "shows the confirmed toolbar actions during history edit=%s",
+    async (historyEdit) => {
+      const element = await mountElement<
+        HTMLElement & { updateComplete: Promise<unknown> }
+      >("autoschedule-schedule-toolbar", {
+        model: createDefaultState(),
+        date: "2026-11-30",
+        historyEditDate: historyEdit ? "2026-11-30" : null,
+      });
+      const buttons = [
+        ...element.querySelectorAll<HTMLButtonElement>("button"),
+      ];
+      const button = (label: string) =>
+        buttons.find((item) => item.textContent?.trim() === label);
+      expect(element.querySelector('[aria-label="导出 HTML"]')).toBeNull();
+      expect(element.querySelector('[aria-label="导出图片"]')).toBeNull();
+      expect(Boolean(button("仅归档"))).toBe(!historyEdit);
+      expect(Boolean(button("归档并排后天"))).toBe(!historyEdit);
+      expect(Boolean(button("保存并更新历史"))).toBe(historyEdit);
+      expect(Boolean(button("取消编辑"))).toBe(historyEdit);
+      expect(
+        element.querySelector('[aria-label="清空全部人员"]')
+      ).not.toBeNull();
+      const commands: UiCommandEvent["detail"][] = [];
+      element.addEventListener(UI_COMMAND_EVENT, (event) => {
+        commands.push((event as UiCommandEvent).detail);
+      });
+      button("导出结果")?.click();
+      button("重新排班")?.click();
+      expect(commands).toEqual([
+        { type: "export-schedule" },
+        { type: "open-reschedule-flight-picker" },
+      ]);
+    }
+  );
+
   it("keeps the two display controls separate and collapsed by default", async () => {
     const state = createDefaultState();
     const commands: UiCommandEvent["detail"][] = [];
@@ -1502,14 +1539,7 @@ describe("schedule page", () => {
       "仅归档",
       "是否启用行政支援模式",
     ].forEach((label) => expect(text).toContain(label));
-    [
-      "导出 HTML",
-      "导出图片",
-      "清空全部人员",
-      "缩小排班表",
-      "恢复 100%",
-      "放大排班表",
-    ].forEach((label) =>
+    ["清空全部人员", "缩小排班表", "恢复 100%", "放大排班表"].forEach((label) =>
       expect(element.querySelector(`[aria-label="${label}"]`)).not.toBeNull()
     );
     expect(element.querySelectorAll('th[colspan="2"]')).toHaveLength(

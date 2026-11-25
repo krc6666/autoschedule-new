@@ -1,0 +1,55 @@
+RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+npm.cmd : stderr | tests/ui/schedule-view.test.ts
+所在位置 行:10 字符: 1
++ npm.cmd exec vitest -- run tests/ui/schedule-view.test.ts -t 'confirm ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (stderr | tests/ui/schedule-view.test.ts:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+
+ ❯ tests/ui/schedule-view.test.ts (27 tests | 2 failed | 25 skipped) 56ms
+     × shows the confirmed toolbar actions during history edit=false 41ms
+     × shows the confirmed toolbar actions during history edit=true 13ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/ui/schedule-view.test.ts > schedule page > shows the confirmed toolbar actions during history edit=false
+ FAIL  tests/ui/schedule-view.test.ts > schedule page > shows the confirmed toolbar actions during history edit=true
+AssertionError: expected <button type="button" …(3)>…(1)</button> to be null
+
+- Expected:
+null
+
++ Received:
+<button
+  aria-label="导出 HTML"
+  class="btn btn-sm btn-outline-primary icon-btn"
+  title="导出 HTML"
+  type="button"
+>
+
+
+  <i
+    class="bi bi-filetype-html"
+  />
+
+
+</button>
+
+ ❯ tests/ui/schedule-view.test.ts:32:61
+     30|     const button = (label: string) =>
+     31|       buttons.find((item) => item.textContent?.trim() === label);
+     32|     expect(element.querySelector('[aria-label="导出 HTML"]')).toBeNull();
+       |                                                             ^
+     33|     expect(element.querySelector('[aria-label="导出图片"]')).toBeNull();
+     34|     expect(Boolean(button("仅归档"))).toBe(!historyEdit);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 25 skipped (27)
+   Start at  20:00:02
+   Duration  2.65s (transform 1.56s, setup 0ms, import 1.84s, tests 56ms, environment 423ms)

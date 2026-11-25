@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-25-schedule-toolbar-actions",
+  "title": "精简当天及历史编辑排班工具栏",
+  "startedFrom": "e38a630c1f981f6b7e79bff031050e700d90e6ec",
+  "expectation": {
+    "example": "当天排班及从历史进入 11 月 30 日编辑",
+    "expected": "两者移除 HTML/图片；历史编辑另隐藏仅归档/归档并排后天",
+    "unchanged": "当天归档、历史保存取消、重新排班、Excel 导出及其他工具保留",
+    "fallback": "仅调整按钮投影，失败回退本次界面修改，不写排班数据"
+  },
+  "testedVersion": "374b6c575023c9d8c71fc6ceba683c65ba9a105f51dc39fa1144c8797addda3b",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "确认目标按钮集合在原组件中失败，改后通过",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-25-toolbar-red.txt",
+          "summary": "两种模式的按钮集合修改前失败",
+          "sha256": "f646bd6fe0dbfa1958c40a6cc612c836ce6d35e58c0a4630fa3f331d683b2f4b"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-25-toolbar-tests.txt",
+          "summary": "86 项相关 UI/应用测试通过",
+          "sha256": "4dd1e7f006323a1e0d5cb6877762ae701b91f09bc94c472d619ec01c95398cee"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-25-toolbar-typecheck.txt",
+          "summary": "类型检查退出 0",
+          "sha256": "9b14ca2df96beab1aa8ce6fec998cfc0efa58c04c040c828dc69c1f043e4ea0d"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "当天保留两种归档、Excel 与重新排班命令",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-25-toolbar-tests.txt",
+          "summary": "86 项相关 UI/应用测试通过",
+          "sha256": "4dd1e7f006323a1e0d5cb6877762ae701b91f09bc94c472d619ec01c95398cee"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-25-toolbar-typecheck.txt",
+          "summary": "类型检查退出 0",
+          "sha256": "9b14ca2df96beab1aa8ce6fec998cfc0efa58c04c040c828dc69c1f043e4ea0d"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "历史编辑保留保存取消，隐藏两种归档",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-25-toolbar-tests.txt",
+          "summary": "86 项相关 UI/应用测试通过",
+          "sha256": "4dd1e7f006323a1e0d5cb6877762ae701b91f09bc94c472d619ec01c95398cee"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-25-toolbar-typecheck.txt",
+          "summary": "类型检查退出 0",
+          "sha256": "9b14ca2df96beab1aa8ce6fec998cfc0efa58c04c040c828dc69c1f043e4ea0d"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "not_applicable",
+      "reason": "仅改变一个 UI 组件的按钮投影，不修改领域数据或写入路径",
+      "evidence": []
+    },
+    "finalGuard": {
+      "status": "not_applicable",
+      "reason": "仅改变一个 UI 组件的按钮投影，不修改领域数据或写入路径",
+      "evidence": []
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "排班、历史同步与应用协调器 86 项通过",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-25-toolbar-tests.txt",
+          "summary": "86 项相关 UI/应用测试通过",
+          "sha256": "4dd1e7f006323a1e0d5cb6877762ae701b91f09bc94c472d619ec01c95398cee"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-25-toolbar-typecheck.txt",
+          "summary": "类型检查退出 0",
+          "sha256": "9b14ca2df96beab1aa8ce6fec998cfc0efa58c04c040c828dc69c1f043e4ea0d"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "真实页面待 owner 核对，自动渲染与命令验证通过",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-25-toolbar-tests.txt",
+          "summary": "86 项相关 UI/应用测试通过",
+          "sha256": "4dd1e7f006323a1e0d5cb6877762ae701b91f09bc94c472d619ec01c95398cee"
+        }
+      ]
+    }
+  },
+  "answers": {
+    "originalFailure": "红灯日志确认原组件多出 HTML/图片入口；修改后两个模式均通过。",
+    "laterChanges": "历史编辑状态从同一页面传入同一工具栏；状态分支及原历史同步测试通过。",
+    "finalArtifact": "自动组件入口证明按钮集合与命令，真实页面待验收。"
+  },
+  "review": {
+    "missedScope": "两种状态的目标按钮及周边历史保存同步已测试，真实页面未验收。",
+    "rootCause": "共享工具栏没有对历史编辑隐藏归档入口，同时保留了用户不需要的两种导出入口。",
+    "earlyDetection": "修改共享工具栏时用当天/历史编辑两种状态检查按钮集合及保留操作。"
+  }
+}
