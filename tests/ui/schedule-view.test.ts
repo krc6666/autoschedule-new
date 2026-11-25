@@ -9,6 +9,7 @@ import type { Assignment, PositionRule } from "../../src/model";
 import { generateSchedule } from "../helpers/generate-schedule";
 import { schedulingDecision } from "../../src/domain/rules/schedule-rule-contract";
 import { buildMonthlyRelaxedShiftStatistics } from "../../src/domain/statistics/relaxed-shift-statistics";
+import { buildSchedulePageModel } from "../../src/ui/projections/schedule-page-model";
 import {
   UI_COMMAND_EVENT,
   type UiCommandEvent,
@@ -17,6 +18,58 @@ import "../../src/ui/components/schedule-page";
 import { mountElement, settleLit } from "./lit-test-helpers";
 
 describe("schedule page", () => {
+  it("keeps the two display controls separate and collapsed by default", async () => {
+    const state = createDefaultState();
+    const commands: UiCommandEvent["detail"][] = [];
+    const element = await mountElement<
+      HTMLElement & { updateComplete: Promise<unknown> }
+    >("autoschedule-schedule-toolbar", {
+      model: state,
+      date: "2026-10-15",
+      zoom: 1.2,
+      cellSize: 0.9,
+    });
+    element.addEventListener(UI_COMMAND_EVENT, (event) => {
+      commands.push((event as UiCommandEvent).detail);
+    });
+
+    const settings = element.querySelector<HTMLDetailsElement>(
+      ".schedule-display-settings"
+    );
+    expect(settings?.open).toBe(false);
+    expect(element.textContent).toContain("表格缩放");
+    expect(element.textContent).toContain("格内大小");
+
+    element
+      .querySelector<HTMLButtonElement>('[aria-label="格内放大"]')
+      ?.click();
+    element
+      .querySelector<HTMLButtonElement>('[aria-label="放大排班表"]')
+      ?.click();
+
+    expect(commands).toContainEqual({
+      type: "set-schedule-cell-size",
+      value: 1,
+    });
+    expect(commands).toContainEqual({
+      type: "set-schedule-zoom",
+      value: 1.3,
+    });
+  });
+
+  it("compiles table and cell display sizes into separate style variables", () => {
+    const state = createDefaultState();
+    const view = buildSchedulePageModel(state, "2026-10-15", {
+      zoom: 1.4,
+      cellSize: 0.8,
+    });
+
+    expect(view.tableStyles["--schedule-column-width"]).toBe("89.6px");
+    expect(view.tableStyles["--schedule-position-size"]).toBe("13.4px");
+    expect(view.tableStyles["--schedule-small-size"]).toBe("14px");
+    expect(view.tableStyles["--schedule-cell-min-height"]).toBe("33.6px");
+  });
+
   it("keeps vacant person cells free of explanations and usable for manual filling", async () => {
     const state = createDefaultState();
     const flight = state.flights[0]!;
@@ -57,6 +110,35 @@ describe("schedule page", () => {
     const cell = element.querySelector(
       '.schedule-person-cell[data-assignment-id="vacancy-detail"]'
     )!;
+    const position = cell.closest("td")!.previousElementSibling!;
+    expect(
+      position.querySelector(".position-code-row .schedule-position-button")
+    ).toBeTruthy();
+    expect(
+      position.querySelector(".position-code-row .schedule-candidate-trigger")
+    ).toBeTruthy();
+    for (const note of ["申报", "申报及送资料", ""]) {
+      const grid = element.querySelector("autoschedule-schedule-grid")!;
+      grid.model = {
+        ...state,
+        assignments: [
+          { ...state.assignments[0]!, position: "H06", remark: note },
+        ],
+      };
+      grid.view = buildSchedulePageModel(grid.model, "2026-10-15", { zoom: 1 });
+      await grid.updateComplete;
+      expect(
+        position.querySelector(".schedule-position-button")?.textContent?.trim()
+      ).toBe("H06");
+      const row = position.querySelector(".position-remark-row");
+      expect(row !== null).toBe(Boolean(note));
+      if (note) {
+        expect(
+          row?.querySelector(".position-remark")?.getAttribute("title")
+        ).toBe(note);
+        expect(row?.querySelector('[aria-label="清空人员"]')).toBeTruthy();
+      }
+    }
     expect(cell.querySelector("details")).toBeNull();
     expect(cell.textContent).not.toContain("上一班做了需要休息保护的晚班岗位");
     expect(cell.classList.contains("is-unfilled")).toBe(true);

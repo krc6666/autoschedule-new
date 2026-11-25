@@ -212,45 +212,19 @@ export class ScheduleGridElement extends LightDomElement {
       .filter(Boolean)
       .join(" ");
     const remark = visiblePositionRemark(assignment.remark);
+    const clearPerson = html`<button
+      class="btn btn-sm btn-light icon-btn position-action"
+      type="button"
+      title="清空人员"
+      aria-label="清空人员"
+      @click=${() => dispatchUiCommand(this, { type: "assign-staff", assignmentId: assignment.id, staffId: "" })}
+    >
+      <i class="bi bi-eraser"></i>
+    </button>`;
     return [
       html`<td class="schedule-grid-slot schedule-position-slot">
         <article class="schedule-cell schedule-position-cell ${stateClasses}">
-          <div class="schedule-cell-actions schedule-position-actions">
-            <!-- candidate actions live in the position cell -->
-            <button
-              type="button"
-              class="schedule-candidate-trigger"
-              title="查看当前合格空闲人员"
-              aria-label="查看${assignment.position}当前合格空闲人员"
-              data-candidate-assignment-id=${assignment.id}
-              @click=${() => this.toggleCandidates(assignment.id)}
-            >
-              <i class="bi bi-person-plus" aria-hidden="true"></i>
-            </button>
-            <button
-              class="btn btn-sm btn-light icon-btn"
-              type="button"
-              title="清空人员"
-              aria-label="清空人员"
-              @click=${() => dispatchUiCommand(this, { type: "assign-staff", assignmentId: assignment.id, staffId: "" })}
-            >
-              <i class="bi bi-eraser"></i>
-            </button>
-            ${
-              temporary
-                ? html`<button
-                    class="btn btn-sm btn-light icon-btn"
-                    type="button"
-                    title="删除本次临时岗位"
-                    aria-label="删除本次临时岗位"
-                    @click=${() => dispatchUiCommand(this, { type: "delete-temporary-assignment", id: assignment.id })}
-                  >
-                    <i class="bi bi-x-lg"></i>
-                  </button>`
-                : null
-            }
-          </div>
-          <div class="schedule-position-content">
+          <div class="position-code-row">
             ${
               temporary
                 ? html`<input
@@ -262,7 +236,7 @@ export class ScheduleGridElement extends LightDomElement {
                 : html`<button
                     class="schedule-position schedule-position-button"
                     type="button"
-                    title="查看当前可用人员"
+                    title=${assignment.position + " · 查看可用人员"}
                     aria-label="查看${assignment.position}可用人员"
                     data-candidate-assignment-id=${assignment.id}
                     @click=${() => this.toggleCandidates(assignment.id)}
@@ -270,22 +244,22 @@ export class ScheduleGridElement extends LightDomElement {
                     ${guide ? html`<span class="guide-tag">引</span>` : administrative ? html`<span class="admin-support-tag">行</span>` : diversion ? html`<span class="diversion-tag">流</span>` : null}${assignment.position}
                   </button>`
             }
-            ${remark ? html`<span class="position-remark" title=${remark}>${remark}</span>` : null}
+            <button
+              type="button"
+              class="schedule-candidate-trigger icon-btn position-action"
+              title="查看当前合格空闲人员"
+              aria-label="查看${assignment.position}当前合格空闲人员"
+              data-candidate-assignment-id=${assignment.id}
+              @click=${() => this.toggleCandidates(assignment.id)}
+            >
+              <i class="bi bi-person-plus" aria-hidden="true"></i>
+            </button>
           </div>
           ${
-            temporary
-              ? html`<div
-                  class="schedule-cell-actions legacy-temporary-actions"
-                >
-                  <button
-                    class="btn btn-sm btn-light icon-btn"
-                    type="button"
-                    title="删除本次临时岗位"
-                    aria-label="删除本次临时岗位"
-                    @click=${() => dispatchUiCommand(this, { type: "delete-temporary-assignment", id: assignment.id })}
-                  >
-                    <i class="bi bi-x-lg"></i>
-                  </button>
+            remark
+              ? html`<div class="position-remark-row">
+                  <span class="position-remark" title=${remark}>${remark}</span>
+                  ${clearPerson}
                 </div>`
               : null
           }
@@ -359,17 +333,26 @@ export class ScheduleGridElement extends LightDomElement {
               @change=${(event: Event) => this.updateAssignment(assignment.id, "staffName", event)}
             />
           </div>
-          <div class="schedule-cell-actions legacy-person-actions">
-            <button
-              class="btn btn-sm btn-light icon-btn"
-              type="button"
-              title="清空人员"
-              aria-label="清空人员"
-              @click=${() => dispatchUiCommand(this, { type: "assign-staff", assignmentId: assignment.id, staffId: "" })}
-            >
-              <i class="bi bi-eraser"></i>
-            </button>
-          </div>
+          ${
+            !remark || temporary
+              ? html`<div class="schedule-cell-actions person-row-actions">
+                  ${!remark ? clearPerson : null}
+                  ${
+                    temporary
+                      ? html`<button
+                          class="btn btn-sm btn-light icon-btn"
+                          type="button"
+                          title="删除本次临时岗位"
+                          aria-label="删除本次临时岗位"
+                          @click=${() => dispatchUiCommand(this, { type: "delete-temporary-assignment", id: assignment.id })}
+                        >
+                          <i class="bi bi-x-lg"></i>
+                        </button>`
+                      : null
+                  }
+                </div>`
+              : null
+          }
           <input
             class="schedule-manual-remark"
             .value=${assignment.manualRemark}

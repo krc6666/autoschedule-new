@@ -31,6 +31,7 @@ export class SchedulePageElement extends LightDomElement {
     model: { attribute: false },
     date: { type: String },
     zoom: { type: Number },
+    cellSize: { type: Number },
     halfRestStaffIds: { attribute: false },
     halfRestModes: { attribute: false },
     historyEditDate: { attribute: false },
@@ -40,6 +41,7 @@ export class SchedulePageElement extends LightDomElement {
   model!: AppState;
   date = "";
   zoom = 1;
+  cellSize = 1;
   halfRestStaffIds: string[] = [];
   halfRestModes: Record<string, HalfRestMode> = {};
   historyEditDate: string | null = null;
@@ -108,6 +110,7 @@ export class SchedulePageElement extends LightDomElement {
     }
     const view = buildSchedulePageModel(this.model, this.date, {
       zoom: this.zoom,
+      cellSize: this.cellSize,
       halfRestStaffIds: this.halfRestStaffIds,
     });
     const previousSchedule = buildPreviousArchivedScheduleView(
@@ -119,6 +122,7 @@ export class SchedulePageElement extends LightDomElement {
         .model=${this.model}
         .date=${this.date}
         .zoom=${view.zoom}
+        .cellSize=${view.cellSize}
         .previousScheduleDate=${previousSchedule?.date ?? ""}
         .previousScheduleVisible=${this.previousScheduleVisible}
         .halfRestStaffIds=${this.halfRestStaffIds}

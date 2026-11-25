@@ -11,6 +11,7 @@ export class ScheduleToolbarElement extends LightDomElement {
     model: { attribute: false },
     date: { type: String },
     zoom: { type: Number },
+    cellSize: { type: Number },
     previousScheduleDate: { type: String },
     previousScheduleVisible: { type: Boolean },
     halfRestStaffIds: { attribute: false },
@@ -20,6 +21,7 @@ export class ScheduleToolbarElement extends LightDomElement {
   model!: AppState;
   date = "";
   zoom = 1;
+  cellSize = 1;
   previousScheduleDate = "";
   previousScheduleVisible = false;
   halfRestStaffIds: string[] = [];
@@ -72,14 +74,37 @@ export class ScheduleToolbarElement extends LightDomElement {
           .selectedStaffIds=${this.halfRestStaffIds}
           .selectedModes=${this.halfRestModes}
         ></autoschedule-half-rest-selector>
-        <div class="schedule-zoom-control" role="group" aria-label="排班表缩放">
-          ${this.zoomButton("zoom-out", "缩小排班表", this.zoom - 0.1, this.zoom <= 0.7)}
-          <output aria-label="当前排班表比例"
-            >${Math.round(this.zoom * 100)}%</output
-          >
-          ${this.zoomButton("arrow-counterclockwise", "恢复 100%", 1, false)}
-          ${this.zoomButton("zoom-in", "放大排班表", this.zoom + 0.1, this.zoom >= 1.6)}
-        </div>
+        <details class="schedule-display-settings">
+          <summary class="btn btn-sm btn-outline-secondary">显示</summary>
+          <div class="schedule-display-settings-body">
+            <div
+              class="schedule-size-control"
+              role="group"
+              aria-label="表格缩放"
+            >
+              <span>表格缩放</span>
+              ${this.zoomButton("zoom-out", "缩小排班表", this.zoom - 0.1, this.zoom <= 0.7)}
+              <output aria-label="当前表格比例"
+                >${Math.round(this.zoom * 100)}%</output
+              >
+              ${this.zoomButton("arrow-counterclockwise", "恢复 100%", 1, false)}
+              ${this.zoomButton("zoom-in", "放大排班表", this.zoom + 0.1, this.zoom >= 1.6)}
+            </div>
+            <div
+              class="schedule-size-control"
+              role="group"
+              aria-label="格内大小"
+            >
+              <span>格内大小</span>
+              ${this.cellSizeButton("dash", "格内缩小", this.cellSize - 0.1, this.cellSize <= 0.8)}
+              <output aria-label="当前格内大小"
+                >${Math.round(this.cellSize * 100)}%</output
+              >
+              ${this.cellSizeButton("arrow-counterclockwise", "格内恢复100%", 1, false)}
+              ${this.cellSizeButton("plus", "格内放大", this.cellSize + 0.1, this.cellSize >= 1.3)}
+            </div>
+          </div>
+        </details>
         <label
           class="form-check form-switch admin-support-switch"
           title="切换后会按当前模式重新排班"
@@ -166,6 +191,24 @@ export class ScheduleToolbarElement extends LightDomElement {
       aria-label=${label}
       ?disabled=${disabled}
       @click=${() => dispatchUiCommand(this, { type: "set-schedule-zoom", value })}
+    >
+      <i class="bi bi-${icon}"></i>
+    </button>`;
+  }
+
+  private cellSizeButton(
+    icon: string,
+    label: string,
+    value: number,
+    disabled: boolean
+  ) {
+    return html`<button
+      class="btn btn-sm icon-btn"
+      type="button"
+      title=${label}
+      aria-label=${label}
+      ?disabled=${disabled}
+      @click=${() => dispatchUiCommand(this, { type: "set-schedule-cell-size", value })}
     >
       <i class="bi bi-${icon}"></i>
     </button>`;

@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "taskId": "2026-11-25-schedule-display-settings",
+  "title": "排班页独立显示设置",
+  "startedFrom": "55ac2c2b95b3ca0b0203d86d63bb5e747e51bea8",
+  "expectation": {
+    "example": "进入当天排班页，打开默认收起的“显示”区域，分别点击“表格缩放”和“格内大小”的加减按钮。 H06 和申报应各占一行，分别与加人和清除对齐。",
+    "expected": "表格缩放只改变整张排班表的列宽、标题和整体尺寸；格内大小只改变岗位名、人员姓名和单元格紧凑程度。空备注不占额外行，有备注时紧凑显示。两项可分别保存并在刷新后恢复。",
+    "unchanged": "排班数据、岗位规则、人员安排、备注内容、历史记录、导出数据和现有表格缩放范围保持不变。显示区域默认收起且不遮挡排班表。",
+    "fallback": "缺少旧显示偏好时使用100%默认值；达到上下限时对应按钮禁用；本地保存失败时当前页面继续使用新值并保留原表格与业务状态。"
+  },
+  "testedVersion": "2f0fd57f7a7d24d0fc50a84930a6b8b824a2181204bdb3f9d340681dd71fa8e1",
+  "checks": {
+    "reproduction": {
+      "status": "verified",
+      "reason": "截图里岗位号断行，旧页面缺少与编号同行的加人操作。新结构通过短、长及空备注检查。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-25-position-lines-red.txt",
+          "summary": "旧页面在岗位行与加人按钮的同一行检查失败。",
+          "sha256": "429318986bbcf7074951bfb7ddec6ed210e0aef4e4115b91baf946d69a94892b"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-25-position-lines-tests.txt",
+          "summary": "排班页、历史编辑和临时岗位的33项测试通过。",
+          "sha256": "d7ef6e8ae4af6e05010b799370964bd90bfca90e43842961dabd09df5fe70636"
+        }
+      ]
+    },
+    "normalPath": {
+      "status": "verified",
+      "reason": "类型检查、生产构建和定向测试通过，显示偏好分开读取和保存。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-25-schedule-display-settings-targeted.txt",
+          "summary": "定向功能测试退出0",
+          "sha256": "eb2f6113a86aac2032eb0f3cf026d5052b3033565d8d8cda22ec8f2deb6474fc"
+        },
+        {
+          "path": "docs/acceptance/evidence/2026-11-25-position-lines-tests.txt",
+          "summary": "排班页、历史编辑和临时岗位的33项测试通过。",
+          "sha256": "d7ef6e8ae4af6e05010b799370964bd90bfca90e43842961dabd09df5fe70636"
+        }
+      ]
+    },
+    "alternatePath": {
+      "status": "verified",
+      "reason": "空岗位备注省去备注行；已有岗位备注保留完整标题。历史编辑与临时岗位测试通过。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-25-position-lines-tests.txt",
+          "summary": "排班页、历史编辑和临时岗位的33项测试通过。",
+          "sha256": "d7ef6e8ae4af6e05010b799370964bd90bfca90e43842961dabd09df5fe70636"
+        }
+      ]
+    },
+    "postProcessing": {
+      "status": "not_applicable",
+      "reason": "显示设置不修改排班后置流程或业务结果。",
+      "evidence": []
+    },
+    "finalGuard": {
+      "status": "not_applicable",
+      "reason": "显示设置不写入 assignments，也不改变最终守卫。",
+      "evidence": []
+    },
+    "unchanged": {
+      "status": "verified",
+      "reason": "保留原表格缩放命令和标签，定向旧 UI 测试继续通过；排班数据、历史、Excel 与规则未接入新字段。",
+      "evidence": [
+        {
+          "path": "docs/acceptance/evidence/2026-11-25-schedule-display-settings-targeted.txt",
+          "summary": "旧排班页行为测试通过",
+          "sha256": "eb2f6113a86aac2032eb0f3cf026d5052b3033565d8d8cda22ec8f2deb6474fc"
+        }
+      ]
+    },
+    "finalArtifact": {
+      "status": "unverified",
+      "reason": "自动测试已完成，尚未取得 owner 在真实排班入口打开/调节/刷新后的页面证据。",
+      "evidence": []
+    }
+  },
+  "answers": {
+    "originalFailure": "截图确认 H06 折行，改前布局测试失败，改后通过。",
+    "laterChanges": "显示设置不进入排班求解、后置流程或业务存储，只有 UI 投影、偏好读取和工具栏命令会消费它们，定向测试覆盖这些消费者。",
+    "finalArtifact": "本地页面组件测试覆盖 H06/申报、长备注及空备注。Owner 现场验收待完成。"
+  },
+  "review": {
+    "missedScope": "未取得真实浏览器入口对不同字号、长岗位名和有备注单元格的现场截图，已通过 DOM 样式变量和定向渲染测试检查代码路径。",
+    "rootCause": "现有表格把整体宽度、字号和行高全部绑定到单一 zoom，备注输入框又固定保留高度，无法满足只放大格内内容的需求。 岗位内容还固定为操作按钮预留42px，挤窄了 H06 和备注。",
+    "earlyDetection": "改动前先列出显示偏好所有消费者并为整体缩放与格内大小各写一条独立 UI 命令测试，同时检查空备注和刷新后的本地存储值。"
+  }
+}

@@ -291,6 +291,7 @@ export type UiCommand =
     }
   | { type: "confirm-next-workday-flight-picker"; selectedIds: string[] }
   | { type: "set-schedule-zoom"; value: number }
+  | { type: "set-schedule-cell-size"; value: number }
   | { type: "clear-history" }
   | { type: "delete-history"; id: string }
   | { type: "edit-history-date"; date: string }

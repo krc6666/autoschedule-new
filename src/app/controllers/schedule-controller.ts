@@ -260,6 +260,12 @@ export class ScheduleController implements UiCommandController {
         this.context.updateView({ zoom });
         return true;
       }
+      case "set-schedule-cell-size": {
+        const cellSize = Math.min(1.3, Math.max(0.8, command.value));
+        this.context.preferences.saveScheduleCellSize?.(cellSize);
+        this.context.updateView({ cellSize });
+        return true;
+      }
       default:
         return false;
     }

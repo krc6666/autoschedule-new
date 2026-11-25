@@ -50,6 +50,7 @@ const COMMANDS_ALLOWED_DURING_SCHEDULE_RUN = new Set<UiCommand["type"]>([
   "close-dialog",
   "dismiss-toast",
   "set-schedule-zoom",
+  "set-schedule-cell-size",
   "stop-schedule-without-result",
   "stop-schedule-with-current-result",
 ]);
@@ -67,6 +68,7 @@ const COMMANDS_ALLOWED_DURING_HISTORY_EDIT = new Set<UiCommand["type"]>([
   "close-dialog",
   "dismiss-toast",
   "set-schedule-zoom",
+  "set-schedule-cell-size",
   "assign-staff",
   "update-assignment",
   "create-temporary-assignment",
@@ -114,10 +116,12 @@ function initialView(
   restoredScheduleNotice = false
 ): ApplicationViewState {
   const storedZoom = preferences.loadScheduleZoom();
+  const storedCellSize = preferences.loadScheduleCellSize?.();
   return {
     section: "overview",
     date: latestScheduleDate(model) ?? todayIso(),
     zoom: Math.min(1.6, Math.max(0.7, storedZoom || 1)),
+    cellSize: Math.min(1.3, Math.max(0.8, storedCellSize || 1)),
     halfRestStaffIds: [],
     halfRestModes: {},
     historyEditDate: null,

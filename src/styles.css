@@ -2253,11 +2253,12 @@ autoschedule-schedule-grid {
 .schedule-cell {
   position: relative;
   display: grid;
-  gap: 1px;
+  gap: var(--schedule-cell-content-gap, 1px);
   width: 100%;
-  min-height: var(--schedule-cell-height);
+  min-height: var(--schedule-cell-min-height, var(--schedule-cell-height));
   overflow: visible;
-  padding: 2px 3px;
+  padding: var(--schedule-cell-padding-y, 2px)
+    var(--schedule-cell-padding-x, 3px);
   border: 0;
   border-radius: 0;
   background: transparent;
@@ -2511,7 +2512,7 @@ autoschedule-schedule-grid {
 .schedule-person-edit {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 1px 2px;
   min-width: 0;
   touch-action: none;
@@ -2572,7 +2573,7 @@ autoschedule-schedule-grid {
   max-width: 100%;
   color: #176b48;
   font-weight: 650;
-  font-size: max(12px, calc(var(--schedule-small-size) + 2px));
+  font-size: var(--schedule-name-size);
 }
 .schedule-person-edit > .schedule-candidate-trigger,
 .schedule-person-cell > .schedule-cell-actions {
@@ -2621,7 +2622,9 @@ autoschedule-schedule-grid {
 .schedule-manual-remark {
   width: 100%;
   max-width: 100%;
-  height: 8px;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
   overflow: visible;
   color: #59636e;
   white-space: nowrap;
@@ -2631,11 +2634,15 @@ autoschedule-schedule-grid {
 }
 .schedule-cell:hover .schedule-manual-remark:placeholder-shown,
 .schedule-manual-remark:focus {
-  height: 19px;
+  height: var(--schedule-input-height, 19px);
+  opacity: 1;
+  pointer-events: auto;
   border-color: #d8dde3;
 }
 .schedule-manual-remark:not(:placeholder-shown) {
-  height: 19px;
+  height: var(--schedule-input-height, 19px);
+  opacity: 1;
+  pointer-events: auto;
   border-color: #d8dde3;
   background: #fafbfc;
 }
@@ -2666,12 +2673,44 @@ autoschedule-schedule-grid {
   opacity: 0;
   transition: opacity 0.1s ease;
 }
-.schedule-position-actions {
-  right: 2px;
+.position-code-row,
+.position-remark-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
+  min-width: 0;
+  container-type: inline-size;
 }
-.schedule-position-actions .schedule-candidate-trigger {
-  display: inline-grid;
+.position-code-row .schedule-position-button,
+.schedule-cell.is-guide .position-code-row .schedule-position,
+.position-remark-row .position-remark {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.position-code-row .schedule-position-button {
+  font-size: min(var(--schedule-position-size), 30cqi);
+}
+.position-code-row .position-action,
+.position-remark-row .position-action {
+  width: min(18px, 26cqi);
+  height: 1.15em;
+  padding: 0;
+  opacity: 0;
+}
+.schedule-cell:hover .position-action,
+.schedule-cell:focus-within .position-action {
+  opacity: 1;
+}
+.schedule-person-cell > .person-row-actions {
+  display: flex;
+}
+.schedule-position-cell:has(.position-code-row) {
+  grid-template-columns: minmax(0, 1fr);
+  align-content: center;
+}
+.schedule-person-edit .schedule-name-input {
+  flex: 1 1 0;
 }
 .schedule-cell:hover .schedule-cell-actions,
 .schedule-cell:focus-within .schedule-cell-actions {
@@ -2714,6 +2753,56 @@ autoschedule-schedule-grid {
   display: flex;
   align-items: center;
   gap: 12px;
+}
+.schedule-display-settings {
+  position: relative;
+}
+.schedule-display-settings > summary {
+  min-height: 31px;
+  padding: 5px 9px;
+  cursor: pointer;
+  list-style: none;
+}
+.schedule-display-settings > summary::-webkit-details-marker {
+  display: none;
+}
+.schedule-display-settings > summary::after {
+  content: "⌄";
+  margin-left: 5px;
+}
+.schedule-display-settings[open] > summary::after {
+  content: "⌃";
+}
+.schedule-display-settings-body {
+  display: grid;
+  gap: 5px;
+  margin-top: 4px;
+}
+.schedule-size-control {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  min-height: 29px;
+  white-space: nowrap;
+}
+.schedule-size-control > span {
+  min-width: 58px;
+  color: #4c5661;
+  font-size: 11px;
+  font-weight: 650;
+}
+.schedule-size-control .icon-btn {
+  width: 25px;
+  height: 25px;
+  padding: 0;
+  color: #59636e;
+}
+.schedule-size-control output {
+  min-width: 36px;
+  color: #4c5661;
+  font-size: 11px;
+  font-weight: 650;
+  text-align: center;
 }
 .half-rest-selector {
   position: relative;

@@ -13,6 +13,7 @@ import type { AppState, Assignment, Staff } from "../../model";
 
 export interface SchedulePageOptions {
   zoom: number;
+  cellSize?: number;
   halfRestStaffIds?: readonly string[];
 }
 
@@ -50,8 +51,10 @@ export function buildSchedulePageModel(
   options: SchedulePageOptions
 ) {
   const zoom = Math.min(1.6, Math.max(0.7, options.zoom));
+  const cellSize = Math.min(1.3, Math.max(0.8, options.cellSize ?? 1));
   const scaled = (value: number): string =>
     `${Number((value * zoom).toFixed(1))}px`;
+  const cellScaled = (value: number): string => scaled(value * cellSize);
   const flights = [...state.flights].sort((left, right) =>
     left.startTime.localeCompare(right.startTime)
   );
@@ -152,6 +155,7 @@ export function buildSchedulePageModel(
     ),
     zoom,
     zoomPercent: Math.round(zoom * 100),
+    cellSize,
     tableStyles: {
       "--flight-count": String(Math.max(1, flights.length)),
       "--schedule-column-width": scaled(64),
@@ -160,11 +164,16 @@ export function buildSchedulePageModel(
       "--schedule-header-height": scaled(50),
       "--schedule-cell-height": scaled(36),
       "--schedule-flight-size": scaled(14),
-      "--schedule-position-size": scaled(11),
+      "--schedule-position-size": cellScaled(12),
+      "--schedule-name-size": cellScaled(14),
       "--schedule-small-size": scaled(10),
       "--schedule-tiny-size": scaled(9),
-      "--schedule-input-height": scaled(19),
-      "--schedule-name-width": scaled(48),
+      "--schedule-input-height": cellScaled(19),
+      "--schedule-name-width": cellScaled(48),
+      "--schedule-cell-content-gap": cellScaled(1),
+      "--schedule-cell-padding-y": cellScaled(2),
+      "--schedule-cell-padding-x": cellScaled(3),
+      "--schedule-cell-min-height": cellScaled(30),
       "--schedule-divider-height": scaled(20),
     },
   };

@@ -208,6 +208,7 @@ export class AutoscheduleAppElement extends LightDomElement {
         .model=${this.model}
         .date=${this.view.date}
         .zoom=${this.view.zoom}
+        .cellSize=${this.view.cellSize ?? 1}
         .halfRestStaffIds=${this.view.halfRestStaffIds}
         .halfRestModes=${this.view.halfRestModes}
         .historyEditDate=${this.view.historyEditDate}

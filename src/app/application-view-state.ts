@@ -142,6 +142,7 @@ export interface ApplicationViewState {
   section: AppSection;
   date: string;
   zoom: number;
+  cellSize?: number;
   halfRestStaffIds: string[];
   halfRestModes: Record<string, HalfRestMode>;
   historyEditDate?: string | null;

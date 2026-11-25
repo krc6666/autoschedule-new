@@ -5,6 +5,8 @@ export interface ApplicationPreferences {
   saveScheduleDate(date: string): void;
   loadScheduleZoom(): number | null;
   saveScheduleZoom(zoom: number): void;
+  loadScheduleCellSize?(): number | null;
+  saveScheduleCellSize?(size: number): void;
   /** Optional for hosts without durable form preferences; session memory still works. */
   loadPreflightDrafts?(): PreflightDraft[];
   savePreflightDrafts?(drafts: PreflightDraft[]): void;

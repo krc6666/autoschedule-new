@@ -6,6 +6,7 @@ import {
 
 const SCHEDULE_DATE_KEY = "autoschedule.scheduleDate";
 const SCHEDULE_ZOOM_KEY = "autoschedule.scheduleZoom";
+const SCHEDULE_CELL_SIZE_KEY = "autoschedule.scheduleCellSize";
 
 export function createBrowserPreferences(
   storage: Pick<Storage, "getItem" | "setItem"> = localStorage
@@ -22,5 +23,11 @@ export function createBrowserPreferences(
     },
     saveScheduleZoom: (zoom) =>
       storage.setItem(SCHEDULE_ZOOM_KEY, String(zoom)),
+    loadScheduleCellSize: () => {
+      const value = Number(storage.getItem(SCHEDULE_CELL_SIZE_KEY));
+      return Number.isFinite(value) && value > 0 ? value : null;
+    },
+    saveScheduleCellSize: (size) =>
+      storage.setItem(SCHEDULE_CELL_SIZE_KEY, String(size)),
   };
 }

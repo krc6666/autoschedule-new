@@ -1,0 +1,41 @@
+RUN  v4.1.10 D:/autoschedule-migrate/autoschedule
+
+npx.cmd : stderr | tests/ui/schedule-view.test.ts
+所在位置 行:2 字符: 1
++ npx.cmd vitest run tests/ui/schedule-view.test.ts -t "keeps vacant pe ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (stderr | tests/ui/schedule-view.test.ts:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+
+ ❯ tests/ui/schedule-view.test.ts (25 tests | 1 failed | 24 skipped) 222ms
+     × keeps vacant person cells free of explanations and usable for manual filling 219ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/ui/schedule-view.test.ts > schedule page > keeps vacant person cells free of explanations and usable for m
+anual filling
+AssertionError: expected null to be truthy
+
+- Expected:
+true
+
++ Received:
+null
+
+ ❯ tests/ui/schedule-view.test.ts:113:84
+    111|     )!;
+    112|     const position = cell.closest("td")!.previousElementSibling!;
+    113|     expect(position.querySelector(".position-code-row .schedule-positi…
+       |                                                                                    ^
+    114|     expect(position.querySelector(".position-code-row .schedule-candid…
+    115|     for (const note of ["申报", "申报及送资料", ""]) {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 24 skipped (25)
+   Start at  12:37:21
+   Duration  4.25s (transform 2.56s, setup 0ms, import 3.00s, tests 222ms, environment 662ms)
